@@ -37,18 +37,11 @@ export class WebGLApplication extends BaseApplication {
         }
         // 从canvas元素中获得webgl上下文渲染对象，WebGL API都通过该上下文渲染对象进行调用
         if (need2D) {
-            const canvas: HTMLCanvasElement = document.createElement('canvas',) as HTMLCanvasElement;
-            canvas.width = this.canvas.width;
-            canvas.height = this.canvas.height;
-            canvas.style.backgroundColor = 'transparent';
-            canvas.style.position = 'absolute';
-            canvas.style.left = '0px';
-            canvas.style.top = '0px';
             const parent: HTMLElement | null = this.canvas.parentElement;
             if (!parent) throw new Error('canvas元素必须要有父亲!!');
-            parent.appendChild(canvas);
-            this.ctx2D = canvas.getContext('2d');
-            this.canvas2D = canvas;
+            this.ctx2D = this.canvas.getContext('2d');
+            parent.appendChild(this.canvas);
+            this.canvas2D = this.canvas;
         }
 
         this.matStack = new GLWorldMatrixStack();

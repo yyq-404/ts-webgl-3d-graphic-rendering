@@ -1,8 +1,11 @@
 import {Timer, TimerCallback} from "./Timer";
 
+/**
+ * 定时器管理器
+ */
 export class TimerManager {
     /** 定时器集合 */
-    public timers: Timer[] = [];
+    private timers: Timer[] = [];
     /** 定时器编号 */
     private _timeId: number = -1;
 
@@ -44,9 +47,8 @@ export class TimerManager {
         return false;
     }
 
-
     /**
-     * 处理定时器。
+     * 更新。
      * @param intervalSec
      * @private
      */

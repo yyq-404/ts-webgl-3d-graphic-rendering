@@ -1,5 +1,8 @@
 export type TimerCallback = (id: number, data: any) => void;
 
+/**
+ * 定时器
+ */
 export class Timer {
     /** 编号 */
     public id: number = -1;

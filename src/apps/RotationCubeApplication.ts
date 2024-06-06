@@ -37,13 +37,13 @@ export class RotatingCubeApplication extends CameraApplication {
     triTimerId: number; // 由于三角形使用键盘控制的更新方式，需要添加和删除操作，需要定时器id
     triMatrix: Matrix4; // 合成的三角形的世界矩阵
 
-    private _hitAxis: EAxisType; // 为了支持鼠标点选，记录选中的坐标轴的enum值
+    private readonly _hitAxis: EAxisType; // 为了支持鼠标点选，记录选中的坐标轴的enum值
 
     constructor(canvas: HTMLCanvasElement) {
         // 调用基类构造函数，最后一个参数为true，意味着我们要创建一个Canvas2D上下文渲染对象
         // 这样我们才能使用该上下文对象进行2D文字渲染
         super(canvas, {premultipliedAlpha: false}, true);
-        if(!this.gl){
+        if (!this.gl) {
             throw new Error('this.gl is not defined');
         }
         // 初始化角位移和角速度
@@ -92,11 +92,7 @@ export class RotatingCubeApplication extends CameraApplication {
             this.matStack.pushMatrix(); // 矩阵进栈
             this.matStack.rotate(this.cubeAngle, Vector3.up, false); // 以角度(非弧度)为单位，每帧旋转
             // 合成modelViewProjection矩阵
-            Matrix4.product(
-                this.camera.viewProjectionMatrix,
-                this.matStack.modelViewMatrix,
-                this.cubeMatrix,
-            );
+            Matrix4.product(this.camera.viewProjectionMatrix, this.matStack.modelViewMatrix, this.cubeMatrix);
             // 将合成的矩阵给GLProgram对象
             this.textureProgram.setMatrix4(GLProgram.MVPMatrix, this.cubeMatrix);
             this.cubeVAO.draw(); // 使用当前绑定的texture和program绘制cubeVao对象
@@ -111,7 +107,7 @@ export class RotatingCubeApplication extends CameraApplication {
     }
 
     private _renderTriangle(): void {
-        if(!this.gl){
+        if (!this.gl) {
             throw new Error('this.gl is not defined');
         }
         // 禁止渲染三角形时启用背面剔除功能
@@ -133,11 +129,7 @@ export class RotatingCubeApplication extends CameraApplication {
             this.builder.color(0, 1, 0).vertex(0.5, 0, 0); // 三角形第二个点的颜色与坐标
             this.builder.color(0, 0, 1).vertex(0, 0.5, 0); // 三角形第三个点的颜色与坐标
             // 合成model-view-projection matrix
-            Matrix4.product(
-                this.camera.viewProjectionMatrix,
-                this.matStack.modelViewMatrix,
-                this.triMatrix,
-            );
+            Matrix4.product(this.camera.viewProjectionMatrix, this.matStack.modelViewMatrix, this.triMatrix);
             // 将mvpMatrix传递给GLMeshBuilder的end方法，该方法会正确的显示图形
             this.builder.end(this.triMatrix);
 
@@ -149,11 +141,7 @@ export class RotatingCubeApplication extends CameraApplication {
     }
 
     // 关于Canvas2D的详细应用，可以参考本书的姐妹篇：TypeScript图形渲染实战：2D架构设计与实现
-    private _renderText(
-        text: string,
-        x: number = this.canvas.width * 0.5,
-        y: number = 150,
-    ): void {
+    private _renderText(text: string, x: number = this.canvas.width * 0.5, y: number = 150): void {
         if (this.ctx2D) {
             this.ctx2D.clearRect(0, 0, this.canvas.width, this.canvas.height);
             this.ctx2D.save(); // 渲染状态进栈
@@ -170,7 +158,6 @@ export class RotatingCubeApplication extends CameraApplication {
         if (this.ctx2D === null) {
             return;
         }
-
         const out: Vector3 = new Vector3();
         // 调用 MathHelper.obj2ScreenSpace这个核心函数，将局部坐标系标示的一个点变换到屏幕坐标系上
         if (MathHelper.obj2GLViewportSpace(pos, mvp, this.camera.getViewport(), out)) {
@@ -215,7 +202,7 @@ export class RotatingCubeApplication extends CameraApplication {
     }
 
     public override render(): void {
-        if(!this.gl){
+        if (!this.gl) {
             throw new Error('this.gl is not defined');
         }
         // FIXME: 切记，一定要先清屏（清除掉颜色缓冲区和深度缓冲区）(书上有，随书源码中无？？？)
@@ -238,7 +225,7 @@ export class RotatingCubeApplication extends CameraApplication {
 
     // 资源同步方法
     public override async runAsync(): Promise<void> {
-        if(!this.gl){
+        if (!this.gl) {
             throw new Error('this.gl is not defined');
         }
         let img: HTMLImageElement = await HttpRequest.loadImageAsync('data/pic0.png');
