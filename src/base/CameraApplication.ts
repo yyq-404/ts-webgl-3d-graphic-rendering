@@ -1,5 +1,7 @@
 import {WebGLApplication} from "./WebGLApplication";
 import {Camera} from "../lib/camera/Camera";
+import {CanvasMouseEvent} from "../event/CanvasMouseEvent";
+import {CanvasKeyboardEvent} from "../event/CanvasKeyboardEvent";
 
 /**
  * 摄像机应用。
@@ -30,10 +32,10 @@ export class CameraApplication extends WebGLApplication {
 
     /**
      * 按键按下。
-     * @param e
+     * @param event
      */
-    public onKeyPress(e: KeyboardEvent): void {
-        switch (e.key) {
+    public override onKeyPress(event: CanvasKeyboardEvent): void {
+        switch (event.key) {
             case 'w':
                 this.camera.moveForward(-1);
                 break;
@@ -61,6 +63,8 @@ export class CameraApplication extends WebGLApplication {
             case 'p':
                 this.camera.pitch(1);
                 break;
+            default:
+                break
         }
     }
 }

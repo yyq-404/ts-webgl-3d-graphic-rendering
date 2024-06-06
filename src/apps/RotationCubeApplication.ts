@@ -11,7 +11,7 @@ import {GLTextureCache} from "../webgl/texture/GLTextureCache";
 import {Vector3} from "../common/math/Vector3";
 import {DrawHelper} from "../lib/DrawHelper";
 import {HttpRequest} from "../net/HttpRequest";
-import {CanvasKeyBoardEvent} from "../event/CanvasKeyBoardEvent";
+import {CanvasKeyboardEvent} from "../event/CanvasKeyboardEvent";
 
 export class RotatingCubeApplication extends CameraApplication {
     // GPU可编程管线对象，后面章节详解
@@ -259,7 +259,7 @@ export class RotatingCubeApplication extends CameraApplication {
         this.triAngle += this.triSpeed;
     }
 
-    onKeyDown(evt: CanvasKeyBoardEvent): void {
+    onKeyDown(evt: CanvasKeyboardEvent): void {
         if (evt.key === 'q') {
             if (this.triTimerId === -1) {
                 this.triTimerId = this.timerManager.add(

@@ -4,7 +4,7 @@ import {ECanvasInputEventType} from "../enum/ECanvasInputEventType";
 /**
  * 键盘事件
  */
-export class CanvasKeyBoardEvent extends CanvasInputEvent {
+export class CanvasKeyboardEvent extends CanvasInputEvent {
     /** 按键 */
     public key: string;
     /** 按键编码 */

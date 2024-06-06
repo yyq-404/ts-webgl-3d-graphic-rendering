@@ -5,9 +5,9 @@
   "main": "index.html",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "node_modules/.bin/webpack-dev-server",
-    "watch": "node_modules/.bin/webpack -w",
-    "build": "node_modules/.bin/webpack"
+    "dev": "webpack-dev-server",
+    "watch": "webpack -w",
+    "build": "webpack"
   },
   "keywords": [],
   "author": "",

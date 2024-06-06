@@ -1,6 +1,6 @@
 import {ECanvasInputEventType} from "../enum/ECanvasInputEventType";
 import {CanvasMouseEvent} from "../event/CanvasMouseEvent";
-import {CanvasKeyBoardEvent} from "../event/CanvasKeyBoardEvent";
+import {CanvasKeyboardEvent} from "../event/CanvasKeyboardEvent";
 import {Vector2} from "../common/math/Vector2";
 import {TimerManager} from "../timer/TimerManager";
 import {ICanvasMouseEventListener} from "../interface/event/ICanvasMouseEventListener";
@@ -8,11 +8,11 @@ import {ICanvasKeyBoardEventListener} from "../interface/event/ICanvasKeyBoardEv
 
 export class BaseApplication implements EventListenerObject, ICanvasMouseEventListener, ICanvasKeyBoardEventListener {
     /** 定时器管理器 */
-    public timerManager: TimerManager = new TimerManager();
+    protected timerManager: TimerManager = new TimerManager();
     private _fps: number = 0;
-    public isFlipYCoordinate: boolean = false;
-    public canvas: HTMLCanvasElement;
-    public isSupportMouseMove: boolean = false;
+    protected isFlipYCoordinate: boolean = false;
+    protected canvas: HTMLCanvasElement;
+    protected isSupportMouseMove: boolean = false;
     protected _isMouseDown: boolean = false;
     protected _isRightMouseDown: boolean = false;
     protected _start: boolean = false;
@@ -131,12 +131,11 @@ export class BaseApplication implements EventListenerObject, ICanvasMouseEventLi
         if (!event.target) {
             throw new Error("event.target is null.");
         }
-        let canvas = this.getMouseCanvas();
-        let rect = canvas.getBoundingClientRect();
+        let rect = this.canvas.getBoundingClientRect();
         let x: number = event.clientX - rect.left;
         let y: number = event.clientY - rect.top;
         if (this.isFlipYCoordinate) {
-            y = canvas.height - y;
+            y = this.canvas.height - y;
         }
         return new Vector2([x, y]);
     }
@@ -147,15 +146,25 @@ export class BaseApplication implements EventListenerObject, ICanvasMouseEventLi
      * @param type
      * @private
      */
-    protected toCanvasMouseEvent(event: MouseEvent, type: ECanvasInputEventType): CanvasMouseEvent {
-        if (type === ECanvasInputEventType.KEY_DOWN && event.button == 2) {
-            this._isRightMouseDown = true;
-        } else if (type === ECanvasInputEventType.KEY_UP && event.button == 2) {
-            this._isRightMouseDown = false;
-        }
+    protected toCanvasMouseEvent(event: MouseEvent): CanvasMouseEvent {
+        let type: ECanvasInputEventType = ECanvasInputEventType.MOUSE_MOVE;
         let button = event.button;
-        if (this._isRightMouseDown && type == ECanvasInputEventType.MOUSE_DRAG) {
-            button = 2;
+        if (event.type === 'mousedown') {
+            type = ECanvasInputEventType.MOUSE_DOWN;
+            if (event.button == 2) {
+                this._isRightMouseDown = true;
+            }
+        } else if (event.type === 'mouseup') {
+            type = ECanvasInputEventType.MOUSE_UP;
+            if (event.button == 2) {
+                this._isRightMouseDown = false;
+            }
+        }
+        if (event.type === 'mousemove') {
+            if (this._isMouseDown && this._isRightMouseDown) {
+                button = 2;
+                type = ECanvasInputEventType.MOUSE_DRAG;
+            }
         }
         let mousePosition: Vector2 = this.viewPortToCanvasCoordinate(event);
         return new CanvasMouseEvent(type, mousePosition, button, event.altKey, event.ctrlKey, event.shiftKey);
@@ -164,11 +173,18 @@ export class BaseApplication implements EventListenerObject, ICanvasMouseEventLi
     /**
      * 获取画布键盘事件。
      * @param event
-     * @param type
      * @private
      */
-    private toCanvasKeyBoardEvent(event: KeyboardEvent, type: ECanvasInputEventType): CanvasKeyBoardEvent {
-        return new CanvasKeyBoardEvent(type, event.key, event.code, event.repeat, event.altKey, event.ctrlKey, event.shiftKey);
+    private toCanvasKeyboardEvent(event: KeyboardEvent): CanvasKeyboardEvent {
+        let type = ECanvasInputEventType.KEYBOARD_EVENT;
+        if (event.type === 'keydown') {
+            type = ECanvasInputEventType.KEY_DOWN;
+        } else if (event.type === 'keyup') {
+            type = ECanvasInputEventType.KEY_UP;
+        } else if (event.type === 'keypress') {
+            type = ECanvasInputEventType.KEY_PRESS;
+        }
+        return new CanvasKeyboardEvent(type, event.key, event.code, event.repeat, event.altKey, event.ctrlKey, event.shiftKey);
     }
 
     /**
@@ -176,35 +192,6 @@ export class BaseApplication implements EventListenerObject, ICanvasMouseEventLi
      * @param event
      */
     public handleEvent(event: Event): void {
-        // switch (event.type) {
-        //     case "mousedown":
-        //         this._isMouseDown = true;
-        //         this.dispatchMouseDown(this.toCanvasMouseEvent(event as MouseEvent, ECanvasInputEventType.MOUSE_DOWN))
-        //         break;
-        //     case 'mouseup':
-        //         this._isMouseDown = false;
-        //         this.dispatchMouseUp(this.toCanvasMouseEvent(event as MouseEvent, ECanvasInputEventType.MOUSE_UP))
-        //         break;
-        //     case 'mousemove':
-        //         if (this.isSupportMouseMove) {
-        //             this.dispatchMouseMove(this.toCanvasMouseEvent(event as MouseEvent, ECanvasInputEventType.MOUSE_MOVE))
-        //         }
-        //         if (this._isMouseDown) {
-        //             this.dispatchMouseDrag(this.toCanvasMouseEvent(event as MouseEvent, ECanvasInputEventType.MOUSE_DRAG))
-        //         }
-        //         break;
-        //     case 'keypress':
-        //         this.dispatchKeyBoardPress(this.toCanvasKeyBoardEvent(event as KeyboardEvent, ECanvasInputEventType.KEY_PRESS))
-        //         break;
-        //     case 'keydown':
-        //         this.dispatchKeyBoardDown(this.toCanvasKeyBoardEvent(event as KeyboardEvent, ECanvasInputEventType.KEY_DOWN))
-        //         break
-        //     case 'keyup':
-        //         this.dispatchKeyBoardUp(this.toCanvasKeyBoardEvent(event as KeyboardEvent, ECanvasInputEventType.KEY_UP))
-        //         break;
-        //     default:
-        //         break;
-        // }
         if (event instanceof MouseEvent) {
             this.onMouseEvent(event);
         }
@@ -214,57 +201,109 @@ export class BaseApplication implements EventListenerObject, ICanvasMouseEventLi
 
     }
 
+    /**
+     * 鼠标时间回调。
+     * @param event
+     * @protected
+     */
     protected onMouseEvent(event: MouseEvent): void {
-
+        let mouseEvent: CanvasMouseEvent = this.toCanvasMouseEvent(event);
+        switch (event.type) {
+            case "mousedown":
+                this._isMouseDown = true;
+                this.onMouseDown(mouseEvent)
+                break;
+            case 'mouseup':
+                this.onMouseUp(mouseEvent)
+                break;
+            case 'mousemove':
+                if (this.isSupportMouseMove) {
+                    this.onMouseMove(mouseEvent)
+                }
+                if (this._isMouseDown) {
+                    this.onMouseDrag(mouseEvent)
+                }
+                break;
+            default:
+                break;
+        }
     }
 
+    /**
+     * 键盘事件回调
+     * @param event
+     * @protected
+     */
     protected onKeyBoardEvent(event: KeyboardEvent): void {
-
+        let keyEvent: CanvasKeyboardEvent = this.toCanvasKeyboardEvent(event);
+        switch (event.type) {
+            case 'keypress':
+                this.onKeyPress(keyEvent);
+                break;
+            case 'keydown':
+                this.onKeyPress(keyEvent);
+                break
+            case 'keyup':
+                this.onKeyPress(keyEvent);
+                break;
+            default:
+                break;
+        }
     }
 
-    public dispatchMouseDown(event: CanvasMouseEvent): void {
+    /**
+     * 鼠标按下。
+     * @param event
+     */
+    public onMouseDown(event: CanvasMouseEvent): void {
+        throw new Error('Method not implemented');
     }
 
-    public dispatchMouseUp(event: CanvasMouseEvent): void {
+    /**
+     * 鼠标拖动
+     * @param event
+     */
+    public onMouseDrag(event: CanvasMouseEvent): void {
+        throw new Error('Method not implemented');
     }
 
-    public dispatchMouseMove(event: CanvasMouseEvent): void {
+    /**
+     * 鼠标移动
+     * @param event
+     */
+    public onMouseMove(event: CanvasMouseEvent): void {
+        throw new Error('Method not implemented');
     }
 
-    public dispatchMouseDrag(event: CanvasMouseEvent): void {
+    /**
+     * 鼠标抬起
+     * @param event
+     */
+    public onMouseUp(event: CanvasMouseEvent): void {
+        throw new Error('Method not implemented');
     }
 
-    public dispatchKeyBoardPress(event: CanvasKeyBoardEvent): void {
+    /**
+     * 按键按下
+     * @param event
+     */
+    public onKeyDown(event: CanvasKeyboardEvent): void {
+        throw new Error('Method not implemented');
     }
 
-    public dispatchKeyBoardDown(event: CanvasKeyBoardEvent): void {
+    /**
+     * 按键长按
+     * @param event
+     */
+    public onKeyPress(event: CanvasKeyboardEvent): void {
+        throw new Error('Method not implemented');
     }
 
-    public dispatchKeyBoardUp(event: CanvasKeyBoardEvent): void {
-    }
-
-    protected getMouseCanvas(): HTMLCanvasElement {
-        throw new Error("Method not implemented");
-    }
-
-    onMouseDown(event: MouseEvent): void {
-    }
-
-    onMouseDrag(event: MouseEvent): void {
-    }
-
-    onMouseMove(event: MouseEvent): void {
-    }
-
-    onMouseUp(event: MouseEvent): void {
-    }
-
-    onKeyDown(event: KeyboardEvent): void {
-    }
-
-    onKeyPress(event: KeyboardEvent): void {
-    }
-
-    onKeyUp(event: KeyboardEvent): void {
+    /**
+     * 案件抬起
+     * @param event
+     */
+    public onKeyUp(event: CanvasKeyboardEvent): void {
+        throw new Error('Method not implemented');
     }
 }
