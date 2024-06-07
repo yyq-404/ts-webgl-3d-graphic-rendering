@@ -5,24 +5,37 @@ import {Vector4} from "../../common/math/Vector4";
 import {GLStaticMesh} from "../../webgl/mesh/GLStaticMesh";
 import {MathHelper} from "../../common/math/MathHelper";
 
+/**
+ * 几何数据
+ */
 export class Geometry {
-    // 输入顶点属性数据
+    /** 顶点位置集合 */
     public positions: Vector3[] = [];
+    /** uv集合 */
     public uvs: Vector2[] = [];
+    /** 法线集合 */
     public normals: Vector3[] = [];
+    /** 颜色集合 */
     public colors: Vector4[] = [];
+    /** 切线集合 */
     public tangents: Vector4[] = [];
+    /** 索引结合 */
     public indices: number[] = [];
 
-    public makeStaticVAO(gl: WebGLRenderingContext, needNormals: boolean = false, needUV: boolean = true): GLStaticMesh {
+    /**
+     * 产生静态网格对象
+     * @param gl
+     * @param needNormals
+     * @param optionUV
+     */
+    public makeStaticVAO(gl: WebGLRenderingContext, needNormals: boolean = false, optionUV: boolean = true): GLStaticMesh {
         let bits: GLAttribBits = this.getAttribBits();
         if (!needNormals) {
             bits &= ~GLAttribState.NORMAL_BIT;
         }
-        if (!needUV) {
+        if (!optionUV) {
             bits &= ~GLAttribState.TEXCOORD_BIT;
         }
-
         const stride: number = GLAttribState.getVertexByteStride(bits);
         const step: number = stride / Float32Array.BYTES_PER_ELEMENT;
         const arrayBuffer: ArrayBuffer = new ArrayBuffer(stride * this.positions.length);
@@ -61,21 +74,29 @@ export class Geometry {
             }
         }
         const mesh: GLStaticMesh = new GLStaticMesh(gl, bits, buffer, this.indices.length > 0 ? new Uint16Array(this.indices) : null,);
-        this.buildBoundingBoxTo(mesh.mins, mesh.maxs);
+        this.buildBoundingBox(mesh.mins, mesh.maxs);
         return mesh;
     }
 
-    buildBoundingBoxTo(mins: Vector3, maxs: Vector3): void {
+    /**
+     * 构建包围和。
+     * @param mins
+     * @param maxs
+     * @private
+     */
+    private buildBoundingBox(mins: Vector3, maxs: Vector3): void {
         for (let i: number = 0; i < this.positions.length; i++) {
             MathHelper.boundBoxAddPoint(this.positions[i], mins, maxs);
         }
     }
 
-    getAttribBits(): GLAttribBits {
+    /**
+     * 获取属性集合。
+     */
+    private getAttribBits(): GLAttribBits {
         if (this.positions.length === 0) {
             throw new Error('必须要有顶数据!!!');
         }
-
         let bits: GLAttribBits = GLAttribState.POSITION_BIT;
         if (this.uvs.length > 0) {
             bits |= GLAttribState.TEXCOORD_BIT;

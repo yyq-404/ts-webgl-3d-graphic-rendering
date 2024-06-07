@@ -3,9 +3,16 @@ import {Vector2} from "../../common/math/Vector2";
 import {Geometry} from "./Geometry";
 
 /**
- * 盒子定义
+ * 立方体定义
  */
 export class Cube {
+    /** 半宽 */
+    public halfWidth: number;
+    /** 半高 */
+    public halfHeight: number;
+    /** 半深 */
+    public halfDepth: number;
+
     /**
      * ```plaintext
      *    /3--------/7
@@ -18,13 +25,16 @@ export class Cube {
      * 0---------4/
      * ```
      */
-    constructor(public halfWidth: number = 0.2, public halfHeight: number = 0.2, public halfDepth: number = 0.2,) {
+    public constructor(halfWidth: number = 0.2, halfHeight: number = 0.2, halfDepth: number = 0.2,) {
         this.halfWidth = halfWidth;
         this.halfHeight = halfHeight;
         this.halfDepth = halfDepth;
     }
 
-    makeGeometryWithTextureCoordinate(): Geometry {
+    /**
+     * 使用贴图坐标产生几何数据。
+     */
+    public makeGeometryWithTextureCoordinate(): Geometry {
         const data: Geometry = new Geometry();
         data.positions = [
             new Vector3([-this.halfWidth, -this.halfHeight, this.halfDepth]), // 0
@@ -35,24 +45,21 @@ export class Cube {
         return data;
     }
 
-    makeGeometry(): Geometry {
+    /**
+     * 产生几何数据。
+     */
+    public makeGeometry(): Geometry {
         const data: Geometry = new Geometry();
-        data.positions.push(
-            new Vector3([-this.halfWidth, -this.halfHeight, this.halfDepth]),
-        ); // 0
+        data.positions.push(new Vector3([-this.halfWidth, -this.halfHeight, this.halfDepth])); // 0
         data.uvs.push(new Vector2([1, 0]));
 
         data.positions.push(new Vector3([-this.halfWidth, this.halfHeight, this.halfDepth])); // 1
         data.uvs.push(new Vector2([1, 1]));
 
-        data.positions.push(
-            new Vector3([-this.halfWidth, -this.halfHeight, -this.halfDepth]),
-        ); // 2
+        data.positions.push(new Vector3([-this.halfWidth, -this.halfHeight, -this.halfDepth])); // 2
         data.uvs.push(new Vector2([0, 0]));
 
-        data.positions.push(
-            new Vector3([-this.halfWidth, this.halfHeight, -this.halfDepth]),
-        ); // 3
+        data.positions.push(new Vector3([-this.halfWidth, this.halfHeight, -this.halfDepth])); // 3
         data.uvs.push(new Vector2([0, 1]));
 
         data.positions.push(new Vector3([this.halfWidth, -this.halfHeight, this.halfDepth])); // 4
@@ -61,9 +68,7 @@ export class Cube {
         data.positions.push(new Vector3([this.halfWidth, this.halfHeight, this.halfDepth])); // 5
         data.uvs.push(new Vector2([0, 1]));
 
-        data.positions.push(
-            new Vector3([this.halfWidth, -this.halfHeight, -this.halfDepth]),
-        ); // 6
+        data.positions.push(new Vector3([this.halfWidth, -this.halfHeight, -this.halfDepth])); // 6
         data.uvs.push(new Vector2([1, 0]));
 
         data.positions.push(new Vector3([this.halfWidth, this.halfHeight, -this.halfDepth])); // 7
