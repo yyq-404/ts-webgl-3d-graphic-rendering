@@ -9,6 +9,7 @@ import {Matrix4} from "../../common/math/Matrix4";
 import {GLAttribOffsetMap} from "../GLTypes";
 import {GLTexture} from "../texture/GLTexture";
 import {EGLVertexLayoutType} from "../../enum/EGLVertexLayoutType";
+import {CLConstants} from "../CLConstants";
 
 /**
  * GL网格构建器
@@ -20,21 +21,21 @@ export class GLMeshBuilder extends GLMeshBase {
     private static SEQUENCED: 'SEQUENCED' = 'SEQUENCED' as const;
     private static INTERLEAVED: 'INTERLEAVED' = 'INTERLEAVED' as const;
     /** 顶点在内存或显存中的布局方式 */
-    private _layout: EGLVertexLayoutType;
+    private readonly _layout: EGLVertexLayoutType;
     // 为了简单起见，只支持顶点的位置坐标、纹理0坐标、颜色和法线这4种顶点属性格式
     /** 当前正在输入的顶点颜色属性 */
     private _color: Vector4 = new Vector4([0, 0, 0, 0]);
     /** 当前正在输入的顶点纹理0坐标属性 */
-    private _texCoord: Vector2 = new Vector2([0, 0]);
+    private _texCoordinate: Vector2 = new Vector2([0, 0]);
     /** 当前正在输入的顶点法线属性 */
     private _normal: Vector3 = new Vector3([0, 0, 1]);
     // 从GLAttribBits判断是否包含如下几个顶点属性
     /** 是否有颜色 */
-    private _hasColor: boolean;
+    private readonly _hasColor: boolean;
     /** 是否有纹理坐标 */
-    private _hasTexCoordinate: boolean;
+    private readonly _hasTexCoordinate: boolean;
     /** 是否有法线 */
-    private _hasNormal: boolean;
+    private readonly _hasNormal: boolean;
     /** 渲染的数据源 */
     private _lists: { [key: string]: TypedArrayList<Float32Array> } = {};
     /** 渲染用的`VBO` */
@@ -212,8 +213,8 @@ export class GLMeshBuilder extends GLMeshBase {
      */
     public texCoordinate(u: number, v: number): GLMeshBuilder {
         if (this._hasTexCoordinate) {
-            this._texCoord.x = u;
-            this._texCoord.y = v;
+            this._texCoordinate.x = u;
+            this._texCoordinate.y = v;
         }
         return this;
     }
@@ -249,8 +250,8 @@ export class GLMeshBuilder extends GLMeshBase {
             list.push(z);
             // texcoord
             if (this._hasTexCoordinate) {
-                list.push(this._texCoord.x);
-                list.push(this._texCoord.y);
+                list.push(this._texCoordinate.x);
+                list.push(this._texCoordinate.y);
             }
             // normal
             if (this._hasNormal) {
@@ -274,8 +275,8 @@ export class GLMeshBuilder extends GLMeshBase {
             list.push(z);
             if (this._hasTexCoordinate) {
                 list = this._lists[GLAttribState.TEXCOORD_NAME];
-                list.push(this._texCoord.x);
-                list.push(this._texCoord.y);
+                list.push(this._texCoordinate.x);
+                list.push(this._texCoordinate.y);
             }
             if (this._hasNormal) {
                 list = this._lists[GLAttribState.NORMAL_NAME];
@@ -329,7 +330,7 @@ export class GLMeshBuilder extends GLMeshBase {
      */
     public end(mvp: Matrix4): void {
         this.program.bind(); // 绑定GLProgram
-        this.program.setMatrix4(GLProgram.MVPMatrix, mvp); // 载入MVPMatrix uniform变量
+        this.program.setMatrix4(CLConstants.MVPMatrix, mvp); // 载入MVPMatrix uniform变量
         if (this.texture !== null) {
             this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture);
             this.program.loadSampler();

@@ -23,6 +23,28 @@ export enum EPlaneLoc {
 }
 
 export class MathHelper {
+    /**
+     * 静态辅助数学方法，判断参数x（必须是4）是否是2的n次方，即x是不是1、2、4、8、16、32、64.....
+     * @param x
+     */
+    public static isPowerOfTwo(x: number): boolean {
+        return (x & (x - 1)) == 0;
+    }
+
+    /**
+     * 静态辅助数学方法，给定整数参数x，取下一个2的n次方数
+     * 如果x为3，则返回4；如果x为4，则返回4；如果x为5，则返回8；以此类推
+     * @param x
+     */
+    public static getNextPowerOfTwo(x: number): number {
+        if (x <= 0) throw new Error('参数必须要大于0! ');
+        --x;
+        for (let i = 1; i < 32; i <<= 1) {
+            x = x | (x >> i);
+        }
+        return x + 1;
+    }
+
     /** 角度/弧度互转函数 */
     static toRadian(degree: number): number {
         return (degree * Math.PI) / 180;

@@ -1,4 +1,4 @@
-import { GLAttribInfo, GLAttribMap, GLUniformInfo, GLUniformMap} from "./GLTypes";
+import {GLAttribInfo, GLAttribMap, GLUniformInfo, GLUniformMap} from "./GLTypes";
 import {EShaderType} from "../enum/EShaderType";
 
 export class GLHelper {

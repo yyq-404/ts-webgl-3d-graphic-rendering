@@ -12,6 +12,7 @@ import {Vector3} from "../common/math/Vector3";
 import {DrawHelper} from "../lib/DrawHelper";
 import {HttpHelper} from "../net/HttpHelper";
 import {CanvasKeyboardEvent} from "../event/CanvasKeyboardEvent";
+import {CLConstants} from "../webgl/CLConstants";
 
 /**
  * 立方体旋转应用
@@ -121,7 +122,7 @@ export class RotatingCubeApplication extends CameraApplication {
             // 合成modelViewProjection矩阵
             Matrix4.product(this.camera.viewProjectionMatrix, this.matStack.modelViewMatrix, this.cubeMatrix);
             // 将合成的矩阵给GLProgram对象
-            this.textureProgram.setMatrix4(GLProgram.MVPMatrix, this.cubeMatrix);
+            this.textureProgram.setMatrix4(CLConstants.MVPMatrix, this.cubeMatrix);
             // 使用当前绑定的texture和program绘制cubeVao对象
             this.cubeVAO.draw();
             // 使用辅助方法绘制坐标系
