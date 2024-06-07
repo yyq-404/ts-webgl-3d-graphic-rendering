@@ -79,8 +79,10 @@ export class GLStaticMesh extends GLMeshBase {
         this._indexCount = ibo.length;
     }
 
-    /** 调用 `WebGLRenderingContext.drawElements()` 方法或 `WebGLRenderingContext.drawArrays()` 渲染图元 */
-    draw(): void {
+    /**
+     * 调用 `WebGLRenderingContext.drawElements()` 方法或 `WebGLRenderingContext.drawArrays()` 渲染图元
+     */
+   public draw(): void {
         this.bind(); // 绘制前先要绑定VAO
         if (this._ibo) {
             // 如果有IBO，使用drawElements方法绘制静态网格对象

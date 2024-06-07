@@ -103,45 +103,45 @@ export class DrawHelper {
     ): void {
         // 前面
         builder.begin(builder.gl.TRIANGLE_FAN);
-        builder.texcoord(tc[0], tc[1]).vertex(-halfLen, -halfLen, halfLen); // 0   - - +
-        builder.texcoord(tc[2], tc[3]).vertex(halfLen, -halfLen, halfLen); // 4   + - +
-        builder.texcoord(tc[4], tc[5]).vertex(halfLen, halfLen, halfLen); // 5   + + +
-        builder.texcoord(tc[6], tc[7]).vertex(-halfLen, halfLen, halfLen); // 1   - + +
+        builder.texCoordinate(tc[0], tc[1]).vertex(-halfLen, -halfLen, halfLen); // 0   - - +
+        builder.texCoordinate(tc[2], tc[3]).vertex(halfLen, -halfLen, halfLen); // 4   + - +
+        builder.texCoordinate(tc[4], tc[5]).vertex(halfLen, halfLen, halfLen); // 5   + + +
+        builder.texCoordinate(tc[6], tc[7]).vertex(-halfLen, halfLen, halfLen); // 1   - + +
         builder.end(mat);
         // 右面
         builder.begin(builder.gl.TRIANGLE_FAN);
-        builder.texcoord(tc[8], tc[9]).vertex(halfLen, -halfLen, halfLen); // 4   + - +
-        builder.texcoord(tc[10], tc[11]).vertex(halfLen, -halfLen, -halfLen); // 6   + - -
-        builder.texcoord(tc[12], tc[13]).vertex(halfLen, halfLen, -halfLen); // 7   + + -
-        builder.texcoord(tc[14], tc[15]).vertex(halfLen, halfLen, halfLen); // 5   + + +
+        builder.texCoordinate(tc[8], tc[9]).vertex(halfLen, -halfLen, halfLen); // 4   + - +
+        builder.texCoordinate(tc[10], tc[11]).vertex(halfLen, -halfLen, -halfLen); // 6   + - -
+        builder.texCoordinate(tc[12], tc[13]).vertex(halfLen, halfLen, -halfLen); // 7   + + -
+        builder.texCoordinate(tc[14], tc[15]).vertex(halfLen, halfLen, halfLen); // 5   + + +
         builder.end(mat);
         // 后面
         builder.begin(builder.gl.TRIANGLE_FAN);
-        builder.texcoord(tc[16], tc[17]).vertex(halfLen, -halfLen, -halfLen); // 6   + - -
-        builder.texcoord(tc[18], tc[19]).vertex(-halfLen, -halfLen, -halfLen); // 2   - - -
-        builder.texcoord(tc[20], tc[21]).vertex(-halfLen, halfLen, -halfLen); // 3   - + -
-        builder.texcoord(tc[22], tc[23]).vertex(halfLen, halfLen, -halfLen); // 7   + + -
+        builder.texCoordinate(tc[16], tc[17]).vertex(halfLen, -halfLen, -halfLen); // 6   + - -
+        builder.texCoordinate(tc[18], tc[19]).vertex(-halfLen, -halfLen, -halfLen); // 2   - - -
+        builder.texCoordinate(tc[20], tc[21]).vertex(-halfLen, halfLen, -halfLen); // 3   - + -
+        builder.texCoordinate(tc[22], tc[23]).vertex(halfLen, halfLen, -halfLen); // 7   + + -
         builder.end(mat);
         // 左面
         builder.begin(builder.gl.TRIANGLE_FAN);
-        builder.texcoord(tc[24], tc[25]).vertex(-halfLen, -halfLen, -halfLen); // 2   - - -
-        builder.texcoord(tc[26], tc[27]).vertex(-halfLen, -halfLen, halfLen); // 0   - - +
-        builder.texcoord(tc[28], tc[29]).vertex(-halfLen, halfLen, halfLen); // 1   - + +
-        builder.texcoord(tc[30], tc[31]).vertex(-halfLen, halfLen, -halfLen); // 3   - + -
+        builder.texCoordinate(tc[24], tc[25]).vertex(-halfLen, -halfLen, -halfLen); // 2   - - -
+        builder.texCoordinate(tc[26], tc[27]).vertex(-halfLen, -halfLen, halfLen); // 0   - - +
+        builder.texCoordinate(tc[28], tc[29]).vertex(-halfLen, halfLen, halfLen); // 1   - + +
+        builder.texCoordinate(tc[30], tc[31]).vertex(-halfLen, halfLen, -halfLen); // 3   - + -
         builder.end(mat);
         // 上面
         builder.begin(builder.gl.TRIANGLE_FAN);
-        builder.texcoord(tc[32], tc[33]).vertex(-halfLen, halfLen, halfLen); // 1   - + +
-        builder.texcoord(tc[34], tc[35]).vertex(halfLen, halfLen, halfLen); // 5   + + +
-        builder.texcoord(tc[36], tc[37]).vertex(halfLen, halfLen, -halfLen); // 7   + + -
-        builder.texcoord(tc[38], tc[39]).vertex(-halfLen, halfLen, -halfLen); // 3   - + -
+        builder.texCoordinate(tc[32], tc[33]).vertex(-halfLen, halfLen, halfLen); // 1   - + +
+        builder.texCoordinate(tc[34], tc[35]).vertex(halfLen, halfLen, halfLen); // 5   + + +
+        builder.texCoordinate(tc[36], tc[37]).vertex(halfLen, halfLen, -halfLen); // 7   + + -
+        builder.texCoordinate(tc[38], tc[39]).vertex(-halfLen, halfLen, -halfLen); // 3   - + -
         builder.end(mat);
         // 下面
         builder.begin(builder.gl.TRIANGLE_FAN);
-        builder.texcoord(tc[40], tc[41]).vertex(-halfLen, -halfLen, halfLen); // 0   - - +
-        builder.texcoord(tc[42], tc[43]).vertex(-halfLen, -halfLen, -halfLen); // 2   - - -
-        builder.texcoord(tc[44], tc[45]).vertex(halfLen, -halfLen, -halfLen); // 6   + - -
-        builder.texcoord(tc[46], tc[47]).vertex(halfLen, -halfLen, halfLen); // 4   + - +
+        builder.texCoordinate(tc[40], tc[41]).vertex(-halfLen, -halfLen, halfLen); // 0   - - +
+        builder.texCoordinate(tc[42], tc[43]).vertex(-halfLen, -halfLen, -halfLen); // 2   - - -
+        builder.texCoordinate(tc[44], tc[45]).vertex(halfLen, -halfLen, -halfLen); // 6   + - -
+        builder.texCoordinate(tc[46], tc[47]).vertex(halfLen, -halfLen, halfLen); // 4   + - +
         builder.end(mat);
     }
 

@@ -11,9 +11,9 @@ import {GLAttribBits, GLAttribState} from "../GLAttribState";
  */
 export abstract class GLMeshBase {
     /** WebGL渲染上下文 */
-    gl: WebGLRenderingContext;
+    public gl: WebGLRenderingContext;
     /** `gl.TRIANGLES` 等7种基本几何图元之一 */
-    drawMode: number;
+    protected drawMode: number;
     /** 顶点属性格式，和绘制当前网格时使用的 `GLProgram` 具有一致的 `attribBits` */
     protected _attribState: GLAttribBits;
     /** 当前使用的顶点属性的 `stride` 字节数 */
@@ -24,6 +24,13 @@ export abstract class GLMeshBase {
     /** `WebGLVertexArrayObject` 对象，顶点数组对象 (VAOs) 指向顶点数组数据，并提供不同顶点数据集合的名称。 */
     protected _vao: WebGLVertexArrayObjectOES;
 
+    /**
+     * 构造
+     * @param gl
+     * @param attribState
+     * @param drawMode
+     * @protected
+     */
     protected constructor(gl: WebGLRenderingContext, attribState: GLAttribBits, drawMode: number = gl.TRIANGLES) {
         this.gl = gl;
         // 获取VAO的步骤
@@ -45,18 +52,25 @@ export abstract class GLMeshBase {
         this.drawMode = drawMode;
     }
 
-    /** 绑定 `VAO` 对象 */
+    /**
+     * 获取当前使用的顶点属性的 `stride` 字节数
+     */
+    public get vertexStride(): number {
+        return this._attribStride;
+    }
+
+    /**
+     * 绑定`VAO`对象
+     */
     public bind(): void {
         // 将传递的 WebGLVertexArrayObject 对象绑定到缓冲区。
         this._vaoExtension.bindVertexArrayOES(this._vao);
     }
 
-    /** 解绑 `VAO` */
+    /**
+     * 解绑 `VAO`
+     */
     public unbind(): void {
         this._vaoExtension.bindVertexArrayOES(null);
-    }
-
-    public get vertexStride(): number {
-        return this._attribStride;
     }
 }
