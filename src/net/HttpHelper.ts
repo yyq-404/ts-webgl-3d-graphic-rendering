@@ -1,7 +1,12 @@
-// 若要使用Promise，必须要在tsconfig.json中将default的es5改成ES 2015
-export class HttpRequest {
-    // 所有的load方法都是返回Promise对象，说明都是异步加载方式
-
+/**
+ * HTTP助手
+ */
+export class HttpHelper {
+    /**
+     * 加载图像
+     * @param url
+     * @return {Promise<HTMLImageElement>}
+     */
     public static loadImageAsync(url: string): Promise<HTMLImageElement> {
         // Promise具有两种状态，即resolve和reject，这两种状态以回调函数的方式体
         return new Promise((resolve, reject): void => {
@@ -22,13 +27,19 @@ export class HttpRequest {
         });
     }
 
-    // 通过http get方式从服务器请求文本文件，返回的是Promise<string>
+    /**
+     *  加载文本
+     * @param url
+     * @return {Promise<string>}
+     */
     public static loadTextFileAsync(url: string): Promise<string> {
         return new Promise((resolve, reject): void => {
             let xhr: XMLHttpRequest = new XMLHttpRequest();
             xhr.onreadystatechange = (ev: Event): any => {
                 if (xhr.readyState === 4 && xhr.status === 200) {
                     resolve(xhr.responseText);
+                } else {
+                    reject(new Error('Could not load text file at ' + url));
                 }
             }
             xhr.open("get", url, true, null, null);
@@ -36,7 +47,11 @@ export class HttpRequest {
         });
     }
 
-// 通过http get 方式从服务器请求二进制文件，返回的是Promise<ArrayBuffer>
+    /**
+     * 加载二进制
+     * @param url
+     * @return {Promise<ArrayBuffer>}
+     */
     public static loadArrayBufferAsync(url: string): Promise<ArrayBuffer> {
         return new Promise((resolve, reject): void => {
             let xhr: XMLHttpRequest = new XMLHttpRequest();
@@ -44,6 +59,8 @@ export class HttpRequest {
             xhr.onreadystatechange = (ev: Event): any => {
                 if (xhr.readyState === 4 && xhr.status === 200) {
                     resolve(xhr.response as ArrayBuffer);
+                } else {
+                    reject(new Error('Could not load array buffer at ' + url));
                 }
             }
             xhr.open("get", url, true, null, null);

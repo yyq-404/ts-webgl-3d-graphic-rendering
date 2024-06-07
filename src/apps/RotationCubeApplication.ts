@@ -10,7 +10,7 @@ import {Geometry} from "../lib/geometry/Geometry";
 import {GLTextureCache} from "../webgl/texture/GLTextureCache";
 import {Vector3} from "../common/math/Vector3";
 import {DrawHelper} from "../lib/DrawHelper";
-import {HttpRequest} from "../net/HttpRequest";
+import {HttpHelper} from "../net/HttpHelper";
 import {CanvasKeyboardEvent} from "../event/CanvasKeyboardEvent";
 
 /**
@@ -125,7 +125,7 @@ export class RotatingCubeApplication extends CameraApplication {
             // 使用当前绑定的texture和program绘制cubeVao对象
             this.cubeVAO.draw();
             // 使用辅助方法绘制坐标系
-            DrawHelper.drawCoordSystem(this.builder, this.cubeMatrix, this._hitAxis, 1);
+            DrawHelper.drawCoordinateSystem(this.builder, this.cubeMatrix, this._hitAxis, 1);
             this.matStack.popMatrix(); // 矩阵出栈
         }
         // 解除绑定的texture和program
@@ -309,13 +309,13 @@ export class RotatingCubeApplication extends CameraApplication {
         if (!this.gl) {
             throw new Error('this.gl is not defined');
         }
-        let img: HTMLImageElement = await HttpRequest.loadImageAsync('data/pic0.png');
+        let img: HTMLImageElement = await HttpHelper.loadImageAsync('data/pic0.png');
         let tex: GLTexture = new GLTexture(this.gl);
         tex.upload(img, 0, true);
         tex.filter();
         this.textures.push(tex);
         console.log('1、第一个纹理载入成功!');
-        img = await HttpRequest.loadImageAsync('data/pic1.jpg');
+        img = await HttpHelper.loadImageAsync('data/pic1.jpg');
         tex = new GLTexture(this.gl);
         tex.upload(img, 0, true);
         tex.filter();
