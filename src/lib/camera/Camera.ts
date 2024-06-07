@@ -57,119 +57,224 @@ export class Camera {
         this._invViewProMatrix = new Matrix4();
     }
 
-
+    /**
+     * 设置Y视场角
+     * @param value
+     */
     public set fovY(value: number) {
         this._fovY = value;
     }
 
+    /**
+     * 获取Y视场角
+     */
     public get fovY(): number {
         return this._fovY
     }
 
+    /**
+     * 设置摄像机近距
+     * @param value
+     */
     public set near(value: number) {
         this._near = value;
     }
 
+    /**
+     * 获取摄像机近距
+     */
     public get near(): number {
         return this._near;
     }
 
+    /**
+     * 设置摄像机远距
+     * @param value
+     */
     public set far(value: number) {
         this._far = value;
     }
 
+    /**
+     * 获取摄像机远距
+     */
     public get far(): number {
         return this._far;
     }
 
+    /**
+     * 设置纵横比
+     * @param value
+     */
     public set aspectRatio(value: number) {
         this._aspectRatio = value;
     }
 
+    /**
+     * 获取纵横比
+     */
     public get aspectRatio(): number {
         return this._aspectRatio;
     }
 
+    /**
+     * 设置位置
+     * @param value
+     */
     public set position(value: Vector3) {
         this._position = value;
     }
 
+    /**
+     * 获取位置
+     */
     public get position(): Vector3 {
         return this._position;
     }
 
+    /**
+     * 设置X轴位置
+     * @param value
+     */
     public set x(value: number) {
         this._position.x = value;
     }
 
+    /**
+     * 获取X轴位置
+     */
     public get x(): number {
         return this._position.x;
     }
 
+    /**
+     * 设置Y轴位置
+     * @param value
+     */
     public set y(value: number) {
         this._position.y = value;
     }
 
+    /**
+     * 获取Y轴位置
+     */
     public get y(): number {
         return this._position.y;
     }
 
+    /**
+     * 设置Z轴位置
+     * @param value
+     */
     public set z(value: number) {
         this._position.z = value;
     }
 
+    /**
+     * 获取Z轴位置
+     */
     public get z(): number {
         return this._position.z;
     }
 
+    /**
+     * 设置X轴坐标
+     * @param value
+     */
     public set xAxis(value: Vector3) {
         this._xAxis = value;
     }
 
+    /**
+     * 获取X轴坐标
+     */
     public get xAxis(): Vector3 {
         return this._xAxis;
     }
 
+    /**
+     * 设置Y轴坐标
+     * @param value
+     */
     public set yAxis(value: Vector3) {
         this._yAxis = value;
     }
 
+    /**
+     * 获取Y轴坐标
+     */
     public get yAxis(): Vector3 {
         return this._yAxis;
     }
 
+    /**
+     * 设置Z轴坐标
+     * @param value
+     */
     public set zAxis(value: Vector3) {
         this._zAxis = value;
     }
 
+    /**
+     * 获取Z轴坐标
+     */
     public get zAxis(): Vector3 {
         return this._zAxis;
     }
 
+    /**
+     * 设置摄像机类型
+     * @param value
+     */
     public set type(value: ECameraType) {
         this._type = value;
     }
 
+    /**
+     * 获取摄像机类型
+     */
     public get type(): ECameraType {
         return this._type;
     }
 
-    public setViewPort(x: GLint, y: GLint, width: GLsizei, height: GLsizei): void {
+    /**
+     * 设置视口
+     * 调用`WebGLRenderingContext.viewport()` 方法，用来设置视口，即指定从标准设备到窗口坐标的 x、y 仿射变换
+     * @param x 用来设定视口的左下角水平坐标。默认值：`0`
+     * @param y 用来设定视口的左下角垂直坐标。默认值：`0`
+     * @param width 非负数，用来设定视口的宽度。默认值：`canvas` 的宽度
+     * @param height 非负数，用来设定视口的高度。默认值：`canvas` 的高度
+     */
+    public setViewport(x: GLint, y: GLint, width: GLsizei, height: GLsizei): void {
         this.gl?.viewport(x, y, width, height);
     }
 
-    public set viewProjectionMatrix(value: Matrix4) {
-        this._viewProMatrix = value;
-    }
-
-    public get viewProjectionMatrix(): Matrix4 {
-        return this._viewProMatrix;
-    }
-
+    /**
+     * 获取视口
+     */
     public getViewport(): Int32Array {
         return this.gl?.getParameter(this.gl?.VIEWPORT)
     }
 
+    /**
+     * 设置投影矩阵*摄像机矩阵及其逆矩阵
+     * @param value
+     */
+    public set viewProjectionMatrix(value: Matrix4) {
+        this._viewProMatrix = value;
+    }
+
+    /**
+     * 设置投影矩阵*摄像机矩阵及其逆矩阵
+     */
+    public get viewProjectionMatrix(): Matrix4 {
+        return this._viewProMatrix;
+    }
+
+    /**
+     * 前移
+     * @param speed
+     */
     public moveForward(speed: number): void {
         this._position.x += this._zAxis.x * speed;
         if (this._type == ECameraType.FLY_CAMERA) {
@@ -178,6 +283,10 @@ export class Camera {
         this._position.z += this._zAxis.z * speed;
     }
 
+    /**
+     * 右移
+     * @param speed
+     */
     public moveRightward(speed: number): void {
         this._position.x += this._xAxis.x * speed;
         if (this._type == ECameraType.FLY_CAMERA) {
@@ -186,6 +295,10 @@ export class Camera {
         this._position.z += this._xAxis.z * speed;
     }
 
+    /**
+     * 上移
+     * @param speed
+     */
     public moveUpward(speed: number): void {
         if (this._type == ECameraType.FPS_CAMERA) {
             this._position.y += speed
@@ -196,6 +309,10 @@ export class Camera {
         }
     }
 
+    /**
+     * Y轴旋转，左右旋转
+     * @param degree
+     */
     public yaw(degree: number): void {
         Matrix4Adapter.m0.setIdentity();
         let radian = MathHelper.toRadian(degree);
@@ -204,29 +321,45 @@ export class Camera {
         } else if (this._type === ECameraType.FLY_CAMERA) {
             Matrix4Adapter.m0.rotate(radian, this._yAxis);
         }
-        Matrix4Adapter.m0.multiplyVec3(this._zAxis);
-        Matrix4Adapter.m0.multiplyVec3(this._xAxis);
+        this._xAxis.xyz = Matrix4Adapter.m0.multiplyVec3(this._xAxis).xyz;
+        this._zAxis.xyz = Matrix4Adapter.m0.multiplyVec3(this._zAxis).xyz;
     }
 
+    /**
+     * X轴旋转，上下旋转
+     * @param degree
+     */
     public pitch(degree: number): void {
         Matrix4Adapter.m0.setIdentity();
         let radian = MathHelper.toRadian(degree);
         Matrix4Adapter.m0.rotate(radian, this._xAxis);
-        Matrix4Adapter.m0.multiplyVec3(this._zAxis);
-        Matrix4Adapter.m0.multiplyVec3(this._yAxis);
-        Matrix4Adapter.m0.multiplyVec3(this._zAxis);
+        this._yAxis.xyz = Matrix4Adapter.m0.multiplyVec3(this._yAxis).xyz;
+        this._zAxis.xyz = Matrix4Adapter.m0.multiplyVec3(this._zAxis).xyz;
     }
 
+    /**
+     * Z轴旋转，倾斜旋转
+     * @param degree
+     */
     public roll(degree: number): void {
         if (this._type == ECameraType.FLY_CAMERA) {
-            let radian = MathHelper.toRadian(degree);
             Matrix4Adapter.m0.setIdentity();
+            let radian = MathHelper.toRadian(degree);
             Matrix4Adapter.m0.rotate(radian, this._zAxis);
-            Matrix4Adapter.m0.multiplyVec3(this._xAxis);
-            Matrix4Adapter.m0.multiplyVec3(this._yAxis);
+            this._xAxis.xyz = Matrix4Adapter.m0.multiplyVec3(this._xAxis).xyz;
+            this._yAxis.xyz = Matrix4Adapter.m0.multiplyVec3(this._yAxis).xyz;
         }
     }
 
+    /**
+     * 更新
+     *
+     * 当我们对摄像机进行移动或旋转操作时，或者改变投影的一些属性后，需要更新摄像机的视图矩阵和投影矩阵。
+     * 本书为了简单起见，并不对这些操作进行优化，而是采取最简单直接的方式，每帧都自动计算相关矩阵
+     * 摄像机的update需要每帧被调用，因此其最好的调用时机点是在`Application`及其子类的`update`虚方法中。
+     *
+     * @param intervalSec
+     */
     public update(intervalSec: number): void {
         this._projectionMatrix = Matrix4Adapter.perspective(this._fovY, this._aspectRatio, this._near, this._far);
         this.calcViewMatrix();
@@ -234,11 +367,11 @@ export class Camera {
         this._invViewProMatrix.inverse()
         new Matrix4().setIdentity().init(this._viewProMatrix.all()).inverse()?.all();
         this._viewProMatrix.all()
-        // if (this._viewProMatrix) {
-        //     this._invViewProMatrix.init(new Matrix4().setIdentity().init(this._viewProMatrix.all()).inverse()?.all())
-        // }
     }
 
+    /**
+     * 计算视口矩阵
+     */
     public calcViewMatrix(): void {
         this._zAxis.normalize();
         Vector3.cross(this._zAxis, this._xAxis, this._yAxis);
@@ -257,6 +390,11 @@ export class Camera {
         this._viewMatrix.init(values);
     }
 
+    /**
+     * 从当前`position`和`target`获得`view矩阵`,并且从 `view矩阵` 抽取`forward`、`up`、`right`方向矢量
+     * @param target 要观察的目标，世界坐标系中的任意一个点来构建视图矩阵
+     * @param up
+     */
     public lookAt(target: Vector3, up: Vector3 = Vector3.up): void {
         this._viewMatrix = Matrix4.lookAt(target, up);
         this._xAxis.xyz = [this._viewMatrix.at(0), this._viewMatrix.at(4), this._viewMatrix.at(8)];
