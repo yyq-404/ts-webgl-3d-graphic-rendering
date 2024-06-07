@@ -77,7 +77,7 @@ export class BaseApplication implements EventListenerObject, IBaseApplication, I
      * 运行
      * @protected
      */
-    protected async runAsync(): Promise<void> {
+    public async runAsync(): Promise<void> {
         this.start();
     }
 

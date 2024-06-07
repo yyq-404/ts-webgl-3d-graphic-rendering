@@ -26,9 +26,9 @@ export class WebGLApplication extends BaseApplication {
      * 构造
      * @param canvas
      * @param contextAttributes
-     * @param need2D
+     * @param option2d
      */
-    public constructor(canvas: HTMLCanvasElement, contextAttributes: WebGLContextAttributes = {premultipliedAlpha: false}, need2D: boolean = false) {
+    public constructor(canvas: HTMLCanvasElement, contextAttributes: WebGLContextAttributes = {premultipliedAlpha: false}, option2d: boolean = false) {
         super(canvas);
         this.gl = this.canvas.getContext('webgl', contextAttributes);
         if (!this.gl) {
@@ -36,7 +36,7 @@ export class WebGLApplication extends BaseApplication {
             throw new Error(' 无法创建WebGLRenderingContext上下文对象 ');
         }
         // 从canvas元素中获得webgl上下文渲染对象，WebGL API都通过该上下文渲染对象进行调用
-        if (need2D) {
+        if (option2d) {
             const parent: HTMLElement | null = this.canvas.parentElement;
             if (!parent) throw new Error('canvas元素必须要有父亲!!');
             this.ctx2D = this.canvas.getContext('2d');
@@ -62,6 +62,10 @@ export class WebGLApplication extends BaseApplication {
         this.builder = new GLMeshBuilder(this.gl, GLAttribState.POSITION_BIT | GLAttribState.COLOR_BIT, GLProgramCache.instance.getMust('color'));
     }
 
+    /**
+     * 获取顶点属性。
+     * @param gl
+     */
     public static getMaxVertexAttributes(gl: WebGLRenderingContext): number {
         return gl.getParameter(gl.MAX_VERTEX_ATTRIBS) as number;
     }

@@ -1,6 +1,5 @@
 import {WebGLApplication} from "./WebGLApplication";
 import {Camera} from "../lib/camera/Camera";
-import {CanvasMouseEvent} from "../event/CanvasMouseEvent";
 import {CanvasKeyboardEvent} from "../event/CanvasKeyboardEvent";
 
 /**
@@ -14,10 +13,10 @@ export class CameraApplication extends WebGLApplication {
      * 构造。
      * @param canvas
      * @param attributes
-     * @param need2d
+     * @param option2d
      */
-    public constructor(canvas: HTMLCanvasElement, attributes: WebGLContextAttributes = {premultipliedAlpha: false}, need2d: boolean = false) {
-        super(canvas, attributes, need2d);
+    public constructor(canvas: HTMLCanvasElement, attributes: WebGLContextAttributes = {premultipliedAlpha: false}, option2d: boolean = false) {
+        super(canvas, attributes, option2d);
         this.camera = new Camera(this.gl, canvas.width, canvas.height, 45, 1);
     }
 
