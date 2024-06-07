@@ -1,9 +1,12 @@
-import {IEnumerator} from "../interface/IEnumerator";
+import {INodeIterator} from "../interface/INodeIterator";
 import {TreeNode} from "../tree/TreeNode";
 
-export class NodeB2TEnumerator<T> implements IEnumerator<TreeNode<T>> {
+/**
+ * 后跟/后序枚举器
+ */
+export class NodeB2TIterator<T> implements INodeIterator<TreeNode<T>> {
     /** 枚举迭代器 */
-    private _iter: IEnumerator<TreeNode<T>>;
+    private _iter: INodeIterator<TreeNode<T>>;
     /** 节点数组 */
     private _arr!: Array<TreeNode<T> | undefined>;
     /** 节点索引 */
@@ -13,7 +16,7 @@ export class NodeB2TEnumerator<T> implements IEnumerator<TreeNode<T>> {
      * 构造
      * @param iter
      */
-    public constructor(iter: IEnumerator<TreeNode<T>>) {
+    public constructor(iter: INodeIterator<TreeNode<T>>) {
         this._iter = iter;
         this._arrIdx = 0;
         this.reset();
@@ -23,10 +26,7 @@ export class NodeB2TEnumerator<T> implements IEnumerator<TreeNode<T>> {
      * 获取当前节点
      */
     public get current(): TreeNode<T> | undefined {
-        if (this._arrIdx >= this._arr.length) {
-            return undefined;
-        }
-        return this._arr[this._arrIdx];
+        return this._arrIdx < this._arr.length ? this._arr[this._arrIdx] : undefined;
     }
 
     /**

@@ -1,5 +1,5 @@
 import {ListAdapter} from "./list/ListAdapter";
-import {List} from "./list/List";
+import {LinkedList} from "./list/LinkedList";
 
 /**
  * 队列
@@ -12,7 +12,7 @@ export class Queue<T> extends ListAdapter<T> {
         if (this.length <= 0) {
             return undefined;
         }
-        if (this._array instanceof List) {
+        if (this._array instanceof LinkedList) {
             return this._array.popFront()
         } else {
             return this._array.shift();

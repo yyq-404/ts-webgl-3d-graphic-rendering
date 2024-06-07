@@ -1,7 +1,7 @@
 /**
  * 适配器接口
  */
-export interface IAdapter<T> {
+export interface IListAdapter<T> {
     /**
      * 增加
      */

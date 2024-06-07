@@ -1,9 +1,9 @@
 import {ListNode} from "./ListNode";
 
 /**
- * 链表
+ * 双向链表
  */
-export class List<T> {
+export class LinkedList<T> {
     /** 头节点 */
     private readonly _headNode: ListNode<T>;
     /** 长度 */
@@ -55,7 +55,7 @@ export class List<T> {
      * @param data
      */
     public contains(data: T): boolean {
-        for (let link: ListNode<T> | null = this._headNode.next; link != null && link != this._headNode; link = link.next) {
+        for (let link: ListNode<T> | null = this._headNode.next; link != null && link != this._headNode; link = link?.next) {
             if (link != null && link.data !== undefined && link.data === data) {
                 return true;
             }

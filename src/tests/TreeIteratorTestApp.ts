@@ -1,8 +1,14 @@
 import {TreeNode} from "../common/container/tree/TreeNode";
-import {IEnumerator} from "../common/container/interface/IEnumerator";
-import {NodeEnumeratorFactory} from "../common/container/enumerator/NodeEnumeratorFactory";
+import {INodeIterator} from "../common/container/interface/INodeIterator";
+import {NodeIteratorFactory} from "../common/container/iterator/NodeIteratorFactory";
 
-export class TreeTest {
+/**
+ * 树结构迭代器测试
+ */
+export class TreeIteratorTestApp {
+    /**
+     * 创建
+     */
     public static createNumberTree(): TreeNode<number> {
         let root = new TreeNode<number>(0, undefined, "root");
         let node1 = new TreeNode<number>(1, root, "node1");
@@ -20,12 +26,15 @@ export class TreeTest {
         return root;
     }
 
+    /**
+     * 测试
+     */
     public static test(): void {
-        let root = TreeTest.createNumberTree();
-        let iter: IEnumerator<TreeNode<number>>;
+        let root = TreeIteratorTestApp.createNumberTree();
+        let iter: INodeIterator<TreeNode<number>>;
         let current: TreeNode<number> | undefined = undefined;
         console.log('1. depthFirst_left2right_top2bottom_enumerator');
-        iter = NodeEnumeratorFactory.create_df_l2r_t2b_iter(root);
+        iter = NodeIteratorFactory.create_df_l2r_t2b_iter(root);
         while (iter.moveNext()) {
             current = iter.current;
             if (current !== undefined) {

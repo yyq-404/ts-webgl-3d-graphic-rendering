@@ -187,6 +187,12 @@ export class TreeNode<T> {
         return depth;
     }
 
+    /**
+     * 重复字符串
+     * 方便打印调试
+     * @param target
+     * @param n
+     */
     public repeatString(target: string, n: number): string {
         let total: string = '';
         for (let i = 1; i < n; ++i) {

@@ -1,12 +1,12 @@
-import {List} from "./List";
-import {IAdapter} from "../interface/IAdapter";
+import {LinkedList} from "./LinkedList";
+import {IListAdapter} from "../interface/IListAdapter";
 
 /**
  * 链表适配器。
  */
-export abstract class ListAdapter<T> implements IAdapter<T> {
+export abstract class ListAdapter<T> implements IListAdapter<T> {
     /** 内部类型数组 */
-    protected _array: Array<T> | List<T>;
+    protected _array: Array<T> | LinkedList<T>;
 
     /**
      * 构造
@@ -14,7 +14,7 @@ export abstract class ListAdapter<T> implements IAdapter<T> {
      */
     public constructor(useList: boolean = true) {
         if (useList) {
-            this._array = new List<T>()
+            this._array = new LinkedList<T>()
         } else {
             this._array = new Array<T>();
         }
@@ -46,8 +46,8 @@ export abstract class ListAdapter<T> implements IAdapter<T> {
      * 清空。
      */
     public clear(): void {
-        if (this._array instanceof List) {
-            this._array = new List<T>();
+        if (this._array instanceof LinkedList) {
+            this._array = new LinkedList<T>();
         } else {
             this._array = new Array<T>();
         }

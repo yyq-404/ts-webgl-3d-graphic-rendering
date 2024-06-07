@@ -1,26 +1,33 @@
-import {Indexer} from "../tree/Indexer";
-import {IAdapter} from "../interface/IAdapter";
+import {TreeIndexer} from "../tree/TreeIndexer";
+import {IListAdapter} from "../interface/IListAdapter";
 import {TreeNode} from "../tree/TreeNode";
-import {IEnumerator} from "../interface/IEnumerator";
+import {INodeIterator} from "../interface/INodeIterator";
 
 /**
- * 先根/前序枚举其。
+ * 先根/前序枚举器。
  */
-export class NodeT2BEnumerator<T, IdxFunc extends Indexer, Adapter extends IAdapter<TreeNode<T>>> implements IEnumerator<TreeNode<T>> {
-    get adapter(): IAdapter<TreeNode<T>> {
-        return this._adapter;
-    }
-
-    set adapter(value: IAdapter<TreeNode<T>>) {
+export class NodeT2BIterator<T, IdxFunc extends TreeIndexer, Adapter extends IListAdapter<TreeNode<T>>> implements INodeIterator<TreeNode<T>> {
+    /**
+     * 设置适配器
+     * @param value
+     */
+    public set adapter(value: IListAdapter<TreeNode<T>>) {
         this._adapter = value;
     }
 
+    /**
+     * 获取适配器
+     */
+    public get adapter(): IListAdapter<TreeNode<T>> {
+        return this._adapter;
+    }
+
     /** 节点 */
-    private _node: TreeNode<T> | undefined;
+    private readonly _node: TreeNode<T> | undefined;
     /** 适配器 */
-    private _adapter!: IAdapter<TreeNode<T>>;
+    private _adapter!: IListAdapter<TreeNode<T>>;
     /** 索引器 */
-    private _indexer!: IdxFunc;
+    private readonly _indexer!: IdxFunc;
     /** 当前节点 */
     private _currNode!: TreeNode<T> | undefined;
 

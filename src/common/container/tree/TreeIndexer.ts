@@ -1,7 +1,7 @@
 /**
  * 回调函数原型
  */
-export  type Indexer = (len: number, idx: number) => number;
+export  type TreeIndexer = (len: number, idx: number) => number;
 
 /**
  * 从左到右的索引
