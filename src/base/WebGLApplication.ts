@@ -62,7 +62,7 @@ export class WebGLApplication extends BaseApplication {
         this.builder = new GLMeshBuilder(this.gl, GLAttribState.POSITION_BIT | GLAttribState.COLOR_BIT, GLProgramCache.instance.getMust('color'));
     }
 
-    public static getMaxVertexAttribs(gl: WebGLRenderingContext): number {
+    public static getMaxVertexAttributes(gl: WebGLRenderingContext): number {
         return gl.getParameter(gl.MAX_VERTEX_ATTRIBS) as number;
     }
 }

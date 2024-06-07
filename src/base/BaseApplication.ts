@@ -3,10 +3,13 @@ import {CanvasMouseEvent} from "../event/CanvasMouseEvent";
 import {CanvasKeyboardEvent} from "../event/CanvasKeyboardEvent";
 import {Vector2} from "../common/math/Vector2";
 import {TimerManager} from "../timer/TimerManager";
-import {ICanvasMouseEventListener} from "../interface/event/ICanvasMouseEventListener";
-import {ICanvasKeyBoardEventListener} from "../interface/event/ICanvasKeyBoardEventListener";
+import {ICanvasInputEventListener} from "../interface/ICanvasInputEventListener";
+import {IBaseApplication} from "../interface/IBaseApplication";
 
-export class BaseApplication implements EventListenerObject, ICanvasMouseEventListener, ICanvasKeyBoardEventListener {
+/**
+ * 基础应用
+ */
+export class BaseApplication implements EventListenerObject, IBaseApplication, ICanvasInputEventListener {
     /** 定时器管理器 */
     protected timerManager: TimerManager = new TimerManager();
     private _fps: number = 0;
@@ -55,18 +58,32 @@ export class BaseApplication implements EventListenerObject, ICanvasMouseEventLi
         window.addEventListener('keypress', this, false);
     }
 
+    /**
+     * 设置fps
+     * @param fps
+     */
     public set fps(fps: number) {
         this._fps = fps;
     }
 
+    /**
+     * 获取fps
+     */
     public get fps(): number {
         return this._fps;
     }
 
+    /**
+     * 运行
+     * @protected
+     */
     protected async runAsync(): Promise<void> {
         this.start();
     }
 
+    /**
+     * 启动
+     */
     public start(): void {
         if (!this._start) {
             this._start = true;
@@ -75,10 +92,16 @@ export class BaseApplication implements EventListenerObject, ICanvasMouseEventLi
         }
     }
 
+    /**
+     * 是否运行。
+     */
     public isRunning(): boolean {
         return this._start;
     }
 
+    /**
+     * 停止
+     */
     public stop(): void {
         if (this._start) {
             cancelAnimationFrame(this._requestId);
@@ -88,14 +111,11 @@ export class BaseApplication implements EventListenerObject, ICanvasMouseEventLi
         }
     }
 
-    public update(elapsedMsec: number, intervalSec: number): void {
-        throw new Error('Method not implemented');
-    }
-
-    public render(): void {
-        throw new Error('Method not implemented');
-    }
-
+    /**
+     * 配置
+     * @param timeStamp
+     * @protected
+     */
     protected step(timeStamp: number): void {
         if (this._startTime === -1) {
             this._startTime = timeStamp;
@@ -143,7 +163,6 @@ export class BaseApplication implements EventListenerObject, ICanvasMouseEventLi
     /**
      * 获取画布鼠标事件。
      * @param event
-     * @param type
      * @private
      */
     protected toCanvasMouseEvent(event: MouseEvent): CanvasMouseEvent {
@@ -198,7 +217,6 @@ export class BaseApplication implements EventListenerObject, ICanvasMouseEventLi
         if (event instanceof KeyboardEvent) {
             this.onKeyBoardEvent(event);
         }
-
     }
 
     /**
@@ -256,23 +274,7 @@ export class BaseApplication implements EventListenerObject, ICanvasMouseEventLi
      * @param event
      */
     public onMouseDown(event: CanvasMouseEvent): void {
-        throw new Error('Method not implemented');
-    }
-
-    /**
-     * 鼠标拖动
-     * @param event
-     */
-    public onMouseDrag(event: CanvasMouseEvent): void {
-        throw new Error('Method not implemented');
-    }
-
-    /**
-     * 鼠标移动
-     * @param event
-     */
-    public onMouseMove(event: CanvasMouseEvent): void {
-        throw new Error('Method not implemented');
+        console.log(`onMouseDown: ${event.button}, pos: ${event.mousePosition}`);
     }
 
     /**
@@ -280,7 +282,23 @@ export class BaseApplication implements EventListenerObject, ICanvasMouseEventLi
      * @param event
      */
     public onMouseUp(event: CanvasMouseEvent): void {
-        throw new Error('Method not implemented');
+        console.log(`onMouseUp: ${event.button}, pos: ${event.mousePosition}`);
+    }
+
+    /**
+     * 鼠标拖动
+     * @param event
+     */
+    public onMouseDrag(event: CanvasMouseEvent): void {
+        console.log(`onMouseDrag: ${event.button}, pos: ${event.mousePosition}`);
+    }
+
+    /**
+     * 鼠标移动
+     * @param event
+     */
+    public onMouseMove(event: CanvasMouseEvent): void {
+        console.log(`onMouseMove: ${event.button}, pos: ${event.mousePosition}`);
     }
 
     /**
@@ -288,15 +306,7 @@ export class BaseApplication implements EventListenerObject, ICanvasMouseEventLi
      * @param event
      */
     public onKeyDown(event: CanvasKeyboardEvent): void {
-        throw new Error('Method not implemented');
-    }
-
-    /**
-     * 按键长按
-     * @param event
-     */
-    public onKeyPress(event: CanvasKeyboardEvent): void {
-        throw new Error('Method not implemented');
+        console.log(`onKeyDown: ${event.keyCode}`)
     }
 
     /**
@@ -304,6 +314,30 @@ export class BaseApplication implements EventListenerObject, ICanvasMouseEventLi
      * @param event
      */
     public onKeyUp(event: CanvasKeyboardEvent): void {
-        throw new Error('Method not implemented');
+        console.log(`onKeyUp: ${event.keyCode}`)
+    }
+
+    /**
+     * 按键长按
+     * @param event
+     */
+    public onKeyPress(event: CanvasKeyboardEvent): void {
+        console.log(`onKeyPress: ${event.keyCode}`)
+    }
+
+    /**
+     * 更新
+     * @param elapsedMsec
+     * @param intervalSec
+     */
+    public update(elapsedMsec: number, intervalSec: number): void {
+        throw new Error('Method not implemented, please override it in sub class.');
+    }
+
+    /**
+     * 渲染
+     */
+    public render(): void {
+        throw new Error('Method not implemented, please override it in sub class.');
     }
 }
