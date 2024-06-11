@@ -64,7 +64,7 @@ export class GLMeshBuilder extends GLMeshBase {
 
         // 根据attribBits，测试是否使用了下面几种类型的顶点属性格式
         this._hasColor = GLAttribState.hasColor(this._attribState);
-        this._hasTexCoordinate = GLAttribState.hasTexCoord_0(this._attribState);
+        this._hasTexCoordinate = GLAttribState.hasTexCoordinate_0(this._attribState);
         this._hasNormal = GLAttribState.hasNormal(this._attribState);
 
         this._ibo = null;
@@ -110,7 +110,7 @@ export class GLMeshBuilder extends GLMeshBase {
                 this._lists[GLAttribState.COLOR_NAME] = new TypedArrayList<Float32Array>(Float32Array);
             }
             if (this._hasTexCoordinate) {
-                this._lists[GLAttribState.TEXCOORD_NAME] = new TypedArrayList<Float32Array>(Float32Array);
+                this._lists[GLAttribState.TEX_COORDINATE_NAME] = new TypedArrayList<Float32Array>(Float32Array);
             }
             if (this._hasNormal) {
                 this._lists[GLAttribState.NORMAL_NAME] = new TypedArrayList<Float32Array>(Float32Array);
@@ -145,11 +145,11 @@ export class GLMeshBuilder extends GLMeshBase {
                 this.gl.enableVertexAttribArray(GLAttribState.COLOR_LOCATION);
             }
             if (this._hasTexCoordinate) {
-                this._lists[GLAttribState.TEXCOORD_NAME] = new TypedArrayList<Float32Array>(Float32Array);
-                this._buffers[GLAttribState.TEXCOORD_NAME] = indexBuffer;
+                this._lists[GLAttribState.TEX_COORDINATE_NAME] = new TypedArrayList<Float32Array>(Float32Array);
+                this._buffers[GLAttribState.TEX_COORDINATE_NAME] = indexBuffer;
                 this.gl.bindBuffer(this.gl.ARRAY_BUFFER, indexBuffer);
-                this.gl.vertexAttribPointer(GLAttribState.TEXCOORD_BIT, 2, gl.FLOAT, false, 0, 0);
-                this.gl.enableVertexAttribArray(GLAttribState.TEXCOORD_BIT);
+                this.gl.vertexAttribPointer(GLAttribState.TEX_COORDINATE_BIT, 2, gl.FLOAT, false, 0, 0);
+                this.gl.enableVertexAttribArray(GLAttribState.TEX_COORDINATE_BIT);
             }
             if (this._hasNormal) {
                 this._lists[GLAttribState.NORMAL_NAME] = new TypedArrayList<Float32Array>(Float32Array);
@@ -274,7 +274,7 @@ export class GLMeshBuilder extends GLMeshBase {
             list.push(y);
             list.push(z);
             if (this._hasTexCoordinate) {
-                list = this._lists[GLAttribState.TEXCOORD_NAME];
+                list = this._lists[GLAttribState.TEX_COORDINATE_NAME];
                 list.push(this._texCoordinate.x);
                 list.push(this._texCoordinate.y);
             }
@@ -311,7 +311,7 @@ export class GLMeshBuilder extends GLMeshBase {
             // 使用自己实现的动态类型数组，重用
             let list: TypedArrayList<Float32Array> = this._lists[GLAttribState.POSITION_NAME];
             if (this._hasTexCoordinate) {
-                list = this._lists[GLAttribState.TEXCOORD_NAME];
+                list = this._lists[GLAttribState.TEX_COORDINATE_NAME];
             }
             if (this._hasNormal) {
                 list = this._lists[GLAttribState.NORMAL_NAME];
@@ -355,8 +355,8 @@ export class GLMeshBuilder extends GLMeshBase {
             let list: TypedArrayList<Float32Array> = this._lists[GLAttribState.POSITION_NAME];
             this.gl.bufferSubData(this.gl.ARRAY_BUFFER, 0, list.subArray());
             if (this._hasTexCoordinate) {
-                list = this._lists[GLAttribState.TEXCOORD_NAME];
-                this.gl.bufferSubData(this.gl.ARRAY_BUFFER, map[GLAttribState.TEXCOORD_NAME], list.subArray());
+                list = this._lists[GLAttribState.TEX_COORDINATE_NAME];
+                this.gl.bufferSubData(this.gl.ARRAY_BUFFER, map[GLAttribState.TEX_COORDINATE_NAME], list.subArray());
             }
             if (this._hasNormal) {
                 list = this._lists[GLAttribState.NORMAL_NAME];
@@ -380,8 +380,8 @@ export class GLMeshBuilder extends GLMeshBase {
 
             // texture
             if (this._hasTexCoordinate) {
-                buffer = this._buffers[GLAttribState.TEXCOORD_NAME];
-                list = this._lists[GLAttribState.TEXCOORD_NAME];
+                buffer = this._buffers[GLAttribState.TEX_COORDINATE_NAME];
+                list = this._lists[GLAttribState.TEX_COORDINATE_NAME];
                 this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
                 this.gl.bufferData(this.gl.ARRAY_BUFFER, list.subArray(), this.gl.DYNAMIC_DRAW);
             }

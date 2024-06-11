@@ -50,7 +50,7 @@ export class GLStaticMesh extends GLMeshBase {
         // 然后计算出交错存储的顶点属性attribOffsetMap相关的值
         const offsetMap: GLAttribOffsetMap = GLAttribState.getInterleavedLayoutAttribOffsetMap(this._attribState);
         // 计算出顶点的数量
-        this._vertCount = vbo.byteLength / offsetMap[GLAttribState.ATTRIBSTRIDE];
+        this._vertCount = vbo.byteLength / offsetMap[GLAttribState.ATTRIB_STRIDE];
         // 使用VAO后，我们只要初始化时设置一次setAttribVertexArrayPointer和setAttribVertexArrayState就行了
         // 当我们后续调用基类的bind方法绑定VAO对象后，VAO会自动处理顶点地址绑定和顶点属性寄存器开启相关操作，这就简化了很多操作
         GLAttribState.setAttribVertexArrayPointer(gl, offsetMap);

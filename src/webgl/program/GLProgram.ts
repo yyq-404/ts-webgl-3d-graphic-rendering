@@ -345,11 +345,11 @@ export class GLProgram {
         if (GLAttribState.hasNormal(this._attribState)) {
             gl.bindAttribLocation(program, GLAttribState.NORMAL_LOCATION, GLAttribState.NORMAL_NAME);
         }
-        if (GLAttribState.hasTexCoord_0(this._attribState)) {
-            gl.bindAttribLocation(program, GLAttribState.TEXCOORD_LOCATION, GLAttribState.TEXCOORD_NAME);
+        if (GLAttribState.hasTexCoordinate_0(this._attribState)) {
+            gl.bindAttribLocation(program, GLAttribState.TEX_COORDINATE_LOCATION, GLAttribState.TEX_COORDINATE_NAME);
         }
-        if (GLAttribState.hasTexCoord_1(this._attribState)) {
-            gl.bindAttribLocation(program, GLAttribState.TEXCOORD1_LOCATION, GLAttribState.TEXCOORD1_NAME);
+        if (GLAttribState.hasTexCoordinate_1(this._attribState)) {
+            gl.bindAttribLocation(program, GLAttribState.TEX_COORDINATE1_LOCATION, GLAttribState.TEX_COORDINATE1_NAME);
         }
         if (GLAttribState.hasColor(this._attribState)) {
             gl.bindAttribLocation(program, GLAttribState.COLOR_LOCATION, GLAttribState.COLOR_NAME);
@@ -371,7 +371,7 @@ export class GLProgram {
         // 获取当前active状态的attribute和uniform的数量
         // 很重要的一点，active_attributes/uniforms必须在link后才能获得
         GLHelper.getProgramActiveAttribs(gl, program, this.attribMap);
-        GLHelper.getProgramAtciveUniforms(gl, program, this.uniformMap);
+        GLHelper.getProgramActiveUniforms(gl, program, this.uniformMap);
         console.log(JSON.stringify(this.attribMap));
         console.log(JSON.stringify(this.uniformMap));
     }

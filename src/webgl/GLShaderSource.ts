@@ -1,4 +1,6 @@
-/** 着色器源代码存储器 */
+/**
+ * 着色器源代码存储器
+ */
 export const GLShaderSource = {
     colorShader: {
         vs: `

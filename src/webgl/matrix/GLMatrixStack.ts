@@ -1,36 +1,48 @@
-import {Matrix4} from "../common/math/Matrix4";
-import {MathHelper} from "../common/math/MathHelper";
-import {Matrix4Adapter} from "../common/math/MathAdapter";
-import {Vector3} from "../common/math/Vector3";
+import {Matrix4} from "../../common/math/Matrix4";
+import {MathHelper} from "../../common/math/MathHelper";
+import {Matrix4Adapter} from "../../common/math/MathAdapter";
+import {Vector3} from "../../common/math/Vector3";
 
 
+/**
+ * 矩阵模式
+ */
 export enum EMatrixMode {
-    MODELVIEW,
+    MODEL_VIEW,
     PROJECTION,
     TEXTURE,
 }
 
-/** 实现 `OpenGL 1.x` 中矩阵堆栈的相关功能 */
+/**
+ * 实现 `OpenGL 1.x` 中矩阵堆栈的相关功能
+ */
 export class GLMatrixStack {
-    private _mvStack: Matrix4[];
-    private _projStack: Matrix4[];
-    private _texStack: Matrix4[];
-    matrixMode: EMatrixMode;
+    /** 矩阵模式 */
+    private matrixMode: EMatrixMode;
+    /** 模型矩阵栈 */
+    private readonly _mvStack: Matrix4[];
+    /** 正交矩阵栈 */
+    private readonly _projStack: Matrix4[];
+    /** 纹理矩阵栈 */
+    private readonly _texStack: Matrix4[];
 
-    constructor() {
+    /**
+     * 构造
+     */
+    public constructor() {
         //初始化时每个矩阵栈都先添加一个正交归一化后的矩阵
         this._mvStack = [];
         this._mvStack.push(new Matrix4().setIdentity());
-
         this._projStack = [];
         this._projStack.push(new Matrix4().setIdentity());
-
         this._texStack = [];
         this._texStack.push(new Matrix4().setIdentity());
-
-        this.matrixMode = EMatrixMode.MODELVIEW;
+        this.matrixMode = EMatrixMode.MODEL_VIEW;
     }
 
+    /**
+     * 获取模型矩阵
+     */
     get modelViewMatrix(): Matrix4 {
         if (this._mvStack.length <= 0) {
             throw new Error('model view matrix stack为空!');
@@ -38,6 +50,9 @@ export class GLMatrixStack {
         return this._mvStack[this._mvStack.length - 1];
     }
 
+    /**
+     * 获取正交矩阵
+     */
     get projectionMatrix(): Matrix4 {
         if (this._projStack.length <= 0) {
             throw new Error('projection matrix stack为空!');
@@ -45,6 +60,9 @@ export class GLMatrixStack {
         return this._projStack[this._projStack.length - 1];
     }
 
+    /**
+     * 获取模型视图投影矩阵
+     */
     get modelViewProjectionMatrix(): Matrix4 {
         const ret: Matrix4 = new Matrix4().setIdentity();
         this.projectionMatrix.copy(ret);
@@ -52,16 +70,21 @@ export class GLMatrixStack {
         return ret;
     }
 
+    /**
+     * 获取法线矩阵
+     */
     get normalMatrix(): Matrix4 {
         const ret: Matrix4 = new Matrix4();
         this.modelViewMatrix.copy(ret);
-
         // Matrix4Instance.inverse() 会修改自身!!!
         if (!ret.inverse()) throw new Error('can not solve `ret.inverse()` ');
         ret.transpose();
         return ret;
     }
 
+    /**
+     * 获取纹理矩阵
+     */
     get textureMatrix(): Matrix4 {
         if (this._texStack.length <= 0) {
             throw new Error('projection matrix stack为空!');
@@ -69,13 +92,15 @@ export class GLMatrixStack {
         return this._texStack[this._texStack.length - 1];
     }
 
-    pushMatrix(): GLMatrixStack {
+    /**
+     * 压入矩阵。
+     */
+    public pushMatrix(): GLMatrixStack {
         const mv: Matrix4 = new Matrix4().setIdentity();
         const proj = new Matrix4().setIdentity();
         const tex: Matrix4 = new Matrix4().setIdentity();
-
         switch (this.matrixMode) {
-            case EMatrixMode.MODELVIEW:
+            case EMatrixMode.MODEL_VIEW:
                 this.modelViewMatrix.copy(mv);
                 this._mvStack.push(mv);
                 break;
@@ -91,9 +116,12 @@ export class GLMatrixStack {
         return this;
     }
 
-    popMatrix(): GLMatrixStack {
+    /**
+     * 弹出矩阵
+     */
+    public popMatrix(): GLMatrixStack {
         switch (this.matrixMode) {
-            case EMatrixMode.MODELVIEW:
+            case EMatrixMode.MODEL_VIEW:
                 this._mvStack.pop();
                 break;
             case EMatrixMode.PROJECTION:
@@ -106,9 +134,12 @@ export class GLMatrixStack {
         return this;
     }
 
-    loadIdentity(): GLMatrixStack {
+    /**
+     * 将栈顶的矩阵重置为单位矩阵
+     */
+    public loadIdentity(): GLMatrixStack {
         switch (this.matrixMode) {
-            case EMatrixMode.MODELVIEW:
+            case EMatrixMode.MODEL_VIEW:
                 this.modelViewMatrix.setIdentity();
                 break;
             case EMatrixMode.PROJECTION:
@@ -121,9 +152,13 @@ export class GLMatrixStack {
         return this;
     }
 
-    loadMatrix(mat: Matrix4): GLMatrixStack {
+    /**
+     * 将参数矩阵mat的值复制到栈顶矩阵
+     * @param mat
+     */
+    public loadMatrix(mat: Matrix4): GLMatrixStack {
         switch (this.matrixMode) {
-            case EMatrixMode.MODELVIEW:
+            case EMatrixMode.MODEL_VIEW:
                 mat.copy(this.modelViewMatrix);
                 break;
             case EMatrixMode.PROJECTION:
@@ -136,69 +171,86 @@ export class GLMatrixStack {
         return this;
     }
 
-    perspective(
-        fov: number,
-        aspect: number,
-        near: number,
-        far: number,
-        isRadians: boolean = false,
-    ): GLMatrixStack {
+    /**
+     * 计算透视矩阵
+     * @param fov
+     * @param aspect
+     * @param near
+     * @param far
+     * @param isRadians
+     */
+    public perspective(fov: number, aspect: number, near: number, far: number, isRadians: boolean = false): GLMatrixStack {
         this.matrixMode = EMatrixMode.PROJECTION;
-        if (isRadians == false) {
+        if (!isRadians) {
             fov = MathHelper.toRadian(fov);
         }
-
         const mat: Matrix4 = Matrix4Adapter.perspective(fov, aspect, near, far);
-
         this.loadMatrix(mat);
-        this.matrixMode = EMatrixMode.MODELVIEW;
+        this.matrixMode = EMatrixMode.MODEL_VIEW;
         // 是否要调用loadIdentity方法???
         this.loadIdentity();
         return this;
     }
 
-    frustum(
-        left: number,
-        right: number,
-        bottom: number,
-        top: number,
-        near: number,
-        far: number,
-    ): GLMatrixStack {
+    /**
+     * 计算视锥矩阵
+     * @param left
+     * @param right
+     * @param bottom
+     * @param top
+     * @param near
+     * @param far
+     */
+    public frustum(left: number, right: number, bottom: number, top: number, near: number, far: number): GLMatrixStack {
         this.matrixMode = EMatrixMode.PROJECTION;
         const mat: Matrix4 = Matrix4.frustum(left, right, bottom, top, near, far);
         this.loadMatrix(mat);
-        this.matrixMode = EMatrixMode.MODELVIEW;
+        this.matrixMode = EMatrixMode.MODEL_VIEW;
         // 是否要调用loadIdentity方法???
         this.loadIdentity();
         return this;
     }
 
-    ortho(
-        left: number,
-        right: number,
-        bottom: number,
-        top: number,
-        near: number,
-        far: number,
-    ): GLMatrixStack {
+    /**
+     * 计算正交矩阵
+     * @param left
+     * @param right
+     * @param bottom
+     * @param top
+     * @param near
+     * @param far
+     */
+    public orthographic(left: number, right: number, bottom: number, top: number, near: number, far: number): GLMatrixStack {
         this.matrixMode = EMatrixMode.PROJECTION;
         const mat: Matrix4 = Matrix4.orthographic(left, right, bottom, top, near, far);
         this.loadMatrix(mat);
-        this.matrixMode = EMatrixMode.MODELVIEW;
+        this.matrixMode = EMatrixMode.MODEL_VIEW;
         // 是否要调用loadIdentity方法???
         this.loadIdentity();
         return this;
     }
 
-    lookAt(pos: Vector3, target: Vector3, up: Vector3 = Vector3.up): GLMatrixStack {
-        this.matrixMode = EMatrixMode.MODELVIEW;
+    /**
+     * 计算朝向
+     * @param pos
+     * @param target
+     * @param up
+     */
+    public lookAt(pos: Vector3, target: Vector3, up: Vector3 = Vector3.up): GLMatrixStack {
+        this.matrixMode = EMatrixMode.MODEL_VIEW;
         const mat: Matrix4 = Matrix4.lookAt(pos, target, up);
         this.loadMatrix(mat);
         return this;
     }
 
-    makeView(pos: Vector3, xAxis: Vector3, yAxis: Vector3, zAxis: Vector3): GLMatrixStack {
+    /**
+     * 构建视图
+     * @param pos
+     * @param xAxis
+     * @param yAxis
+     * @param zAxis
+     */
+    public makeView(pos: Vector3, xAxis: Vector3, yAxis: Vector3, zAxis: Vector3): GLMatrixStack {
         zAxis.normalize();
 
         //forward cross right = up
@@ -225,9 +277,13 @@ export class GLMatrixStack {
         return this;
     }
 
-    multMatrix(mat: Matrix4): GLMatrixStack {
+    /**
+     * 矩阵乘法
+     * @param mat
+     */
+    public multiplyMatrix(mat: Matrix4): GLMatrixStack {
         switch (this.matrixMode) {
-            case EMatrixMode.MODELVIEW:
+            case EMatrixMode.MODEL_VIEW:
                 this.modelViewMatrix.multiply(mat);
                 break;
             case EMatrixMode.PROJECTION:
@@ -240,9 +296,13 @@ export class GLMatrixStack {
         return this;
     }
 
-    translate(pos: Vector3): GLMatrixStack {
+    /**
+     * 矩阵平移
+     * @param pos
+     */
+    public translate(pos: Vector3): GLMatrixStack {
         switch (this.matrixMode) {
-            case EMatrixMode.MODELVIEW:
+            case EMatrixMode.MODEL_VIEW:
                 this.modelViewMatrix.translate(pos);
                 break;
             case EMatrixMode.PROJECTION:
@@ -255,12 +315,18 @@ export class GLMatrixStack {
         return this;
     }
 
-    rotate(angle: number, axis: Vector3, isRadians: boolean = false): GLMatrixStack {
-        if (isRadians === false) {
+    /**
+     * 矩阵旋转
+     * @param angle
+     * @param axis
+     * @param isRadians
+     */
+    public rotate(angle: number, axis: Vector3, isRadians: boolean = false): GLMatrixStack {
+        if (!isRadians) {
             angle = MathHelper.toRadian(angle);
         }
         switch (this.matrixMode) {
-            case EMatrixMode.MODELVIEW:
+            case EMatrixMode.MODEL_VIEW:
                 this.modelViewMatrix.rotate(angle, axis);
                 break;
             case EMatrixMode.PROJECTION:
@@ -273,9 +339,13 @@ export class GLMatrixStack {
         return this;
     }
 
-    scale(s: Vector3): GLMatrixStack {
+    /**
+     * 矩阵缩放
+     * @param s
+     */
+    public scale(s: Vector3): GLMatrixStack {
         switch (this.matrixMode) {
-            case EMatrixMode.MODELVIEW:
+            case EMatrixMode.MODEL_VIEW:
                 this.modelViewMatrix.scale(s);
                 break;
             case EMatrixMode.PROJECTION:
@@ -286,84 +356,5 @@ export class GLMatrixStack {
                 break;
         }
         return this;
-    }
-}
-
-/** 该类用于将**局部坐标系**表示的顶点变换到**世界坐标系**, 以`Matrix4`矩阵为栈中的元素 */
-export class GLWorldMatrixStack {
-    /** 内置一个矩阵数组 */
-    private _worldMatrixStack: Matrix4[];
-
-    constructor() {
-        //初始化时矩阵栈先添加一个正交单位化后的矩阵
-        this._worldMatrixStack = [];
-        this._worldMatrixStack.push(new Matrix4().setIdentity());
-    }
-
-    /** 获取堆栈顶部的世界矩阵 */
-    get worldMatrix(): Matrix4 {
-        if (this._worldMatrixStack.length <= 0) {
-            throw new Error(' model matrix stack为空!');
-        }
-        return this._worldMatrixStack[this._worldMatrixStack.length - 1];
-    }
-
-    get modelViewMatrix(): Matrix4 {
-        if (this._worldMatrixStack.length <= 0) {
-            throw new Error(' model matrix stack为空!');
-        }
-        return this._worldMatrixStack[this._worldMatrixStack.length - 1];
-    }
-
-    /** 在矩阵堆栈中添加一个矩阵 */
-    pushMatrix(): GLWorldMatrixStack {
-        const mv: Matrix4 = new Matrix4().setIdentity(); // 要新增的矩阵复制了父矩阵的值
-        this.worldMatrix.copy(mv); // 然后添加到堆栈的顶部
-        this._worldMatrixStack.push(mv);
-        return this; // 返回this，可用于链式操作
-    }
-
-    /** remove掉堆栈顶部的矩阵并返回this */
-    popMatrix(): GLWorldMatrixStack {
-        this._worldMatrixStack.pop();
-        return this; // 返回this，可用于链式操作
-    }
-    /** 将栈顶的矩阵重置为单位矩阵 */
-    loadIdentity(): GLWorldMatrixStack {
-        this.worldMatrix.setIdentity();
-        return this; // 返回this，可用于链式操作
-    }
-
-    /** 将参数矩阵mat的值复制到栈顶矩阵 */
-    loadMatrix(mat: Matrix4): GLWorldMatrixStack {
-        mat.copy(this.worldMatrix);
-        return this; // 返回this，可用于链式操作
-    }
-
-    /** 栈顶矩阵 = 栈顶矩阵 ＊ 参数矩阵mat */
-    multiMatrix(mat: Matrix4): GLWorldMatrixStack {
-        this.worldMatrix.multiply(mat);
-        return this; // 返回this，可用于链式操作
-    }
-
-    /* 栈顶矩阵 = 栈顶矩阵 ＊ 平移矩阵 */
-    translate(pos: Vector3): GLWorldMatrixStack {
-        this.worldMatrix.translate(pos);
-        return this; // 返回this，可用于链式操作
-    }
-
-    /** 栈顶矩阵 = 栈顶矩阵 ＊ 轴角对表示的旋转矩阵 */
-    rotate(angle: number, axis: Vector3, isRadians: boolean = false): GLWorldMatrixStack {
-        if (isRadians === false) {
-            angle = MathHelper.toRadian(angle);
-        }
-        this.worldMatrix.rotate(angle, axis);
-        return this; // 返回this，可用于链式操作
-    }
-
-    /** 栈顶矩阵 = 栈顶矩阵 ＊ 缩放矩阵 */
-    scale(s: Vector3): GLWorldMatrixStack {
-        this.worldMatrix.scale(s);
-        return this; // 返回this，可用于链式操作
     }
 }

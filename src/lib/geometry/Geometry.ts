@@ -34,7 +34,7 @@ export class Geometry {
             bits &= ~GLAttribState.NORMAL_BIT;
         }
         if (!optionUV) {
-            bits &= ~GLAttribState.TEXCOORD_BIT;
+            bits &= ~GLAttribState.TEX_COORDINATE_BIT;
         }
         const stride: number = GLAttribState.getVertexByteStride(bits);
         const step: number = stride / Float32Array.BYTES_PER_ELEMENT;
@@ -54,7 +54,7 @@ export class Geometry {
                 buffer[j + idx++] = this.normals[i].z;
             }
             //纹理
-            if (bits & GLAttribState.TEXCOORD_BIT) {
+            if (bits & GLAttribState.TEX_COORDINATE_BIT) {
                 buffer[j + idx++] = this.uvs[i].x;
                 buffer[j + idx++] = this.uvs[i].y;
             }
@@ -99,7 +99,7 @@ export class Geometry {
         }
         let bits: GLAttribBits = GLAttribState.POSITION_BIT;
         if (this.uvs.length > 0) {
-            bits |= GLAttribState.TEXCOORD_BIT;
+            bits |= GLAttribState.TEX_COORDINATE_BIT;
         }
         if (this.normals.length > 0) {
             bits |= GLAttribState.NORMAL_BIT;

@@ -1,6 +1,8 @@
 import {Vector3} from "../common/math/Vector3";
 
-/** `GLCoordinateSystem` 类用来描述和显示WebGL的坐标系结构，支持多视口的绘制 */
+/**
+ *  `GLCoordinateSystem` 类用来描述和显示WebGL的坐标系结构，支持多视口的绘制
+ */
 export class GLCoordinateSystem {
     // 此处更改参见 https://www.typescriptlang.org/docs/handbook/2/classes.html#parameter-properties
     /** 当前坐标系被绘制在哪个视口中 */
@@ -16,7 +18,16 @@ export class GLCoordinateSystem {
     /** 是否绘制为 `Direct3D` 左手系 */
     public isD3D: boolean = false;
 
-    constructor(viewport: number[], position: Vector3 = Vector3.zero, axis: Vector3 = Vector3.up, angle: number = 0, isDrawAxis: boolean = false, isD3D: boolean = false) {
+    /**
+     * 构造
+     * @param viewport
+     * @param position
+     * @param axis
+     * @param angle
+     * @param isDrawAxis
+     * @param isD3D
+     */
+    public constructor(viewport: number[], position: Vector3 = Vector3.zero, axis: Vector3 = Vector3.up, angle: number = 0, isDrawAxis: boolean = false, isD3D: boolean = false) {
         this.viewport = viewport;
         this.position = position;
         this.axis = axis;
@@ -25,10 +36,19 @@ export class GLCoordinateSystem {
         this.isD3D = isD3D;
     }
 
+    /**
+     * 构建视图坐标系统。
+     * @param width
+     * @param height
+     * @param row
+     * @param colum
+     */
     public static makeViewportCoordinateSystems(width: number, height: number, row: number = 2, colum: number = 2): GLCoordinateSystem[] {
         const coords: GLCoordinateSystem[] = [];
-        const w: number = width / colum; // 一行有多少个
-        const h: number = height / row; // 一列有多少个
+        // 一行有多少个
+        const w: number = width / colum;
+        // 一列有多少个
+        const h: number = height / row;
         // 循环生成GLCoordinateSystem对象，每个GLCoordinateSystem内置了表示viewport的数组
         for (let i: number = 0; i < colum; i++) {
             for (let j: number = 0; j < row; j++) {
