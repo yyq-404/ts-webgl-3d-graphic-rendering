@@ -1,88 +1,158 @@
 import {Matrix4} from './Matrix4'
-import {Quaternion} from './Quaternion'
-import {Vector2} from './Vector2'
-import {Vector3} from './Vector3'
+import {Quaternion} from '../Quaternion'
+import {Vector2} from '../vector/Vector2'
+import {Vector3} from '../vector/Vector3'
 
-import {epsilon} from './Constants'
+import {epsilon} from '../Constants'
 
+/**
+ * 三维矩阵
+ */
 export class Matrix3 {
 
-    constructor(values?: number[]) {
+    static readonly identity = new Matrix3().setIdentity()
+    private values = new Float32Array(9)
+
+    /**
+     * 构造
+     * @param values
+     */
+    public constructor(values?: number[]) {
         if (values !== undefined) {
             this.init(values)
         }
     }
 
-    private values = new Float32Array(9)
+    /**
+     * 乘积
+     * @param m1
+     * @param m2
+     * @param result
+     */
+    public static product(m1: Matrix3, m2: Matrix3, result: Matrix3): Matrix3 {
+        const a00 = m1.at(0)
+        const a01 = m1.at(1)
+        const a02 = m1.at(2)
+        const a10 = m1.at(3)
+        const a11 = m1.at(4)
+        const a12 = m1.at(5)
+        const a20 = m1.at(6)
+        const a21 = m1.at(7)
+        const a22 = m1.at(8)
 
-    static readonly identity = new Matrix3().setIdentity()
+        const b00 = m2.at(0)
+        const b01 = m2.at(1)
+        const b02 = m2.at(2)
+        const b10 = m2.at(3)
+        const b11 = m2.at(4)
+        const b12 = m2.at(5)
+        const b20 = m2.at(6)
+        const b21 = m2.at(7)
+        const b22 = m2.at(8)
 
-    at(index: number): number {
+        if (!result) result = new Matrix3();
+        return result.init([
+            b00 * a00 + b01 * a10 + b02 * a20,
+            b00 * a01 + b01 * a11 + b02 * a21,
+            b00 * a02 + b01 * a12 + b02 * a22,
+
+            b10 * a00 + b11 * a10 + b12 * a20,
+            b10 * a01 + b11 * a11 + b12 * a21,
+            b10 * a02 + b11 * a12 + b12 * a22,
+
+            b20 * a00 + b21 * a10 + b22 * a20,
+            b20 * a01 + b21 * a11 + b22 * a21,
+            b20 * a02 + b21 * a12 + b22 * a22,
+        ])
+    }
+
+    /**
+     * 按索引获取值
+     * @param index
+     */
+    public at(index: number): number {
         return this.values[index]
     }
 
-    init(values: number[]): Matrix3 {
+    /**
+     * 初始化
+     * @param values
+     */
+    public init(values: number[]): Matrix3 {
         for (let i = 0; i < 9; i++) {
             this.values[i] = values[i]
         }
-
         return this
     }
 
-    reset(): void {
+    /**
+     * 重置
+     */
+    public reset(): void {
         for (let i = 0; i < 9; i++) {
             this.values[i] = 0
         }
     }
 
-    copy(dest?: Matrix3): Matrix3 {
+    /**
+     * 拷贝
+     * @param dest
+     */
+    public copy(dest?: Matrix3): Matrix3 {
         if (!dest) {
             dest = new Matrix3()
         }
-
         for (let i = 0; i < 9; i++) {
             dest.values[i] = this.values[i]
         }
-
         return dest
     }
 
-    all(): number[] {
+    /**
+     * 获取所有值
+     */
+    public all(): number[] {
         const data: number[] = []
         for (let i = 0; i < 9; i++) {
             data[i] = this.values[i]
         }
-
         return data
     }
 
-    row(index: number): number[] {
-        return [
-            this.values[index * 3 + 0],
-            this.values[index * 3 + 1],
-            this.values[index * 3 + 2],
-        ]
+    /**
+     * 按索引获取行
+     * @param index
+     */
+    public row(index: number): number[] {
+        return [this.values[index * 3], this.values[index * 3 + 1], this.values[index * 3 + 2]]
     }
 
-    col(index: number): number[] {
-        return [
-            this.values[index],
-            this.values[index + 3],
-            this.values[index + 6],
-        ]
+    /**
+     * 按索引获取列
+     * @param index
+     */
+    public col(index: number): number[] {
+        return [this.values[index], this.values[index + 3], this.values[index + 6]]
     }
 
-    equals(matrix: Matrix3, threshold = epsilon): boolean {
+    /**
+     * 比较
+     * @param matrix
+     * @param threshold
+     */
+    public equals(matrix: Matrix3, threshold = epsilon): boolean {
         for (let i = 0; i < 9; i++) {
             if (Math.abs(this.values[i] - matrix.at(i)) > threshold) {
                 return false
             }
         }
-
         return true
     }
 
-    determinant(): number {
+    /**
+     * 行列式
+     */
+    public determinant(): number {
         const a00 = this.values[0]
         const a01 = this.values[1]
         const a02 = this.values[2]
@@ -100,7 +170,10 @@ export class Matrix3 {
         return a00 * det01 + a01 * det11 + a02 * det21
     }
 
-    setIdentity(): Matrix3 {
+    /**
+     * 重置为单位矩阵
+     */
+    public setIdentity(): Matrix3 {
         this.values[0] = 1
         this.values[1] = 0
         this.values[2] = 0
@@ -110,26 +183,29 @@ export class Matrix3 {
         this.values[6] = 0
         this.values[7] = 0
         this.values[8] = 1
-
         return this
     }
 
-    transpose(): Matrix3 {
+    /**
+     * 调换
+     */
+    public transpose(): Matrix3 {
         const temp01 = this.values[1]
         const temp02 = this.values[2]
         const temp12 = this.values[5]
-
         this.values[1] = this.values[3]
         this.values[2] = this.values[6]
         this.values[3] = temp01
         this.values[5] = this.values[7]
         this.values[6] = temp02
         this.values[7] = temp12
-
         return this
     }
 
-    inverse(): Matrix3 | null {
+    /**
+     * 逆矩阵
+     */
+    public inverse(): Matrix3 | null {
         const a00 = this.values[0]
         const a01 = this.values[1]
         const a02 = this.values[2]
@@ -165,7 +241,11 @@ export class Matrix3 {
         return this
     }
 
-    multiply(matrix: Matrix3): Matrix3 {
+    /**
+     * 自身乘积
+     * @param matrix
+     */
+    public multiply(matrix: Matrix3): Matrix3 {
         const a00 = this.values[0]
         const a01 = this.values[1]
         const a02 = this.values[2]
@@ -201,98 +281,73 @@ export class Matrix3 {
         return this
     }
 
-    multiplyVec2(vector: Vector2, result: Vector2): Vector2 {
+    /**
+     * 与二维向量的乘积
+     * @param vector
+     * @param result
+     */
+    public multiplyVec2(vector: Vector2, result?: Vector2): Vector2 {
         const x = vector.x
         const y = vector.y
-
-        if (result) {
-            result.xy = [
-                x * this.values[0] + y * this.values[3] + this.values[6],
-                x * this.values[1] + y * this.values[4] + this.values[7],
-            ]
-
-            return result
-        } else {
-            return new Vector2([
-                x * this.values[0] + y * this.values[3] + this.values[6],
-                x * this.values[1] + y * this.values[4] + this.values[7],
-            ])
-        }
+        if (!result) result = new Vector2();
+        result.xy = [
+            x * this.values[0] + y * this.values[3] + this.values[6],
+            x * this.values[1] + y * this.values[4] + this.values[7],
+        ]
+        return result;
     }
 
-    multiplyVec3(vector: Vector3, result: Vector3): Vector3 {
+    /**
+     * 与三维向量的乘积
+     * @param vector
+     * @param result
+     */
+    public multiplyVec3(vector: Vector3, result?: Vector3): Vector3 {
         const x = vector.x
         const y = vector.y
         const z = vector.z
-
-        if (result) {
-            result.xyz = [
-                x * this.values[0] + y * this.values[3] + z * this.values[6],
-                x * this.values[1] + y * this.values[4] + z * this.values[7],
-                x * this.values[2] + y * this.values[5] + z * this.values[8],
-            ]
-
-            return result
-        } else {
-            return new Vector3([
-                x * this.values[0] + y * this.values[3] + z * this.values[6],
-                x * this.values[1] + y * this.values[4] + z * this.values[7],
-                x * this.values[2] + y * this.values[5] + z * this.values[8],
-            ])
-        }
+        if (!result) result = new Vector3();
+        result.xyz = [
+            x * this.values[0] + y * this.values[3] + z * this.values[6],
+            x * this.values[1] + y * this.values[4] + z * this.values[7],
+            x * this.values[2] + y * this.values[5] + z * this.values[8],
+        ]
+        return result
     }
 
-    toMat4(result: Matrix4): Matrix4 {
-        if (result) {
-            result.init([
-                this.values[0],
-                this.values[1],
-                this.values[2],
-                0,
+    /**
+     * 转换为四维矩阵
+     * @param result
+     */
+    public toMat4(result?: Matrix4): Matrix4 {
+        if (!result) result = new Matrix4();
+        return result.init([
+            this.values[0],
+            this.values[1],
+            this.values[2],
+            0,
 
-                this.values[3],
-                this.values[4],
-                this.values[5],
-                0,
+            this.values[3],
+            this.values[4],
+            this.values[5],
+            0,
 
-                this.values[6],
-                this.values[7],
-                this.values[8],
-                0,
+            this.values[6],
+            this.values[7],
+            this.values[8],
+            0,
 
-                0,
-                0,
-                0,
-                1,
-            ])
-
-            return result
-        } else {
-            return new Matrix4([
-                this.values[0],
-                this.values[1],
-                this.values[2],
-                0,
-
-                this.values[3],
-                this.values[4],
-                this.values[5],
-                0,
-
-                this.values[6],
-                this.values[7],
-                this.values[8],
-                0,
-
-                0,
-                0,
-                0,
-                1,
-            ])
-        }
+            0,
+            0,
+            0,
+            1,
+        ]);
     }
 
-    toQuat(): Quaternion {
+    /**
+     * 转换为四元数
+     */
+    public toQuat(): Quaternion {
         const m00 = this.values[0]
         const m01 = this.values[1]
         const m02 = this.values[2]
@@ -373,7 +428,12 @@ export class Matrix3 {
         return result
     }
 
-    rotate(angle: number, axis: Vector3): Matrix3 | null {
+    /**
+     * 旋转
+     * @param angle
+     * @param axis
+     */
+    public rotate(angle: number, axis: Vector3): Matrix3 | null {
         let x = axis.x
         let y = axis.y
         let z = axis.z
@@ -430,59 +490,4 @@ export class Matrix3 {
 
         return this
     }
-
-    static product(m1: Matrix3, m2: Matrix3, result: Matrix3): Matrix3 {
-        const a00 = m1.at(0)
-        const a01 = m1.at(1)
-        const a02 = m1.at(2)
-        const a10 = m1.at(3)
-        const a11 = m1.at(4)
-        const a12 = m1.at(5)
-        const a20 = m1.at(6)
-        const a21 = m1.at(7)
-        const a22 = m1.at(8)
-
-        const b00 = m2.at(0)
-        const b01 = m2.at(1)
-        const b02 = m2.at(2)
-        const b10 = m2.at(3)
-        const b11 = m2.at(4)
-        const b12 = m2.at(5)
-        const b20 = m2.at(6)
-        const b21 = m2.at(7)
-        const b22 = m2.at(8)
-
-        if (result) {
-            result.init([
-                b00 * a00 + b01 * a10 + b02 * a20,
-                b00 * a01 + b01 * a11 + b02 * a21,
-                b00 * a02 + b01 * a12 + b02 * a22,
-
-                b10 * a00 + b11 * a10 + b12 * a20,
-                b10 * a01 + b11 * a11 + b12 * a21,
-                b10 * a02 + b11 * a12 + b12 * a22,
-
-                b20 * a00 + b21 * a10 + b22 * a20,
-                b20 * a01 + b21 * a11 + b22 * a21,
-                b20 * a02 + b21 * a12 + b22 * a22,
-            ])
-
-            return result
-        } else {
-            return new Matrix3([
-                b00 * a00 + b01 * a10 + b02 * a20,
-                b00 * a01 + b01 * a11 + b02 * a21,
-                b00 * a02 + b01 * a12 + b02 * a22,
-
-                b10 * a00 + b11 * a10 + b12 * a20,
-                b10 * a01 + b11 * a11 + b12 * a21,
-                b10 * a02 + b11 * a12 + b12 * a22,
-
-                b20 * a00 + b21 * a10 + b22 * a20,
-                b20 * a01 + b21 * a11 + b22 * a21,
-                b20 * a02 + b21 * a12 + b22 * a22,
-            ])
-        }
-    }
-
 }

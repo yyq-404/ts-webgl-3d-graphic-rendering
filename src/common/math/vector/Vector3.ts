@@ -1,8 +1,8 @@
-import {Matrix3} from './Matrix3'
-import {Quaternion} from './Quaternion'
+import {Matrix3} from '../matrix/Matrix3'
+import {Quaternion} from '../Quaternion'
 
-import {epsilon} from './Constants'
-import {Matrix2} from "./Matrix2";
+import {epsilon} from '../Constants'
+import {Matrix2} from "../matrix/Matrix2";
 
 export class Vector3 {
 

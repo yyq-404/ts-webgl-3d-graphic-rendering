@@ -1,4 +1,4 @@
-import {Vector3} from "../common/math/Vector3";
+import {Vector3} from "../common/math/vector/Vector3";
 
 /**
  *  `GLCoordinateSystem` 类用来描述和显示WebGL的坐标系结构，支持多视口的绘制

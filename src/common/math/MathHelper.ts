@@ -1,10 +1,13 @@
-import {Vector3} from "./Vector3";
-import {Vector4} from "./Vector4";
-import {Vector2} from "./Vector2";
+import {Vector3} from "./vector/Vector3";
+import {Vector4} from "./vector/Vector4";
+import {Vector2} from "./vector/Vector2";
 import {Quaternion} from "./Quaternion";
-import {Matrix4} from "./Matrix4";
+import {Matrix4} from "./matrix/Matrix4";
 import {MathAdapter} from "./MathAdapter";
 
+/**
+ * 坐标轴类型
+ */
 export enum EAxisType {
     NONE = -1,
     X_AXIS,
@@ -12,7 +15,9 @@ export enum EAxisType {
     Z_AXIS,
 }
 
-/** 点与平面之间的关系 */
+/**
+ * 点与平面之间的关系
+ */
 export enum EPlaneLoc {
     /** 在平面的正面 */
     FRONT,
@@ -22,7 +27,11 @@ export enum EPlaneLoc {
     COPLANAR,
 }
 
+/**
+ * 数学工具类。
+ */
 export class MathHelper {
+
     /**
      * 静态辅助数学方法，判断参数x（必须是4）是否是2的n次方，即x是不是1、2、4、8、16、32、64.....
      * @param x
@@ -45,42 +54,56 @@ export class MathHelper {
         return x + 1;
     }
 
-    /** 角度/弧度互转函数 */
-    static toRadian(degree: number): number {
+    /**
+     *  角度/弧度互转函数
+     *  @param degree
+     */
+    public static toRadian(degree: number): number {
         return (degree * Math.PI) / 180;
     }
 
-    static toDegree(radian: number): number {
+    /**
+     * 弧度/角度互换函数
+     * @param radian
+     */
+    public static toDegree(radian: number): number {
         return (radian / Math.PI) * 180;
     }
 
-    /** 浮点数容差相等函数 */
+    /**
+     * 浮点数容差相等函数
+     * @param left
+     * @param right
+     */
     static numberEquals(left: number, right: number): boolean {
-        if (Math.abs(left - right) > MathAdapter.EPSILON) {
-            return false;
-        }
-        return true;
+        return Math.abs(left - right) <= MathAdapter.EPSILON;
+
     }
 
-    static clamp(x: number, min: number, max: number): number {
+    /**
+     * 检测目标值是否在区间之内
+     * @param x
+     * @param min
+     * @param max
+     */
+    public static clamp(x: number, min: number, max: number): number {
         return x < min ? min : x > max ? max : x;
     }
 
-    /** 通过不共线的三个点构造平面，平面的隐式方程：ax+by+cz+d=0 */
+    /**
+     * 通过不共线的三个点构造平面，平面的隐式方程：ax+by+cz+d=0
+     * @param a
+     * @param b
+     * @param c
+     * @param result
+     * @param result
+     */
     static planeFromPoints(a: Vector3, b: Vector3, c: Vector3, result: Vector4 | null = null): Vector4 {
-        // if (!result) result = new Vector4();
-        // const normal: Vector3 = new Vector3(); // 计算三个点构成的三角形的法线
-        // MathHelper.computeNormal(a, b, c, normal); // 计算ax+by+cz+d=0中的d
-        // const d: number = -Vector3.dot(normal, a);
-        // result.x = normal.x; // ax+by+cz+d=0中的x
-        // result.y = normal.y; // ax+by+cz+d=0中的y
-        // result.z = normal.z; // ax+by+cz+d=0中的z
-        // result.w = d; // ax+by+cz+d=0中的d
-        // return result;
-
         if (!result) result = new Vector4();
         const normal: Vector3 = new Vector3();
+        // 计算三个点构成的三角形的法线
         this.computeNormal(a, b, c, normal);
+        // 计算ax+by+cz+d=0中的d
         const d: number = -Vector3.dot(normal, a);
         result.x = normal.x;
         result.y = normal.y;
@@ -89,8 +112,14 @@ export class MathHelper {
         return result;
     }
 
-    /** 计算三角形的法向量，其公式为：cross ( b-a , c-a ).normalize() */
-    static computeNormal(a: Vector3, b: Vector3, c: Vector3, result: Vector3 | null): Vector3 {
+    /**
+     * 计算三角形的法向量，其公式为：cross ( b-a , c-a ).normalize()
+     * @param a
+     * @param b
+     * @param c
+     * @param result
+     */
+    public static computeNormal(a: Vector3, b: Vector3, c: Vector3, result: Vector3 | null): Vector3 {
         if (!result) result = new Vector3();
         const l0: Vector3 = new Vector3();
         const l1: Vector3 = new Vector3();
@@ -101,12 +130,13 @@ export class MathHelper {
         return result;
     }
 
-    /** 通过一条法线和一个点来构造一个平面，平面的隐式方程：ax+by+cz+d=0 */
-    static planeFromPointNormal(
-        point: Vector3,
-        normal: Vector3,
-        result: Vector4 | null = null,
-    ): Vector4 {
+    /**
+     * 通过一条法线和一个点来构造一个平面，平面的隐式方程：ax+by+cz+d=0
+     * @param point
+     * @param normal
+     * @param result
+     */
+    public static planeFromPointNormal(point: Vector3, normal: Vector3, result: Vector4 | null = null): Vector4 {
         if (!result) result = new Vector4();
         result.x = normal.x;
         result.y = normal.y;
@@ -118,28 +148,34 @@ export class MathHelper {
     /**
      * 平面的单位化
      * 如果平面中的法向量（即Vector4中的x、y、z分量部分）为单位向量，那么这个平面被称为单位化平面
+     * @param plane
      */
-    static planeNormalize(plane: Vector4): number {
-        const length = Math.sqrt(
-            plane.x * plane.x + plane.y * plane.y + plane.z * plane.z,
-        );
+    public static planeNormalize(plane: Vector4): number {
+        const length = Math.sqrt(plane.x * plane.x + plane.y * plane.y + plane.z * plane.z);
         if (length === 0) throw new Error('面积为0的平面!!!');
-        const ilength = 1.0 / length;
-        plane.x = plane.x * ilength;
-        plane.y = plane.y * ilength;
-        plane.z = plane.z * ilength;
-        plane.w = plane.w * ilength;
-
+        const iLength = 1.0 / length;
+        plane.x = plane.x * iLength;
+        plane.y = plane.y * iLength;
+        plane.z = plane.z * iLength;
+        plane.w = plane.w * iLength;
         return length;
     }
 
-    /** 三维空间中任意一个点与平面之间的有向距离 */
-    static planeDistanceFromPoint(plane: Vector4, point: Vector3): number {
+    /**
+     * 三维空间中任意一个点与平面之间的有向距离
+     * @param plane
+     * @param point
+     */
+    public static planeDistanceFromPoint(plane: Vector4, point: Vector3): number {
         return point.x * plane.x + point.y * plane.y + point.z * plane.z + plane.w;
     }
 
-    /** 判断一个点是在平面的正面、反面还是该点在平面上 */
-    static planeTestPoint(plane: Vector4, point: Vector3): EPlaneLoc {
+    /**
+     * 判断一个点是在平面的正面、反面还是该点在平面上
+     * @param plane
+     * @param point
+     */
+    public static planeTestPoint(plane: Vector4, point: Vector3): EPlaneLoc {
         // 三维空间中任意一个点与平面的有向距离
         const num: number = MathHelper.planeDistanceFromPoint(plane, point);
         if (num > MathAdapter.EPSILON) {
@@ -153,14 +189,17 @@ export class MathHelper {
         }
     }
 
-    static obj2GLViewportSpace(
-        localPt: Vector3,
-        mvp: Matrix4,
-        viewport: Int32Array | Float32Array,
-        viewportPt: Vector3,
-    ): boolean {
+    /**
+     * 本地坐标系转换到视图坐标系
+     * @param localPt
+     * @param mvp
+     * @param viewport
+     * @param viewportPt
+     */
+    public static obj2GLViewportSpace(localPt: Vector3, mvp: Matrix4, viewport: Int32Array | Float32Array, viewportPt: Vector3): boolean {
         const v: Vector4 = new Vector4([localPt.x, localPt.y, localPt.z, 1.0]);
-        mvp.multiplyVec4(v, v); // 将顶点从local坐标系变换到投影坐标系，或裁剪坐标系
+        // 将顶点从local坐标系变换到投影坐标系，或裁剪坐标系
+        mvp.multiplyVec4(v, v);
         if (v.w === 0.0) {
             // 如果变换后的w为0，则返回false
             return false;
@@ -192,8 +231,11 @@ export class MathHelper {
      * |/        | /
      * 0---------4/
      * ```
+     * @param v
+     * @param mins
+     * @param maxs
      */
-    static boundBoxAddPoint(v: Vector3, mins: Vector3, maxs: Vector3): void {
+    public static boundBoxAddPoint(v: Vector3, mins: Vector3, maxs: Vector3): void {
         if (v.x < mins.x) {
             mins.x = v.x;
         }
@@ -218,14 +260,24 @@ export class MathHelper {
         }
     }
 
-    /** 初始化 `mins` 和 `maxs` */
-    static boundBoxClear(mins: Vector3, maxs: Vector3, value: number = Infinity): void {
+    /**
+     * 初始化 `mins` 和 `maxs`
+     * @param mins
+     * @param maxs
+     * @param value
+     */
+    public static boundBoxClear(mins: Vector3, maxs: Vector3, value: number = Infinity): void {
         mins.x = mins.y = mins.z = value; // 初始化时，让mins表示浮点数的最大范围
         maxs.x = maxs.y = maxs.z = -value; // 初始化是，让maxs表示浮点数的最小范围
     }
 
-    /** 获得AABB包围盒的中心点坐标 */
-    static boundBoxGetCenter(mins: Vector3, maxs: Vector3, out: Vector3 | null = null): Vector3 {
+    /**
+     * 获得AABB包围盒的中心点坐标
+     * @param mins
+     * @param maxs
+     * @param out
+     */
+    public static boundBoxGetCenter(mins: Vector3, maxs: Vector3, out: Vector3 | null = null): Vector3 {
         if (!out) out = new Vector3();
         // (maxs + mins) ＊ 0.5
         Vector3.sum(mins, maxs, out);
@@ -245,72 +297,42 @@ export class MathHelper {
      * |/        | /
      * 0---------4/
      * ```
+     * @param mins
+     * @param maxs
+     * @param pts8
      */
-    static boundBoxGet8Points(mins: Vector3, maxs: Vector3, pts8: Vector3[]): void {
+    public static boundBoxGet8Points(mins: Vector3, maxs: Vector3, pts8: Vector3[]): void {
         const center: Vector3 = MathHelper.boundBoxGetCenter(mins, maxs); // 获取中心点
         const maxs2center: Vector3 = Vector3.difference(center, maxs); // 获取最大点到中心点之间的距离向量
-        pts8.push(
-            new Vector3([
-                center.x + maxs2center.x,
-                center.y + maxs2center.y,
-                center.z + maxs2center.z,
-            ]),
-        ); // 0
-        pts8.push(
-            new Vector3([
-                center.x + maxs2center.x,
-                center.y - maxs2center.y,
-                center.z + maxs2center.z,
-            ]),
-        ); // 1
-        pts8.push(
-            new Vector3([
-                center.x + maxs2center.x,
-                center.y + maxs2center.y,
-                center.z - maxs2center.z,
-            ]),
-        ); // 2
-        pts8.push(
-            new Vector3([
-                center.x + maxs2center.x,
-                center.y - maxs2center.y,
-                center.z - maxs2center.z,
-            ]),
-        ); // 3
-        pts8.push(
-            new Vector3([
-                center.x - maxs2center.x,
-                center.y + maxs2center.y,
-                center.z + maxs2center.z,
-            ]),
-        ); // 4
-        pts8.push(
-            new Vector3([
-                center.x - maxs2center.x,
-                center.y - maxs2center.y,
-                center.z + maxs2center.z,
-            ]),
-        ); // 5
-        pts8.push(
-            new Vector3([
-                center.x - maxs2center.x,
-                center.y + maxs2center.y,
-                center.z - maxs2center.z,
-            ]),
-        ); // 6
-        pts8.push(
-            new Vector3([
-                center.x - maxs2center.x,
-                center.y - maxs2center.y,
-                center.z - maxs2center.z,
-            ]),
-        ); // 7
+        // 0
+        pts8.push(new Vector3([center.x + maxs2center.x, center.y + maxs2center.y, center.z + maxs2center.z]));
+        // 1
+        pts8.push(new Vector3([center.x + maxs2center.x, center.y - maxs2center.y, center.z + maxs2center.z,]));
+        // 2
+        pts8.push(new Vector3([center.x + maxs2center.x, center.y + maxs2center.y, center.z - maxs2center.z,]));
+        // 3
+        pts8.push(new Vector3([center.x + maxs2center.x, center.y - maxs2center.y, center.z - maxs2center.z,]));
+        // 4
+        pts8.push(new Vector3([center.x - maxs2center.x, center.y + maxs2center.y, center.z + maxs2center.z,]));
+        // 5
+        pts8.push(new Vector3([center.x - maxs2center.x, center.y - maxs2center.y, center.z + maxs2center.z,]));
+        // 6
+        pts8.push(new Vector3([center.x - maxs2center.x, center.y + maxs2center.y, center.z - maxs2center.z,]));
+        // 7
+        pts8.push(new Vector3([center.x - maxs2center.x, center.y - maxs2center.y, center.z - maxs2center.z,]));
     }
 
-    /** 计算变换后的 `AABB包围盒` */
-    static boundBoxTransform(mat: Matrix4, mins: Vector3, maxs: Vector3): void {
-        const pts: Vector3[] = []; // 分配数组内存，类型为Vector3
-        MathHelper.boundBoxGet8Points(mins, maxs, pts); // 获得局部坐标系表示的AABB的8个顶点坐标
+    /**
+     * 计算变换后的 `AABB包围盒`
+     * @param mat
+     * @param mins
+     * @param maxs
+     */
+    public static boundBoxTransform(mat: Matrix4, mins: Vector3, maxs: Vector3): void {
+        // 分配数组内存，类型为Vector3
+        const pts: Vector3[] = [];
+        // 获得局部坐标系表示的AABB的8个顶点坐标
+        MathHelper.boundBoxGet8Points(mins, maxs, pts);
         const out: Vector3 = new Vector3(); // 变换后的顶点
         // 遍历局部坐标系的8个AABB包围盒的顶点坐标
         pts.forEach((pt) => {
@@ -321,25 +343,21 @@ export class MathHelper {
         });
     }
 
-    /** 判断一个点是否在AABB包围盒内部，如果在则返回true，否则返回false */
-    static boundBoxContainsPoint(point: Vector3, mins: Vector3, maxs: Vector3): boolean {
-        return (
-            point.x >= mins.x &&
-            point.x <= maxs.x &&
-            point.y >= mins.y &&
-            point.y <= maxs.y &&
-            point.z >= mins.z &&
-            point.z <= maxs.z
-        );
+    /**
+     * 判断一个点是否在AABB包围盒内部，如果在则返回true，否则返回false
+     *
+     * @param point
+     * @param mins
+     * @param maxs
+     */
+    public static boundBoxContainsPoint(point: Vector3, mins: Vector3, maxs: Vector3): boolean {
+        return (point.x >= mins.x && point.x <= maxs.x && point.y >= mins.y && point.y <= maxs.y && point.z >= mins.z && point.z <= maxs.z);
     }
 
-    /** `boundBoxBoundBoxOverlap` 方法用来判断两个AABB 包围盒是否相交（或重叠）。如果相交则返回 `true` ，否则返回 `false` */
-    static boundBoxBoundBoxOverlap(
-        min1: Vector3,
-        max1: Vector3,
-        min2: Vector3,
-        max2: Vector3,
-    ): boolean {
+    /**
+     * `boundBoxBoundBoxOverlap` 方法用来判断两个AABB 包围盒是否相交（或重叠）。如果相交则返回 `true` ，否则返回 `false`
+     */
+    public static boundBoxBoundBoxOverlap(min1: Vector3, max1: Vector3, min2: Vector3, max2: Vector3): boolean {
         if (min1.x > max2.x) return false;
         if (max1.x < min2.x) return false;
         if (min1.y > max2.y) return false;
@@ -349,10 +367,18 @@ export class MathHelper {
         return true;
     }
 
-    static convertVector3IDCoord2GLCoord(v: Vector3, scale: number = 10.0): void {
-        const f: number = v.y; // opengl right = dooom3 x
-        v.y = v.z; //opengl up = doom3 z
-        v.z = -f; //opengl forward = doom3 -y
+    /**
+     * 三维向量从ID坐标转换为GL坐标
+     * @param v
+     * @param scale
+     */
+    public static convertVector3IDCoord2GLCoord(v: Vector3, scale: number = 10.0): void {
+        // opengl right = dooom3 x
+        const f: number = v.y;
+        //opengl up = doom3 z
+        v.y = v.z;
+        //opengl forward = doom3 -y
+        v.z = -f;
         if (!MathHelper.numberEquals(scale, 0) && !MathHelper.numberEquals(scale, 1.0)) {
             v.x /= scale;
             v.y /= scale;
@@ -360,11 +386,21 @@ export class MathHelper {
         }
     }
 
-    static convertVector2IDCoord2GLCoord(v: Vector2): void {
+    /**
+     * 二维向量从ID坐标转换为GL坐标
+     * @param v
+     */
+    public static convertVector2IDCoord2GLCoord(v: Vector2): void {
         v.y = 1.0 - v.y;
     }
 
-    static matrixFrom(pos: Vector3, q: Quaternion, dest: Matrix4 | null = null): Matrix4 {
+    /**
+     * 把三维向量的四元数表示转换为向量表示
+     * @param pos
+     * @param q
+     * @param dest
+     */
+    public static matrixFrom(pos: Vector3, q: Quaternion, dest: Matrix4 | null = null): Matrix4 {
         if (!dest) {
             dest = new Matrix4().setIdentity();
         }

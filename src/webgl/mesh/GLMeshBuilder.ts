@@ -1,11 +1,11 @@
-import {Vector4} from "../../common/math/Vector4";
-import {Vector2} from "../../common/math/Vector2";
-import {Vector3} from "../../common/math/Vector3";
+import {Vector4} from "../../common/math/vector/Vector4";
+import {Vector2} from "../../common/math/vector/Vector2";
+import {Vector3} from "../../common/math/vector/Vector3";
 import {TypedArrayList} from "../../common/container/TypedArrayList";
 import {GLAttribBits, GLAttribState} from "../GLAttribState";
 import {GLMeshBase} from "./GLMeshBase";
 import {GLProgram} from "../program/GLProgram";
-import {Matrix4} from "../../common/math/Matrix4";
+import {Matrix4} from "../../common/math/matrix/Matrix4";
 import {GLAttribOffsetMap} from "../GLTypes";
 import {GLTexture} from "../texture/GLTexture";
 import {EGLVertexLayoutType} from "../../enum/EGLVertexLayoutType";

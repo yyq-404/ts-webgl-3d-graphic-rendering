@@ -1,8 +1,8 @@
 import {EAxisType} from '../common/math/MathHelper';
 import {GLMeshBuilder} from "../webgl/mesh/GLMeshBuilder";
-import {Matrix4} from "../common/math/Matrix4";
-import {Vector3} from "../common/math/Vector3";
-import {Vector4} from "../common/math/Vector4";
+import {Matrix4} from "../common/math/matrix/Matrix4";
+import {Vector3} from "../common/math/vector/Vector3";
+import {Vector4} from "../common/math/vector/Vector4";
 import {Vector4Adapter} from "../common/math/MathAdapter";
 
 /**

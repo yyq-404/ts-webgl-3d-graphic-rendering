@@ -1,88 +1,251 @@
-import {epsilon} from './Constants'
-import {Vector4} from './Vector4'
-import {Vector3} from "./Vector3";
+import {epsilon} from '../Constants'
+import {Vector4} from '../vector/Vector4'
+import {Vector3} from "../vector/Vector3";
 import {Matrix3} from "./Matrix3";
 
+/**
+ * 四维向量
+ */
 export class Matrix4 {
+    /** 单位向量 */
+    public static readonly identity = new Matrix4().setIdentity()
+    /** 值 */
+    private values = new Float32Array(16)
 
-    constructor(values?: number[]) {
+    /**
+     * 构造
+     * @param values
+     */
+    public constructor(values?: number[]) {
         if (values !== undefined) {
             this.init(values)
         }
     }
 
-    private values = new Float32Array(16)
+    /**
+     * 视锥矩阵
+     * @param left
+     * @param right
+     * @param bottom
+     * @param top
+     * @param near
+     * @param far
+     */
+    public static frustum(left: number, right: number, bottom: number, top: number, near: number, far: number): Matrix4 {
+        const rl = (right - left)
+        const tb = (top - bottom)
+        const fn = (far - near)
+        return new Matrix4([(near * 2) / rl, 0, 0, 0,
+            0, (near * 2) / tb, 0, 0,
+            (right + left) / rl, (top + bottom) / tb, -(far + near) / fn, -1,
+            0, 0, -(far * near * 2) / fn, 0]);
+    }
 
-    static readonly identity = new Matrix4().setIdentity()
+    /**
+     * 透视矩阵
+     * @param fov
+     * @param aspect
+     * @param near
+     * @param far
+     */
+    public static perspective(fov: number, aspect: number, near: number, far: number): Matrix4 {
+        const top = near * Math.tan(fov * Math.PI / 360.0)
+        const right = top * aspect
+        return Matrix4.frustum(-right, right, -top, top, near, far)
+    }
 
+    /**
+     * 正交矩阵
+     * @param left
+     * @param right
+     * @param bottom
+     * @param top
+     * @param near
+     * @param far
+     */
+    public static orthographic(left: number, right: number, bottom: number, top: number, near: number, far: number): Matrix4 {
+        const rl = (right - left)
+        const tb = (top - bottom)
+        const fn = (far - near)
+        return new Matrix4([
+            2 / rl, 0, 0, 0,
+            0, 2 / tb, 0, 0,
+            0, 0, -2 / fn, 0,
+            -(left + right) / rl, -(top + bottom) / tb, -(far + near) / fn, 1
+        ]);
+    }
+
+    /**
+     * 计算朝向
+     * @param position
+     * @param target
+     * @param up
+     */
+    public static lookAt(position: Vector3, target: Vector3, up: Vector3 = Vector3.up): Matrix4 {
+        if (position.equals(target)) {
+            return this.identity
+        }
+        const z = Vector3.difference(position, target).normalize()
+        const x = Vector3.cross(up, z).normalize()
+        const y = Vector3.cross(z, x).normalize()
+        return new Matrix4([x.x, y.x, z.x, 0,
+            x.y, y.y, z.y, 0,
+            x.z, y.z, z.z, 0,
+            -Vector3.dot(x, position), -Vector3.dot(y, position), -Vector3.dot(z, position), 1
+        ])
+    }
+
+    /**
+     * 矩阵乘积
+     * @param m1
+     * @param m2
+     * @param result
+     */
+    public static product(m1: Matrix4, m2: Matrix4, result: Matrix4): Matrix4 {
+        const a00 = m1.at(0)
+        const a01 = m1.at(1)
+        const a02 = m1.at(2)
+        const a03 = m1.at(3)
+        const a10 = m1.at(4)
+        const a11 = m1.at(5)
+        const a12 = m1.at(6)
+        const a13 = m1.at(7)
+        const a20 = m1.at(8)
+        const a21 = m1.at(9)
+        const a22 = m1.at(10)
+        const a23 = m1.at(11)
+        const a30 = m1.at(12)
+        const a31 = m1.at(13)
+        const a32 = m1.at(14)
+        const a33 = m1.at(15)
+
+        const b00 = m2.at(0)
+        const b01 = m2.at(1)
+        const b02 = m2.at(2)
+        const b03 = m2.at(3)
+        const b10 = m2.at(4)
+        const b11 = m2.at(5)
+        const b12 = m2.at(6)
+        const b13 = m2.at(7)
+        const b20 = m2.at(8)
+        const b21 = m2.at(9)
+        const b22 = m2.at(10)
+        const b23 = m2.at(11)
+        const b30 = m2.at(12)
+        const b31 = m2.at(13)
+        const b32 = m2.at(14)
+        const b33 = m2.at(15)
+        if (!result) result = new Matrix4();
+        return result.init([
+            b00 * a00 + b01 * a10 + b02 * a20 + b03 * a30,
+            b00 * a01 + b01 * a11 + b02 * a21 + b03 * a31,
+            b00 * a02 + b01 * a12 + b02 * a22 + b03 * a32,
+            b00 * a03 + b01 * a13 + b02 * a23 + b03 * a33,
+
+            b10 * a00 + b11 * a10 + b12 * a20 + b13 * a30,
+            b10 * a01 + b11 * a11 + b12 * a21 + b13 * a31,
+            b10 * a02 + b11 * a12 + b12 * a22 + b13 * a32,
+            b10 * a03 + b11 * a13 + b12 * a23 + b13 * a33,
+
+            b20 * a00 + b21 * a10 + b22 * a20 + b23 * a30,
+            b20 * a01 + b21 * a11 + b22 * a21 + b23 * a31,
+            b20 * a02 + b21 * a12 + b22 * a22 + b23 * a32,
+            b20 * a03 + b21 * a13 + b22 * a23 + b23 * a33,
+
+            b30 * a00 + b31 * a10 + b32 * a20 + b33 * a30,
+            b30 * a01 + b31 * a11 + b32 * a21 + b33 * a31,
+            b30 * a02 + b31 * a12 + b32 * a22 + b33 * a32,
+            b30 * a03 + b31 * a13 + b32 * a23 + b33 * a33,
+        ])
+    }
+
+    /**
+     * 根据索引获取值
+     * @param index
+     */
     public at(index: number): number {
         return this.values[index]
     }
 
+    /**
+     * 初始化
+     * @param values
+     */
     public init(values: number[]): Matrix4 {
         for (let i = 0; i < 16; i++) {
             this.values[i] = values[i]
         }
-
         return this
     }
 
+    /**
+     * 重置
+     */
     public reset(): void {
         for (let i = 0; i < 16; i++) {
             this.values[i] = 0
         }
     }
 
+    /**
+     * 拷贝
+     * @param dest
+     */
     public copy(dest?: Matrix4): Matrix4 {
         if (!dest) {
             dest = new Matrix4()
         }
-
         for (let i = 0; i < 16; i++) {
             dest.values[i] = this.values[i]
         }
-
         return dest
     }
 
+    /**
+     * 获取所有值
+     */
     public all(): number[] {
         const data: number[] = []
         for (let i = 0; i < 16; i++) {
             data[i] = this.values[i]
         }
-
         return data
     }
 
+    /**
+     * 根据索引获取值
+     * @param index
+     */
     public row(index: number): number[] {
-        return [
-            this.values[index * 4 + 0],
-            this.values[index * 4 + 1],
-            this.values[index * 4 + 2],
-            this.values[index * 4 + 3],
-        ]
+        return [this.values[index * 4], this.values[index * 4 + 1], this.values[index * 4 + 2], this.values[index * 4 + 3]];
     }
 
-    col(index: number): number[] {
-        return [
-            this.values[index],
-            this.values[index + 4],
-            this.values[index + 8],
-            this.values[index + 12],
-        ]
+    /**
+     * 根绝索引获取列。
+     * @param index
+     */
+    public col(index: number): number[] {
+        return [this.values[index], this.values[index + 4], this.values[index + 8], this.values[index + 12]]
     }
 
-    equals(matrix: Matrix4, threshold = epsilon): boolean {
+    /**
+     * 比较
+     * @param matrix
+     * @param threshold
+     */
+    public equals(matrix: Matrix4, threshold = epsilon): boolean {
         for (let i = 0; i < 16; i++) {
             if (Math.abs(this.values[i] - matrix.at(i)) > threshold) {
                 return false
             }
         }
-
         return true
     }
 
-    determinant(): number {
+    /**
+     * 行列式
+     */
+    public determinant(): number {
         const a00 = this.values[0]
         const a01 = this.values[1]
         const a02 = this.values[2]
@@ -116,7 +279,10 @@ export class Matrix4 {
         return (det00 * det11 - det01 * det10 + det02 * det09 + det03 * det08 - det04 * det07 + det05 * det06)
     }
 
-    setIdentity(): Matrix4 {
+    /**
+     * 重置为单位矩阵
+     */
+    public setIdentity(): Matrix4 {
         this.values[0] = 1
         this.values[1] = 0
         this.values[2] = 0
@@ -137,7 +303,10 @@ export class Matrix4 {
         return this
     }
 
-    transpose(): Matrix4 {
+    /**
+     * 调换矩阵
+     */
+    public transpose(): Matrix4 {
         const temp01 = this.values[1]
         const temp02 = this.values[2]
         const temp03 = this.values[3]
@@ -161,7 +330,10 @@ export class Matrix4 {
         return this
     }
 
-    inverse(): Matrix4 | null {
+    /**
+     * 逆矩阵
+     */
+    public inverse(): Matrix4 | null {
         const a00 = this.values[0]
         const a01 = this.values[1]
         const a02 = this.values[2]
@@ -220,7 +392,11 @@ export class Matrix4 {
         return this
     }
 
-    multiply(matrix: Matrix4): Matrix4 {
+    /**
+     * 自身乘积
+     * @param matrix
+     */
+    public multiply(matrix: Matrix4): Matrix4 {
         const a00 = this.values[0]
         const a01 = this.values[1]
         const a02 = this.values[2]
@@ -281,11 +457,14 @@ export class Matrix4 {
         return this
     }
 
-    multiplyVec3(vector: Vector3): Vector3 {
+    /**
+     * 与三维向量相乘
+     * @param vector
+     */
+    public multiplyVec3(vector: Vector3): Vector3 {
         const x = vector.x
         const y = vector.y
         const z = vector.z
-
         return new Vector3([
             this.values[0] * x + this.values[4] * y + this.values[8] * z + this.values[12],
             this.values[1] * x + this.values[5] * y + this.values[9] * z + this.values[13],
@@ -293,7 +472,12 @@ export class Matrix4 {
         ])
     }
 
-    multiplyVec4(vector: Vector4, dest?: Vector4): Vector4 {
+    /**
+     * 与四维向量相乘
+     * @param vector
+     * @param dest
+     */
+    public multiplyVec4(vector: Vector4, dest?: Vector4): Vector4 {
         if (!dest) {
             dest = new Vector4()
         }
@@ -311,7 +495,10 @@ export class Matrix4 {
         return dest
     }
 
-    toMat3(): Matrix3 {
+    /**
+     * 转化为三维矩阵
+     */
+    public toMatrix3(): Matrix3 {
         return new Matrix3([
             this.values[0],
             this.values[1],
@@ -325,7 +512,10 @@ export class Matrix4 {
         ])
     }
 
-    toInverseMat3(): Matrix3 | null {
+    /**
+     * 转换为三维逆矩阵
+     */
+    public toInverseMatrix3(): Matrix3 | null {
         const a00 = this.values[0]
         const a01 = this.values[1]
         const a02 = this.values[2]
@@ -361,7 +551,11 @@ export class Matrix4 {
         ])
     }
 
-    translate(vector: Vector3): Matrix4 {
+    /**
+     * 平移
+     * @param vector
+     */
+    public translate(vector: Vector3): Matrix4 {
         const x = vector.x
         const y = vector.y
         const z = vector.z
@@ -374,7 +568,11 @@ export class Matrix4 {
         return this
     }
 
-    scale(vector: Vector3): Matrix4 {
+    /**
+     * 缩放
+     * @param vector
+     */
+    public scale(vector: Vector3): Matrix4 {
         const x = vector.x
         const y = vector.y
         const z = vector.z
@@ -397,7 +595,12 @@ export class Matrix4 {
         return this
     }
 
-    rotate(angle: number, axis: Vector3): Matrix4 | null {
+    /**
+     * 旋转
+     * @param angle
+     * @param axis
+     */
+    public rotate(angle: number, axis: Vector3): Matrix4 | null {
         let x = axis.x
         let y = axis.y
         let z = axis.z
@@ -464,185 +667,4 @@ export class Matrix4 {
 
         return this
     }
-
-    static frustum(left: number, right: number, bottom: number, top: number, near: number, far: number): Matrix4 {
-        const rl = (right - left)
-        const tb = (top - bottom)
-        const fn = (far - near)
-
-        return new Matrix4([
-            (near * 2) / rl,
-            0,
-            0,
-            0,
-
-            0,
-            (near * 2) / tb,
-            0,
-            0,
-
-            (right + left) / rl,
-            (top + bottom) / tb,
-            -(far + near) / fn,
-            -1,
-
-            0,
-            0,
-            -(far * near * 2) / fn,
-            0,
-        ])
-    }
-
-    static perspective(fov: number, aspect: number, near: number, far: number): Matrix4 {
-        const top = near * Math.tan(fov * Math.PI / 360.0)
-        const right = top * aspect
-
-        return Matrix4.frustum(-right, right, -top, top, near, far)
-    }
-
-    static orthographic(left: number, right: number, bottom: number, top: number, near: number, far: number): Matrix4 {
-        const rl = (right - left)
-        const tb = (top - bottom)
-        const fn = (far - near)
-
-        return new Matrix4([
-            2 / rl,
-            0,
-            0,
-            0,
-
-            0,
-            2 / tb,
-            0,
-            0,
-
-            0,
-            0,
-            -2 / fn,
-            0,
-
-            -(left + right) / rl,
-            -(top + bottom) / tb,
-            -(far + near) / fn,
-            1,
-        ])
-    }
-
-    static lookAt(position: Vector3, target: Vector3, up: Vector3 = Vector3.up): Matrix4 {
-        if (position.equals(target)) {
-            return this.identity
-        }
-
-        const z = Vector3.difference(position, target).normalize()
-
-        const x = Vector3.cross(up, z).normalize()
-        const y = Vector3.cross(z, x).normalize()
-
-        return new Matrix4([
-            x.x,
-            y.x,
-            z.x,
-            0,
-
-            x.y,
-            y.y,
-            z.y,
-            0,
-
-            x.z,
-            y.z,
-            z.z,
-            0,
-
-            -Vector3.dot(x, position),
-            -Vector3.dot(y, position),
-            -Vector3.dot(z, position),
-            1,
-        ])
-    }
-
-    static product(m1: Matrix4, m2: Matrix4, result: Matrix4): Matrix4 {
-        const a00 = m1.at(0)
-        const a01 = m1.at(1)
-        const a02 = m1.at(2)
-        const a03 = m1.at(3)
-        const a10 = m1.at(4)
-        const a11 = m1.at(5)
-        const a12 = m1.at(6)
-        const a13 = m1.at(7)
-        const a20 = m1.at(8)
-        const a21 = m1.at(9)
-        const a22 = m1.at(10)
-        const a23 = m1.at(11)
-        const a30 = m1.at(12)
-        const a31 = m1.at(13)
-        const a32 = m1.at(14)
-        const a33 = m1.at(15)
-
-        const b00 = m2.at(0)
-        const b01 = m2.at(1)
-        const b02 = m2.at(2)
-        const b03 = m2.at(3)
-        const b10 = m2.at(4)
-        const b11 = m2.at(5)
-        const b12 = m2.at(6)
-        const b13 = m2.at(7)
-        const b20 = m2.at(8)
-        const b21 = m2.at(9)
-        const b22 = m2.at(10)
-        const b23 = m2.at(11)
-        const b30 = m2.at(12)
-        const b31 = m2.at(13)
-        const b32 = m2.at(14)
-        const b33 = m2.at(15)
-
-        if (result) {
-            result.init([
-                b00 * a00 + b01 * a10 + b02 * a20 + b03 * a30,
-                b00 * a01 + b01 * a11 + b02 * a21 + b03 * a31,
-                b00 * a02 + b01 * a12 + b02 * a22 + b03 * a32,
-                b00 * a03 + b01 * a13 + b02 * a23 + b03 * a33,
-
-                b10 * a00 + b11 * a10 + b12 * a20 + b13 * a30,
-                b10 * a01 + b11 * a11 + b12 * a21 + b13 * a31,
-                b10 * a02 + b11 * a12 + b12 * a22 + b13 * a32,
-                b10 * a03 + b11 * a13 + b12 * a23 + b13 * a33,
-
-                b20 * a00 + b21 * a10 + b22 * a20 + b23 * a30,
-                b20 * a01 + b21 * a11 + b22 * a21 + b23 * a31,
-                b20 * a02 + b21 * a12 + b22 * a22 + b23 * a32,
-                b20 * a03 + b21 * a13 + b22 * a23 + b23 * a33,
-
-                b30 * a00 + b31 * a10 + b32 * a20 + b33 * a30,
-                b30 * a01 + b31 * a11 + b32 * a21 + b33 * a31,
-                b30 * a02 + b31 * a12 + b32 * a22 + b33 * a32,
-                b30 * a03 + b31 * a13 + b32 * a23 + b33 * a33,
-            ])
-
-            return result
-        } else {
-            return new Matrix4([
-                b00 * a00 + b01 * a10 + b02 * a20 + b03 * a30,
-                b00 * a01 + b01 * a11 + b02 * a21 + b03 * a31,
-                b00 * a02 + b01 * a12 + b02 * a22 + b03 * a32,
-                b00 * a03 + b01 * a13 + b02 * a23 + b03 * a33,
-
-                b10 * a00 + b11 * a10 + b12 * a20 + b13 * a30,
-                b10 * a01 + b11 * a11 + b12 * a21 + b13 * a31,
-                b10 * a02 + b11 * a12 + b12 * a22 + b13 * a32,
-                b10 * a03 + b11 * a13 + b12 * a23 + b13 * a33,
-
-                b20 * a00 + b21 * a10 + b22 * a20 + b23 * a30,
-                b20 * a01 + b21 * a11 + b22 * a21 + b23 * a31,
-                b20 * a02 + b21 * a12 + b22 * a22 + b23 * a32,
-                b20 * a03 + b21 * a13 + b22 * a23 + b23 * a33,
-
-                b30 * a00 + b31 * a10 + b32 * a20 + b33 * a30,
-                b30 * a01 + b31 * a11 + b32 * a21 + b33 * a31,
-                b30 * a02 + b31 * a12 + b32 * a22 + b33 * a32,
-                b30 * a03 + b31 * a13 + b32 * a23 + b33 * a33,
-            ])
-        }
-    }
-
 }

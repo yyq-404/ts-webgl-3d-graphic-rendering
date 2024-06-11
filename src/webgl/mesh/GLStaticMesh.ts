@@ -1,4 +1,4 @@
-import {Vector3} from "../../common/math/Vector3";
+import {Vector3} from "../../common/math/vector/Vector3";
 import {GLAttribBits, GLAttribState} from "../GLAttribState";
 import {GLMeshBase} from "./GLMeshBase";
 import {GLAttribOffsetMap} from "../GLTypes";

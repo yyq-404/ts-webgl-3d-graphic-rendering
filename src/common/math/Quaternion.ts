@@ -1,7 +1,7 @@
 import { epsilon } from './Constants'
-import {Vector3} from "./Vector3";
-import {Matrix4} from "./Matrix4";
-import {Matrix3} from "./Matrix3";
+import {Vector3} from "./vector/Vector3";
+import {Matrix4} from "./matrix/Matrix4";
+import {Matrix3} from "./matrix/Matrix3";
 
 export  class Quaternion {
 

@@ -1,7 +1,7 @@
-import {Matrix4} from "../../common/math/Matrix4";
+import {Matrix4} from "../../common/math/matrix/Matrix4";
 import {MathHelper} from "../../common/math/MathHelper";
 import {Matrix4Adapter} from "../../common/math/MathAdapter";
-import {Vector3} from "../../common/math/Vector3";
+import {Vector3} from "../../common/math/vector/Vector3";
 
 
 /**

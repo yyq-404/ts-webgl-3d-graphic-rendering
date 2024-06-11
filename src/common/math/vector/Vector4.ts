@@ -1,6 +1,6 @@
-import {Matrix4} from './Matrix4'
+import {Matrix4} from '../matrix/Matrix4'
 
-import {epsilon} from './Constants'
+import {epsilon} from '../Constants'
 
 export class Vector4 {
 

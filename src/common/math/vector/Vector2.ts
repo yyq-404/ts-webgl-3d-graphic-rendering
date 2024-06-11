@@ -1,8 +1,8 @@
 
-import { epsilon } from './Constants'
+import { epsilon } from '../Constants'
 import {Vector3} from "./Vector3";
-import {Matrix2} from "./Matrix2";
-import {Matrix3} from "./Matrix3";
+import {Matrix2} from "../matrix/Matrix2";
+import {Matrix3} from "../matrix/Matrix3";
 
 export  class Vector2 {
 
