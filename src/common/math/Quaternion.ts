@@ -260,7 +260,7 @@ export class Quaternion {
         
         if (cos > 0.9999) {
             k0 = 1 - time;
-            k1 = 0 + time;
+            k1 = time;
         } else {
             const sin: number = Math.sqrt(1 - cos * cos);
             const angle: number = Math.atan2(sin, cos);
@@ -268,7 +268,7 @@ export class Quaternion {
             const oneOverSin: number = 1 / sin;
             
             k0 = Math.sin((1 - time) * angle) * oneOverSin;
-            k1 = Math.sin((0 + time) * angle) * oneOverSin;
+            k1 = Math.sin((time) * angle) * oneOverSin;
         }
         
         dest.x = k0 * q1.x + k1 * q2a.x;

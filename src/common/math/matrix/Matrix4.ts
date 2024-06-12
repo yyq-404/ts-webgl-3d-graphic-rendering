@@ -476,7 +476,7 @@ export class Matrix4 {
      * @param vector
      * @param dest
      */
-    public multiplyVec4(vector: Vector4, dest?: Vector4): Vector4 {
+    public multiplyVector4(vector: Vector4, dest?: Vector4): Vector4 {
         if (!dest) {
             dest = new Vector4();
         }

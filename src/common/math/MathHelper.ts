@@ -199,7 +199,7 @@ export class MathHelper {
     public static obj2GLViewportSpace(localPt: Vector3, mvp: Matrix4, viewport: Int32Array | Float32Array, viewportPt: Vector3): boolean {
         const v: Vector4 = new Vector4([localPt.x, localPt.y, localPt.z, 1.0]);
         // 将顶点从local坐标系变换到投影坐标系，或裁剪坐标系
-        mvp.multiplyVec4(v, v);
+        mvp.multiplyVector4(v, v);
         if (v.w === 0.0) {
             // 如果变换后的w为0，则返回false
             return false;
@@ -362,13 +362,12 @@ export class MathHelper {
      * @param max2
      */
     public static boundBoxBoundBoxOverlap(min1: Vector3, max1: Vector3, min2: Vector3, max2: Vector3): boolean {
-        if (min1.x > max2.x) return false;
-        if (max1.x < min2.x) return false;
-        if (min1.y > max2.y) return false;
-        if (max1.y < min2.y) return false;
-        if (min1.z > max2.z) return false;
-        if (max1.z < min2.z) return false;
-        return true;
+        return (min1.x <= max2.x
+            && min1.y <= max2.y
+            && min1.z <= max2.z
+            && max1.x >= min2.x
+            && max1.y >= min2.y
+            && max1.z >= min2.z);
     }
     
     /**
@@ -394,7 +393,8 @@ export class MathHelper {
      * 二维向量从ID坐标转换为GL坐标
      * @param v
      */
-    public static convertVector2IDCoord2GLCoord(v: Vector2): void {
+    public static convertVector2IDCoordinate2GLCoordinate(v: Vector2): void {
+        v.x = 1.0 - v.x;
         v.y = 1.0 - v.y;
     }
     
