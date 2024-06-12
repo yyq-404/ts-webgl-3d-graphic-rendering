@@ -404,7 +404,7 @@ export class MathHelper {
         if (!dest) {
             dest = new Matrix4().setIdentity();
         }
-        q.toMat4(dest);
+        q.toMatrix4(dest);
         // 调用quat的toMatrix4方法，再放入平移部分数据
 
         dest.init([...dest.all().slice(0, 12), pos.x, pos.y, pos.z, dest.all()[15]]);
