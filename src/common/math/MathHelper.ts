@@ -1,9 +1,9 @@
-import {Vector3} from "./vector/Vector3";
-import {Vector4} from "./vector/Vector4";
-import {Vector2} from "./vector/Vector2";
-import {Quaternion} from "./Quaternion";
-import {Matrix4} from "./matrix/Matrix4";
-import {MathAdapter} from "./MathAdapter";
+import {Vector3} from './vector/Vector3';
+import {Vector4} from './vector/Vector4';
+import {Vector2} from './vector/Vector2';
+import {Quaternion} from './Quaternion';
+import {Matrix4} from './matrix/Matrix4';
+import {MathAdapter} from './MathAdapter';
 
 /**
  * 坐标轴类型
@@ -31,7 +31,7 @@ export enum EPlaneLoc {
  * 数学工具类。
  */
 export class MathHelper {
-
+    
     /**
      * 静态辅助数学方法，判断参数x（必须是4）是否是2的n次方，即x是不是1、2、4、8、16、32、64.....
      * @param x
@@ -39,7 +39,7 @@ export class MathHelper {
     public static isPowerOfTwo(x: number): boolean {
         return (x & (x - 1)) == 0;
     }
-
+    
     /**
      * 静态辅助数学方法，给定整数参数x，取下一个2的n次方数
      * 如果x为3，则返回4；如果x为4，则返回4；如果x为5，则返回8；以此类推
@@ -53,7 +53,7 @@ export class MathHelper {
         }
         return x + 1;
     }
-
+    
     /**
      *  角度/弧度互转函数
      *  @param degree
@@ -61,7 +61,7 @@ export class MathHelper {
     public static toRadian(degree: number): number {
         return (degree * Math.PI) / 180;
     }
-
+    
     /**
      * 弧度/角度互换函数
      * @param radian
@@ -69,7 +69,7 @@ export class MathHelper {
     public static toDegree(radian: number): number {
         return (radian / Math.PI) * 180;
     }
-
+    
     /**
      * 浮点数容差相等函数
      * @param left
@@ -77,9 +77,9 @@ export class MathHelper {
      */
     static numberEquals(left: number, right: number): boolean {
         return Math.abs(left - right) <= MathAdapter.EPSILON;
-
+        
     }
-
+    
     /**
      * 检测目标值是否在区间之内
      * @param x
@@ -89,7 +89,7 @@ export class MathHelper {
     public static clamp(x: number, min: number, max: number): number {
         return x < min ? min : x > max ? max : x;
     }
-
+    
     /**
      * 通过不共线的三个点构造平面，平面的隐式方程：ax+by+cz+d=0
      * @param a
@@ -111,7 +111,7 @@ export class MathHelper {
         result.w = d;
         return result;
     }
-
+    
     /**
      * 计算三角形的法向量，其公式为：cross ( b-a , c-a ).normalize()
      * @param a
@@ -129,7 +129,7 @@ export class MathHelper {
         result.normalize();
         return result;
     }
-
+    
     /**
      * 通过一条法线和一个点来构造一个平面，平面的隐式方程：ax+by+cz+d=0
      * @param point
@@ -144,7 +144,7 @@ export class MathHelper {
         result.w = -Vector3.dot(normal, point);
         return result;
     }
-
+    
     /**
      * 平面的单位化
      * 如果平面中的法向量（即Vector4中的x、y、z分量部分）为单位向量，那么这个平面被称为单位化平面
@@ -160,7 +160,7 @@ export class MathHelper {
         plane.w = plane.w * iLength;
         return length;
     }
-
+    
     /**
      * 三维空间中任意一个点与平面之间的有向距离
      * @param plane
@@ -169,7 +169,7 @@ export class MathHelper {
     public static planeDistanceFromPoint(plane: Vector4, point: Vector3): number {
         return point.x * plane.x + point.y * plane.y + point.z * plane.z + plane.w;
     }
-
+    
     /**
      * 判断一个点是在平面的正面、反面还是该点在平面上
      * @param plane
@@ -188,7 +188,7 @@ export class MathHelper {
             return EPlaneLoc.COPLANAR; // 有向距离在-0.0001～+0.0001之间，表示点与平面共面
         }
     }
-
+    
     /**
      * 本地坐标系转换到视图坐标系
      * @param localPt
@@ -218,7 +218,7 @@ export class MathHelper {
         viewportPt.z = v.z;
         return true;
     }
-
+    
     /**
      * 计算 `AABB包围盒` 的 mins 和 `maxs` 值
      * ```plaintext
@@ -259,7 +259,7 @@ export class MathHelper {
             maxs.z = v.z;
         }
     }
-
+    
     /**
      * 初始化 `mins` 和 `maxs`
      * @param mins
@@ -270,7 +270,7 @@ export class MathHelper {
         mins.x = mins.y = mins.z = value; // 初始化时，让mins表示浮点数的最大范围
         maxs.x = maxs.y = maxs.z = -value; // 初始化是，让maxs表示浮点数的最小范围
     }
-
+    
     /**
      * 获得AABB包围盒的中心点坐标
      * @param mins
@@ -284,7 +284,7 @@ export class MathHelper {
         out.scale(0.5);
         return out;
     }
-
+    
     /**
      * 计算8个顶点的坐标值
      * ```plaintext
@@ -307,21 +307,21 @@ export class MathHelper {
         // 0
         pts8.push(new Vector3([center.x + maxs2center.x, center.y + maxs2center.y, center.z + maxs2center.z]));
         // 1
-        pts8.push(new Vector3([center.x + maxs2center.x, center.y - maxs2center.y, center.z + maxs2center.z,]));
+        pts8.push(new Vector3([center.x + maxs2center.x, center.y - maxs2center.y, center.z + maxs2center.z]));
         // 2
-        pts8.push(new Vector3([center.x + maxs2center.x, center.y + maxs2center.y, center.z - maxs2center.z,]));
+        pts8.push(new Vector3([center.x + maxs2center.x, center.y + maxs2center.y, center.z - maxs2center.z]));
         // 3
-        pts8.push(new Vector3([center.x + maxs2center.x, center.y - maxs2center.y, center.z - maxs2center.z,]));
+        pts8.push(new Vector3([center.x + maxs2center.x, center.y - maxs2center.y, center.z - maxs2center.z]));
         // 4
-        pts8.push(new Vector3([center.x - maxs2center.x, center.y + maxs2center.y, center.z + maxs2center.z,]));
+        pts8.push(new Vector3([center.x - maxs2center.x, center.y + maxs2center.y, center.z + maxs2center.z]));
         // 5
-        pts8.push(new Vector3([center.x - maxs2center.x, center.y - maxs2center.y, center.z + maxs2center.z,]));
+        pts8.push(new Vector3([center.x - maxs2center.x, center.y - maxs2center.y, center.z + maxs2center.z]));
         // 6
-        pts8.push(new Vector3([center.x - maxs2center.x, center.y + maxs2center.y, center.z - maxs2center.z,]));
+        pts8.push(new Vector3([center.x - maxs2center.x, center.y + maxs2center.y, center.z - maxs2center.z]));
         // 7
-        pts8.push(new Vector3([center.x - maxs2center.x, center.y - maxs2center.y, center.z - maxs2center.z,]));
+        pts8.push(new Vector3([center.x - maxs2center.x, center.y - maxs2center.y, center.z - maxs2center.z]));
     }
-
+    
     /**
      * 计算变换后的 `AABB包围盒`
      * @param mat
@@ -337,12 +337,12 @@ export class MathHelper {
         // 遍历局部坐标系的8个AABB包围盒的顶点坐标
         pts.forEach((pt) => {
             // 将局部坐标表示的顶点变换到mat坐标空间中去，变换后的结果放在out变量中
-            out.xyz = mat.multiplyVec3(pt).xyz;
+            out.xyz = mat.multiplyVector3(pt).xyz;
             // 重新构造新的，与世界坐标系轴对称的AABB包围盒
             this.boundBoxAddPoint(out, mins, maxs);
         });
     }
-
+    
     /**
      * 判断一个点是否在AABB包围盒内部，如果在则返回true，否则返回false
      *
@@ -353,9 +353,13 @@ export class MathHelper {
     public static boundBoxContainsPoint(point: Vector3, mins: Vector3, maxs: Vector3): boolean {
         return (point.x >= mins.x && point.x <= maxs.x && point.y >= mins.y && point.y <= maxs.y && point.z >= mins.z && point.z <= maxs.z);
     }
-
+    
     /**
      * `boundBoxBoundBoxOverlap` 方法用来判断两个AABB 包围盒是否相交（或重叠）。如果相交则返回 `true` ，否则返回 `false`
+     * @param min1
+     * @param max1
+     * @param min2
+     * @param max2
      */
     public static boundBoxBoundBoxOverlap(min1: Vector3, max1: Vector3, min2: Vector3, max2: Vector3): boolean {
         if (min1.x > max2.x) return false;
@@ -366,7 +370,7 @@ export class MathHelper {
         if (max1.z < min2.z) return false;
         return true;
     }
-
+    
     /**
      * 三维向量从ID坐标转换为GL坐标
      * @param v
@@ -385,7 +389,7 @@ export class MathHelper {
             v.z /= scale;
         }
     }
-
+    
     /**
      * 二维向量从ID坐标转换为GL坐标
      * @param v
@@ -393,7 +397,7 @@ export class MathHelper {
     public static convertVector2IDCoord2GLCoord(v: Vector2): void {
         v.y = 1.0 - v.y;
     }
-
+    
     /**
      * 把三维向量的四元数表示转换为向量表示
      * @param pos
@@ -405,10 +409,7 @@ export class MathHelper {
             dest = new Matrix4().setIdentity();
         }
         q.toMatrix4(dest);
-        // 调用quat的toMatrix4方法，再放入平移部分数据
-
-        dest.init([...dest.all().slice(0, 12), pos.x, pos.y, pos.z, dest.all()[15]]);
-
-        return dest;
+        // 调用quaternion的toMatrix4方法，再放入平移部分数据
+        return dest.init([...dest.all().slice(0, 12), pos.x, pos.y, pos.z, dest.all()[15]]);
     }
 }

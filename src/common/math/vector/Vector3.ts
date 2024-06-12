@@ -364,7 +364,7 @@ export class Vector3 {
     }
     
     /**
-     * 比较
+     * 在指定的阈值范围内比较两个矩阵是否相等。
      * @param {Vector3} vector
      * @param {number} threshold
      * @return {boolean}
@@ -512,7 +512,7 @@ export class Vector3 {
         if (!dest) {
             dest = this;
         }
-        return matrix.multiplyVec3(this, dest);
+        return matrix.multiplyVector3(this, dest);
     }
     
     /**

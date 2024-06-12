@@ -10,7 +10,9 @@ import {epsilon} from '../Constants';
  */
 export class Matrix3 {
     
-    static readonly identity = new Matrix3().setIdentity();
+    /** 表示单位矩阵（对角线上的值为1，其余为0的矩阵）*/
+    public static readonly identity = new Matrix3().setIdentity();
+    /** 矩阵值 */
     private values = new Float32Array(9);
     
     /**
@@ -24,7 +26,7 @@ export class Matrix3 {
     }
     
     /**
-     * 乘积
+     * 计算两个矩阵的乘积，并将结果存储在第三个矩阵中。
      * @param m1
      * @param m2
      * @param result
@@ -62,7 +64,7 @@ export class Matrix3 {
             
             b20 * a00 + b21 * a10 + b22 * a20,
             b20 * a01 + b21 * a11 + b22 * a21,
-            b20 * a02 + b21 * a12 + b22 * a22,
+            b20 * a02 + b21 * a12 + b22 * a22
         ]);
     }
     
@@ -86,7 +88,7 @@ export class Matrix3 {
     }
     
     /**
-     * 重置
+     * 将矩阵的值重置为零。
      */
     public reset(): void {
         for (let i = 0; i < 9; i++) {
@@ -95,7 +97,7 @@ export class Matrix3 {
     }
     
     /**
-     * 拷贝
+     * 将矩阵的值复制到另一个矩阵
      * @param dest
      */
     public copy(dest?: Matrix3): Matrix3 {
@@ -109,7 +111,7 @@ export class Matrix3 {
     }
     
     /**
-     * 获取所有值
+     * 返回矩阵的所有值作为一个数组。
      */
     public all(): number[] {
         const data: number[] = [];
@@ -120,7 +122,7 @@ export class Matrix3 {
     }
     
     /**
-     * 按索引获取行
+     * 返回矩阵中指定行的值作为一个数组。
      * @param index
      */
     public row(index: number): number[] {
@@ -128,7 +130,7 @@ export class Matrix3 {
     }
     
     /**
-     * 按索引获取列
+     * 返回矩阵中指定列的值作为一个数组。
      * @param index
      */
     public col(index: number): number[] {
@@ -136,7 +138,7 @@ export class Matrix3 {
     }
     
     /**
-     * 比较
+     * 在指定的阈值范围内比较两个矩阵是否相等。
      * @param matrix
      * @param threshold
      */
@@ -150,7 +152,7 @@ export class Matrix3 {
     }
     
     /**
-     * 行列式
+     * 计算并返回矩阵的行列式。
      */
     public determinant(): number {
         const a00 = this.values[0];
@@ -187,7 +189,7 @@ export class Matrix3 {
     }
     
     /**
-     * 调换
+     * 转置矩阵。
      */
     public transpose(): Matrix3 {
         const temp01 = this.values[1];
@@ -242,7 +244,7 @@ export class Matrix3 {
     }
     
     /**
-     * 自身乘积
+     * 将当前矩阵与另一个矩阵相乘。
      * @param matrix
      */
     public multiply(matrix: Matrix3): Matrix3 {
@@ -282,27 +284,27 @@ export class Matrix3 {
     }
     
     /**
-     * 与二维向量的乘积
+     * 将矩阵与一个二维向量相乘。
      * @param vector
      * @param result
      */
-    public multiplyVec2(vector: Vector2, result?: Vector2): Vector2 {
+    public multiplyVector2(vector: Vector2, result?: Vector2): Vector2 {
         const x = vector.x;
         const y = vector.y;
         if (!result) result = new Vector2();
         result.xy = [
             x * this.values[0] + y * this.values[3] + this.values[6],
-            x * this.values[1] + y * this.values[4] + this.values[7],
+            x * this.values[1] + y * this.values[4] + this.values[7]
         ];
         return result;
     }
     
     /**
-     * 与三维向量的乘积
+     * 将矩阵与一个三维向量相乘。
      * @param vector
      * @param result
      */
-    public multiplyVec3(vector: Vector3, result?: Vector3): Vector3 {
+    public multiplyVector3(vector: Vector3, result?: Vector3): Vector3 {
         const x = vector.x;
         const y = vector.y;
         const z = vector.z;
@@ -310,7 +312,7 @@ export class Matrix3 {
         result.xyz = [
             x * this.values[0] + y * this.values[3] + z * this.values[6],
             x * this.values[1] + y * this.values[4] + z * this.values[7],
-            x * this.values[2] + y * this.values[5] + z * this.values[8],
+            x * this.values[2] + y * this.values[5] + z * this.values[8]
         ];
         return result;
     }
@@ -319,35 +321,20 @@ export class Matrix3 {
      * 转换为四维矩阵
      * @param result
      */
-    public toMat4(result?: Matrix4): Matrix4 {
+    public toMatrix4(result?: Matrix4): Matrix4 {
         if (!result) result = new Matrix4();
         return result.init([
-            this.values[0],
-            this.values[1],
-            this.values[2],
-            0,
-            
-            this.values[3],
-            this.values[4],
-            this.values[5],
-            0,
-            
-            this.values[6],
-            this.values[7],
-            this.values[8],
-            0,
-            
-            0,
-            0,
-            0,
-            1,
+            this.values[0], this.values[1], this.values[2], 0,
+            this.values[3], this.values[4], this.values[5], 0,
+            this.values[6], this.values[7], this.values[8], 0,
+            0, 0, 0, 1
         ]);
     }
     
     /**
      * 转换为四元数
      */
-    public toQuat(): Quaternion {
+    public toQuaternion(): Quaternion {
         const m00 = this.values[0];
         const m01 = this.values[1];
         const m02 = this.values[2];

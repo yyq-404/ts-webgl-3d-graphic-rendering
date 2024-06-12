@@ -4,7 +4,7 @@ import {Vector3} from '../vector/Vector3';
 import {Matrix3} from './Matrix3';
 
 /**
- * 四维向量
+ * 四维矩阵
  */
 export class Matrix4 {
     /** 单位向量 */
@@ -23,7 +23,7 @@ export class Matrix4 {
     }
     
     /**
-     * 视锥矩阵
+     * 创建一个视锥矩阵，常用于透视投影。
      * @param left
      * @param right
      * @param bottom
@@ -42,7 +42,7 @@ export class Matrix4 {
     }
     
     /**
-     * 透视矩阵
+     * 创建一个视锥矩阵，常用于透视投影。
      * @param fov
      * @param aspect
      * @param near
@@ -55,7 +55,7 @@ export class Matrix4 {
     }
     
     /**
-     * 正交矩阵
+     * 创建一个视锥矩阵，常用于透视投影。
      * @param left
      * @param right
      * @param bottom
@@ -71,12 +71,12 @@ export class Matrix4 {
             2 / rl, 0, 0, 0,
             0, 2 / tb, 0, 0,
             0, 0, -2 / fn, 0,
-            -(left + right) / rl, -(top + bottom) / tb, -(far + near) / fn, 1,
+            -(left + right) / rl, -(top + bottom) / tb, -(far + near) / fn, 1
         ]);
     }
     
     /**
-     * 计算朝向
+     * 创建一个视锥矩阵，常用于透视投影。
      * @param position
      * @param target
      * @param up
@@ -88,15 +88,16 @@ export class Matrix4 {
         const z = Vector3.difference(position, target).normalize();
         const x = Vector3.cross(up, z).normalize();
         const y = Vector3.cross(z, x).normalize();
-        return new Matrix4([x.x, y.x, z.x, 0,
+        return new Matrix4([
+            x.x, y.x, z.x, 0,
             x.y, y.y, z.y, 0,
             x.z, y.z, z.z, 0,
-            -Vector3.dot(x, position), -Vector3.dot(y, position), -Vector3.dot(z, position), 1,
+            -Vector3.dot(x, position), -Vector3.dot(y, position), -Vector3.dot(z, position), 1
         ]);
     }
     
     /**
-     * 矩阵乘积
+     * 计算两个矩阵的乘积，并将结果存储在第三个矩阵中。
      * @param m1
      * @param m2
      * @param result
@@ -155,7 +156,7 @@ export class Matrix4 {
             b30 * a00 + b31 * a10 + b32 * a20 + b33 * a30,
             b30 * a01 + b31 * a11 + b32 * a21 + b33 * a31,
             b30 * a02 + b31 * a12 + b32 * a22 + b33 * a32,
-            b30 * a03 + b31 * a13 + b32 * a23 + b33 * a33,
+            b30 * a03 + b31 * a13 + b32 * a23 + b33 * a33
         ]);
     }
     
@@ -179,7 +180,7 @@ export class Matrix4 {
     }
     
     /**
-     * 重置
+     * 将矩阵的值重置为零。
      */
     public reset(): void {
         for (let i = 0; i < 16; i++) {
@@ -188,7 +189,7 @@ export class Matrix4 {
     }
     
     /**
-     * 拷贝
+     * 将矩阵的值复制到另一个矩阵。
      * @param dest
      */
     public copy(dest?: Matrix4): Matrix4 {
@@ -202,7 +203,7 @@ export class Matrix4 {
     }
     
     /**
-     * 获取所有值
+     * 返回矩阵的所有值作为一个数组。
      */
     public all(): number[] {
         const data: number[] = [];
@@ -213,7 +214,7 @@ export class Matrix4 {
     }
     
     /**
-     * 根据索引获取值
+     * 返回矩阵中指定行的值作为一个数组。
      * @param index
      */
     public row(index: number): number[] {
@@ -221,7 +222,7 @@ export class Matrix4 {
     }
     
     /**
-     * 根绝索引获取列。
+     * 返回矩阵中指定列的值作为一个数组。
      * @param index
      */
     public col(index: number): number[] {
@@ -229,7 +230,7 @@ export class Matrix4 {
     }
     
     /**
-     * 比较
+     * 在指定的阈值范围内比较两个矩阵是否相等。
      * @param matrix
      * @param threshold
      */
@@ -243,7 +244,7 @@ export class Matrix4 {
     }
     
     /**
-     * 行列式
+     *  计算并返回矩阵的行列式。
      */
     public determinant(): number {
         const a00 = this.values[0];
@@ -275,12 +276,11 @@ export class Matrix4 {
         const det09 = a21 * a32 - a22 * a31;
         const det10 = a21 * a33 - a23 * a31;
         const det11 = a22 * a33 - a23 * a32;
-        
         return (det00 * det11 - det01 * det10 + det02 * det09 + det03 * det08 - det04 * det07 + det05 * det06);
     }
     
     /**
-     * 重置为单位矩阵
+     * 将矩阵重置为单位矩阵。
      */
     public setIdentity(): Matrix4 {
         this.values[0] = 1;
@@ -299,12 +299,11 @@ export class Matrix4 {
         this.values[13] = 0;
         this.values[14] = 0;
         this.values[15] = 1;
-        
         return this;
     }
     
     /**
-     * 调换矩阵
+     * 转置矩阵。
      */
     public transpose(): Matrix4 {
         const temp01 = this.values[1];
@@ -331,7 +330,7 @@ export class Matrix4 {
     }
     
     /**
-     * 逆矩阵
+     * 计算并返回矩阵的逆矩阵（如果存在）。
      */
     public inverse(): Matrix4 | null {
         const a00 = this.values[0];
@@ -393,7 +392,7 @@ export class Matrix4 {
     }
     
     /**
-     * 自身乘积
+     * 。
      * @param matrix
      */
     public multiply(matrix: Matrix4): Matrix4 {
@@ -458,22 +457,22 @@ export class Matrix4 {
     }
     
     /**
-     * 与三维向量相乘
+     * 将矩阵与一个三维向量相乘。
      * @param vector
      */
-    public multiplyVec3(vector: Vector3): Vector3 {
+    public multiplyVector3(vector: Vector3): Vector3 {
         const x = vector.x;
         const y = vector.y;
         const z = vector.z;
         return new Vector3([
             this.values[0] * x + this.values[4] * y + this.values[8] * z + this.values[12],
             this.values[1] * x + this.values[5] * y + this.values[9] * z + this.values[13],
-            this.values[2] * x + this.values[6] * y + this.values[10] * z + this.values[14],
+            this.values[2] * x + this.values[6] * y + this.values[10] * z + this.values[14]
         ]);
     }
     
     /**
-     * 与四维向量相乘
+     * 将矩阵与一个四维向量相乘，并可选择将结果存储在另一个向量中。
      * @param vector
      * @param dest
      */
@@ -496,7 +495,7 @@ export class Matrix4 {
     }
     
     /**
-     * 转化为三维矩阵
+     * 通过提取左上角的 3x3 部分将 4x4 矩阵转换为 3x3 矩阵。
      */
     public toMatrix3(): Matrix3 {
         return new Matrix3([
@@ -508,12 +507,12 @@ export class Matrix4 {
             this.values[6],
             this.values[8],
             this.values[9],
-            this.values[10],
+            this.values[10]
         ]);
     }
     
     /**
-     * 转换为三维逆矩阵
+     * 计算并返回矩阵左上角 3x3 部分的逆矩阵（如果存在）。
      */
     public toInverseMatrix3(): Matrix3 | null {
         const a00 = this.values[0];
@@ -547,12 +546,12 @@ export class Matrix4 {
             (-a12 * a00 + a02 * a10) * det,
             det21 * det,
             (-a21 * a00 + a01 * a20) * det,
-            (a11 * a00 - a01 * a10) * det,
+            (a11 * a00 - a01 * a10) * det
         ]);
     }
     
     /**
-     * 平移
+     * 按给定的向量平移矩阵。
      * @param vector
      */
     public translate(vector: Vector3): Matrix4 {
@@ -569,7 +568,7 @@ export class Matrix4 {
     }
     
     /**
-     * 缩放
+     * 按给定的向量缩放矩阵。
      * @param vector
      */
     public scale(vector: Vector3): Matrix4 {
@@ -596,7 +595,7 @@ export class Matrix4 {
     }
     
     /**
-     * 旋转
+     * 围绕指定的轴按给定的角度旋转矩阵。
      * @param angle
      * @param axis
      */

@@ -457,6 +457,6 @@ export class Vector2 {
         if (!dest) {
             dest = this;
         }
-        return matrix.multiplyVec2(this, dest);
+        return matrix.multiplyVector2(this, dest);
     }
 }

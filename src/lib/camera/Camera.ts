@@ -321,8 +321,8 @@ export class Camera {
         } else if (this._type === ECameraType.FLY_CAMERA) {
             Matrix4Adapter.m0.rotate(radian, this._yAxis);
         }
-        this._xAxis.xyz = Matrix4Adapter.m0.multiplyVec3(this._xAxis).xyz;
-        this._zAxis.xyz = Matrix4Adapter.m0.multiplyVec3(this._zAxis).xyz;
+        this._xAxis.xyz = Matrix4Adapter.m0.multiplyVector3(this._xAxis).xyz;
+        this._zAxis.xyz = Matrix4Adapter.m0.multiplyVector3(this._zAxis).xyz;
     }
 
     /**
@@ -333,8 +333,8 @@ export class Camera {
         Matrix4Adapter.m0.setIdentity();
         let radian = MathHelper.toRadian(degree);
         Matrix4Adapter.m0.rotate(radian, this._xAxis);
-        this._yAxis.xyz = Matrix4Adapter.m0.multiplyVec3(this._yAxis).xyz;
-        this._zAxis.xyz = Matrix4Adapter.m0.multiplyVec3(this._zAxis).xyz;
+        this._yAxis.xyz = Matrix4Adapter.m0.multiplyVector3(this._yAxis).xyz;
+        this._zAxis.xyz = Matrix4Adapter.m0.multiplyVector3(this._zAxis).xyz;
     }
 
     /**
@@ -346,8 +346,8 @@ export class Camera {
             Matrix4Adapter.m0.setIdentity();
             let radian = MathHelper.toRadian(degree);
             Matrix4Adapter.m0.rotate(radian, this._zAxis);
-            this._xAxis.xyz = Matrix4Adapter.m0.multiplyVec3(this._xAxis).xyz;
-            this._yAxis.xyz = Matrix4Adapter.m0.multiplyVec3(this._yAxis).xyz;
+            this._xAxis.xyz = Matrix4Adapter.m0.multiplyVector3(this._xAxis).xyz;
+            this._yAxis.xyz = Matrix4Adapter.m0.multiplyVector3(this._yAxis).xyz;
         }
     }
 
