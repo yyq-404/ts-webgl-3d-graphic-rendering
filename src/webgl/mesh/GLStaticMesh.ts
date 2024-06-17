@@ -1,5 +1,5 @@
 import {Vector3} from "../../common/math/vector/Vector3";
-import {GLAttribBits, GLAttribState} from "../GLAttribState";
+import {GLAttributeBits, GLAttributeState} from "../GLAttribState";
 import {GLMeshBase} from "./GLMeshBase";
 import {GLAttributeOffsetMap} from "../GLTypes";
 
@@ -34,7 +34,7 @@ export class GLStaticMesh extends GLMeshBase {
      * @param ibo Index Buffer Object
      * @param drawMode 图元绘制模式
      */
-    public constructor(gl: WebGLRenderingContext, attribState: GLAttribBits, vbo: Float32Array | ArrayBuffer, ibo: Uint16Array | null = null, drawMode: number = gl.TRIANGLES) {
+    public constructor(gl: WebGLRenderingContext, attribState: GLAttributeBits, vbo: Float32Array | ArrayBuffer, ibo: Uint16Array | null = null, drawMode: number = gl.TRIANGLES) {
         // 调用基类的构造函数
         super(gl, attribState, drawMode);
         // 关键的操作：
@@ -48,13 +48,13 @@ export class GLStaticMesh extends GLMeshBase {
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this._vbo); // 绑定VBO
         this.gl.bufferData(this.gl.ARRAY_BUFFER, vbo, this.gl.STATIC_DRAW); // 将顶点数据载入到VBO中
         // 然后计算出交错存储的顶点属性attribOffsetMap相关的值
-        const offsetMap: GLAttributeOffsetMap = GLAttribState.getInterleavedLayoutAttribOffsetMap(this._attribState);
+        const offsetMap: GLAttributeOffsetMap = GLAttributeState.getInterleavedLayoutAttribOffsetMap(this._attribState);
         // 计算出顶点的数量
-        this._vertCount = vbo.byteLength / offsetMap[GLAttribState.ATTRIB_STRIDE];
+        this._vertCount = vbo.byteLength / offsetMap[GLAttributeState.ATTRIB_STRIDE];
         // 使用VAO后，我们只要初始化时设置一次setAttribVertexArrayPointer和setAttribVertexArrayState就行了
         // 当我们后续调用基类的bind方法绑定VAO对象后，VAO会自动处理顶点地址绑定和顶点属性寄存器开启相关操作，这就简化了很多操作
-        GLAttribState.setAttribVertexArrayPointer(gl, offsetMap);
-        GLAttribState.setAttribVertexArrayState(gl, this._attribState);
+        GLAttributeState.setAttribVertexArrayPointer(gl, offsetMap);
+        GLAttributeState.setAttribVertexArrayState(gl, this._attribState);
         // 再创建IBO（IBO表示Index Buffer Object,EBO表示Element Buffer Object，表示一样的概念）
         this.setIBO(ibo);
         // 必须放在这里

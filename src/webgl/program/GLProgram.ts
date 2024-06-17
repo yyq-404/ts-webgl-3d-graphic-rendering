@@ -1,4 +1,4 @@
-import {GLAttribBits, GLAttribState} from '../GLAttribState';
+import {GLAttributeBits, GLAttributeState} from '../GLAttribState';
 import {GLAttributeMap, GLUniformMap} from '../GLTypes';
 import {GLHelper} from '../GLHelper';
 import {Vector2} from '../../common/math/vector/Vector2';
@@ -32,7 +32,7 @@ export class GLProgram {
     /** 当调用gl.useProgram(null)前触发unbindCallback回调函数 */
     public unbindCallback: ((program: GLProgram) => void) | null;
     /** 当前的Program使用的顶点属性bits值 */
-    private readonly _attribState: GLAttribBits;
+    private readonly _attributeState: GLAttributeBits;
     private _vsShaderDefineStrings: string[] = [];
     private _fsShaderDefineStrings: string[] = [];
     
@@ -43,9 +43,9 @@ export class GLProgram {
      * @param vsShader
      * @param fsShader
      */
-    public constructor(context: WebGLRenderingContext, attribState: GLAttribBits, vsShader: string | null = null, fsShader: string | null = null) {
+    public constructor(context: WebGLRenderingContext, attribState: GLAttributeBits, vsShader: string | null = null, fsShader: string | null = null) {
         this.gl = context;
-        this._attribState = attribState;
+        this._attributeState = attribState;
         // 最好能从shader源码中抽取，目前暂时使用参数传递方式
         this.bindCallback = null;
         this.unbindCallback = null;
@@ -78,7 +78,7 @@ export class GLProgram {
      * @param gl
      */
     public static createDefaultTextureProgram(gl: WebGLRenderingContext): GLProgram {
-        return new GLProgram(gl, GLAttribState.makeVertexAttribs(true, false, false, false, false), GLShaderSource.textureShader.vs, GLShaderSource.textureShader.fs);
+        return new GLProgram(gl, GLAttributeState.makeVertexAttribs(true, false, false, false, false), GLShaderSource.textureShader.vs, GLShaderSource.textureShader.fs);
     }
     
     /**
@@ -86,7 +86,7 @@ export class GLProgram {
      * @param gl
      */
     public static createDefaultColorProgram(gl: WebGLRenderingContext): GLProgram {
-        return new GLProgram(gl, GLAttribState.makeVertexAttribs(false, false, false, false, true), GLShaderSource.colorShader.vs, GLShaderSource.colorShader.fs);
+        return new GLProgram(gl, GLAttributeState.makeVertexAttribs(false, false, false, false, true), GLShaderSource.colorShader.vs, GLShaderSource.colorShader.fs);
     }
     
     /**
@@ -133,6 +133,7 @@ export class GLProgram {
      * @param fs 片段着色器
      */
     public loadShaders(vs: string, fs: string): void {
+        this.programBeforeLink(this.gl, this.program);
         if (!GLHelper.compileShader(this.gl, vs, this.vsShader)) {
             throw new Error(' WebGL顶点Shader链接不成功! ');
         }
@@ -142,7 +143,7 @@ export class GLProgram {
         if (!GLHelper.linkProgram(this.gl, this.program, this.vsShader, this.fsShader, this.programBeforeLink.bind(this), this.programAfterLink.bind(this))) {
             throw new Error(' WebGLProgram链接不成功! ');
         }
-        console.log(JSON.stringify(this.attributeMap));
+        this.programAfterLink(this.gl, this.program);
     }
     
     /**
@@ -339,23 +340,23 @@ export class GLProgram {
         // 1.attrib名字和shader中的命名必须要一致
         // 2．数量必须要和mesh中一致
         // 3.mesh中的数组的component必须固定
-        if (GLAttribState.hasPosition(this._attribState)) {
-            gl.bindAttribLocation(program, GLAttribState.POSITION_LOCATION, GLAttribState.POSITION_NAME);
+        if (GLAttributeState.hasPosition(this._attributeState)) {
+            gl.bindAttribLocation(program, GLAttributeState.POSITION_LOCATION, GLAttributeState.POSITION_NAME);
         }
-        if (GLAttribState.hasNormal(this._attribState)) {
-            gl.bindAttribLocation(program, GLAttribState.NORMAL_LOCATION, GLAttribState.NORMAL_NAME);
+        if (GLAttributeState.hasNormal(this._attributeState)) {
+            gl.bindAttribLocation(program, GLAttributeState.NORMAL_LOCATION, GLAttributeState.NORMAL_NAME);
         }
-        if (GLAttribState.hasTexCoordinate_0(this._attribState)) {
-            gl.bindAttribLocation(program, GLAttribState.TEX_COORDINATE_LOCATION, GLAttribState.TEX_COORDINATE_NAME);
+        if (GLAttributeState.hasTexCoordinate_0(this._attributeState)) {
+            gl.bindAttribLocation(program, GLAttributeState.TEX_COORDINATE_LOCATION, GLAttributeState.TEX_COORDINATE_NAME);
         }
-        if (GLAttribState.hasTexCoordinate_1(this._attribState)) {
-            gl.bindAttribLocation(program, GLAttribState.TEX_COORDINATE1_LOCATION, GLAttribState.TEX_COORDINATE1_NAME);
+        if (GLAttributeState.hasTexCoordinate_1(this._attributeState)) {
+            gl.bindAttribLocation(program, GLAttributeState.TEX_COORDINATE1_LOCATION, GLAttributeState.TEX_COORDINATE1_NAME);
         }
-        if (GLAttribState.hasColor(this._attribState)) {
-            gl.bindAttribLocation(program, GLAttribState.COLOR_LOCATION, GLAttribState.COLOR_NAME);
+        if (GLAttributeState.hasColor(this._attributeState)) {
+            gl.bindAttribLocation(program, GLAttributeState.COLOR_LOCATION, GLAttributeState.COLOR_NAME);
         }
-        if (GLAttribState.hasTangent(this._attribState)) {
-            gl.bindAttribLocation(program, GLAttribState.TANGENT_LOCATION, GLAttribState.TANGENT_NAME);
+        if (GLAttributeState.hasTangent(this._attributeState)) {
+            gl.bindAttribLocation(program, GLAttributeState.TANGENT_LOCATION, GLAttributeState.TANGENT_NAME);
         }
     }
     

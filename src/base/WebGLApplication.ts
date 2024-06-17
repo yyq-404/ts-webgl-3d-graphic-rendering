@@ -3,7 +3,7 @@ import {BaseApplication} from "./BaseApplication";
 import {GLHelper} from "../webgl/GLHelper";
 import {GLTextureCache} from "../webgl/texture/GLTextureCache";
 import {GLProgramCache} from "../webgl/program/GLProgramCache";
-import {GLAttribState} from "../webgl/GLAttribState";
+import {GLAttributeState} from "../webgl/GLAttribState";
 import {GLProgram} from "../webgl/program/GLProgram";
 import {GLTexture} from "../webgl/texture/GLTexture";
 import {GLWorldMatrixStack} from "../webgl/matrix/GLWorldMatrixStack";
@@ -59,7 +59,7 @@ export class WebGLApplication extends BaseApplication {
         GLProgramCache.instance.set('texture', GLProgram.createDefaultTextureProgram(this.gl));
 
         // 初始化时，创建颜色GLMeshBuilder对象
-        this.builder = new GLMeshBuilder(this.gl, GLAttribState.POSITION_BIT | GLAttribState.COLOR_BIT, GLProgramCache.instance.getMust('color'));
+        this.builder = new GLMeshBuilder(this.gl, GLAttributeState.POSITION_BIT | GLAttributeState.COLOR_BIT, GLProgramCache.instance.getMust('color'));
     }
 
     /**

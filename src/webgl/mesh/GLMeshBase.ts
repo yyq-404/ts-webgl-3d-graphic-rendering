@@ -1,4 +1,4 @@
-import {GLAttribBits, GLAttribState} from "../GLAttribState";
+import {GLAttributeBits, GLAttributeState} from "../GLAttribState";
 
 /**
  * `GLMesh` 网格是渲染数据源，其中，`GLMeshBase` 是一个抽象基类，内部使用
@@ -15,7 +15,7 @@ export abstract class GLMeshBase {
     /** `gl.TRIANGLES` 等7种基本几何图元之一 */
     protected drawMode: number;
     /** 顶点属性格式，和绘制当前网格时使用的 `GLProgram` 具有一致的 `attribBits` */
-    protected _attribState: GLAttribBits;
+    protected _attribState: GLAttributeBits;
     /** 当前使用的顶点属性的 `stride` 字节数 */
     protected _attribStride: number;
     /** 我们使用 `VAO` （顶点数组对象）来管理 `VBO` 和 `EBO` */
@@ -31,7 +31,7 @@ export abstract class GLMeshBase {
      * @param drawMode
      * @protected
      */
-    protected constructor(gl: WebGLRenderingContext, attribState: GLAttribBits, drawMode: number = gl.TRIANGLES) {
+    protected constructor(gl: WebGLRenderingContext, attribState: GLAttributeBits, drawMode: number = gl.TRIANGLES) {
         this.gl = gl;
         // 获取VAO的步骤
         // 1．使用gl.getExtension( "OES_vertex_array_object" )方式获取 VAO 扩展
@@ -47,7 +47,7 @@ export abstract class GLMeshBase {
         // 顶点属性格式，和绘制当前网格时使用的GLProgram具有一致的attribBits
         this._attribState = attribState;
         // 调用GLAttribState的getVertexByteStride方法，根据attribBits计算出顶点的stride字节数
-        this._attribStride = GLAttribState.getVertexByteStride(this._attribState);
+        this._attribStride = GLAttributeState.getVertexByteStride(this._attribState);
         // 设置当前绘制时使用的基本几何图元类型，默认为三角形集合
         this.drawMode = drawMode;
     }

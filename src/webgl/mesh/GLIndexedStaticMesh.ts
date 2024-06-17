@@ -1,5 +1,5 @@
 import {TypedArrayList} from "../../common/container/TypedArrayList";
-import {GLAttribBits} from "../GLAttribState";
+import {GLAttributeBits} from "../GLAttribState";
 import {GLStaticMesh} from "./GLStaticMesh";
 
 /**
@@ -16,7 +16,7 @@ export class GLIndexedStaticMesh extends GLStaticMesh {
      * @param vbo
      * @param drawMode
      */
-    public constructor(gl: WebGLRenderingContext, attribState: GLAttribBits, vbo: Float32Array | ArrayBuffer, drawMode: number = gl.TRIANGLES) {
+    public constructor(gl: WebGLRenderingContext, attribState: GLAttributeBits, vbo: Float32Array | ArrayBuffer, drawMode: number = gl.TRIANGLES) {
         super(gl, attribState, vbo, null, drawMode);
         this._indices = new TypedArrayList<Uint16Array>(Uint16Array, 90);
     }
