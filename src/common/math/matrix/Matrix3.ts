@@ -344,74 +344,54 @@ export class Matrix3 {
         const m20 = this.values[6];
         const m21 = this.values[7];
         const m22 = this.values[8];
-        
         const fourXSquaredMinus1 = m00 - m11 - m22;
         const fourYSquaredMinus1 = m11 - m00 - m22;
         const fourZSquaredMinus1 = m22 - m00 - m11;
         const fourWSquaredMinus1 = m00 + m11 + m22;
-        
         let biggestIndex = 0;
-        
         let fourBiggestSquaredMinus1 = fourWSquaredMinus1;
-        
         if (fourXSquaredMinus1 > fourBiggestSquaredMinus1) {
             fourBiggestSquaredMinus1 = fourXSquaredMinus1;
             biggestIndex = 1;
         }
-        
         if (fourYSquaredMinus1 > fourBiggestSquaredMinus1) {
             fourBiggestSquaredMinus1 = fourYSquaredMinus1;
             biggestIndex = 2;
         }
-        
         if (fourZSquaredMinus1 > fourBiggestSquaredMinus1) {
             fourBiggestSquaredMinus1 = fourZSquaredMinus1;
             biggestIndex = 3;
         }
-        
         const biggestVal = Math.sqrt(fourBiggestSquaredMinus1 + 1) * 0.5;
         const mult = 0.25 / biggestVal;
-        
         const result = new Quaternion();
-        
         switch (biggestIndex) {
             case 0:
-                
                 result.w = biggestVal;
                 result.x = (m12 - m21) * mult;
                 result.y = (m20 - m02) * mult;
                 result.z = (m01 - m10) * mult;
-                
                 break;
-            
             case 1:
-                
                 result.w = (m12 - m21) * mult;
                 result.x = biggestVal;
                 result.y = (m01 + m10) * mult;
                 result.z = (m20 + m02) * mult;
-                
                 break;
             
             case 2:
-                
                 result.w = (m20 - m02) * mult;
                 result.x = (m01 + m10) * mult;
                 result.y = biggestVal;
                 result.z = (m12 + m21) * mult;
-                
                 break;
-            
             case 3:
-                
                 result.w = (m01 - m10) * mult;
                 result.x = (m20 + m02) * mult;
                 result.y = (m12 + m21) * mult;
                 result.z = biggestVal;
-                
                 break;
         }
-        
         return result;
     }
     
@@ -424,25 +404,19 @@ export class Matrix3 {
         let x = axis.x;
         let y = axis.y;
         let z = axis.z;
-        
         let length = Math.sqrt(x * x + y * y + z * z);
-        
         if (!length) {
             return null;
         }
-        
         if (length !== 1) {
             length = 1 / length;
             x *= length;
             y *= length;
             z *= length;
         }
-        
         const s = Math.sin(angle);
         const c = Math.cos(angle);
-        
         const t = 1.0 - c;
-        
         const a00 = this.values[0];
         const a01 = this.values[1];
         const a02 = this.values[2];
@@ -452,7 +426,6 @@ export class Matrix3 {
         const a20 = this.values[8];
         const a21 = this.values[9];
         const a22 = this.values[10];
-        
         const b00 = x * x * t + c;
         const b01 = y * x * t + z * s;
         const b02 = z * x * t - y * s;
@@ -462,19 +435,15 @@ export class Matrix3 {
         const b20 = x * z * t + y * s;
         const b21 = y * z * t - x * s;
         const b22 = z * z * t + c;
-        
         this.values[0] = a00 * b00 + a10 * b01 + a20 * b02;
         this.values[1] = a01 * b00 + a11 * b01 + a21 * b02;
         this.values[2] = a02 * b00 + a12 * b01 + a22 * b02;
-        
         this.values[3] = a00 * b10 + a10 * b11 + a20 * b12;
         this.values[4] = a01 * b10 + a11 * b11 + a21 * b12;
         this.values[5] = a02 * b10 + a12 * b11 + a22 * b12;
-        
         this.values[6] = a00 * b20 + a10 * b21 + a20 * b22;
         this.values[7] = a01 * b20 + a11 * b21 + a21 * b22;
         this.values[8] = a02 * b20 + a12 * b21 + a22 * b22;
-        
         return this;
     }
 }
