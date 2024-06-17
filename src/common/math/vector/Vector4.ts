@@ -92,10 +92,7 @@ export class Vector4 {
      * @return {[number, number]}
      */
     public get xy(): [number, number] {
-        return [
-            this.values[0],
-            this.values[1]
-        ];
+        return [this.values[0], this.values[1]];
     }
     
     /**
@@ -112,11 +109,7 @@ export class Vector4 {
      * @return {[number, number, number]}
      */
     public get xyz(): [number, number, number] {
-        return [
-            this.values[0],
-            this.values[1],
-            this.values[2]
-        ];
+        return [this.values[0], this.values[1], this.values[2]];
     }
     
     /**
@@ -134,12 +127,7 @@ export class Vector4 {
      * @return {[number, number, number, number]}
      */
     public get xyzw(): [number, number, number, number] {
-        return [
-            this.values[0],
-            this.values[1],
-            this.values[2],
-            this.values[3]
-        ];
+        return [this.values[0], this.values[1], this.values[2], this.values[3]];
     }
     
     /**
@@ -222,10 +210,7 @@ export class Vector4 {
      * @return {[number, number]}
      */
     get rg(): [number, number] {
-        return [
-            this.values[0],
-            this.values[1]
-        ];
+        return [this.values[0], this.values[1]];
     }
     
     /**
@@ -242,11 +227,7 @@ export class Vector4 {
      * @return {[number, number, number]}
      */
     public get rgb(): [number, number, number] {
-        return [
-            this.values[0],
-            this.values[1],
-            this.values[2]
-        ];
+        return [this.values[0], this.values[1], this.values[2]];
     }
     
     /**
@@ -295,12 +276,10 @@ export class Vector4 {
         if (!dest) {
             dest = new Vector4();
         }
-        
         dest.x = vector.x + time * (vector2.x - vector.x);
         dest.y = vector.y + time * (vector2.y - vector.y);
         dest.z = vector.z + time * (vector2.z - vector.z);
         dest.w = vector.w + time * (vector2.w - vector.w);
-        
         return dest;
     }
     
@@ -315,12 +294,10 @@ export class Vector4 {
         if (!dest) {
             dest = new Vector4();
         }
-        
         dest.x = vector.x + vector2.x;
         dest.y = vector.y + vector2.y;
         dest.z = vector.z + vector2.z;
         dest.w = vector.w + vector2.w;
-        
         return dest;
     }
     
@@ -335,12 +312,10 @@ export class Vector4 {
         if (!dest) {
             dest = new Vector4();
         }
-        
         dest.x = vector.x - vector2.x;
         dest.y = vector.y - vector2.y;
         dest.z = vector.z - vector2.z;
         dest.w = vector.w - vector2.w;
-        
         return dest;
     }
     
@@ -352,16 +327,14 @@ export class Vector4 {
      * @param {Vector4} dest
      * @return {Vector4}
      */
-    static product(vector: Vector4, vector2: Vector4, dest?: Vector4): Vector4 {
+    public static product(vector: Vector4, vector2: Vector4, dest?: Vector4): Vector4 {
         if (!dest) {
             dest = new Vector4();
         }
-        
         dest.x = vector.x * vector2.x;
         dest.y = vector.y * vector2.y;
         dest.z = vector.z * vector2.z;
         dest.w = vector.w * vector2.w;
-        
         return dest;
     }
     
@@ -376,12 +349,10 @@ export class Vector4 {
         if (!dest) {
             dest = new Vector4();
         }
-        
         dest.x = vector.x / vector2.x;
         dest.y = vector.y / vector2.y;
         dest.z = vector.z / vector2.z;
         dest.w = vector.w / vector2.w;
-        
         return dest;
     }
     
@@ -413,12 +384,10 @@ export class Vector4 {
         if (!dest) {
             dest = new Vector4();
         }
-        
         dest.x = this.x;
         dest.y = this.y;
         dest.z = this.z;
         dest.w = this.w;
-        
         return dest;
     }
     
@@ -431,12 +400,10 @@ export class Vector4 {
         if (!dest) {
             dest = this;
         }
-        
         dest.x = -this.x;
         dest.y = -this.y;
         dest.z = -this.z;
         dest.w = -this.w;
-        
         return dest;
     }
     
@@ -447,28 +414,17 @@ export class Vector4 {
      * @return {boolean}
      */
     public equals(vector: Vector4, threshold = epsilon): boolean {
-        if (Math.abs(this.x - vector.x) > threshold) {
-            return false;
-        }
-        
-        if (Math.abs(this.y - vector.y) > threshold) {
-            return false;
-        }
-        
-        if (Math.abs(this.z - vector.z) > threshold) {
-            return false;
-        }
-        
-        return Math.abs(this.w - vector.w) <= threshold;
-        
-        
+        return (Math.abs(this.x - vector.x) <= threshold)
+            && (Math.abs(this.y - vector.y) <= threshold)
+            && (Math.abs(this.z - vector.z) <= threshold)
+            && (Math.abs(this.w - vector.w) <= threshold);
     }
     
     /**
      * 获取长度
      * @return {number}
      */
-   public length(): number {
+    public length(): number {
         return Math.sqrt(this.squaredLength());
     }
     
@@ -481,7 +437,6 @@ export class Vector4 {
         const y = this.y;
         const z = this.z;
         const w = this.w;
-        
         return (x * x + y * y + z * z + w * w);
     }
     
@@ -495,7 +450,6 @@ export class Vector4 {
         this.y += vector.y;
         this.z += vector.z;
         this.w += vector.w;
-        
         return this;
     }
     
@@ -509,7 +463,6 @@ export class Vector4 {
         this.y -= vector.y;
         this.z -= vector.z;
         this.w -= vector.w;
-        
         return this;
     }
     
@@ -523,7 +476,6 @@ export class Vector4 {
         this.y *= vector.y;
         this.z *= vector.z;
         this.w *= vector.w;
-        
         return this;
     }
     
@@ -537,7 +489,6 @@ export class Vector4 {
         this.y /= vector.y;
         this.z /= vector.z;
         this.w /= vector.w;
-        
         return this;
     }
     
@@ -551,12 +502,10 @@ export class Vector4 {
         if (!dest) {
             dest = this;
         }
-        
         dest.x *= value;
         dest.y *= value;
         dest.z *= value;
         dest.w *= value;
-        
         return dest;
     }
     
@@ -569,29 +518,22 @@ export class Vector4 {
         if (!dest) {
             dest = this;
         }
-        
         let length = this.length();
-        
         if (length === 1) {
             return this;
         }
-        
         if (length === 0) {
             dest.x *= 0;
             dest.y *= 0;
             dest.z *= 0;
             dest.w *= 0;
-            
             return dest;
         }
-        
         length = 1.0 / length;
-        
         dest.x *= length;
         dest.y *= length;
         dest.z *= length;
         dest.w *= length;
-        
         return dest;
     }
     

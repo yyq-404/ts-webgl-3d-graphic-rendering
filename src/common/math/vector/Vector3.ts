@@ -123,19 +123,15 @@ export class Vector3 {
         if (!dest) {
             dest = new Vector3();
         }
-        
         const x = vector.x;
         const y = vector.y;
         const z = vector.z;
-        
         const x2 = vector2.x;
         const y2 = vector2.y;
         const z2 = vector2.z;
-        
         dest.x = y * z2 - z * y2;
         dest.y = z * x2 - x * z2;
         dest.z = x * y2 - y * x2;
-        
         return dest;
     }
     
@@ -149,11 +145,9 @@ export class Vector3 {
         const x = vector.x;
         const y = vector.y;
         const z = vector.z;
-        
         const x2 = vector2.x;
         const y2 = vector2.y;
         const z2 = vector2.z;
-        
         return (x * x2 + y * y2 + z * z2);
     }
     
@@ -191,27 +185,20 @@ export class Vector3 {
         if (!dest) {
             dest = new Vector3();
         }
-        
         const x = vector.x - vector2.x;
         const y = vector.y - vector2.y;
         const z = vector.z - vector2.z;
-        
         let length = Math.sqrt(x * x + y * y + z * z);
-        
         if (length === 0) {
             dest.x = 0;
             dest.y = 0;
             dest.z = 0;
-            
             return dest;
         }
-        
         length = 1 / length;
-        
         dest.x = x * length;
         dest.y = y * length;
         dest.z = z * length;
-        
         return dest;
     }
     
@@ -227,11 +214,9 @@ export class Vector3 {
         if (!dest) {
             dest = new Vector3();
         }
-        
         dest.x = vector.x + time * (vector2.x - vector.x);
         dest.y = vector.y + time * (vector2.y - vector.y);
         dest.z = vector.z + time * (vector2.z - vector.z);
-        
         return dest;
     }
     
@@ -246,11 +231,9 @@ export class Vector3 {
         if (!dest) {
             dest = new Vector3();
         }
-        
         dest.x = vector.x + vector2.x;
         dest.y = vector.y + vector2.y;
         dest.z = vector.z + vector2.z;
-        
         return dest;
     }
     
@@ -265,11 +248,9 @@ export class Vector3 {
         if (!dest) {
             dest = new Vector3();
         }
-        
         dest.x = vector.x - vector2.x;
         dest.y = vector.y - vector2.y;
         dest.z = vector.z - vector2.z;
-        
         return dest;
     }
     
@@ -284,11 +265,9 @@ export class Vector3 {
         if (!dest) {
             dest = new Vector3();
         }
-        
         dest.x = vector.x * vector2.x;
         dest.y = vector.y * vector2.y;
         dest.z = vector.z * vector2.z;
-        
         return dest;
     }
     
@@ -303,11 +282,9 @@ export class Vector3 {
         if (!dest) {
             dest = new Vector3();
         }
-        
         dest.x = vector.x / vector2.x;
         dest.y = vector.y / vector2.y;
         dest.z = vector.z / vector2.z;
-        
         return dest;
     }
     
@@ -338,11 +315,9 @@ export class Vector3 {
         if (!dest) {
             dest = new Vector3();
         }
-        
         dest.x = this.x;
         dest.y = this.y;
         dest.z = this.z;
-        
         return dest;
     }
     
@@ -355,11 +330,9 @@ export class Vector3 {
         if (!dest) {
             dest = this;
         }
-        
         dest.x = -this.x;
         dest.y = -this.y;
         dest.z = -this.z;
-        
         return dest;
     }
     
@@ -373,14 +346,10 @@ export class Vector3 {
         if (Math.abs(this.x - vector.x) > threshold) {
             return false;
         }
-        
         if (Math.abs(this.y - vector.y) > threshold) {
             return false;
         }
-        
         return Math.abs(this.z - vector.z) <= threshold;
-        
-        
     }
     
     /**
@@ -399,7 +368,6 @@ export class Vector3 {
         const x = this.x;
         const y = this.y;
         const z = this.z;
-        
         return (x * x + y * y + z * z);
     }
     
@@ -478,27 +446,20 @@ export class Vector3 {
         if (!dest) {
             dest = this;
         }
-        
         let length = this.length();
-        
         if (length === 1) {
             return this;
         }
-        
         if (length === 0) {
             dest.x = 0;
             dest.y = 0;
             dest.z = 0;
-            
             return dest;
         }
-        
         length = 1.0 / length;
-        
         dest.x *= length;
         dest.y *= length;
         dest.z *= length;
-        
         return dest;
     }
     
@@ -537,24 +498,18 @@ export class Vector3 {
         if (!dest) {
             dest = new Quaternion();
         }
-        
         const c = new Vector3();
         const s = new Vector3();
-        
         c.x = Math.cos(this.x * 0.5);
         s.x = Math.sin(this.x * 0.5);
-        
         c.y = Math.cos(this.y * 0.5);
         s.y = Math.sin(this.y * 0.5);
-        
         c.z = Math.cos(this.z * 0.5);
         s.z = Math.sin(this.z * 0.5);
-        
         dest.x = s.x * c.y * c.z - c.x * s.y * s.z;
         dest.y = c.x * s.y * c.z + s.x * c.y * s.z;
         dest.z = c.x * c.y * s.z - s.x * s.y * c.z;
         dest.w = c.x * c.y * c.z + s.x * s.y * s.z;
-        
         return dest;
     }
 }

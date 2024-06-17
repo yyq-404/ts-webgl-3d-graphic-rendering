@@ -85,19 +85,14 @@ export class Vector2 {
         if (!dest) {
             dest = new Vector3();
         }
-        
         const x = vector.x;
         const y = vector.y;
-        
         const x2 = vector2.x;
         const y2 = vector2.y;
-        
         const z = x * y2 - y * x2;
-        
         dest.x = 0;
         dest.y = 0;
         dest.z = z;
-        
         return dest;
     }
     
@@ -144,24 +139,17 @@ export class Vector2 {
         if (!dest) {
             dest = new Vector2();
         }
-        
         const x = vector.x - vector2.x;
         const y = vector.y - vector2.y;
-        
         let length = Math.sqrt(x * x + y * y);
-        
         if (length === 0) {
             dest.x = 0;
             dest.y = 0;
-            
             return dest;
         }
-        
         length = 1 / length;
-        
         dest.x = x * length;
         dest.y = y * length;
-        
         return dest;
     }
     
@@ -177,16 +165,12 @@ export class Vector2 {
         if (!dest) {
             dest = new Vector2();
         }
-        
         const x = vector.x;
         const y = vector.y;
-        
         const x2 = vector2.x;
         const y2 = vector2.y;
-        
         dest.x = x + time * (x2 - x);
         dest.y = y + time * (y2 - y);
-        
         return dest;
     }
     
@@ -201,10 +185,8 @@ export class Vector2 {
         if (!dest) {
             dest = new Vector2();
         }
-        
         dest.x = vector.x + vector2.x;
         dest.y = vector.y + vector2.y;
-        
         return dest;
     }
     
@@ -219,10 +201,8 @@ export class Vector2 {
         if (!dest) {
             dest = new Vector2();
         }
-        
         dest.x = vector.x - vector2.x;
         dest.y = vector.y - vector2.y;
-        
         return dest;
     }
     
@@ -237,10 +217,8 @@ export class Vector2 {
         if (!dest) {
             dest = new Vector2();
         }
-        
         dest.x = vector.x * vector2.x;
         dest.y = vector.y * vector2.y;
-        
         return dest;
     }
     
@@ -255,10 +233,8 @@ export class Vector2 {
         if (!dest) {
             dest = new Vector2();
         }
-        
         dest.x = vector.x / vector2.x;
         dest.y = vector.y / vector2.y;
-        
         return dest;
     }
     
@@ -288,10 +264,8 @@ export class Vector2 {
         if (!dest) {
             dest = new Vector2();
         }
-        
         dest.x = this.x;
         dest.y = this.y;
-        
         return dest;
     }
     
@@ -304,10 +278,8 @@ export class Vector2 {
         if (!dest) {
             dest = this;
         }
-        
         dest.x = -this.x;
         dest.y = -this.y;
-        
         return dest;
     }
     
@@ -339,7 +311,6 @@ export class Vector2 {
     public squaredLength(): number {
         const x = this.x;
         const y = this.y;
-        
         return (x * x + y * y);
     }
     
@@ -351,7 +322,6 @@ export class Vector2 {
     public add(vector: Vector2): Vector2 {
         this.x += vector.x;
         this.y += vector.y;
-        
         return this;
     }
     
@@ -412,25 +382,18 @@ export class Vector2 {
         if (!dest) {
             dest = this;
         }
-        
         let length = this.length();
-        
         if (length === 1) {
             return this;
         }
-        
         if (length === 0) {
             dest.x = 0;
             dest.y = 0;
-            
             return dest;
         }
-        
         length = 1.0 / length;
-        
         dest.x *= length;
         dest.y *= length;
-        
         return dest;
     }
     
@@ -453,7 +416,7 @@ export class Vector2 {
      * @param {Vector2} dest
      * @return {Vector2}
      */
-    public multiplyMat3(matrix: Matrix3, dest?: Vector2): Vector2 {
+    public multiplyMatrix3(matrix: Matrix3, dest?: Vector2): Vector2 {
         if (!dest) {
             dest = this;
         }
