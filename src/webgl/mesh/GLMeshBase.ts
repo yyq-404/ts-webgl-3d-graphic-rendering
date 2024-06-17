@@ -1,4 +1,4 @@
-import {GLAttributeBits, GLAttributeState} from "../GLAttribState";
+import {GLAttributeBits, GLAttributeState} from "../GLAttributeState";
 
 /**
  * `GLMesh` 网格是渲染数据源，其中，`GLMeshBase` 是一个抽象基类，内部使用

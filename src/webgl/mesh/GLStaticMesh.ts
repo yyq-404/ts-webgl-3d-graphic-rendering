@@ -1,5 +1,5 @@
 import {Vector3} from "../../common/math/vector/Vector3";
-import {GLAttributeBits, GLAttributeState} from "../GLAttribState";
+import {GLAttributeBits, GLAttributeState} from "../GLAttributeState";
 import {GLMeshBase} from "./GLMeshBase";
 import {GLAttributeOffsetMap} from "../GLTypes";
 

@@ -3,7 +3,7 @@ import {BaseApplication} from "./BaseApplication";
 import {GLHelper} from "../webgl/GLHelper";
 import {GLTextureCache} from "../webgl/texture/GLTextureCache";
 import {GLProgramCache} from "../webgl/program/GLProgramCache";
-import {GLAttributeState} from "../webgl/GLAttribState";
+import {GLAttributeState} from "../webgl/GLAttributeState";
 import {GLProgram} from "../webgl/program/GLProgram";
 import {GLTexture} from "../webgl/texture/GLTexture";
 import {GLWorldMatrixStack} from "../webgl/matrix/GLWorldMatrixStack";

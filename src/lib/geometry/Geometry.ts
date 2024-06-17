@@ -1,6 +1,6 @@
 import {Vector3} from "../../common/math/vector/Vector3";
 import {Vector2} from "../../common/math/vector/Vector2";
-import {GLAttributeBits, GLAttributeState} from "../../webgl/GLAttribState";
+import {GLAttributeBits, GLAttributeState} from "../../webgl/GLAttributeState";
 import {Vector4} from "../../common/math/vector/Vector4";
 import {GLStaticMesh} from "../../webgl/mesh/GLStaticMesh";
 import {MathHelper} from "../../common/math/MathHelper";

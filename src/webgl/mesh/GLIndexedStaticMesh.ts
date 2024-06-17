@@ -1,5 +1,5 @@
 import {TypedArrayList} from "../../common/container/TypedArrayList";
-import {GLAttributeBits} from "../GLAttribState";
+import {GLAttributeBits} from "../GLAttributeState";
 import {GLStaticMesh} from "./GLStaticMesh";
 
 /**

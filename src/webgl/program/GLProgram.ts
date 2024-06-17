@@ -1,4 +1,4 @@
-import {GLAttributeBits, GLAttributeState} from '../GLAttribState';
+import {GLAttributeBits, GLAttributeState} from '../GLAttributeState';
 import {GLAttributeMap, GLUniformMap} from '../GLTypes';
 import {GLHelper} from '../GLHelper';
 import {Vector2} from '../../common/math/vector/Vector2';
