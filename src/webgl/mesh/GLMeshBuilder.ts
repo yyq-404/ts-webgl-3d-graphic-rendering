@@ -1,15 +1,15 @@
-import {Vector4} from "../../common/math/vector/Vector4";
-import {Vector2} from "../../common/math/vector/Vector2";
-import {Vector3} from "../../common/math/vector/Vector3";
-import {TypedArrayList} from "../../common/container/TypedArrayList";
-import {GLAttribBits, GLAttribState} from "../GLAttribState";
-import {GLMeshBase} from "./GLMeshBase";
-import {GLProgram} from "../program/GLProgram";
-import {Matrix4} from "../../common/math/matrix/Matrix4";
-import {GLAttribOffsetMap} from "../GLTypes";
-import {GLTexture} from "../texture/GLTexture";
-import {EGLVertexLayoutType} from "../../enum/EGLVertexLayoutType";
-import {CLConstants} from "../CLConstants";
+import {Vector4} from '../../common/math/vector/Vector4';
+import {Vector2} from '../../common/math/vector/Vector2';
+import {Vector3} from '../../common/math/vector/Vector3';
+import {TypedArrayList} from '../../common/container/TypedArrayList';
+import {GLAttribBits, GLAttribState} from '../GLAttribState';
+import {GLMeshBase} from './GLMeshBase';
+import {GLProgram} from '../program/GLProgram';
+import {Matrix4} from '../../common/math/matrix/Matrix4';
+import {GLAttribOffsetMap} from '../GLTypes';
+import {GLTexture} from '../texture/GLTexture';
+import {EGLVertexLayoutType} from '../../enum/EGLVertexLayoutType';
+import {CLConstants} from '../CLConstants';
 
 /**
  * GL网格构建器
@@ -17,8 +17,9 @@ import {CLConstants} from "../CLConstants";
  * 实现了类似于`OpenGL1.x`中的立即渲染模式（`glBegin` /`glVertex` /`glEnd`这种操作模式），用于**动态更新渲染数据及显示绘制**
  */
 export class GLMeshBuilder extends GLMeshBase {
-    // 字符串常量key
+    /** 连续存储方式，存储在一个 `VBO` 中 */
     private static SEQUENCED: 'SEQUENCED' = 'SEQUENCED' as const;
+    /** 交错数组存储方式，存储在一个 `VBO` 中 */
     private static INTERLEAVED: 'INTERLEAVED' = 'INTERLEAVED' as const;
     /** 顶点在内存或显存中的布局方式 */
     private readonly _layout: EGLVertexLayoutType;
@@ -43,14 +44,14 @@ export class GLMeshBuilder extends GLMeshBase {
     /** 要渲染的顶点数量  */
     private _vertCount: number = 0;
     /** 当前使用的`GLProgram`对象 */
-    program: GLProgram;
+    private program: GLProgram;
     /** 如果使用了纹理坐标，那么需要设置当前使用的纹理对象，否则将`texture`变量设置为`null` */
-    texture: WebGLTexture | null;
+    private texture: WebGLTexture | null;
     /** 渲染buffer数据 */
     private _ibo: WebGLBuffer | null = null;
     /** 索引数量 */
     private _indexCount: number = -1;
-
+    
     /**
      * 构造
      * @param gl
@@ -60,42 +61,35 @@ export class GLMeshBuilder extends GLMeshBase {
      * @param layout
      */
     public constructor(gl: WebGLRenderingContext, state: GLAttribBits, program: GLProgram, texture: WebGLTexture | null = null, layout: EGLVertexLayoutType = EGLVertexLayoutType.INTERLEAVED) {
-        super(gl, state); // 调用基类的构造方法
-
+        // 调用基类的构造方法
+        super(gl, state);
         // 根据attribBits，测试是否使用了下面几种类型的顶点属性格式
         this._hasColor = GLAttribState.hasColor(this._attribState);
         this._hasTexCoordinate = GLAttribState.hasTexCoordinate_0(this._attribState);
         this._hasNormal = GLAttribState.hasNormal(this._attribState);
-
         this._ibo = null;
-
         // 默认情况下，使用INTERLEAVED存储顶点
         this._layout = layout;
-
         // 设置当前使用的GLProgram和GLTexture2D对象
         this.program = program;
         this.texture = texture;
-
         // 先绑定VAO对象
         this.bind();
-
         // 生成索引缓存
         /** 索引缓存 */
         let indexBuffer: WebGLBuffer | null = this.gl.createBuffer();
         // buffer = this.gl.createBuffer();
         if (!indexBuffer) throw new Error('WebGLBuffer创建不成功!');
-
         if (this._layout === EGLVertexLayoutType.INTERLEAVED) {
             // interleaved的话：
             // 使用一个arraylist,一个顶点缓存
             // 调用的是GLAttribState.getInterleavedLayoutAttribOffsetMap方法
             this._lists[GLMeshBuilder.INTERLEAVED] = new TypedArrayList<Float32Array>(
-                Float32Array,
+                Float32Array
             );
             this._buffers[GLMeshBuilder.INTERLEAVED] = indexBuffer;
             this.gl.bindBuffer(this.gl.ARRAY_BUFFER, indexBuffer);
-            const offsetMap: GLAttribOffsetMap =
-                GLAttribState.getInterleavedLayoutAttribOffsetMap(this._attribState);
+            const offsetMap: GLAttribOffsetMap = GLAttribState.getInterleavedLayoutAttribOffsetMap(this._attribState);
             // 调用如下两个方法
             GLAttribState.setAttribVertexArrayPointer(this.gl, offsetMap);
             GLAttribState.setAttribVertexArrayState(this.gl, this._attribState);
@@ -128,7 +122,6 @@ export class GLMeshBuilder extends GLMeshBase {
             // 调用的是getSepratedLayoutAttribOffsetMap方法
             // 能够使用能够使用GLAttribState.setAttribVertexArrayPointer方法预先固定地址
             // 能够使用GLAttribState.setAttribVertexArrayState开启顶点属性寄存器
-
             // 肯定要有的是位置数据
             this._lists[GLAttribState.POSITION_NAME] = new TypedArrayList<Float32Array>(Float32Array);
             this._buffers[GLAttribState.POSITION_NAME] = indexBuffer;
@@ -165,7 +158,7 @@ export class GLMeshBuilder extends GLMeshBase {
         }
         this.unbind();
     }
-
+    
     /**
      * 设置纹理
      * @param tex
@@ -173,7 +166,7 @@ export class GLMeshBuilder extends GLMeshBase {
     public setTexture(tex: GLTexture): void {
         this.texture = tex.texture;
     }
-
+    
     /**
      * 设置IBO对象
      * @param data
@@ -190,7 +183,7 @@ export class GLMeshBuilder extends GLMeshBase {
         this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, data, this.gl.STATIC_DRAW);
         this._indexCount = data.length;
     }
-
+    
     /**
      * 输入rgba颜色值，取值范围为`[0, 1]`之间，返回 `this`
      * @param r
@@ -207,7 +200,7 @@ export class GLMeshBuilder extends GLMeshBase {
         }
         return this;
     }
-
+    
     /**
      * 输入uv纹理坐标值，返回 `this`
      */
@@ -218,7 +211,7 @@ export class GLMeshBuilder extends GLMeshBase {
         }
         return this;
     }
-
+    
     /**
      * 输入法线值xyz，返回 `this`
      * @param x
@@ -233,7 +226,7 @@ export class GLMeshBuilder extends GLMeshBase {
         }
         return this;
     }
-
+    
     /**
      * `vertex` 必须要最后调用，输入`xyz`，返回 `this`
      * @param x
@@ -248,7 +241,7 @@ export class GLMeshBuilder extends GLMeshBase {
             list.push(x);
             list.push(y);
             list.push(z);
-            // texcoord
+            // texCoordinate
             if (this._hasTexCoordinate) {
                 list.push(this._texCoordinate.x);
                 list.push(this._texCoordinate.y);
@@ -296,7 +289,7 @@ export class GLMeshBuilder extends GLMeshBase {
         this._vertCount++;
         return this;
     }
-
+    
     /**
      *  每次调用上述几个添加顶点属性的方法之前，必须要先调用 `begin` 方法，返回 `this`
      *  @param drawMode
@@ -323,7 +316,7 @@ export class GLMeshBuilder extends GLMeshBase {
         }
         return this;
     }
-
+    
     /**
      * `end` 方法用于渲染操作
      * @param mvp
@@ -377,7 +370,6 @@ export class GLMeshBuilder extends GLMeshBase {
                 this._lists[GLAttribState.POSITION_NAME];
             this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
             this.gl.bufferData(this.gl.ARRAY_BUFFER, list.subArray(), this.gl.DYNAMIC_DRAW);
-
             // texture
             if (this._hasTexCoordinate) {
                 buffer = this._buffers[GLAttribState.TEX_COORDINATE_NAME];
@@ -385,7 +377,6 @@ export class GLMeshBuilder extends GLMeshBase {
                 this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
                 this.gl.bufferData(this.gl.ARRAY_BUFFER, list.subArray(), this.gl.DYNAMIC_DRAW);
             }
-
             // normal
             if (this._hasNormal) {
                 buffer = this._buffers[GLAttribState.NORMAL_NAME];
@@ -393,7 +384,6 @@ export class GLMeshBuilder extends GLMeshBase {
                 this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
                 this.gl.bufferData(this.gl.ARRAY_BUFFER, list.subArray(), this.gl.DYNAMIC_DRAW);
             }
-
             // color
             if (this._hasColor) {
                 buffer = this._buffers[GLAttribState.COLOR_NAME];

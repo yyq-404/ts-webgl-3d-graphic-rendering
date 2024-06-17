@@ -1,4 +1,6 @@
-/** 顶点数组存储布局方式 */
+/**
+ * 顶点数组存储布局方式
+ */
 export enum EGLVertexLayoutType {
     /** 交错数组存储方式，存储在一个 `VBO` 中 */
     INTERLEAVED,
