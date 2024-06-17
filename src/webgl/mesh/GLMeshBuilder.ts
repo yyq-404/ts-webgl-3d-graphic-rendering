@@ -6,7 +6,7 @@ import {GLAttribBits, GLAttribState} from '../GLAttribState';
 import {GLMeshBase} from './GLMeshBase';
 import {GLProgram} from '../program/GLProgram';
 import {Matrix4} from '../../common/math/matrix/Matrix4';
-import {GLAttribOffsetMap} from '../GLTypes';
+import {GLAttributeOffsetMap} from '../GLTypes';
 import {GLTexture} from '../texture/GLTexture';
 import {EGLVertexLayoutType} from '../../enum/EGLVertexLayoutType';
 import {CLConstants} from '../CLConstants';
@@ -89,7 +89,7 @@ export class GLMeshBuilder extends GLMeshBase {
             );
             this._buffers[GLMeshBuilder.INTERLEAVED] = indexBuffer;
             this.gl.bindBuffer(this.gl.ARRAY_BUFFER, indexBuffer);
-            const offsetMap: GLAttribOffsetMap = GLAttribState.getInterleavedLayoutAttribOffsetMap(this._attribState);
+            const offsetMap: GLAttributeOffsetMap = GLAttribState.getInterleavedLayoutAttribOffsetMap(this._attribState);
             // 调用如下两个方法
             GLAttribState.setAttribVertexArrayPointer(this.gl, offsetMap);
             GLAttribState.setAttribVertexArrayState(this.gl, this._attribState);
@@ -344,7 +344,7 @@ export class GLMeshBuilder extends GLMeshBase {
             this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
             //用的是预先分配显存机制
             this.gl.bufferData(this.gl.ARRAY_BUFFER, this._attribStride * this._vertCount, this.gl.DYNAMIC_DRAW);
-            const map: GLAttribOffsetMap = GLAttribState.getSequencedLayoutAttribOffsetMap(this._attribState, this._vertCount);
+            const map: GLAttributeOffsetMap = GLAttribState.getSequencedLayoutAttribOffsetMap(this._attribState, this._vertCount);
             let list: TypedArrayList<Float32Array> = this._lists[GLAttribState.POSITION_NAME];
             this.gl.bufferSubData(this.gl.ARRAY_BUFFER, 0, list.subArray());
             if (this._hasTexCoordinate) {

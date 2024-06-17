@@ -1,5 +1,5 @@
-import {GLAttribInfo, GLAttribMap, GLUniformInfo, GLUniformMap} from "./GLTypes";
-import {EShaderType} from "../enum/EShaderType";
+import {GLAttributeInfo, GLAttributeMap, GLUniformInfo, GLUniformMap} from './GLTypes';
+import {EShaderType} from '../enum/EShaderType';
 
 /**
  * GL渲染工具类。
@@ -17,12 +17,12 @@ export class GLHelper {
         console.log(`3. isDepthTestEnable = ${gl.isEnabled(gl.DEPTH_TEST)}`);
         console.log(`4. isDitherEnable  = ${gl.isEnabled(gl.DITHER)}`);
         console.log(`5. isPolygonOffsetFillEnable = ${gl.isEnabled(gl.POLYGON_OFFSET_FILL)}`);
-        console.log(`6. isSampleAlphtToCoverageEnable = ${gl.isEnabled(gl.SAMPLE_ALPHA_TO_COVERAGE,)}`);
+        console.log(`6. isSampleAlphtToCoverageEnable = ${gl.isEnabled(gl.SAMPLE_ALPHA_TO_COVERAGE)}`);
         console.log(`7. isSampleCoverageEnable = ${gl.isEnabled(gl.SAMPLE_COVERAGE)}`);
         console.log(`8. isScissorTestEnable = ${gl.isEnabled(gl.SCISSOR_TEST)}`);
         console.log(`9. isStencilTestEnable  = ${gl.isEnabled(gl.STENCIL_TEST)}`);
     }
-
+    
     /**
      * 模拟触发 `WebGLRenderingContext` 上下文渲染对象丢失
      * @param gl
@@ -31,7 +31,7 @@ export class GLHelper {
         const ret: WEBGL_lose_context | null = gl.getExtension('WEBGL_lose_context');
         if (ret) ret.loseContext();
     }
-
+    
     /**
      * 打印一些 `WebGL` 的关键信息，如当前使用的 `GLSL ES` 版本之类的信息
      * @param gl
@@ -42,7 +42,7 @@ export class GLHelper {
         console.log('vendor = ' + gl.getParameter(gl.VENDOR));
         console.log('glsl version = ' + gl.getParameter(gl.SHADING_LANGUAGE_VERSION));
     }
-
+    
     /**
      * 创建着色器
      * @param gl
@@ -58,7 +58,7 @@ export class GLHelper {
         if (!shader) throw new Error('WebGLShader创建失败!');
         return shader;
     }
-
+    
     /**
      * 设置视图
      * @param gl
@@ -67,7 +67,7 @@ export class GLHelper {
     public static setViewport(gl: WebGLRenderingContext, v: number[]): void {
         gl.viewport(v[0], v[1], v[2], v[3]);
     }
-
+    
     /**
      * 编译着色器
      */
@@ -86,7 +86,7 @@ export class GLHelper {
         // 编译成功返回true
         return true;
     }
-
+    
     /**
      * 创建链接器程序
      * @param gl
@@ -96,7 +96,7 @@ export class GLHelper {
         if (!program) throw new Error('WebGLProgram创建失败!');
         return program;
     }
-
+    
     /**
      * 链接着色器
      * @param gl 渲染上下文对象
@@ -115,7 +115,7 @@ export class GLHelper {
         // 3．调用linkProgram进行链接操作
         gl.linkProgram(program);
         // 4．使用带gl.LINK_STATUS参数的getProgramParameter方法，进行链接状态检查
-        if (gl.getProgramParameter(program, gl.LINK_STATUS) === false) {
+        if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
             // 4.1 如果链接出错，调用getProgramInfoLog方法将错误信息以弹框方式通知调用者
             alert(gl.getProgramInfoLog(program));
             // 4.2 删除掉相关资源，防止内存泄漏
@@ -128,7 +128,7 @@ export class GLHelper {
         // 5．使用validateProgram进行链接验证
         gl.validateProgram(program);
         // 6．使用带gl.VALIDATE_STATUS参数的getProgramParameter方法，进行验证状态检查
-        if (gl.getProgramParameter(program, gl.VALIDATE_STATUS) === false) {
+        if (!gl.getProgramParameter(program, gl.VALIDATE_STATUS)) {
             // 6.1 如果验证出错，调用getProgramInfoLog方法将错误信息以弹框方式通知调用者
             alert(gl.getProgramInfoLog(program));
             // 6.2 删除相关资源，防止内存泄漏
@@ -138,20 +138,20 @@ export class GLHelper {
             // 6.3 返回链接失败状态
             return false;
         }
-
         // 7．全部正确，按需调用afterProgramLink回调函数
         afterProgramLink && afterProgramLink(gl, program);
         // 8．返回链接正确表示
         return true;
     }
-
+    
     /**
      * 获取当前active状态的`attribute`的数量
      * @param gl
      * @param program
-     * @param out
+     * @return GLAttributeMap
      */
-    public static getProgramActiveAttribs(gl: WebGLRenderingContext, program: WebGLProgram, out: GLAttribMap): void {
+    public static getProgramActiveAttribs(gl: WebGLRenderingContext, program: WebGLProgram): GLAttributeMap {
+        let attributeMap: GLAttributeMap = {};
         //获取当前active状态的attribute和uniform的数量
         //很重要的一点，active_attributes/uniforms必须在link后才能获得
         const attributesCount: number = gl.getProgramParameter(program, gl.ACTIVE_ATTRIBUTES);
@@ -162,19 +162,20 @@ export class GLHelper {
             if (info) {
                 // 将WebGLActiveInfo对象转换为GLAttribInfo对象，并存储在GLAttribMap中
                 // 内部调用了getAttribLocation方法获取索引号
-                out[info.name] = new GLAttribInfo(info.size, info.type, gl.getAttribLocation(program, info.name));
+                attributeMap[info.name] = new GLAttributeInfo(info.size, info.type, gl.getAttribLocation(program, info.name));
             }
         }
+        return attributeMap;
     }
-
+    
     /**
      * 获取当前active状态的`uniform`的数量
      * @param gl
      * @param program
-     * @param out
-     *
+     * @return GLUniformMap
      */
-    public static getProgramActiveUniforms(gl: WebGLRenderingContext, program: WebGLProgram, out: GLUniformMap): void {
+    public static getProgramActiveUniforms(gl: WebGLRenderingContext, program: WebGLProgram): GLUniformMap {
+        let uniformMap: GLUniformMap = {};
         const uniformsCount: number = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
         //很重要的一点，所谓active是指uniform已经被使用的，否则不属于uniform.uniform在shader中必须是读取，不能赋值
         for (let i = 0; i < uniformsCount; i++) {
@@ -183,15 +184,13 @@ export class GLHelper {
             if (info) {
                 // 将WebGLActiveInfo对象转换为GLUniformInfo对象，并存储在GLUniformMap 中
                 // 内部调用了getUniformLocation方法获取WebGLUniformLocation对象
-                const loc: WebGLUniformLocation | null = gl.getUniformLocation(
-                    program,
-                    info.name,
-                );
-                if (loc) out[info.name] = new GLUniformInfo(info.size, info.type, loc);
+                const loc: WebGLUniformLocation | null = gl.getUniformLocation(program, info.name);
+                if (loc) uniformMap[info.name] = new GLUniformInfo(info.size, info.type, loc);
             }
         }
+        return uniformMap;
     }
-
+    
     /**
      * 创建渲染用数据缓冲区
      * @param gl
@@ -201,7 +200,7 @@ export class GLHelper {
         if (!buffer) throw new Error('WebGLBuffer创建失败!');
         return buffer;
     }
-
+    
     /**
      * 设置默认渲染状态
      * @param gl
@@ -219,7 +218,7 @@ export class GLHelper {
         //开启裁剪测试
         gl.enable(gl.SCISSOR_TEST);
     }
-
+    
     /**
      * 检查错误
      * @param gl

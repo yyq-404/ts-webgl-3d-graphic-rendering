@@ -1,4 +1,4 @@
-import {GLAttribOffsetMap} from "./GLTypes";
+import {GLAttributeOffsetMap} from "./GLTypes";
 
 export type GLAttribBits = number;
 
@@ -122,8 +122,8 @@ export class GLAttribState {
      * 交错数组存储方式
      * @param attribBits
      */
-    public static getInterleavedLayoutAttribOffsetMap(attribBits: GLAttribBits): GLAttribOffsetMap {
-        const offsets: GLAttribOffsetMap = {}; // 初始化顶点属性偏移表
+    public static getInterleavedLayoutAttribOffsetMap(attribBits: GLAttribBits): GLAttributeOffsetMap {
+        const offsets: GLAttributeOffsetMap = {}; // 初始化顶点属性偏移表
         let byteOffset: number = 0; // 初始化时的首地址为0
         if (GLAttribState.hasPosition(attribBits)) {
             // 记录位置坐标的首地址
@@ -166,8 +166,8 @@ export class GLAttribState {
      * @param attribBits
      * @param vertCount
      */
-    public static getSequencedLayoutAttribOffsetMap(attribBits: GLAttribBits, vertCount: number): GLAttribOffsetMap {
-        const offsets: GLAttribOffsetMap = {}; // 初始化顶点属性偏移表
+    public static getSequencedLayoutAttribOffsetMap(attribBits: GLAttribBits, vertCount: number): GLAttributeOffsetMap {
+        const offsets: GLAttributeOffsetMap = {}; // 初始化顶点属性偏移表
         let byteOffset: number = 0; // 初始化时的首地址为0
         if (GLAttribState.hasPosition(attribBits)) {
             // 记录位置坐标的首地址
@@ -208,10 +208,10 @@ export class GLAttribState {
      * 每种顶点属性存储在单独的一个 `WebGLBuffer` 对象中，偏移值都是0
      * @param attribBits
      */
-    public static getSeparatedLayoutAttribOffsetMap(attribBits: GLAttribBits): GLAttribOffsetMap {
+    public static getSeparatedLayoutAttribOffsetMap(attribBits: GLAttribBits): GLAttributeOffsetMap {
         // 每个顶点属性使用一个vbo的话，每个offsets中的顶点属性的偏移都是为0
         // 并且offsets的length = vbo的个数，不需要顶点stride和byteLength属性
-        const offsets: GLAttribOffsetMap = {};
+        const offsets: GLAttributeOffsetMap = {};
 
         if (GLAttribState.hasPosition(attribBits)) {
             offsets[GLAttribState.POSITION_NAME] = 0;
@@ -267,7 +267,7 @@ export class GLAttribState {
      * @param gl
      * @param offsetMap
      */
-    public static setAttribVertexArrayPointer(gl: WebGLRenderingContext, offsetMap: GLAttribOffsetMap): void {
+    public static setAttribVertexArrayPointer(gl: WebGLRenderingContext, offsetMap: GLAttributeOffsetMap): void {
         let stride: number = offsetMap[GLAttribState.ATTRIB_STRIDE];
         if (stride === 0) throw new Error('vertex Array有问题! ! ');
         // sequenced 的话 stride 为 0

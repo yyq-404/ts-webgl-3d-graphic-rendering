@@ -1,14 +1,14 @@
-import {GLAttribBits, GLAttribState} from "../GLAttribState";
-import {GLAttribMap, GLUniformMap} from "../GLTypes";
-import {GLHelper} from "../GLHelper";
-import {Vector2} from "../../common/math/vector/Vector2";
-import {Vector3} from "../../common/math/vector/Vector3";
-import {Vector4} from "../../common/math/vector/Vector4";
-import {Matrix4} from "../../common/math/matrix/Matrix4";
-import {Quaternion} from "../../common/math/Quaternion";
-import {EShaderType} from "../../enum/EShaderType";
-import {CLConstants} from "../CLConstants";
-import {GLShaderSource} from "../GLShaderSource";
+import {GLAttribBits, GLAttribState} from '../GLAttribState';
+import {GLAttributeMap, GLUniformMap} from '../GLTypes';
+import {GLHelper} from '../GLHelper';
+import {Vector2} from '../../common/math/vector/Vector2';
+import {Vector3} from '../../common/math/vector/Vector3';
+import {Vector4} from '../../common/math/vector/Vector4';
+import {Matrix4} from '../../common/math/matrix/Matrix4';
+import {Quaternion} from '../../common/math/Quaternion';
+import {EShaderType} from '../../enum/EShaderType';
+import {CLConstants} from '../CLConstants';
+import {GLShaderSource} from '../GLShaderSource';
 
 /**
  * `GLProgram` 类用来用来GLSL ES源码的编译、链接、绑定及 `uniform` 变量载入等操作
@@ -25,7 +25,7 @@ export class GLProgram {
     /** fragment shader编译器 */
     public fsShader: WebGLShader;
     /** 主要用于信息输出 */
-    public attribMap: GLAttribMap;
+    public attributeMap: GLAttributeMap;
     public uniformMap: GLUniformMap;
     /** 当调用gl.useProgram(this.program)后触发bindCallback回调 */
     public bindCallback: ((program: GLProgram) => void) | null;
@@ -35,7 +35,7 @@ export class GLProgram {
     private readonly _attribState: GLAttribBits;
     private _vsShaderDefineStrings: string[] = [];
     private _fsShaderDefineStrings: string[] = [];
-
+    
     /**
      * 构造。
      * @param context
@@ -63,7 +63,7 @@ export class GLProgram {
         if (!program) throw new Error('Create WebGLProgram Object Fail! ! ! ');
         this.program = program;
         // 初始化map对象
-        this.attribMap = {};
+        this.attributeMap = {};
         this.uniformMap = {};
         // 如果构造函数参数包含GLSL ES源码，就调用loadShaders方法
         // 否则需要在调用构造函数后手动调用loadShaders方法
@@ -72,7 +72,7 @@ export class GLProgram {
         }
         this.name = 'name';
     }
-
+    
     /**
      * 创建默认纹理着色器
      * @param gl
@@ -80,7 +80,7 @@ export class GLProgram {
     public static createDefaultTextureProgram(gl: WebGLRenderingContext): GLProgram {
         return new GLProgram(gl, GLAttribState.makeVertexAttribs(true, false, false, false, false), GLShaderSource.textureShader.vs, GLShaderSource.textureShader.fs);
     }
-
+    
     /**
      * 创建默认颜色着色器
      * @param gl
@@ -88,7 +88,7 @@ export class GLProgram {
     public static createDefaultColorProgram(gl: WebGLRenderingContext): GLProgram {
         return new GLProgram(gl, GLAttribState.makeVertexAttribs(false, false, false, false, true), GLShaderSource.colorShader.vs, GLShaderSource.colorShader.fs);
     }
-
+    
     /**
      * 在Vertex Shader中动态添加宏
      * @param str
@@ -99,7 +99,7 @@ export class GLProgram {
         }
         this._vsShaderDefineStrings.push(str);
     }
-
+    
     /**
      * 在Fragment Shader中动态添加宏
      * @param str
@@ -110,7 +110,7 @@ export class GLProgram {
         }
         this._fsShaderDefineStrings.push(str);
     }
-
+    
     /**
      * vs fs都要添加的宏，例如在VS / FS中添加如下宏：
      * ```C
@@ -124,7 +124,7 @@ export class GLProgram {
         this.addVSShaderMacro(str);
         this.addFSShaderMacro(str);
     }
-
+    
     /**
      * 1. 载入并编译 `VS` 和 `FS`
      * 2. 使用 `WebGLRenderingContext` 对象的 `bindAttribLocation` 方法在链接前预先绑定顶点索引号
@@ -139,12 +139,12 @@ export class GLProgram {
         if (!GLHelper.compileShader(this.gl, fs, this.fsShader)) {
             throw new Error(' WebGL像素片段Shader链接不成功! ');
         }
-        if (!GLHelper.linkProgram(this.gl, this.program, this.vsShader, this.fsShader, this.programBeforeLink.bind(this), this.programAfterLink.bind(this),)) {
+        if (!GLHelper.linkProgram(this.gl, this.program, this.vsShader, this.fsShader, this.programBeforeLink.bind(this), this.programAfterLink.bind(this))) {
             throw new Error(' WebGLProgram链接不成功! ');
         }
-        console.log(JSON.stringify(this.attribMap));
+        console.log(JSON.stringify(this.attributeMap));
     }
-
+    
     /**
      * 将定义好的 `WebGLProgram` 对象添加到当前的 `WebGLRenderingContext`中
      */
@@ -152,7 +152,7 @@ export class GLProgram {
         this.gl.useProgram(this.program);
         this.bindCallback && this.bindCallback(this);
     }
-
+    
     /**
      * 解绑
      */
@@ -160,7 +160,7 @@ export class GLProgram {
         this.unbindCallback && this.unbindCallback(this);
         this.gl.useProgram(null);
     }
-
+    
     /**
      * 根据变量名获取WebGLUniformLocation对象
      * @param name
@@ -168,7 +168,7 @@ export class GLProgram {
     public getUniformLocation(name: string): WebGLUniformLocation | null {
         return this.gl.getUniformLocation(this.program, name);
     }
-
+    
     /**
      * 更具名称获取WebGL Location属性
      * @param name
@@ -176,7 +176,7 @@ export class GLProgram {
     public getAttributeLocation(name: string): number {
         return this.gl.getAttribLocation(this.program, name);
     }
-
+    
     /**
      * 设置WebGL Location属性
      * @param name
@@ -185,7 +185,7 @@ export class GLProgram {
     public setAttributeLocation(name: string, loc: number): void {
         this.gl.bindAttribLocation(this.program, loc, name);
     }
-
+    
     /**
      * 设置整数
      * @param name
@@ -199,7 +199,7 @@ export class GLProgram {
         }
         return false;
     }
-
+    
     /**
      * 设置浮点数
      * @param name
@@ -213,7 +213,7 @@ export class GLProgram {
         }
         return false;
     }
-
+    
     /**
      * 设置二维向量
      * @param name
@@ -227,7 +227,7 @@ export class GLProgram {
         }
         return false;
     }
-
+    
     /**
      * 设置三维向量
      * @param name
@@ -241,7 +241,7 @@ export class GLProgram {
         }
         return false;
     }
-
+    
     /**
      * 设置四维向量
      * @param name
@@ -255,7 +255,7 @@ export class GLProgram {
         }
         return false;
     }
-
+    
     /**
      * 设置四元数
      * @param name
@@ -269,7 +269,7 @@ export class GLProgram {
         }
         return false;
     }
-
+    
     /**
      * 设置三维矩阵
      * @param name
@@ -283,7 +283,7 @@ export class GLProgram {
         }
         return false;
     }
-
+    
     /**
      * 使用 `gl.uniformMatrix4fv` 方法载入类型为 `mat4` 的 `uniform` 变量到 `GLProgram` 对象中
      * @param name
@@ -297,7 +297,7 @@ export class GLProgram {
         }
         return false;
     }
-
+    
     /**
      * 设置取样器
      * @param name
@@ -311,7 +311,7 @@ export class GLProgram {
         }
         return false;
     }
-
+    
     /**
      * 加载取样器
      * @param unit
@@ -319,7 +319,7 @@ export class GLProgram {
     public loadSampler(unit: number = 0): boolean {
         return this.setSampler(CLConstants.Sampler, unit);
     }
-
+    
     /**
      * 加载模型视图矩阵
      * @param mat
@@ -327,7 +327,7 @@ export class GLProgram {
     public loadModelViewMatrix(mat: Matrix4): boolean {
         return this.setMatrix4(CLConstants.MVMatrix, mat);
     }
-
+    
     /**
      * 渲染前置处理。
      * @param gl
@@ -358,7 +358,7 @@ export class GLProgram {
             gl.bindAttribLocation(program, GLAttribState.TANGENT_LOCATION, GLAttribState.TANGENT_NAME);
         }
     }
-
+    
     /**
      * 渲染后置处理
      *
@@ -370,9 +370,9 @@ export class GLProgram {
     private programAfterLink(gl: WebGLRenderingContext, program: WebGLProgram): void {
         // 获取当前active状态的attribute和uniform的数量
         // 很重要的一点，active_attributes/uniforms必须在link后才能获得
-        GLHelper.getProgramActiveAttribs(gl, program, this.attribMap);
-        GLHelper.getProgramActiveUniforms(gl, program, this.uniformMap);
-        console.log(JSON.stringify(this.attribMap));
+        this.attributeMap = GLHelper.getProgramActiveAttribs(gl, program);
+        this.uniformMap = GLHelper.getProgramActiveUniforms(gl, program);
+        console.log(JSON.stringify(this.attributeMap));
         console.log(JSON.stringify(this.uniformMap));
     }
 }

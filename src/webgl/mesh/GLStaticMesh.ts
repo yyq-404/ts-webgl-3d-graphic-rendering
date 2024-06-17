@@ -1,7 +1,7 @@
 import {Vector3} from "../../common/math/vector/Vector3";
 import {GLAttribBits, GLAttribState} from "../GLAttribState";
 import {GLMeshBase} from "./GLMeshBase";
-import {GLAttribOffsetMap} from "../GLTypes";
+import {GLAttributeOffsetMap} from "../GLTypes";
 
 /**
  * `GLStaticMesh` 类继承自 `GLMeshBase` ，并且持有两个 `WebGLBuffer` 对象，分别表示顶点缓冲区和索引缓冲区。
@@ -48,7 +48,7 @@ export class GLStaticMesh extends GLMeshBase {
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this._vbo); // 绑定VBO
         this.gl.bufferData(this.gl.ARRAY_BUFFER, vbo, this.gl.STATIC_DRAW); // 将顶点数据载入到VBO中
         // 然后计算出交错存储的顶点属性attribOffsetMap相关的值
-        const offsetMap: GLAttribOffsetMap = GLAttribState.getInterleavedLayoutAttribOffsetMap(this._attribState);
+        const offsetMap: GLAttributeOffsetMap = GLAttribState.getInterleavedLayoutAttribOffsetMap(this._attribState);
         // 计算出顶点的数量
         this._vertCount = vbo.byteLength / offsetMap[GLAttribState.ATTRIB_STRIDE];
         // 使用VAO后，我们只要初始化时设置一次setAttribVertexArrayPointer和setAttribVertexArrayState就行了
