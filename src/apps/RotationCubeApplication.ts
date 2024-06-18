@@ -23,19 +23,16 @@ export class RotatingCubeApplication extends CameraApplication {
     private colorProgram: GLProgram;
     /** 使用颜色GPU Program对象 */
     private textureProgram: GLProgram;
-
     // 纹理对象
     /** 由于cube会进行周而复始的换纹理操作，因此需要记录当前纹理的索引号 */
     private currTexIdx: number;
     /** 需要一个数组保存多个纹理 */
     private textures: GLTexture[];
-
     // 立方体渲染数据，后续章节详解
     /** 几何体的数据表达式 */
     private cube: Cube;
     /** 几何体的渲染数据源 */
     private cubeVAO: GLStaticMesh;
-
     // 立方体的角运动相关变量
     /** cube的角位移 */
     private cubeAngle: number;
@@ -43,7 +40,6 @@ export class RotatingCubeApplication extends CameraApplication {
     private readonly cubeSpeed: number;
     /** 合成的cube的世界矩阵 */
     private readonly cubeMatrix: Matrix4;
-
     // 三角形
     /** 三角形的角位移 */
     private triAngle: number;
@@ -53,7 +49,6 @@ export class RotatingCubeApplication extends CameraApplication {
     private triTimerId: number;
     /** 合成的三角形的世界矩阵 */
     private readonly triMatrix: Matrix4;
-
     /** 为了支持鼠标点选，记录选中的坐标轴的enum值 */
     private readonly _hitAxis: EAxisType;
 
@@ -74,30 +69,24 @@ export class RotatingCubeApplication extends CameraApplication {
         this.cubeSpeed = 100;
         this.triSpeed = 1;
         this.triTimerId = -1;
-
         this.currTexIdx = 0;
         this.textures = [];
         // 我们在WebGLApplication基类中内置了default的纹理贴图
         this.textures.push(GLTextureCache.instance.getMust('default'));
-
         // 创建封装后的GLProgram类
         // 我们在WebGLApplication基类中内置texture/color的GLProgram对象
         this.textureProgram = GLProgramCache.instance.getMust('texture');
         this.colorProgram = GLProgramCache.instance.getMust('color');
-
         // 创建cube的渲染数据
         // 对于三角形的渲染数据，我们使用GLMeshBuilder中立即模式绘制方式
         this.cube = new Cube(0.5, 0.5, 0.5);
         const data: Geometry = this.cube.makeGeometry();
         this.cubeVAO = data.makeStaticVAO(this.gl);
-
         // 初始化时没选中任何一条坐标轴
         this._hitAxis = EAxisType.NONE;
-
         // 初始化时，世界矩阵都为归一化矩阵
         this.cubeMatrix = new Matrix4().setIdentity();
         this.triMatrix = new Matrix4().setIdentity();
-
         // 调整摄像机的位置
         this.camera.z = 8;
     }

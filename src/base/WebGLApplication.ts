@@ -43,21 +43,16 @@ export class WebGLApplication extends BaseApplication {
             parent.appendChild(this.canvas);
             this.canvas2D = this.canvas;
         }
-
         this.matStack = new GLWorldMatrixStack();
         // 初始化渲染状态
         GLHelper.setDefaultState(this.gl);
-
         // 由于Canvas是左手系，而webGL是右手系，需要FilpYCoord
         this.isFlipYCoordinate = true;
-
         // 初始化时，创建default纹理
         GLTextureCache.instance.set('default', GLTexture.createDefaultTexture(this.gl));
-
         // 初始化时，创建颜色和纹理Program
         GLProgramCache.instance.set('color', GLProgram.createDefaultColorProgram(this.gl));
         GLProgramCache.instance.set('texture', GLProgram.createDefaultTextureProgram(this.gl));
-
         // 初始化时，创建颜色GLMeshBuilder对象
         this.builder = new GLMeshBuilder(this.gl, GLAttributeState.POSITION_BIT | GLAttributeState.COLOR_BIT, GLProgramCache.instance.getMust('color'));
     }
