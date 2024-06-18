@@ -145,12 +145,28 @@ export class GLHelper {
     }
     
     /**
+     * 打印着色器链接程序激活信息
+     * 这里只是为了输出当前Program相关的uniform和attribute变量的信息
+     * @param gl
+     * @param program
+     * @private
+     */
+    public static printProgramActiveInfos(gl: WebGLRenderingContext, program: WebGLProgram): void {
+        // 获取当前active状态的attribute和uniform的数量
+        // 很重要的一点，active_attributes/uniforms必须在link后才能获得
+        const attributeMap: GLAttributeMap = GLHelper.getProgramActiveAttributes(gl, program);
+        const uniformMap: GLUniformMap = GLHelper.getProgramActiveUniforms(gl, program);
+        console.log(JSON.stringify(attributeMap));
+        console.log(JSON.stringify(uniformMap));
+    }
+    
+    /**
      * 获取当前active状态的`attribute`的数量
      * @param gl
      * @param program
      * @return GLAttributeMap
      */
-    public static getProgramActiveAttribs(gl: WebGLRenderingContext, program: WebGLProgram): GLAttributeMap {
+    public static getProgramActiveAttributes(gl: WebGLRenderingContext, program: WebGLProgram): GLAttributeMap {
         let attributeMap: GLAttributeMap = {};
         //获取当前active状态的attribute和uniform的数量
         //很重要的一点，active_attributes/uniforms必须在link后才能获得

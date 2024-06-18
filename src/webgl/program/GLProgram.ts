@@ -1,5 +1,4 @@
 import {GLAttributeBits, GLAttributeState} from '../GLAttributeState';
-import {GLAttributeMap, GLUniformMap} from '../GLTypes';
 import {GLHelper} from '../GLHelper';
 import {Vector2} from '../../common/math/vector/Vector2';
 import {Vector3} from '../../common/math/vector/Vector3';
@@ -11,7 +10,7 @@ import {CLConstants} from '../CLConstants';
 import {GLShaderSource} from '../GLShaderSource';
 
 /**
- * `GLProgram` 类用来用来GLSL ES源码的编译、链接、绑定及 `uniform` 变量载入等操作
+ * `GLProgram` 类用来执行GLSL ES源码的编译、链接、绑定及 `uniform` 变量载入等操作
  */
 export class GLProgram {
     /** WebGL上下文渲染对象 */
@@ -24,9 +23,6 @@ export class GLProgram {
     public vsShader: WebGLShader;
     /** fragment shader编译器 */
     public fsShader: WebGLShader;
-    /** 主要用于信息输出 */
-    public attributeMap: GLAttributeMap;
-    public uniformMap: GLUniformMap;
     /** 当调用gl.useProgram(this.program)后触发bindCallback回调 */
     public bindCallback: ((program: GLProgram) => void) | null;
     /** 当调用gl.useProgram(null)前触发unbindCallback回调函数 */
@@ -62,9 +58,6 @@ export class GLProgram {
         const program: WebGLProgram | null = GLHelper.createProgram(this.gl);
         if (!program) throw new Error('Create WebGLProgram Object Fail! ! ! ');
         this.program = program;
-        // 初始化map对象
-        this.attributeMap = {};
-        this.uniformMap = {};
         // 如果构造函数参数包含GLSL ES源码，就调用loadShaders方法
         // 否则需要在调用构造函数后手动调用loadShaders方法
         if (vsShader !== null && fsShader !== null) {
@@ -140,10 +133,10 @@ export class GLProgram {
         if (!GLHelper.compileShader(this.gl, fs, this.fsShader)) {
             throw new Error(' WebGL像素片段Shader链接不成功! ');
         }
-        if (!GLHelper.linkProgram(this.gl, this.program, this.vsShader, this.fsShader, this.programBeforeLink.bind(this), this.programAfterLink.bind(this))) {
+        if (!GLHelper.linkProgram(this.gl, this.program, this.vsShader, this.fsShader, this.programBeforeLink.bind(this), GLHelper.printProgramActiveInfos)) {
             throw new Error(' WebGLProgram链接不成功! ');
         }
-        this.programAfterLink(this.gl, this.program);
+        GLHelper.printProgramActiveInfos(this.gl, this.program);
     }
     
     /**
@@ -358,22 +351,5 @@ export class GLProgram {
         if (GLAttributeState.hasTangent(this._attributeState)) {
             gl.bindAttribLocation(program, GLAttributeState.TANGENT_LOCATION, GLAttributeState.TANGENT_NAME);
         }
-    }
-    
-    /**
-     * 渲染后置处理
-     *
-     * 这里只是为了输出当前Program相关的uniform和attribute变量的信息
-     * @param gl
-     * @param program
-     * @private
-     */
-    private programAfterLink(gl: WebGLRenderingContext, program: WebGLProgram): void {
-        // 获取当前active状态的attribute和uniform的数量
-        // 很重要的一点，active_attributes/uniforms必须在link后才能获得
-        this.attributeMap = GLHelper.getProgramActiveAttribs(gl, program);
-        this.uniformMap = GLHelper.getProgramActiveUniforms(gl, program);
-        console.log(JSON.stringify(this.attributeMap));
-        console.log(JSON.stringify(this.uniformMap));
     }
 }
