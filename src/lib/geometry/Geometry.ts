@@ -1,6 +1,6 @@
 import {Vector3} from '../../common/math/vector/Vector3';
 import {Vector2} from '../../common/math/vector/Vector2';
-import {GLAttributeState} from '../../webgl/GLAttributeState';
+import {GLAttributeHelper} from '../../webgl/GLAttributeHelper';
 import {Vector4} from '../../common/math/vector/Vector4';
 import {GLStaticMesh} from '../../webgl/mesh/GLStaticMesh';
 import {MathHelper} from '../../common/math/MathHelper';
@@ -32,12 +32,12 @@ export class Geometry {
     public makeStaticVAO(gl: WebGLRenderingContext, needNormals: boolean = false, optionUV: boolean = true): GLStaticMesh {
         let bits: GLAttributeBits = this.getAttribBits();
         if (!needNormals) {
-            bits &= ~GLAttributeState.NORMAL.BIT;
+            bits &= ~GLAttributeHelper.NORMAL.BIT;
         }
         if (!optionUV) {
-            bits &= ~GLAttributeState.TEX_COORDINATE_0.BIT;
+            bits &= ~GLAttributeHelper.TEX_COORDINATE_0.BIT;
         }
-        const stride: number = GLAttributeState.getVertexByteStride(bits);
+        const stride: number = GLAttributeHelper.getVertexByteStride(bits);
         const step: number = stride / Float32Array.BYTES_PER_ELEMENT;
         const arrayBuffer: ArrayBuffer = new ArrayBuffer(stride * this.positions.length);
         const buffer = new Float32Array(arrayBuffer);
@@ -49,25 +49,25 @@ export class Geometry {
             buffer[j + idx++] = this.positions[i].y;
             buffer[j + idx++] = this.positions[i].z;
             //法线(用了bits后，不能用length来判断了!!!)
-            if (bits & GLAttributeState.NORMAL.BIT) {
+            if (bits & GLAttributeHelper.NORMAL.BIT) {
                 buffer[j + idx++] = this.normals[i].x;
                 buffer[j + idx++] = this.normals[i].y;
                 buffer[j + idx++] = this.normals[i].z;
             }
             //纹理
-            if (bits & GLAttributeState.TEX_COORDINATE_0.BIT) {
+            if (bits & GLAttributeHelper.TEX_COORDINATE_0.BIT) {
                 buffer[j + idx++] = this.uvs[i].x;
                 buffer[j + idx++] = this.uvs[i].y;
             }
             //颜色
-            if (bits & GLAttributeState.COLOR.BIT) {
+            if (bits & GLAttributeHelper.COLOR.BIT) {
                 buffer[j + idx++] = this.colors[i].x;
                 buffer[j + idx++] = this.colors[i].y;
                 buffer[j + idx++] = this.colors[i].z;
                 buffer[j + idx++] = this.colors[i].w;
             }
             //切线
-            if (bits & GLAttributeState.TANGENT.BIT) {
+            if (bits & GLAttributeHelper.TANGENT.BIT) {
                 buffer[j + idx++] = this.tangents[i].x;
                 buffer[j + idx++] = this.tangents[i].y;
                 buffer[j + idx++] = this.tangents[i].z;
@@ -98,18 +98,18 @@ export class Geometry {
         if (this.positions.length === 0) {
             throw new Error('必须要有顶数据!!!');
         }
-        let bits: GLAttributeBits = GLAttributeState.POSITION.BIT;
+        let bits: GLAttributeBits = GLAttributeHelper.POSITION.BIT;
         if (this.uvs.length > 0) {
-            bits |= GLAttributeState.TEX_COORDINATE_0.BIT;
+            bits |= GLAttributeHelper.TEX_COORDINATE_0.BIT;
         }
         if (this.normals.length > 0) {
-            bits |= GLAttributeState.NORMAL.BIT;
+            bits |= GLAttributeHelper.NORMAL.BIT;
         }
         if (this.colors.length > 0) {
-            bits |= GLAttributeState.COLOR.BIT;
+            bits |= GLAttributeHelper.COLOR.BIT;
         }
         if (this.tangents.length > 0) {
-            bits |= GLAttributeState.TANGENT.BIT;
+            bits |= GLAttributeHelper.TANGENT.BIT;
         }
         return bits;
     }

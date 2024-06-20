@@ -1,4 +1,4 @@
-import { GLAttributeState} from '../GLAttributeState';
+import { GLAttributeHelper} from '../GLAttributeHelper';
 import {GLHelper} from '../GLHelper';
 import {Vector2} from '../../common/math/vector/Vector2';
 import {Vector3} from '../../common/math/vector/Vector3';
@@ -72,7 +72,7 @@ export class GLProgram {
      * @param gl
      */
     public static createDefaultTextureProgram(gl: WebGLRenderingContext): GLProgram {
-        return new GLProgram(gl, GLAttributeState.makeVertexAttributes(true, false, false, false, false), GLShaderSource.textureShader.vs, GLShaderSource.textureShader.fs);
+        return new GLProgram(gl, GLAttributeHelper.makeVertexAttributes(true, false, false, false, false), GLShaderSource.textureShader.vs, GLShaderSource.textureShader.fs);
     }
     
     /**
@@ -80,7 +80,7 @@ export class GLProgram {
      * @param gl
      */
     public static createDefaultColorProgram(gl: WebGLRenderingContext): GLProgram {
-        return new GLProgram(gl, GLAttributeState.makeVertexAttributes(false, false, false, false, true), GLShaderSource.colorShader.vs, GLShaderSource.colorShader.fs);
+        return new GLProgram(gl, GLAttributeHelper.makeVertexAttributes(false, false, false, false, true), GLShaderSource.colorShader.vs, GLShaderSource.colorShader.fs);
     }
     
     /**
@@ -334,23 +334,23 @@ export class GLProgram {
         // 1.attrib名字和shader中的命名必须要一致
         // 2．数量必须要和mesh中一致
         // 3.mesh中的数组的component必须固定
-        if (GLAttributeState.hasAttribute(this._attributesState, GLAttributeState.POSITION.BIT)) {
-            gl.bindAttribLocation(program, GLAttributeState.POSITION.LOCATION, GLAttributeState.POSITION.NAME);
+        if (GLAttributeHelper.hasAttribute(this._attributesState, GLAttributeHelper.POSITION.BIT)) {
+            gl.bindAttribLocation(program, GLAttributeHelper.POSITION.LOCATION, GLAttributeHelper.POSITION.NAME);
         }
-        if (GLAttributeState.hasAttribute(this._attributesState, GLAttributeState.NORMAL.BIT)) {
-            gl.bindAttribLocation(program, GLAttributeState.NORMAL.LOCATION, GLAttributeState.NORMAL.NAME);
+        if (GLAttributeHelper.hasAttribute(this._attributesState, GLAttributeHelper.NORMAL.BIT)) {
+            gl.bindAttribLocation(program, GLAttributeHelper.NORMAL.LOCATION, GLAttributeHelper.NORMAL.NAME);
         }
-        if (GLAttributeState.hasAttribute(this._attributesState, GLAttributeState.TEX_COORDINATE_0.BIT)) {
-            gl.bindAttribLocation(program, GLAttributeState.TEX_COORDINATE_0.LOCATION, GLAttributeState.TEX_COORDINATE_0.NAME);
+        if (GLAttributeHelper.hasAttribute(this._attributesState, GLAttributeHelper.TEX_COORDINATE_0.BIT)) {
+            gl.bindAttribLocation(program, GLAttributeHelper.TEX_COORDINATE_0.LOCATION, GLAttributeHelper.TEX_COORDINATE_0.NAME);
         }
-        if (GLAttributeState.hasAttribute(this._attributesState, GLAttributeState.TEX_COORDINATE_1.BIT)) {
-            gl.bindAttribLocation(program, GLAttributeState.TEX_COORDINATE_1.LOCATION, GLAttributeState.TEX_COORDINATE_1.NAME);
+        if (GLAttributeHelper.hasAttribute(this._attributesState, GLAttributeHelper.TEX_COORDINATE_1.BIT)) {
+            gl.bindAttribLocation(program, GLAttributeHelper.TEX_COORDINATE_1.LOCATION, GLAttributeHelper.TEX_COORDINATE_1.NAME);
         }
-        if (GLAttributeState.hasAttribute(this._attributesState, GLAttributeState.COLOR.BIT)) {
-            gl.bindAttribLocation(program, GLAttributeState.COLOR.LOCATION, GLAttributeState.COLOR.NAME);
+        if (GLAttributeHelper.hasAttribute(this._attributesState, GLAttributeHelper.COLOR.BIT)) {
+            gl.bindAttribLocation(program, GLAttributeHelper.COLOR.LOCATION, GLAttributeHelper.COLOR.NAME);
         }
-        if (GLAttributeState.hasAttribute(this._attributesState, GLAttributeState.TANGENT.BIT)) {
-            gl.bindAttribLocation(program, GLAttributeState.TANGENT.LOCATION, GLAttributeState.TANGENT.NAME);
+        if (GLAttributeHelper.hasAttribute(this._attributesState, GLAttributeHelper.TANGENT.BIT)) {
+            gl.bindAttribLocation(program, GLAttributeHelper.TANGENT.LOCATION, GLAttributeHelper.TANGENT.NAME);
         }
     }
 }

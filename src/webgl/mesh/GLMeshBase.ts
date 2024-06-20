@@ -1,4 +1,4 @@
-import {GLAttributeState} from '../GLAttributeState';
+import {GLAttributeHelper} from '../GLAttributeHelper';
 import {GLAttributeBits} from '../GLTypes';
 
 /**
@@ -48,7 +48,7 @@ export abstract class GLMeshBase {
         // 顶点属性格式，和绘制当前网格时使用的GLProgram具有一致的attribBits
         this._attributesState = attributesState;
         // 调用GLAttribState的getVertexByteStride方法，根据attribBits计算出顶点的stride字节数
-        this._attributeStride = GLAttributeState.getVertexByteStride(this._attributesState);
+        this._attributeStride = GLAttributeHelper.getVertexByteStride(this._attributesState);
         // 设置当前绘制时使用的基本几何图元类型，默认为三角形集合
         this.drawMode = drawMode;
     }

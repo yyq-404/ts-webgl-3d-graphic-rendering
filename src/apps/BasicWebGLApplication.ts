@@ -127,8 +127,8 @@ export class BasicWebGLApplication extends BaseApplication {
         // this.gl.frontFace(this.gl.CCW);
         this.gl.enable(this.gl.CULL_FACE);
         // this.gl.cullFace(this.gl.BACK);
-        this.coordinateSystem9s = this.makeViewportCoordinateSystems();
-        this.coordinateSystem4s = this.makeViewportCoordinateSystems(2);
+        this.coordinateSystem9s = GLCoordinateSystem.makeViewportCoordinateSystems(this.canvas.width, this.canvas.height, 3, 3);
+        this.coordinateSystem4s = GLCoordinateSystem.makeViewportCoordinateSystems(this.canvas.width, this.canvas.height, 2, 2);
         this.attributeMap = GLHelper.getProgramActiveAttributes(this.gl, this.program);
         this.uniformMap = GLHelper.getProgramActiveUniforms(this.gl, this.program);
     }
@@ -339,23 +339,5 @@ export class BasicWebGLApplication extends BaseApplication {
             // 帧缓冲区抗锯齿及是否保留上一帧的内容，default为true
             preserveDrawingBuffer: false
         } as WebGLContextAttributes;
-    }
-    
-    /**
-     * 构建视口坐标系统
-     * @param {number} num
-     * @return {GLCoordinateSystem[]}
-     * @private
-     */
-    private makeViewportCoordinateSystems(num: number = 3): GLCoordinateSystem[] {
-        const coords: GLCoordinateSystem[] = [];
-        const w: number = this.canvas.width / num;
-        const h: number = this.canvas.height / num;
-        for (let i = 0; i < num; i++) {
-            for (let j = 0; j < num; j++) {
-                coords.push(new GLCoordinateSystem([i * w, j * h, w, h]));
-            }
-        }
-        return coords;
     }
 }
