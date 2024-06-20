@@ -5,6 +5,7 @@ import {GLAttributeCoordinate1} from './attribute/GLAttributeCoordinate1';
 import {GLAttributeNormal} from './attribute/GLAttributeNormal';
 import {GLAttributeTangent} from './attribute/GLAttributeTangent';
 import {GLAttributeColor} from './attribute/GLAttributeColor';
+import {IGLAttribute} from './attribute/IGLAttribute';
 
 /**
  * `GLAttributeState` 类封装顶点属性相关的操作方法
@@ -30,9 +31,6 @@ export class GLAttributeState {
     static readonly WEIGHT3_BIT: 0b10_000_000_000 = (1 << 10) as 0b10_000_000_000;
     */
     public static readonly ATTRIB_BYTE_LENGTH: 'BYTE_LENGTH' = 'BYTE_LENGTH' as const;
-    /** float类型和uint16类型的字节长度*/
-    public static readonly FLOAT32_SIZE = Float32Array.BYTES_PER_ELEMENT;
-    public static readonly UINT16_SIZE = Uint16Array.BYTES_PER_ELEMENT;
     
     /**
      * 顶点属性设置
@@ -75,28 +73,28 @@ export class GLAttributeState {
             // 记录位置坐标的首地址
             offsets[GLAttributeState.POSITION.NAME] = 0;
             // 位置坐标由3个float值组成，因此下一个属性的首地址位 3 * 4 = 12个字节处
-            byteOffset += GLAttributeState.POSITION.COMPONENT * GLAttributeState.FLOAT32_SIZE;
+            byteOffset += GLAttributeState.POSITION.COMPONENT * Float32Array.BYTES_PER_ELEMENT;
         }
         // 下面各个属性偏移计算算法同上，唯一区别是分量的不同而已
         if (GLAttributeState.hasAttribute(attributeBits, GLAttributeState.NORMAL.BIT)) {
             offsets[GLAttributeState.NORMAL.NAME] = byteOffset;
-            byteOffset += GLAttributeState.NORMAL.COMPONENT * GLAttributeState.FLOAT32_SIZE;
+            byteOffset += GLAttributeState.NORMAL.COMPONENT * Float32Array.BYTES_PER_ELEMENT;
         }
         if (GLAttributeState.hasAttribute(attributeBits, GLAttributeState.TEX_COORDINATE_0.BIT)) {
             offsets[GLAttributeState.TEX_COORDINATE_0.NAME] = byteOffset;
-            byteOffset += GLAttributeState.TEX_COORDINATE_0.COMPONENT * GLAttributeState.FLOAT32_SIZE;
+            byteOffset += GLAttributeState.TEX_COORDINATE_0.COMPONENT * Float32Array.BYTES_PER_ELEMENT;
         }
         if (GLAttributeState.hasAttribute(attributeBits, GLAttributeState.TEX_COORDINATE_1.BIT)) {
             offsets[GLAttributeState.TEX_COORDINATE_1.NAME] = byteOffset;
-            byteOffset += GLAttributeState.TEX_COORDINATE_1.COMPONENT * GLAttributeState.FLOAT32_SIZE;
+            byteOffset += GLAttributeState.TEX_COORDINATE_1.COMPONENT * Float32Array.BYTES_PER_ELEMENT;
         }
         if (GLAttributeState.hasAttribute(attributeBits, GLAttributeState.COLOR.BIT)) {
             offsets[GLAttributeState.COLOR.NAME] = byteOffset;
-            byteOffset += GLAttributeState.COLOR.COMPONENT * GLAttributeState.FLOAT32_SIZE;
+            byteOffset += GLAttributeState.COLOR.COMPONENT * Float32Array.BYTES_PER_ELEMENT;
         }
         if (GLAttributeState.hasAttribute(attributeBits, GLAttributeState.TANGENT.BIT)) {
             offsets[GLAttributeState.TANGENT.NAME] = byteOffset;
-            byteOffset += GLAttributeState.TANGENT.COMPONENT * GLAttributeState.FLOAT32_SIZE;
+            byteOffset += GLAttributeState.TANGENT.COMPONENT * Float32Array.BYTES_PER_ELEMENT;
         }
         // stride和length相等
         offsets[GLAttributeState.COLOR.STRIDE] = byteOffset;
@@ -119,27 +117,27 @@ export class GLAttributeState {
             // 记录位置坐标的首地址
             offsets[GLAttributeState.POSITION.NAME] = 0;
             // 位置坐标由3个float值组成，因此下一个属性的首地址为 3 * 4 * 顶点数量
-            byteOffset += vertCount * GLAttributeState.POSITION.COMPONENT * GLAttributeState.FLOAT32_SIZE;
+            byteOffset += vertCount * GLAttributeState.POSITION.COMPONENT * Float32Array.BYTES_PER_ELEMENT;
         }
         if (GLAttributeState.hasAttribute(attributeBits, GLAttributeState.NORMAL.BIT)) {
             offsets[GLAttributeState.NORMAL.NAME] = byteOffset;
-            byteOffset += vertCount * GLAttributeState.NORMAL.COMPONENT * GLAttributeState.FLOAT32_SIZE;
+            byteOffset += vertCount * GLAttributeState.NORMAL.COMPONENT * Float32Array.BYTES_PER_ELEMENT;
         }
         if (GLAttributeState.hasAttribute(attributeBits, GLAttributeState.TEX_COORDINATE_0.BIT)) {
             offsets[GLAttributeState.TEX_COORDINATE_0.NAME] = byteOffset;
-            byteOffset += vertCount * GLAttributeState.TEX_COORDINATE_0.COMPONENT * GLAttributeState.FLOAT32_SIZE;
+            byteOffset += vertCount * GLAttributeState.TEX_COORDINATE_0.COMPONENT * Float32Array.BYTES_PER_ELEMENT;
         }
         if (GLAttributeState.hasAttribute(attributeBits, GLAttributeState.TEX_COORDINATE_1.BIT)) {
             offsets[GLAttributeState.TEX_COORDINATE_1.NAME] = byteOffset;
-            byteOffset += vertCount * GLAttributeState.TEX_COORDINATE_1.COMPONENT * GLAttributeState.FLOAT32_SIZE;
+            byteOffset += vertCount * GLAttributeState.TEX_COORDINATE_1.COMPONENT * Float32Array.BYTES_PER_ELEMENT;
         }
         if (GLAttributeState.hasAttribute(attributeBits, GLAttributeState.COLOR.BIT)) {
             offsets[GLAttributeState.COLOR.NAME] = byteOffset;
-            byteOffset += vertCount * GLAttributeState.COLOR.COMPONENT * GLAttributeState.FLOAT32_SIZE;
+            byteOffset += vertCount * GLAttributeState.COLOR.COMPONENT * Float32Array.BYTES_PER_ELEMENT;
         }
         if (GLAttributeState.hasAttribute(attributeBits, GLAttributeState.TANGENT.BIT)) {
             offsets[GLAttributeState.TANGENT.NAME] = byteOffset;
-            byteOffset += vertCount * GLAttributeState.TANGENT.COMPONENT * GLAttributeState.FLOAT32_SIZE;
+            byteOffset += vertCount * GLAttributeState.TANGENT.COMPONENT * Float32Array.BYTES_PER_ELEMENT;
         }
         //SequencedLayout具有ATTRIBSTRIDE和ATTRIBSTRIDE属性
         offsets[GLAttributeState.COLOR.STRIDE] = byteOffset / vertCount;
@@ -186,22 +184,22 @@ export class GLAttributeState {
     public static getVertexByteStride(attributeBits: GLAttributeBits): number {
         let byteOffset: number = 0;
         if (GLAttributeState.hasAttribute(attributeBits, GLAttributeState.POSITION.BIT)) {
-            byteOffset += GLAttributeState.POSITION.COMPONENT * GLAttributeState.FLOAT32_SIZE;
+            byteOffset += GLAttributeState.POSITION.COMPONENT * Float32Array.BYTES_PER_ELEMENT;
         }
         if (GLAttributeState.hasAttribute(attributeBits, GLAttributeState.NORMAL.BIT)) {
-            byteOffset += GLAttributeState.NORMAL.COMPONENT * GLAttributeState.FLOAT32_SIZE;
+            byteOffset += GLAttributeState.NORMAL.COMPONENT * Float32Array.BYTES_PER_ELEMENT;
         }
         if (GLAttributeState.hasAttribute(attributeBits, GLAttributeState.TEX_COORDINATE_0.BIT)) {
-            byteOffset += GLAttributeState.TEX_COORDINATE_0.COMPONENT * GLAttributeState.FLOAT32_SIZE;
+            byteOffset += GLAttributeState.TEX_COORDINATE_0.COMPONENT * Float32Array.BYTES_PER_ELEMENT;
         }
         if (GLAttributeState.hasAttribute(attributeBits, GLAttributeState.TEX_COORDINATE_1.BIT)) {
-            byteOffset += GLAttributeState.TEX_COORDINATE_1.COMPONENT * GLAttributeState.FLOAT32_SIZE;
+            byteOffset += GLAttributeState.TEX_COORDINATE_1.COMPONENT * Float32Array.BYTES_PER_ELEMENT;
         }
         if (GLAttributeState.hasAttribute(attributeBits, GLAttributeState.COLOR.BIT)) {
-            byteOffset += GLAttributeState.COLOR.COMPONENT * GLAttributeState.FLOAT32_SIZE;
+            byteOffset += GLAttributeState.COLOR.COMPONENT * Float32Array.BYTES_PER_ELEMENT;
         }
         if (GLAttributeState.hasAttribute(attributeBits, GLAttributeState.TANGENT.BIT)) {
-            byteOffset += GLAttributeState.TANGENT.COMPONENT * GLAttributeState.FLOAT32_SIZE;
+            byteOffset += GLAttributeState.TANGENT.COMPONENT * Float32Array.BYTES_PER_ELEMENT;
         }
         return byteOffset;
     }
@@ -251,31 +249,26 @@ export class GLAttributeState {
      * @param [enable=true]
      */
     public static setAttributeVertexArrayState(gl: WebGLRenderingContext, attributeBits: GLAttributeBits, enable: boolean = true): void {
-        GLAttributeState.setAttributeVertexState(gl, attributeBits, GLAttributeState.POSITION.BIT, GLAttributeState.POSITION.LOCATION, enable);
-        GLAttributeState.setAttributeVertexState(gl, attributeBits, GLAttributeState.NORMAL.BIT, GLAttributeState.NORMAL.LOCATION, enable);
-        GLAttributeState.setAttributeVertexState(gl, attributeBits, GLAttributeState.TEX_COORDINATE_0.BIT, GLAttributeState.TEX_COORDINATE_0.LOCATION, enable);
-        GLAttributeState.setAttributeVertexState(gl, attributeBits, GLAttributeState.TEX_COORDINATE_1.BIT, GLAttributeState.TEX_COORDINATE_1.LOCATION, enable);
-        GLAttributeState.setAttributeVertexState(gl, attributeBits, GLAttributeState.COLOR.BIT, GLAttributeState.COLOR.LOCATION, enable);
-        GLAttributeState.setAttributeVertexState(gl, attributeBits, GLAttributeState.TANGENT.BIT, GLAttributeState.TANGENT.LOCATION, enable);
+        GLAttributeState.setAttributeVertexState(gl, attributeBits, GLAttributeState.POSITION, enable);
+        GLAttributeState.setAttributeVertexState(gl, attributeBits, GLAttributeState.NORMAL, enable);
+        GLAttributeState.setAttributeVertexState(gl, attributeBits, GLAttributeState.TEX_COORDINATE_0, enable);
+        GLAttributeState.setAttributeVertexState(gl, attributeBits, GLAttributeState.TEX_COORDINATE_1, enable);
+        GLAttributeState.setAttributeVertexState(gl, attributeBits, GLAttributeState.COLOR, enable);
+        GLAttributeState.setAttributeVertexState(gl, attributeBits, GLAttributeState.TANGENT, enable);
     }
     
     /**
      * 设置顶点属性状态。
      * @param {WebGLRenderingContext} gl
      * @param {GLAttributeBits} attributeBits
-     * @param {number} attributeState
-     * @param location
+     * @param attribute
      * @param {boolean} enable
      */
-    public static setAttributeVertexState(gl: WebGLRenderingContext, attributeBits: GLAttributeBits, attributeState: number, location: number, enable: boolean = true): void {
-        if (GLAttributeState.hasAttribute(attributeBits, attributeState)) {
-            if (enable) {
-                gl.enableVertexAttribArray(location);
-            } else {
-                gl.disableVertexAttribArray(location);
-            }
+    public static setAttributeVertexState(gl: WebGLRenderingContext, attributeBits: GLAttributeBits, attribute: IGLAttribute, enable: boolean = true): void {
+        if (GLAttributeState.hasAttribute(attributeBits, attribute.BIT) && enable) {
+            gl.enableVertexAttribArray(attribute.LOCATION);
         } else {
-            gl.disableVertexAttribArray(location);
+            gl.disableVertexAttribArray(attribute.LOCATION);
         }
     }
 }
