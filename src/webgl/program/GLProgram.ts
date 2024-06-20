@@ -1,4 +1,4 @@
-import {GLAttributeBits, GLAttributeState} from '../GLAttributeState';
+import { GLAttributeState} from '../GLAttributeState';
 import {GLHelper} from '../GLHelper';
 import {Vector2} from '../../common/math/vector/Vector2';
 import {Vector3} from '../../common/math/vector/Vector3';
@@ -8,6 +8,7 @@ import {Quaternion} from '../../common/math/Quaternion';
 import {EShaderType} from '../../enum/EShaderType';
 import {CLConstants} from '../CLConstants';
 import {GLShaderSource} from '../GLShaderSource';
+import {GLAttributeBits} from '../GLTypes';
 
 /**
  * `GLProgram` 类用来执行GLSL ES源码的编译、链接、绑定及 `uniform` 变量载入等操作
@@ -333,23 +334,23 @@ export class GLProgram {
         // 1.attrib名字和shader中的命名必须要一致
         // 2．数量必须要和mesh中一致
         // 3.mesh中的数组的component必须固定
-        if (GLAttributeState.hasAttribute(this._attributesState, GLAttributeState.POSITION_BIT)) {
-            gl.bindAttribLocation(program, GLAttributeState.POSITION_LOCATION, GLAttributeState.POSITION_NAME);
+        if (GLAttributeState.hasAttribute(this._attributesState, GLAttributeState.POSITION.BIT)) {
+            gl.bindAttribLocation(program, GLAttributeState.POSITION.LOCATION, GLAttributeState.POSITION.NAME);
         }
-        if (GLAttributeState.hasAttribute(this._attributesState, GLAttributeState.NORMAL_BIT)) {
-            gl.bindAttribLocation(program, GLAttributeState.NORMAL_LOCATION, GLAttributeState.NORMAL_NAME);
+        if (GLAttributeState.hasAttribute(this._attributesState, GLAttributeState.NORMAL.BIT)) {
+            gl.bindAttribLocation(program, GLAttributeState.NORMAL.LOCATION, GLAttributeState.NORMAL.NAME);
         }
-        if (GLAttributeState.hasAttribute(this._attributesState, GLAttributeState.TEX_COORDINATE_BIT)) {
-            gl.bindAttribLocation(program, GLAttributeState.TEX_COORDINATE_LOCATION, GLAttributeState.TEX_COORDINATE_NAME);
+        if (GLAttributeState.hasAttribute(this._attributesState, GLAttributeState.TEX_COORDINATE_0.BIT)) {
+            gl.bindAttribLocation(program, GLAttributeState.TEX_COORDINATE_0.LOCATION, GLAttributeState.TEX_COORDINATE_0.NAME);
         }
-        if (GLAttributeState.hasAttribute(this._attributesState, GLAttributeState.TEX_COORDINATE1_BIT)) {
-            gl.bindAttribLocation(program, GLAttributeState.TEX_COORDINATE1_LOCATION, GLAttributeState.TEX_COORDINATE1_NAME);
+        if (GLAttributeState.hasAttribute(this._attributesState, GLAttributeState.TEX_COORDINATE_1.BIT)) {
+            gl.bindAttribLocation(program, GLAttributeState.TEX_COORDINATE_1.LOCATION, GLAttributeState.TEX_COORDINATE_1.NAME);
         }
-        if (GLAttributeState.hasAttribute(this._attributesState, GLAttributeState.COLOR_BIT)) {
-            gl.bindAttribLocation(program, GLAttributeState.COLOR_LOCATION, GLAttributeState.COLOR_NAME);
+        if (GLAttributeState.hasAttribute(this._attributesState, GLAttributeState.COLOR.BIT)) {
+            gl.bindAttribLocation(program, GLAttributeState.COLOR.LOCATION, GLAttributeState.COLOR.NAME);
         }
-        if (GLAttributeState.hasAttribute(this._attributesState, GLAttributeState.TANGENT_BIT)) {
-            gl.bindAttribLocation(program, GLAttributeState.TANGENT_LOCATION, GLAttributeState.TANGENT_NAME);
+        if (GLAttributeState.hasAttribute(this._attributesState, GLAttributeState.TANGENT.BIT)) {
+            gl.bindAttribLocation(program, GLAttributeState.TANGENT.LOCATION, GLAttributeState.TANGENT.NAME);
         }
     }
 }

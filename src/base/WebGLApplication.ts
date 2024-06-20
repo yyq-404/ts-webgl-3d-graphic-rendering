@@ -54,7 +54,7 @@ export class WebGLApplication extends BaseApplication {
         GLProgramCache.instance.set('color', GLProgram.createDefaultColorProgram(this.gl));
         GLProgramCache.instance.set('texture', GLProgram.createDefaultTextureProgram(this.gl));
         // 初始化时，创建颜色GLMeshBuilder对象
-        this.builder = new GLMeshBuilder(this.gl, GLAttributeState.POSITION_BIT | GLAttributeState.COLOR_BIT, GLProgramCache.instance.getMust('color'));
+        this.builder = new GLMeshBuilder(this.gl, GLAttributeState.POSITION.BIT | GLAttributeState.COLOR.BIT, GLProgramCache.instance.getMust('color'));
     }
 
     /**

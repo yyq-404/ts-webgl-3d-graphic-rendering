@@ -1,7 +1,7 @@
-import {Vector3} from "../../common/math/vector/Vector3";
-import {GLAttributeBits, GLAttributeState} from "../GLAttributeState";
-import {GLMeshBase} from "./GLMeshBase";
-import {GLAttributeOffsetMap} from "../GLTypes";
+import {Vector3} from '../../common/math/vector/Vector3';
+import {GLAttributeState} from '../GLAttributeState';
+import {GLMeshBase} from './GLMeshBase';
+import {GLAttributeBits, GLAttributeOffsetMap} from '../GLTypes';
 
 /**
  * `GLStaticMesh` 类继承自 `GLMeshBase` ，并且持有两个 `WebGLBuffer` 对象，分别表示顶点缓冲区和索引缓冲区。
@@ -11,6 +11,8 @@ import {GLAttributeOffsetMap} from "../GLTypes";
  * `GLStaticMesh` 类使用的是**交错数组方式**存储顶点属性相关的数据。
  */
 export class GLStaticMesh extends GLMeshBase {
+    public mins: Vector3 = new Vector3([Infinity, Infinity, Infinity]);
+    public maxs: Vector3 = new Vector3([-Infinity, -Infinity, -Infinity]);
     //GLStaticMesh内置了一个顶点缓冲区
     /** 顶点缓冲区 */
     protected _vbo: WebGLBuffer;
@@ -21,10 +23,7 @@ export class GLStaticMesh extends GLMeshBase {
     protected _ibo: WebGLBuffer | null = null;
     /** 索引的数量 */
     protected _indexCount: number = 0;
-
-    public mins: Vector3 = new Vector3([Infinity, Infinity, Infinity]);
-    public maxs: Vector3 = new Vector3([-Infinity, -Infinity, -Infinity]);
-
+    
     /**
      * `GLStaticMesh` 构造函数，`GLStatciMesh` 用于静态场景对象的数据存储和绘制。
      * `GLStaticMesh` 类使用的是交错数组方式存储顶点属性相关的数据。
@@ -50,7 +49,7 @@ export class GLStaticMesh extends GLMeshBase {
         // 然后计算出交错存储的顶点属性attribOffsetMap相关的值
         const offsetMap: GLAttributeOffsetMap = GLAttributeState.getInterleavedLayoutAttributeOffsetMap(this._attributesState);
         // 计算出顶点的数量
-        this._vertCount = vbo.byteLength / offsetMap[GLAttributeState.ATTRIB_STRIDE];
+        this._vertCount = vbo.byteLength / offsetMap[GLAttributeState.COLOR.STRIDE];
         // 使用VAO后，我们只要初始化时设置一次setAttribVertexArrayPointer和setAttribVertexArrayState就行了
         // 当我们后续调用基类的bind方法绑定VAO对象后，VAO会自动处理顶点地址绑定和顶点属性寄存器开启相关操作，这就简化了很多操作
         GLAttributeState.setAttributeVertexArrayPointer(gl, offsetMap);
@@ -59,30 +58,15 @@ export class GLStaticMesh extends GLMeshBase {
         this.setIBO(ibo);
         // 必须放在这里
         this.unbind();
-
+        
         this.mins = new Vector3();
         this.maxs = new Vector3();
     }
-
-    /**
-     * 创建`IBO`
-     * @param ibo `IBO`表示 `Index Buffer Object`
-     */
-    protected setIBO(ibo: Uint16Array | null): void {
-        if (!ibo) return; // 按需创建IBO
-        // 创建IBO
-        this._ibo = this.gl.createBuffer();
-        if (!this._ibo) throw new Error('IBO creation fail');
-        // 绑定IBO
-        this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this._ibo); // 将索引数据上传到IBO中
-        this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, ibo, this.gl.STATIC_DRAW); // 计算出索引个数
-        this._indexCount = ibo.length;
-    }
-
+    
     /**
      * 调用 `WebGLRenderingContext.drawElements()` 方法或 `WebGLRenderingContext.drawArrays()` 渲染图元
      */
-   public draw(): void {
+    public draw(): void {
         this.bind(); // 绘制前先要绑定VAO
         if (this._ibo) {
             // 如果有IBO，使用drawElements方法绘制静态网格对象
@@ -90,7 +74,7 @@ export class GLStaticMesh extends GLMeshBase {
                 this.drawMode,
                 this._indexCount,
                 this.gl.UNSIGNED_SHORT,
-                0,
+                0
             );
         } else {
             // 如果没有IBO，则使用drawArrays方法绘制静态网格对象
@@ -98,7 +82,7 @@ export class GLStaticMesh extends GLMeshBase {
         }
         this.unbind(); // 绘制好后解除VAO绑定
     }
-
+    
     /**
      * 很重要的几点说明:
      * `gl.drawElements()`中的`offset`是以**字节**为单位。
@@ -117,5 +101,20 @@ export class GLStaticMesh extends GLMeshBase {
         } else {
             this.gl.drawArrays(this.drawMode, offset, count);
         }
+    }
+    
+    /**
+     * 创建`IBO`
+     * @param ibo `IBO`表示 `Index Buffer Object`
+     */
+    protected setIBO(ibo: Uint16Array | null): void {
+        if (!ibo) return; // 按需创建IBO
+        // 创建IBO
+        this._ibo = this.gl.createBuffer();
+        if (!this._ibo) throw new Error('IBO creation fail');
+        // 绑定IBO
+        this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this._ibo); // 将索引数据上传到IBO中
+        this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, ibo, this.gl.STATIC_DRAW); // 计算出索引个数
+        this._indexCount = ibo.length;
     }
 }
