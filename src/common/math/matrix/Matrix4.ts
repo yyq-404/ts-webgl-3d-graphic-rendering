@@ -52,7 +52,7 @@ export class Matrix4 {
     
     /**
      * 创建一个视锥矩阵，常用于透视投影。
-     * @param fov
+     * @param fov 角度
      * @param aspect
      * @param near
      * @param far
