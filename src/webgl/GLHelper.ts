@@ -1,4 +1,4 @@
-import {GLAttributeInfo, GLAttributeMap, GLUniformInfo, GLUniformMap} from './GLTypes';
+import {GLAttributeInfo, GLAttributeMap, GLProgramLinkHook, GLUniformInfo, GLUniformMap} from './GLTypes';
 import {EShaderType} from '../enum/EShaderType';
 
 /**
@@ -106,7 +106,7 @@ export class GLHelper {
      * @param beforeProgramLink 链接前置处理
      * @param afterProgramLink 链接后置处理
      */
-    public static linkProgram(gl: WebGLRenderingContext, program: WebGLProgram, vsShader: WebGLShader, fsShader: WebGLShader, beforeProgramLink?: (gl: WebGLRenderingContext, program: WebGLProgram) => void, afterProgramLink?: (gl: WebGLRenderingContext, program: WebGLProgram) => void): boolean {
+    public static linkProgram(gl: WebGLRenderingContext, program: WebGLProgram, vsShader: WebGLShader, fsShader: WebGLShader, beforeProgramLink?: GLProgramLinkHook, afterProgramLink?: GLProgramLinkHook): boolean {
         // 1．使用attachShader方法将顶点和片段着色器与当前的链接器相关联
         gl.attachShader(program, vsShader);
         gl.attachShader(program, fsShader);
