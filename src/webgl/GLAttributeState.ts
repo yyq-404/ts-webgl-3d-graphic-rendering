@@ -71,51 +71,13 @@ export class GLAttributeState {
     }
     
     /**
-     * 使用按位与（&）操作符来测试否是包含位置标记值
-     * @param attributeBits
+     * 使用按位与（&）操作符来测试否是指定属性值
+     * @param {GLAttributeBits} attributeBits
+     * @param {number} attributeSate
+     * @return {boolean}
      */
-    public static hasPosition(attributeBits: GLAttributeBits): boolean {
-        return (attributeBits & GLAttributeState.POSITION_BIT) !== 0;
-    }
-    
-    /**
-     * 使用按位与（&）操作符来测试否是包含法线标记值
-     * @param attributeBits
-     */
-    public static hasNormal(attributeBits: GLAttributeBits): boolean {
-        return (attributeBits & GLAttributeState.NORMAL_BIT) !== 0;
-    }
-    
-    /**
-     * 使用按位与（&）操作符来测试否是包含纹理坐标标记值
-     * @param attributeBits
-     */
-    public static hasTexCoordinate_0(attributeBits: GLAttributeBits): boolean {
-        return (attributeBits & GLAttributeState.TEX_COORDINATE_BIT) !== 0;
-    }
-    
-    /**
-     * 使用按位与（&）操作符来测试否是包含纹理坐标标记值
-     * @param attributeBits
-     */
-    public static hasTexCoordinate_1(attributeBits: GLAttributeBits): boolean {
-        return (attributeBits & GLAttributeState.TEX_COORDINATE1_BIT) !== 0;
-    }
-    
-    /**
-     * 使用按位与（&）操作符来测试否是包含颜色标记值
-     * @param attributeBits
-     */
-    public static hasColor(attributeBits: GLAttributeBits): boolean {
-        return (attributeBits & GLAttributeState.COLOR_BIT) !== 0;
-    }
-    
-    /**
-     * 使用按位与（&）操作符来测试否是包含切线标记值
-     * @param attributeBits
-     */
-    public static hasTangent(attributeBits: GLAttributeBits): boolean {
-        return (attributeBits & GLAttributeState.TANGENT_BIT) !== 0;
+    public static hasAttribute(attributeBits: GLAttributeBits, attributeSate: number): boolean {
+        return (attributeBits & attributeSate) !== 0;
     }
     
     /**
@@ -125,36 +87,35 @@ export class GLAttributeState {
     public static getInterleavedLayoutAttributeOffsetMap(attributeBits: GLAttributeBits): GLAttributeOffsetMap {
         const offsets: GLAttributeOffsetMap = {}; // 初始化顶点属性偏移表
         let byteOffset: number = 0; // 初始化时的首地址为0
-        if (GLAttributeState.hasPosition(attributeBits)) {
+        if (GLAttributeState.hasAttribute(attributeBits, GLAttributeState.POSITION_BIT)) {
             // 记录位置坐标的首地址
             offsets[GLAttributeState.POSITION_NAME] = 0;
             // 位置坐标由3个float值组成，因此下一个属性的首地址位 3 * 4 = 12个字节处
             byteOffset += GLAttributeState.POSITION_COMPONENT * GLAttributeState.FLOAT32_SIZE;
         }
         // 下面各个属性偏移计算算法同上，唯一区别是分量的不同而已
-        if (GLAttributeState.hasNormal(attributeBits)) {
+        if (GLAttributeState.hasAttribute(attributeBits, GLAttributeState.NORMAL_BIT)) {
             offsets[GLAttributeState.NORMAL_NAME] = byteOffset;
             byteOffset += GLAttributeState.NORMAL_COMPONENT * GLAttributeState.FLOAT32_SIZE;
         }
-        if (GLAttributeState.hasTexCoordinate_0(attributeBits)) {
+        if (GLAttributeState.hasAttribute(attributeBits, GLAttributeState.TEX_COORDINATE_BIT)) {
             offsets[GLAttributeState.TEX_COORDINATE_NAME] = byteOffset;
             byteOffset += GLAttributeState.TEX_COORDINATE_COMPONENT * GLAttributeState.FLOAT32_SIZE;
         }
-        if (GLAttributeState.hasTexCoordinate_1(attributeBits)) {
+        if (GLAttributeState.hasAttribute(attributeBits, GLAttributeState.TEX_COORDINATE1_BIT)) {
             offsets[GLAttributeState.TEX_COORDINATE1_NAME] = byteOffset;
             byteOffset += GLAttributeState.TEX_COORDINATE1_COMPONENT * GLAttributeState.FLOAT32_SIZE;
         }
-        if (GLAttributeState.hasColor(attributeBits)) {
+        if (GLAttributeState.hasAttribute(attributeBits, GLAttributeState.COLOR_BIT)) {
             offsets[GLAttributeState.COLOR_NAME] = byteOffset;
             byteOffset += GLAttributeState.COLOR_COMPONENT * GLAttributeState.FLOAT32_SIZE;
         }
-        if (GLAttributeState.hasTangent(attributeBits)) {
+        if (GLAttributeState.hasAttribute(attributeBits, GLAttributeState.TANGENT_BIT)) {
             offsets[GLAttributeState.TANGENT_NAME] = byteOffset;
             byteOffset += GLAttributeState.TANGENT_COMPONENT * GLAttributeState.FLOAT32_SIZE;
         }
         // stride和length相等
         offsets[GLAttributeState.ATTRIB_STRIDE] = byteOffset;
-        
         // 间隔数组方法存储的话，顶点的stride非常重要
         offsets[GLAttributeState.ATTRIB_BYTE_LENGTH] = byteOffset;
         return offsets;
@@ -167,31 +128,32 @@ export class GLAttributeState {
      * @param vertCount
      */
     public static getSequencedLayoutAttributeOffsetMap(attributeBits: GLAttributeBits, vertCount: number): GLAttributeOffsetMap {
-        const offsets: GLAttributeOffsetMap = {}; // 初始化顶点属性偏移表
+        // 初始化顶点属性偏移表
+        const offsets: GLAttributeOffsetMap = {};
         let byteOffset: number = 0; // 初始化时的首地址为0
-        if (GLAttributeState.hasPosition(attributeBits)) {
+        if (GLAttributeState.hasAttribute(attributeBits, GLAttributeState.POSITION_BIT)) {
             // 记录位置坐标的首地址
             offsets[GLAttributeState.POSITION_NAME] = 0;
             // 位置坐标由3个float值组成，因此下一个属性的首地址为 3 * 4 * 顶点数量
             byteOffset += vertCount * GLAttributeState.POSITION_COMPONENT * GLAttributeState.FLOAT32_SIZE;
         }
-        if (GLAttributeState.hasNormal(attributeBits)) {
+        if (GLAttributeState.hasAttribute(attributeBits, GLAttributeState.NORMAL_BIT)) {
             offsets[GLAttributeState.NORMAL_NAME] = byteOffset;
             byteOffset += vertCount * GLAttributeState.NORMAL_COMPONENT * GLAttributeState.FLOAT32_SIZE;
         }
-        if (GLAttributeState.hasTexCoordinate_0(attributeBits)) {
+        if (GLAttributeState.hasAttribute(attributeBits, GLAttributeState.TEX_COORDINATE_BIT)) {
             offsets[GLAttributeState.TEX_COORDINATE_NAME] = byteOffset;
             byteOffset += vertCount * GLAttributeState.TEX_COORDINATE_COMPONENT * GLAttributeState.FLOAT32_SIZE;
         }
-        if (GLAttributeState.hasTexCoordinate_1(attributeBits)) {
+        if (GLAttributeState.hasAttribute(attributeBits, GLAttributeState.TEX_COORDINATE1_BIT)) {
             offsets[GLAttributeState.TEX_COORDINATE1_NAME] = byteOffset;
             byteOffset += vertCount * GLAttributeState.TEX_COORDINATE1_COMPONENT * GLAttributeState.FLOAT32_SIZE;
         }
-        if (GLAttributeState.hasColor(attributeBits)) {
+        if (GLAttributeState.hasAttribute(attributeBits, GLAttributeState.COLOR_BIT)) {
             offsets[GLAttributeState.COLOR_NAME] = byteOffset;
             byteOffset += vertCount * GLAttributeState.COLOR_COMPONENT * GLAttributeState.FLOAT32_SIZE;
         }
-        if (GLAttributeState.hasTangent(attributeBits)) {
+        if (GLAttributeState.hasAttribute(attributeBits, GLAttributeState.TANGENT_BIT)) {
             offsets[GLAttributeState.TANGENT_NAME] = byteOffset;
             byteOffset += vertCount * GLAttributeState.TANGENT_COMPONENT * GLAttributeState.FLOAT32_SIZE;
         }
@@ -208,26 +170,26 @@ export class GLAttributeState {
      * 每种顶点属性存储在单独的一个 `WebGLBuffer` 对象中，偏移值都是0
      * @param attributeBits
      */
-    public static getSeparatedLayoutAttribOffsetMap(attributeBits: GLAttributeBits): GLAttributeOffsetMap {
+    public static getSeparatedLayoutAttributeOffsetMap(attributeBits: GLAttributeBits): GLAttributeOffsetMap {
         // 每个顶点属性使用一个vbo的话，每个offsets中的顶点属性的偏移都是为0
         // 并且offsets的length = vbo的个数，不需要顶点stride和byteLength属性
         const offsets: GLAttributeOffsetMap = {};
-        if (GLAttributeState.hasPosition(attributeBits)) {
+        if (GLAttributeState.hasAttribute(attributeBits, GLAttributeState.POSITION_BIT)) {
             offsets[GLAttributeState.POSITION_NAME] = 0;
         }
-        if (GLAttributeState.hasNormal(attributeBits)) {
+        if (GLAttributeState.hasAttribute(attributeBits, GLAttributeState.NORMAL_BIT)) {
             offsets[GLAttributeState.NORMAL_NAME] = 0;
         }
-        if (GLAttributeState.hasTexCoordinate_0(attributeBits)) {
+        if (GLAttributeState.hasAttribute(attributeBits, GLAttributeState.TEX_COORDINATE_BIT)) {
             offsets[GLAttributeState.TEX_COORDINATE_NAME] = 0;
         }
-        if (GLAttributeState.hasTexCoordinate_1(attributeBits)) {
+        if (GLAttributeState.hasAttribute(attributeBits, GLAttributeState.TEX_COORDINATE1_BIT)) {
             offsets[GLAttributeState.TEX_COORDINATE1_NAME] = 0;
         }
-        if (GLAttributeState.hasColor(attributeBits)) {
+        if (GLAttributeState.hasAttribute(attributeBits, GLAttributeState.COLOR_BIT)) {
             offsets[GLAttributeState.COLOR_NAME] = 0;
         }
-        if (GLAttributeState.hasTangent(attributeBits)) {
+        if (GLAttributeState.hasAttribute(attributeBits, GLAttributeState.TANGENT_BIT)) {
             offsets[GLAttributeState.TANGENT_NAME] = 0;
         }
         return offsets;
@@ -239,22 +201,22 @@ export class GLAttributeState {
      */
     public static getVertexByteStride(attributeBits: GLAttributeBits): number {
         let byteOffset: number = 0;
-        if (GLAttributeState.hasPosition(attributeBits)) {
+        if (GLAttributeState.hasAttribute(attributeBits, GLAttributeState.POSITION_BIT)) {
             byteOffset += GLAttributeState.POSITION_COMPONENT * GLAttributeState.FLOAT32_SIZE;
         }
-        if (GLAttributeState.hasNormal(attributeBits)) {
+        if (GLAttributeState.hasAttribute(attributeBits, GLAttributeState.NORMAL_BIT)) {
             byteOffset += GLAttributeState.NORMAL_COMPONENT * GLAttributeState.FLOAT32_SIZE;
         }
-        if (GLAttributeState.hasTexCoordinate_0(attributeBits)) {
+        if (GLAttributeState.hasAttribute(attributeBits, GLAttributeState.TEX_COORDINATE_BIT)) {
             byteOffset += GLAttributeState.TEX_COORDINATE_COMPONENT * GLAttributeState.FLOAT32_SIZE;
         }
-        if (GLAttributeState.hasTexCoordinate_1(attributeBits)) {
+        if (GLAttributeState.hasAttribute(attributeBits, GLAttributeState.TEX_COORDINATE1_BIT)) {
             byteOffset += GLAttributeState.TEX_COORDINATE1_COMPONENT * GLAttributeState.FLOAT32_SIZE;
         }
-        if (GLAttributeState.hasColor(attributeBits)) {
+        if (GLAttributeState.hasAttribute(attributeBits, GLAttributeState.COLOR_BIT)) {
             byteOffset += GLAttributeState.COLOR_COMPONENT * GLAttributeState.FLOAT32_SIZE;
         }
-        if (GLAttributeState.hasTangent(attributeBits)) {
+        if (GLAttributeState.hasAttribute(attributeBits, GLAttributeState.TANGENT_BIT)) {
             byteOffset += GLAttributeState.TANGENT_COMPONENT * GLAttributeState.FLOAT32_SIZE;
         }
         return byteOffset;
@@ -304,60 +266,31 @@ export class GLAttributeState {
      * @param attributeBits
      * @param [enable=true]
      */
-    public static setAttributeVertexArrayState(gl: WebGLRenderingContext, attributeBits: number, enable: boolean = true): void {
-        if (GLAttributeState.hasPosition(attributeBits)) {
+    public static setAttributeVertexArrayState(gl: WebGLRenderingContext, attributeBits: GLAttributeBits, enable: boolean = true): void {
+        GLAttributeState.setAttributeVertexState(gl, attributeBits, GLAttributeState.POSITION_BIT, GLAttributeState.POSITION_LOCATION, enable);
+        GLAttributeState.setAttributeVertexState(gl, attributeBits, GLAttributeState.NORMAL_BIT, GLAttributeState.NORMAL_LOCATION, enable);
+        GLAttributeState.setAttributeVertexState(gl, attributeBits, GLAttributeState.TEX_COORDINATE_BIT, GLAttributeState.TEX_COORDINATE_LOCATION, enable);
+        GLAttributeState.setAttributeVertexState(gl, attributeBits, GLAttributeState.TEX_COORDINATE1_BIT, GLAttributeState.TEX_COORDINATE1_LOCATION, enable);
+        GLAttributeState.setAttributeVertexState(gl, attributeBits, GLAttributeState.COLOR_BIT, GLAttributeState.COLOR_LOCATION, enable);
+        GLAttributeState.setAttributeVertexState(gl, attributeBits, GLAttributeState.TANGENT_BIT, GLAttributeState.TANGENT_LOCATION, enable);
+    }
+    
+    /**
+     * 设置顶点属性状态。
+     * @param {WebGLRenderingContext} gl
+     * @param {GLAttributeBits} attributeBits
+     * @param {number} attributeState
+     * @param {boolean} enable
+     */
+    public static setAttributeVertexState(gl: WebGLRenderingContext, attributeBits: GLAttributeBits, attributeState: number, location: number, enable: boolean = true): void {
+        if (GLAttributeState.hasAttribute(attributeBits, attributeState)) {
             if (enable) {
-                gl.enableVertexAttribArray(GLAttributeState.POSITION_LOCATION);
+                gl.enableVertexAttribArray(location);
             } else {
-                gl.disableVertexAttribArray(GLAttributeState.POSITION_LOCATION);
+                gl.disableVertexAttribArray(location);
             }
         } else {
-            gl.disableVertexAttribArray(GLAttributeState.POSITION_LOCATION);
-        }
-        if (GLAttributeState.hasNormal(attributeBits)) {
-            if (enable) {
-                gl.enableVertexAttribArray(GLAttributeState.NORMAL_LOCATION);
-            } else {
-                gl.disableVertexAttribArray(GLAttributeState.NORMAL_LOCATION);
-            }
-        } else {
-            gl.disableVertexAttribArray(GLAttributeState.NORMAL_LOCATION);
-        }
-        if (GLAttributeState.hasTexCoordinate_0(attributeBits)) {
-            if (enable) {
-                gl.enableVertexAttribArray(GLAttributeState.TEX_COORDINATE_LOCATION);
-            } else {
-                gl.disableVertexAttribArray(GLAttributeState.TEX_COORDINATE_LOCATION);
-            }
-        } else {
-            gl.disableVertexAttribArray(GLAttributeState.TEX_COORDINATE_LOCATION);
-        }
-        if (GLAttributeState.hasTexCoordinate_1(attributeBits)) {
-            if (enable) {
-                gl.enableVertexAttribArray(GLAttributeState.TEX_COORDINATE1_LOCATION);
-            } else {
-                gl.disableVertexAttribArray(GLAttributeState.TEX_COORDINATE1_LOCATION);
-            }
-        } else {
-            gl.disableVertexAttribArray(GLAttributeState.TEX_COORDINATE1_LOCATION);
-        }
-        if (GLAttributeState.hasColor(attributeBits)) {
-            if (enable) {
-                gl.enableVertexAttribArray(GLAttributeState.COLOR_LOCATION);
-            } else {
-                gl.disableVertexAttribArray(GLAttributeState.COLOR_LOCATION);
-            }
-        } else {
-            gl.disableVertexAttribArray(GLAttributeState.COLOR_LOCATION);
-        }
-        if (GLAttributeState.hasTangent(attributeBits)) {
-            if (enable) {
-                gl.enableVertexAttribArray(GLAttributeState.TANGENT_LOCATION);
-            } else {
-                gl.disableVertexAttribArray(GLAttributeState.TANGENT_LOCATION);
-            }
-        } else {
-            gl.disableVertexAttribArray(GLAttributeState.TANGENT_LOCATION);
+            gl.disableVertexAttribArray(location);
         }
     }
 }

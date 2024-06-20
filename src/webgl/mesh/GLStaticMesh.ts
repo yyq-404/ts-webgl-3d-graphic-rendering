@@ -48,13 +48,13 @@ export class GLStaticMesh extends GLMeshBase {
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this._vbo); // 绑定VBO
         this.gl.bufferData(this.gl.ARRAY_BUFFER, vbo, this.gl.STATIC_DRAW); // 将顶点数据载入到VBO中
         // 然后计算出交错存储的顶点属性attribOffsetMap相关的值
-        const offsetMap: GLAttributeOffsetMap = GLAttributeState.getInterleavedLayoutAttributeOffsetMap(this._attribState);
+        const offsetMap: GLAttributeOffsetMap = GLAttributeState.getInterleavedLayoutAttributeOffsetMap(this._attributesState);
         // 计算出顶点的数量
         this._vertCount = vbo.byteLength / offsetMap[GLAttributeState.ATTRIB_STRIDE];
         // 使用VAO后，我们只要初始化时设置一次setAttribVertexArrayPointer和setAttribVertexArrayState就行了
         // 当我们后续调用基类的bind方法绑定VAO对象后，VAO会自动处理顶点地址绑定和顶点属性寄存器开启相关操作，这就简化了很多操作
         GLAttributeState.setAttributeVertexArrayPointer(gl, offsetMap);
-        GLAttributeState.setAttributeVertexArrayState(gl, this._attribState);
+        GLAttributeState.setAttributeVertexArrayState(gl, this._attributesState);
         // 再创建IBO（IBO表示Index Buffer Object,EBO表示Element Buffer Object，表示一样的概念）
         this.setIBO(ibo);
         // 必须放在这里
