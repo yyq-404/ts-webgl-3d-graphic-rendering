@@ -1,4 +1,4 @@
-import { GLAttributeHelper} from '../GLAttributeHelper';
+import {GLAttributeHelper} from '../GLAttributeHelper';
 import {GLHelper} from '../GLHelper';
 import {Vector2} from '../../common/math/vector/Vector2';
 import {Vector3} from '../../common/math/vector/Vector3';
@@ -6,9 +6,10 @@ import {Vector4} from '../../common/math/vector/Vector4';
 import {Matrix4} from '../../common/math/matrix/Matrix4';
 import {Quaternion} from '../../common/math/Quaternion';
 import {EShaderType} from '../../enum/EShaderType';
-import {CLConstants} from '../CLConstants';
+import {CLShaderConstants} from '../CLShaderConstants';
 import {GLShaderSource} from '../GLShaderSource';
 import {GLAttributeBits} from '../GLTypes';
+import {IGLAttribute} from '../attribute/IGLAttribute';
 
 /**
  * `GLProgram` 类用来执行GLSL ES源码的编译、链接、绑定及 `uniform` 变量载入等操作
@@ -29,7 +30,7 @@ export class GLProgram {
     /** 当调用gl.useProgram(null)前触发unbindCallback回调函数 */
     public unbindCallback: ((program: GLProgram) => void) | null;
     /** 当前的Program使用的顶点属性bits值 */
-    private readonly _attributesState: GLAttributeBits;
+    private readonly _attributeBits: GLAttributeBits;
     private _vsShaderDefineStrings: string[] = [];
     private _fsShaderDefineStrings: string[] = [];
     
@@ -42,7 +43,7 @@ export class GLProgram {
      */
     public constructor(context: WebGLRenderingContext, attributesState: GLAttributeBits, vsShader: string | null = null, fsShader: string | null = null) {
         this.gl = context;
-        this._attributesState = attributesState;
+        this._attributeBits = attributesState;
         // 最好能从shader源码中抽取，目前暂时使用参数传递方式
         this.bindCallback = null;
         this.unbindCallback = null;
@@ -64,7 +65,7 @@ export class GLProgram {
         if (vsShader !== null && fsShader !== null) {
             this.loadShaders(vsShader, fsShader);
         }
-        this.name = 'name';
+        this.name = 'GLProgram';
     }
     
     /**
@@ -312,7 +313,7 @@ export class GLProgram {
      * @param unit
      */
     public loadSampler(unit: number = 0): boolean {
-        return this.setSampler(CLConstants.Sampler, unit);
+        return this.setSampler(CLShaderConstants.Sampler, unit);
     }
     
     /**
@@ -320,7 +321,7 @@ export class GLProgram {
      * @param mat
      */
     public loadModelViewMatrix(mat: Matrix4): boolean {
-        return this.setMatrix4(CLConstants.MVMatrix, mat);
+        return this.setMatrix4(CLShaderConstants.MVMatrix, mat);
     }
     
     /**
@@ -334,23 +335,23 @@ export class GLProgram {
         // 1.attrib名字和shader中的命名必须要一致
         // 2．数量必须要和mesh中一致
         // 3.mesh中的数组的component必须固定
-        if (GLAttributeHelper.hasAttribute(this._attributesState, GLAttributeHelper.POSITION.BIT)) {
-            gl.bindAttribLocation(program, GLAttributeHelper.POSITION.LOCATION, GLAttributeHelper.POSITION.NAME);
-        }
-        if (GLAttributeHelper.hasAttribute(this._attributesState, GLAttributeHelper.NORMAL.BIT)) {
-            gl.bindAttribLocation(program, GLAttributeHelper.NORMAL.LOCATION, GLAttributeHelper.NORMAL.NAME);
-        }
-        if (GLAttributeHelper.hasAttribute(this._attributesState, GLAttributeHelper.TEX_COORDINATE_0.BIT)) {
-            gl.bindAttribLocation(program, GLAttributeHelper.TEX_COORDINATE_0.LOCATION, GLAttributeHelper.TEX_COORDINATE_0.NAME);
-        }
-        if (GLAttributeHelper.hasAttribute(this._attributesState, GLAttributeHelper.TEX_COORDINATE_1.BIT)) {
-            gl.bindAttribLocation(program, GLAttributeHelper.TEX_COORDINATE_1.LOCATION, GLAttributeHelper.TEX_COORDINATE_1.NAME);
-        }
-        if (GLAttributeHelper.hasAttribute(this._attributesState, GLAttributeHelper.COLOR.BIT)) {
-            gl.bindAttribLocation(program, GLAttributeHelper.COLOR.LOCATION, GLAttributeHelper.COLOR.NAME);
-        }
-        if (GLAttributeHelper.hasAttribute(this._attributesState, GLAttributeHelper.TANGENT.BIT)) {
-            gl.bindAttribLocation(program, GLAttributeHelper.TANGENT.LOCATION, GLAttributeHelper.TANGENT.NAME);
+        this.bindAttribLocation(gl, GLAttributeHelper.POSITION);
+        this.bindAttribLocation(gl, GLAttributeHelper.NORMAL);
+        this.bindAttribLocation(gl, GLAttributeHelper.TEX_COORDINATE_0);
+        this.bindAttribLocation(gl, GLAttributeHelper.TEX_COORDINATE_1);
+        this.bindAttribLocation(gl, GLAttributeHelper.COLOR);
+        this.bindAttribLocation(gl, GLAttributeHelper.TANGENT);
+    }
+    
+    /**
+     * 绑定全局属性。
+     * @param {WebGLRenderingContext} gl
+     * @param {IGLAttribute} attribute
+     * @private
+     */
+    private bindAttribLocation(gl: WebGLRenderingContext, attribute: IGLAttribute): void {
+        if (GLAttributeHelper.hasAttribute(this._attributeBits, attribute.BIT)) {
+            gl.bindAttribLocation(this.program, attribute.LOCATION, attribute.NAME);
         }
     }
 }

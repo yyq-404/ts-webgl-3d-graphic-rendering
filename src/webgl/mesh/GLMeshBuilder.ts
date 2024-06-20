@@ -9,7 +9,7 @@ import {Matrix4} from '../../common/math/matrix/Matrix4';
 import {GLAttributeBits, GLAttributeOffsetMap} from '../GLTypes';
 import {GLTexture} from '../texture/GLTexture';
 import {EGLVertexLayoutType} from '../../enum/EGLVertexLayoutType';
-import {CLConstants} from '../CLConstants';
+import {CLShaderConstants} from '../CLShaderConstants';
 
 /**
  * GL网格构建器
@@ -323,7 +323,7 @@ export class GLMeshBuilder extends GLMeshBase {
      */
     public end(mvp: Matrix4): void {
         this.program.bind(); // 绑定GLProgram
-        this.program.setMatrix4(CLConstants.MVPMatrix, mvp); // 载入MVPMatrix uniform变量
+        this.program.setMatrix4(CLShaderConstants.MVPMatrix, mvp); // 载入MVPMatrix uniform变量
         if (this.texture !== null) {
             this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture);
             this.program.loadSampler();
