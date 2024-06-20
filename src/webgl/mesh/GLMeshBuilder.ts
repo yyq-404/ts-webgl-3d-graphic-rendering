@@ -89,10 +89,10 @@ export class GLMeshBuilder extends GLMeshBase {
             );
             this._buffers[GLMeshBuilder.INTERLEAVED] = indexBuffer;
             this.gl.bindBuffer(this.gl.ARRAY_BUFFER, indexBuffer);
-            const offsetMap: GLAttributeOffsetMap = GLAttributeState.getInterleavedLayoutAttribOffsetMap(this._attribState);
+            const offsetMap: GLAttributeOffsetMap = GLAttributeState.getInterleavedLayoutAttributeOffsetMap(this._attribState);
             // 调用如下两个方法
-            GLAttributeState.setAttribVertexArrayPointer(this.gl, offsetMap);
-            GLAttributeState.setAttribVertexArrayState(this.gl, this._attribState);
+            GLAttributeState.setAttributeVertexArrayPointer(this.gl, offsetMap);
+            GLAttributeState.setAttributeVertexArrayState(this.gl, this._attribState);
         } else if (this._layout === EGLVertexLayoutType.SEQUENCED) {
             // sequenced的话：
             // 使用n个arraylist,一个顶点缓存
@@ -115,7 +115,7 @@ export class GLMeshBuilder extends GLMeshBase {
             this.gl.bindBuffer(this.gl.ARRAY_BUFFER, indexBuffer);
             // sequenced没法预先设置指针，因为是动态的
             // 但是可以预先设置顶点属性状态
-            GLAttributeState.setAttribVertexArrayState(this.gl, this._attribState);
+            GLAttributeState.setAttributeVertexArrayState(this.gl, this._attribState);
         } else {
             // seperated的话：
             // 使用n个arraylist,n个顶点缓存
@@ -344,7 +344,7 @@ export class GLMeshBuilder extends GLMeshBase {
             this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
             //用的是预先分配显存机制
             this.gl.bufferData(this.gl.ARRAY_BUFFER, this._attribStride * this._vertCount, this.gl.DYNAMIC_DRAW);
-            const map: GLAttributeOffsetMap = GLAttributeState.getSequencedLayoutAttribOffsetMap(this._attribState, this._vertCount);
+            const map: GLAttributeOffsetMap = GLAttributeState.getSequencedLayoutAttributeOffsetMap(this._attribState, this._vertCount);
             let list: TypedArrayList<Float32Array> = this._lists[GLAttributeState.POSITION_NAME];
             this.gl.bufferSubData(this.gl.ARRAY_BUFFER, 0, list.subArray());
             if (this._hasTexCoordinate) {
@@ -360,7 +360,7 @@ export class GLMeshBuilder extends GLMeshBase {
                 this.gl.bufferSubData(this.gl.ARRAY_BUFFER, map[GLAttributeState.COLOR_NAME], list.subArray());
             }
             // 每次都要重新计算和绑定顶点属性数组的首地址
-            GLAttributeState.setAttribVertexArrayPointer(this.gl, map);
+            GLAttributeState.setAttributeVertexArrayPointer(this.gl, map);
         } else {
             // 针对seperated存储方式的渲染数据处理
             // 需要每个VBO都绑定一次

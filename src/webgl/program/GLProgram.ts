@@ -71,7 +71,7 @@ export class GLProgram {
      * @param gl
      */
     public static createDefaultTextureProgram(gl: WebGLRenderingContext): GLProgram {
-        return new GLProgram(gl, GLAttributeState.makeVertexAttribs(true, false, false, false, false), GLShaderSource.textureShader.vs, GLShaderSource.textureShader.fs);
+        return new GLProgram(gl, GLAttributeState.makeVertexAttributes(true, false, false, false, false), GLShaderSource.textureShader.vs, GLShaderSource.textureShader.fs);
     }
     
     /**
@@ -79,7 +79,7 @@ export class GLProgram {
      * @param gl
      */
     public static createDefaultColorProgram(gl: WebGLRenderingContext): GLProgram {
-        return new GLProgram(gl, GLAttributeState.makeVertexAttribs(false, false, false, false, true), GLShaderSource.colorShader.vs, GLShaderSource.colorShader.fs);
+        return new GLProgram(gl, GLAttributeState.makeVertexAttributes(false, false, false, false, true), GLShaderSource.colorShader.vs, GLShaderSource.colorShader.fs);
     }
     
     /**
