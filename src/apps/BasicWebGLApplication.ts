@@ -1,7 +1,6 @@
 import {BaseApplication} from '../base/BaseApplication';
 import {GLHelper} from '../webgl/GLHelper';
 import {Matrix4} from '../common/math/matrix/Matrix4';
-import {MathHelper} from '../common/math/MathHelper';
 import {Vector3} from '../common/math/vector/Vector3';
 import {EShaderType} from '../enum/EShaderType';
 import {TypedArrayList} from '../common/container/TypedArrayList';
@@ -30,17 +29,17 @@ export class BasicWebGLApplication extends BaseApplication {
     public verts: TypedArrayList<Float32Array>;
     /** 顶点缓冲数据 */
     public ivbo: WebGLBuffer;
-    // BasicWebGLApplication增加EBO
-    /** `gl.ELENENT_ARRAY_BUFFER`类型的顶点Buffer对象 */
-        // e表示gl.ELEMENT_ARRAY_BUFFER
+    /** `gl.ELEMENT_ARRAY_BUFFER`类型的顶点Buffer对象， e表示gl.ELEMENT_ARRAY_BUFFER */
     public evbo: WebGLBuffer;
-    // 索引缓存的数据
+    /** 索引缓存的数据 */
     public indices: TypedArrayList<Uint16Array>;
-    public coordSystem9s: GLCoordinateSystem[];
-    public coordSystem4s: GLCoordinateSystem[];
-    
-    uniformMap: GLUniformMap = {};
-    attributeMap: GLAttributeMap = {};
+    public coordinateSystem9s: GLCoordinateSystem[];
+    public coordinateSystem4s: GLCoordinateSystem[];
+    /** gl全局变量信息 */
+    public uniformMap: GLUniformMap = {};
+    /** gl属性信息 */
+    public attributeMap: GLAttributeMap = {};
+    /** 顶点着色器代码 */
     public colorShader_vs: string = `
     #ifdef GL_ES
         precision highp float;
@@ -60,6 +59,7 @@ export class BasicWebGLApplication extends BaseApplication {
        // 7．将颜色属性传递到Fragment Shader中
        vColor = aColor;
     }`;
+    /** 片元着色器代码 */
     public colorShader_fs: string = `
     // 1．声明varying类型的变量vColor，该变量的数据类型和名称必须要和Vertex Shader中的数据类型和名称一致
     varying lowp vec4 vColor;
@@ -93,7 +93,7 @@ export class BasicWebGLApplication extends BaseApplication {
         // GLHelper.triggerContextLostEvent(this.gl);
         // 打印WebGL状态
         GLHelper.printStates(this.gl);
-        this.projectMatrix = Matrix4.perspective(MathHelper.toRadian(45), this.canvas.width / this.canvas.height, 0.1, 100);
+        this.projectMatrix = Matrix4.perspective(45, this.canvas.width / this.canvas.height, 0.1, 100);
         // 构造视矩阵，摄像机沿着世界坐标系z轴移动5个单位，并且看着世界坐标系的原点
         this.viewMatrix = Matrix4.lookAt(new Vector3([0, 0, 5]), new Vector3());
         // 构造viewProjectMatrix
@@ -116,7 +116,7 @@ export class BasicWebGLApplication extends BaseApplication {
         GLHelper.compileShader(this.gl, this.colorShader_fs, this.fsShader);
         // 创建着色器链接程序
         this.program = GLHelper.createProgram(this.gl);
-        GLHelper.linkProgram(this.gl, this.program, this.vsShader, this.fsShader, undefined, GLHelper.printProgramActiveInfos);
+        GLHelper.linkProgram(this.gl, this.program, this.vsShader, this.fsShader, GLHelper.printProgramActiveInfos, GLHelper.printProgramActiveInfos);
         // 创建顶点数据
         this.verts = new TypedArrayList<Float32Array>(Float32Array, 6 * 7);
         // 创建顶点缓存冲对象
@@ -124,62 +124,53 @@ export class BasicWebGLApplication extends BaseApplication {
         // 初始化evbo
         this.indices = new TypedArrayList(Uint16Array, 6);
         this.evbo = GLHelper.createBuffer(this.gl);
-        
         // this.gl.frontFace(this.gl.CCW);
         this.gl.enable(this.gl.CULL_FACE);
         // this.gl.cullFace(this.gl.BACK);
-        
-        this.coordSystem9s = this.makeViewportCoordinateSystems();
-        this.coordSystem4s = this.makeViewportCoordinateSystems(2);
+        this.coordinateSystem9s = this.makeViewportCoordinateSystems();
+        this.coordinateSystem4s = this.makeViewportCoordinateSystems(2);
         this.attributeMap = GLHelper.getProgramActiveAttributes(this.gl, this.program);
         this.uniformMap = GLHelper.getProgramActiveUniforms(this.gl, this.program);
-        // 初始化渲染状态
-        // GLHelper.setDefaultState(this.gl);
     }
     
+    /**
+     * 9视图，使用drawArray
+     */
     public render9Viewports(): void {
         // 从下到上第一列
-        GLHelper.setViewport(this.gl, this.coordSystem9s[0].viewport);
+        GLHelper.setViewport(this.gl, this.coordinateSystem9s[0].viewport);
         this.drawRectByInterleavedVBO(0, 6, this.gl.TRIANGLES);
-        
-        GLHelper.setViewport(this.gl, this.coordSystem9s[1].viewport);
+        GLHelper.setViewport(this.gl, this.coordinateSystem9s[1].viewport);
         this.drawRectByInterleavedVBO(0, 3, this.gl.TRIANGLES);
-        
-        GLHelper.setViewport(this.gl, this.coordSystem9s[2].viewport);
+        GLHelper.setViewport(this.gl, this.coordinateSystem9s[2].viewport);
         this.drawRectByInterleavedVBO(3, 3, this.gl.TRIANGLES);
-        
         // 从下到上第二列
-        GLHelper.setViewport(this.gl, this.coordSystem9s[3].viewport);
+        GLHelper.setViewport(this.gl, this.coordinateSystem9s[3].viewport);
         this.drawRectByInterleavedVBO(0, 4, this.gl.TRIANGLE_FAN);
-        
-        GLHelper.setViewport(this.gl, this.coordSystem9s[4].viewport);
+        GLHelper.setViewport(this.gl, this.coordinateSystem9s[4].viewport);
         this.drawRectByInterleavedVBO(0, 4, this.gl.TRIANGLE_STRIP);
-        
-        GLHelper.setViewport(this.gl, this.coordSystem9s[5].viewport);
+        GLHelper.setViewport(this.gl, this.coordinateSystem9s[5].viewport);
         this.drawRectByInterleavedVBO(0, 4, this.gl.POINTS);
-        
         // 从下到上第三列
-        GLHelper.setViewport(this.gl, this.coordSystem9s[6].viewport);
+        GLHelper.setViewport(this.gl, this.coordinateSystem9s[6].viewport);
         this.drawRectByInterleavedVBO(0, 4, this.gl.LINE_STRIP);
-        
-        GLHelper.setViewport(this.gl, this.coordSystem9s[7].viewport);
+        GLHelper.setViewport(this.gl, this.coordinateSystem9s[7].viewport);
         this.drawRectByInterleavedVBO(0, 4, this.gl.LINE_LOOP);
-        
-        GLHelper.setViewport(this.gl, this.coordSystem9s[8].viewport);
+        GLHelper.setViewport(this.gl, this.coordinateSystem9s[8].viewport);
         this.drawRectByInterleavedVBO(0, 4, this.gl.LINES);
     }
     
+    /**
+     * 4视图，使用drawElements
+     */
     public render4Viewports(): void {
-        GLHelper.setViewport(this.gl, this.coordSystem4s[0].viewport);
+        GLHelper.setViewport(this.gl, this.coordinateSystem4s[0].viewport);
         this.drawRectByInterleavedVBOWithEBO(0, 6, this.gl.TRIANGLES);
-        
-        GLHelper.setViewport(this.gl, this.coordSystem4s[1].viewport);
+        GLHelper.setViewport(this.gl, this.coordinateSystem4s[1].viewport);
         this.drawRectByInterleavedVBOWithEBO(0, 6, this.gl.TRIANGLE_FAN);
-        
-        GLHelper.setViewport(this.gl, this.coordSystem4s[2].viewport);
+        GLHelper.setViewport(this.gl, this.coordinateSystem4s[2].viewport);
         this.drawRectByInterleavedVBOWithEBO(0, 6, this.gl.TRIANGLE_STRIP);
-        
-        GLHelper.setViewport(this.gl, this.coordSystem4s[3].viewport);
+        GLHelper.setViewport(this.gl, this.coordinateSystem4s[3].viewport);
         this.drawRectByInterleavedVBOWithEBO(2 * 3, 3, this.gl.TRIANGLE_STRIP);
     }
     
@@ -194,7 +185,6 @@ export class BasicWebGLApplication extends BaseApplication {
         this.verts.clear();
         // 声明interleaved存储的顶点数组。
         let data: number[];
-        
         if (mode === this.gl.TRIANGLES) {
             data = [
                 // 三角形0
@@ -221,23 +211,22 @@ export class BasicWebGLApplication extends BaseApplication {
                 ...[-0.5, 0.5, 0, 0, 1, 0, 1] // 左上 3
             ];
         }
-        
         this.verts.pushArray(data);
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.ivbo);
         // 使用我们自己实现的动态类型数组的subArray方法，该方法不会重新创建Float32Array对象
         // 而是返回一个子数组的引用，这样效率比较高
         this.gl.bufferData(this.gl.ARRAY_BUFFER, this.verts.subArray(), this.gl.DYNAMIC_DRAW);
         // vertexAttribPointer方法参数说明：
-        // 1、使用VertexShader中的attribue变量名aPosition,在attribMap中查找到我们自己封装的GLAttribInfo对象,该对象中存储了顶点属性寄存器的索引号
+        // 1、使用VertexShader中的attribute变量名aPosition,在attribMap中查找到我们自己封装的GLAttribInfo对象,该对象中存储了顶点属性寄存器的索引号
         // 2、aPosition的类型为vec3,而vec3由3个float类型组成，因此第二个参数为3,第三个参数为gl.FLOAT常量值
         // 但是aColor的类型为vec4,,而vec4由4个float类型组成,因此第二个参数为4,第三个参数为gl.FLOAT常量值
-        // 3、第四个参数用来指明attribe变量是否使用需要normalized，
+        // 3、第四个参数用来指明attribute变量是否使用需要normalized，
         // 由于normalize只对gl.BYTE / gl.SHORT [-1 , 1 ]和gl.UNSIGNED_BYTE / gl.UNSIGNED_SHORT [ 0 , 1 ]有效
         // 而我们的aPosition和aColor在WebGLBuffer被定义为FLOAT表示的vec3和vec4,因此直接设置false
         // 4、关于最后两个参数，需要参考图5.12，因此请参考本书内容
         this.gl.vertexAttribPointer(this.attributeMap['aPosition'].location, 3, this.gl.FLOAT, false, Float32Array.BYTES_PER_ELEMENT * 7, Float32Array.BYTES_PER_ELEMENT * 0);
         this.gl.vertexAttribPointer(this.attributeMap['aColor'].location, 4, this.gl.FLOAT, false, Float32Array.BYTES_PER_ELEMENT * 7, Float32Array.BYTES_PER_ELEMENT * 3);
-        // 默认情况下，是关闭vertexAttrbArray对象的，因此需要开启
+        // 默认情况下，是关闭vertexAttribArray对象的，因此需要开启
         // 一旦开启后，当我们调用draw开头的WebGL方法时，WebGL驱动会自动将VBO中的顶点数据上传到对应的Vertex Shader中
         this.gl.enableVertexAttribArray(this.attributeMap['aPosition'].location);
         this.gl.enableVertexAttribArray(this.attributeMap['aColor'].location);
@@ -325,6 +314,7 @@ export class BasicWebGLApplication extends BaseApplication {
      */
     public override render(): void {
         this.render9Viewports();
+        // this.render4Viewports();
     }
     
     /**
