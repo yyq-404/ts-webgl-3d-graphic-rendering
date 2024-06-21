@@ -2,7 +2,7 @@ import {Vector4} from '../../common/math/vector/Vector4';
 import {Vector2} from '../../common/math/vector/Vector2';
 import {Vector3} from '../../common/math/vector/Vector3';
 import {TypedArrayList} from '../../common/container/TypedArrayList';
-import {GLAttributeHelper} from '../GLAttributeHelper';
+import {GLAttributeHelper} from '../attribute/GLAttributeHelper';
 import {GLMeshBase} from './GLMeshBase';
 import {GLProgram} from '../program/GLProgram';
 import {Matrix4} from '../../common/math/matrix/Matrix4';

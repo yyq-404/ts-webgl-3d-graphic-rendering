@@ -1,4 +1,4 @@
-import {GLAttributeHelper} from '../GLAttributeHelper';
+import {GLAttributeHelper} from '../attribute/GLAttributeHelper';
 import {GLHelper} from '../GLHelper';
 import {Vector2} from '../../common/math/vector/Vector2';
 import {Vector3} from '../../common/math/vector/Vector3';
