@@ -10,6 +10,7 @@ import {GLAttributeBits, GLAttributeOffsetMap} from '../GLTypes';
 import {GLTexture} from '../texture/GLTexture';
 import {EGLVertexLayoutType} from '../../enum/EGLVertexLayoutType';
 import {CLShaderConstants} from '../CLShaderConstants';
+import {IGLAttribute} from '../attribute/IGLAttribute';
 
 /**
  * GL网格构建器
@@ -75,87 +76,8 @@ export class GLMeshBuilder extends GLMeshBase {
         this.texture = texture;
         // 先绑定VAO对象
         this.bind();
-        // 生成索引缓存
-        /** 索引缓存 */
-        let indexBuffer: WebGLBuffer | null = this.gl.createBuffer();
-        // buffer = this.gl.createBuffer();
-        if (!indexBuffer) throw new Error('WebGLBuffer创建不成功!');
-        if (this._layout === EGLVertexLayoutType.INTERLEAVED) {
-            // interleaved的话：
-            // 使用一个arraylist,一个顶点缓存
-            // 调用的是GLAttribState.getInterleavedLayoutAttribOffsetMap方法
-            this._lists[GLMeshBuilder.INTERLEAVED] = new TypedArrayList<Float32Array>(
-                Float32Array
-            );
-            this._buffers[GLMeshBuilder.INTERLEAVED] = indexBuffer;
-            this.gl.bindBuffer(this.gl.ARRAY_BUFFER, indexBuffer);
-            const offsetMap: GLAttributeOffsetMap = GLAttributeHelper.getInterleavedLayoutAttributeOffsetMap(this._attributesState);
-            // 调用如下两个方法
-            GLAttributeHelper.setAttributeVertexArrayPointer(this.gl, offsetMap);
-            GLAttributeHelper.setAttributeVertexArrayState(this.gl, this._attributesState);
-        } else if (this._layout === EGLVertexLayoutType.SEQUENCED) {
-            // sequenced的话：
-            // 使用n个arraylist,一个顶点缓存
-            // 无法在初始化时调用的是getSequencedLayoutAttribOffsetMap方法
-            // 无法使用GLAttribState.setAttribVertexArrayPointer方法预先固定地址
-            // 能够使用GLAttribState.setAttribVertexArrayState开启顶点属性寄存器
-            this._lists[GLAttributeHelper.POSITION.NAME] = new TypedArrayList<Float32Array>(Float32Array);
-            if (this._hasColor) {
-                this._lists[GLAttributeHelper.COLOR.NAME] = new TypedArrayList<Float32Array>(Float32Array);
-            }
-            if (this._hasTexCoordinate) {
-                this._lists[GLAttributeHelper.TEX_COORDINATE_0.NAME] = new TypedArrayList<Float32Array>(Float32Array);
-            }
-            if (this._hasNormal) {
-                this._lists[GLAttributeHelper.NORMAL.NAME] = new TypedArrayList<Float32Array>(Float32Array);
-            }
-            indexBuffer = this.gl.createBuffer();
-            if (!indexBuffer) throw new Error('WebGLBuffer创建不成功!');
-            this._buffers[GLMeshBuilder.SEQUENCED] = indexBuffer;
-            this.gl.bindBuffer(this.gl.ARRAY_BUFFER, indexBuffer);
-            // sequenced没法预先设置指针，因为是动态的
-            // 但是可以预先设置顶点属性状态
-            GLAttributeHelper.setAttributeVertexArrayState(this.gl, this._attributesState);
-        } else {
-            // seperated的话：
-            // 使用n个arraylist,n个顶点缓存
-            // 调用的是getSepratedLayoutAttribOffsetMap方法
-            // 能够使用能够使用GLAttribState.setAttribVertexArrayPointer方法预先固定地址
-            // 能够使用GLAttribState.setAttribVertexArrayState开启顶点属性寄存器
-            // 肯定要有的是位置数据
-            this._lists[GLAttributeHelper.POSITION.NAME] = new TypedArrayList<Float32Array>(Float32Array);
-            this._buffers[GLAttributeHelper.POSITION.NAME] = indexBuffer;
-            this.gl.bindBuffer(this.gl.ARRAY_BUFFER, indexBuffer);
-            this.gl.vertexAttribPointer(GLAttributeHelper.POSITION.LOCATION, 3, gl.FLOAT, false, 0, 0);
-            this.gl.enableVertexAttribArray(GLAttributeHelper.POSITION.LOCATION);
-            if (this._hasColor) {
-                this._lists[GLAttributeHelper.COLOR.NAME] = new TypedArrayList<Float32Array>(Float32Array);
-                indexBuffer = this.gl.createBuffer();
-                if (!indexBuffer) throw new Error('WebGLBuffer创建不成功!');
-                this._buffers[GLAttributeHelper.COLOR.NAME] = indexBuffer;
-                this.gl.bindBuffer(this.gl.ARRAY_BUFFER, indexBuffer);
-                this.gl.vertexAttribPointer(GLAttributeHelper.COLOR.LOCATION, 4, gl.FLOAT, false, 0, 0);
-                this.gl.enableVertexAttribArray(GLAttributeHelper.COLOR.LOCATION);
-            }
-            if (this._hasTexCoordinate) {
-                this._lists[GLAttributeHelper.TEX_COORDINATE_0.NAME] = new TypedArrayList<Float32Array>(Float32Array);
-                this._buffers[GLAttributeHelper.TEX_COORDINATE_0.NAME] = indexBuffer;
-                this.gl.bindBuffer(this.gl.ARRAY_BUFFER, indexBuffer);
-                this.gl.vertexAttribPointer(GLAttributeHelper.TEX_COORDINATE_0.BIT, 2, gl.FLOAT, false, 0, 0);
-                this.gl.enableVertexAttribArray(GLAttributeHelper.TEX_COORDINATE_0.BIT);
-            }
-            if (this._hasNormal) {
-                this._lists[GLAttributeHelper.NORMAL.NAME] = new TypedArrayList<Float32Array>(Float32Array);
-                indexBuffer = this.gl.createBuffer();
-                if (!indexBuffer) throw new Error('WebGLBuffer创建不成功!');
-                this._buffers[GLAttributeHelper.NORMAL.NAME] = indexBuffer;
-                this.gl.bindBuffer(this.gl.ARRAY_BUFFER, indexBuffer);
-                this.gl.vertexAttribPointer(GLAttributeHelper.NORMAL.LOCATION, 3, gl.FLOAT, false, 0, 0);
-                this.gl.enableVertexAttribArray(GLAttributeHelper.NORMAL.LOCATION);
-            }
-            //GLAttribState.setAttribVertexArrayPointer( this.gl, map );
-            //GLAttribState.setAttribVertexArrayState( this.gl, this._attribState );
-        }
+        // 初始化顶点属性
+        this.initLayoutAttribute();
         this.unbind();
     }
     
@@ -235,55 +157,9 @@ export class GLMeshBuilder extends GLMeshBase {
      */
     public vertex(x: number, y: number, z: number): GLMeshBuilder {
         if (this._layout === EGLVertexLayoutType.INTERLEAVED) {
-            // 针对interleaved存储方式的操作
-            const list: TypedArrayList<Float32Array> = this._lists[GLMeshBuilder.INTERLEAVED];
-            // position
-            list.push(x);
-            list.push(y);
-            list.push(z);
-            // texCoordinate
-            if (this._hasTexCoordinate) {
-                list.push(this._texCoordinate.x);
-                list.push(this._texCoordinate.y);
-            }
-            // normal
-            if (this._hasNormal) {
-                list.push(this._normal.x);
-                list.push(this._normal.y);
-                list.push(this._normal.z);
-            }
-            // color
-            if (this._hasColor) {
-                list.push(this._color.r);
-                list.push(this._color.g);
-                list.push(this._color.b);
-                list.push(this._color.a);
-            }
+            this.interleavedVertex(x, y, z);
         } else {
-            // sequenced和separated都是具有多个ArrayList
-            // 针对除interleaved存储方式之外的操作
-            let list: TypedArrayList<Float32Array> = this._lists[GLAttributeHelper.POSITION.NAME];
-            list.push(x);
-            list.push(y);
-            list.push(z);
-            if (this._hasTexCoordinate) {
-                list = this._lists[GLAttributeHelper.TEX_COORDINATE_0.NAME];
-                list.push(this._texCoordinate.x);
-                list.push(this._texCoordinate.y);
-            }
-            if (this._hasNormal) {
-                list = this._lists[GLAttributeHelper.NORMAL.NAME];
-                list.push(this._normal.x);
-                list.push(this._normal.y);
-                list.push(this._normal.z);
-            }
-            if (this._hasColor) {
-                list = this._lists[GLAttributeHelper.COLOR.NAME];
-                list.push(this._color.r);
-                list.push(this._color.g);
-                list.push(this._color.b);
-                list.push(this._color.a);
-            }
+            this.otherVertex(x, y, z);
         }
         // 记录更新后的顶点数量
         this._vertCount++;
@@ -295,12 +171,12 @@ export class GLMeshBuilder extends GLMeshBase {
      *  @param drawMode
      */
     public begin(drawMode: number = this.gl.TRIANGLES): GLMeshBuilder {
-        this.drawMode = drawMode; // 设置要绘制的mode,7种基本几何图元
-        this._vertCount = 0; // 清空顶点数为0
-        if (this._layout === EGLVertexLayoutType.INTERLEAVED) {
-            const list: TypedArrayList<Float32Array> = this._lists[GLMeshBuilder.INTERLEAVED];
-            list.clear(); // 使用自己实现的动态类型数组，重用
-        } else {
+        // 设置要绘制的mode,7种基本几何图元
+        this.drawMode = drawMode;
+        // 清空顶点数为0
+        this._vertCount = 0;
+        // let list: TypedArrayList<Float32Array> = new TypedArrayList<Float32Array>(Float32Array);
+        if (this._layout !== EGLVertexLayoutType.INTERLEAVED) {
             // 使用自己实现的动态类型数组，重用
             let list: TypedArrayList<Float32Array> = this._lists[GLAttributeHelper.POSITION.NAME];
             if (this._hasTexCoordinate) {
@@ -312,6 +188,10 @@ export class GLMeshBuilder extends GLMeshBase {
             if (this._hasColor) {
                 list = this._lists[GLAttributeHelper.COLOR.NAME];
             }
+            list.clear();
+        } else {
+            const list: TypedArrayList<Float32Array> = this._lists[GLMeshBuilder.INTERLEAVED];
+            // 使用自己实现的动态类型数组，重用
             list.clear();
         }
         return this;
@@ -328,70 +208,10 @@ export class GLMeshBuilder extends GLMeshBase {
             this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture);
             this.program.loadSampler();
         }
-        this.bind(); // 绑定VAO
-        if (this._layout === EGLVertexLayoutType.INTERLEAVED) {
-            // 获取数据源
-            const list: TypedArrayList<Float32Array> = this._lists[GLMeshBuilder.INTERLEAVED];
-            // 获取VBO
-            const buffer: WebGLBuffer = this._buffers[GLMeshBuilder.INTERLEAVED];
-            // 绑定VBO
-            this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
-            // 上传渲染数据到VBO中
-            this.gl.bufferData(this.gl.ARRAY_BUFFER, list.subArray(), this.gl.DYNAMIC_DRAW);
-        } else if (this._layout === EGLVertexLayoutType.SEQUENCED) {
-            // 针对sequenced存储方式的渲染处理
-            const buffer: WebGLBuffer = this._buffers[GLMeshBuilder.SEQUENCED];
-            this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
-            //用的是预先分配显存机制
-            this.gl.bufferData(this.gl.ARRAY_BUFFER, this._attributeStride * this._vertCount, this.gl.DYNAMIC_DRAW);
-            const map: GLAttributeOffsetMap = GLAttributeHelper.getSequencedLayoutAttributeOffsetMap(this._attributesState, this._vertCount);
-            let list: TypedArrayList<Float32Array> = this._lists[GLAttributeHelper.POSITION.NAME];
-            this.gl.bufferSubData(this.gl.ARRAY_BUFFER, 0, list.subArray());
-            if (this._hasTexCoordinate) {
-                list = this._lists[GLAttributeHelper.TEX_COORDINATE_0.NAME];
-                this.gl.bufferSubData(this.gl.ARRAY_BUFFER, map[GLAttributeHelper.TEX_COORDINATE_0.NAME], list.subArray());
-            }
-            if (this._hasNormal) {
-                list = this._lists[GLAttributeHelper.NORMAL.NAME];
-                this.gl.bufferSubData(this.gl.ARRAY_BUFFER, map[GLAttributeHelper.NORMAL.NAME], list.subArray());
-            }
-            if (this._hasColor) {
-                list = this._lists[GLAttributeHelper.COLOR.NAME];
-                this.gl.bufferSubData(this.gl.ARRAY_BUFFER, map[GLAttributeHelper.COLOR.NAME], list.subArray());
-            }
-            // 每次都要重新计算和绑定顶点属性数组的首地址
-            GLAttributeHelper.setAttributeVertexArrayPointer(this.gl, map);
-        } else {
-            // 针对seperated存储方式的渲染数据处理
-            // 需要每个VBO都绑定一次
-            // position
-            let buffer: WebGLBuffer = this._buffers[GLAttributeHelper.POSITION.NAME];
-            let list: TypedArrayList<Float32Array> =
-                this._lists[GLAttributeHelper.POSITION.NAME];
-            this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
-            this.gl.bufferData(this.gl.ARRAY_BUFFER, list.subArray(), this.gl.DYNAMIC_DRAW);
-            // texture
-            if (this._hasTexCoordinate) {
-                buffer = this._buffers[GLAttributeHelper.TEX_COORDINATE_0.NAME];
-                list = this._lists[GLAttributeHelper.TEX_COORDINATE_0.NAME];
-                this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
-                this.gl.bufferData(this.gl.ARRAY_BUFFER, list.subArray(), this.gl.DYNAMIC_DRAW);
-            }
-            // normal
-            if (this._hasNormal) {
-                buffer = this._buffers[GLAttributeHelper.NORMAL.NAME];
-                list = this._lists[GLAttributeHelper.NORMAL.NAME];
-                this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
-                this.gl.bufferData(this.gl.ARRAY_BUFFER, list.subArray(), this.gl.DYNAMIC_DRAW);
-            }
-            // color
-            if (this._hasColor) {
-                buffer = this._buffers[GLAttributeHelper.COLOR.NAME];
-                list = this._lists[GLAttributeHelper.COLOR.NAME];
-                this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
-                this.gl.bufferData(this.gl.ARRAY_BUFFER, list.subArray(), this.gl.DYNAMIC_DRAW);
-            }
-        }
+        // 绑定VAO
+        this.bind();
+        // 绑定buffer
+        this.bindBuffer();
         // GLMeshBuilder不使用索引缓冲区绘制方式，因此调用drawArrays方法
         if (this._ibo) {
             this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this._ibo);
@@ -404,5 +224,296 @@ export class GLMeshBuilder extends GLMeshBase {
         this.unbind();
         // 解绑GLProgram
         this.program.unbind();
+    }
+    
+    /**
+     * 绑定buffer
+     * @private
+     */
+    private bindBuffer(): void {
+        switch (this._layout) {
+            case EGLVertexLayoutType.INTERLEAVED:
+                this.bindInterleavedBuffer();
+                break;
+            case EGLVertexLayoutType.SEQUENCED:
+                this.bindSequencedBuffer();
+                break;
+            case EGLVertexLayoutType.SEPARATED:
+            default:
+                this.bindSeparatedBuffer();
+                break;
+        }
+    }
+    
+    /**
+     * 绑定交错布局buffer
+     * @private
+     */
+    private bindInterleavedBuffer(): void {
+        // 获取数据源
+        const list: TypedArrayList<Float32Array> = this._lists[GLMeshBuilder.INTERLEAVED];
+        // 获取VBO
+        const buffer: WebGLBuffer = this._buffers[GLMeshBuilder.INTERLEAVED];
+        // 绑定VBO
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
+        // 上传渲染数据到VBO中
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, list.subArray(), this.gl.DYNAMIC_DRAW);
+    }
+    
+    /**
+     * 绑定顺序布局buffer
+     * @private
+     */
+    private bindSequencedBuffer(): void {
+        // 针对sequenced存储方式的渲染处理
+        const buffer: WebGLBuffer = this._buffers[GLMeshBuilder.SEQUENCED];
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
+        //用的是预先分配显存机制
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, this._attributeStride * this._vertCount, this.gl.DYNAMIC_DRAW);
+        const offsets: GLAttributeOffsetMap = GLAttributeHelper.getSequencedLayoutAttributeOffsetMap(this._attributesState, this._vertCount);
+        this.bufferSubData(GLAttributeHelper.POSITION, offsets);
+        this.bufferSubData(GLAttributeHelper.TEX_COORDINATE_0, offsets, this._hasTexCoordinate);
+        this.bufferSubData(GLAttributeHelper.NORMAL, offsets, this._hasNormal);
+        this.bufferSubData(GLAttributeHelper.COLOR, offsets, this._hasColor);
+        // 每次都要重新计算和绑定顶点属性数组的首地址
+        GLAttributeHelper.setAttributeVertexArrayPointer(this.gl, offsets);
+    }
+    
+    /**
+     * 绑定分离布局buffer
+     * @private
+     */
+    private bindSeparatedBuffer(): void {
+        // 针对seperated存储方式的渲染数据处理
+        // 需要每个VBO都绑定一次
+        this.bindBufferData(GLAttributeHelper.POSITION);
+        this.bindBufferData(GLAttributeHelper.TEX_COORDINATE_0, this._hasTexCoordinate);
+        this.bindBufferData(GLAttributeHelper.NORMAL, this._hasNormal);
+        this.bindBufferData(GLAttributeHelper.COLOR, this._hasColor);
+    }
+    
+    /**
+     * 交错顶点
+     * @param {number} x
+     * @param {number} y
+     * @param {number} z
+     * @private
+     */
+    private interleavedVertex(x: number, y: number, z: number): void {
+        // 针对interleaved存储方式的操作
+        const list: TypedArrayList<Float32Array> = this._lists[GLMeshBuilder.INTERLEAVED];
+        // position
+        this.pushVector3(list, new Vector3([x, y, z]));
+        // texCoordinate
+        if (this._hasTexCoordinate) {
+            this.pushVector2(list, this._texCoordinate);
+        }
+        // normal
+        if (this._hasNormal) {
+            this.pushVector3(list, this._normal);
+        }
+        // color
+        if (this._hasColor) {
+            this.pushColor(list, this._color);
+        }
+    }
+    
+    /**
+     * 除了交错方式之外的的顶点数据（顺序布局和分离布局）
+     * @param {number} x
+     * @param {number} y
+     * @param {number} z
+     * @private
+     */
+    private otherVertex(x: number, y: number, z: number): void {
+        // sequenced和separated都是具有多个ArrayList
+        // 针对除interleaved存储方式之外的操作
+        let list: TypedArrayList<Float32Array> = this._lists[GLAttributeHelper.POSITION.NAME];
+        // position
+        this.pushVector3(list, new Vector3([x, x, z]));
+        // texCoordinate
+        if (this._hasTexCoordinate) {
+            list = this._lists[GLAttributeHelper.TEX_COORDINATE_0.NAME];
+            this.pushVector2(list, this._texCoordinate);
+        }
+        // normal
+        if (this._hasNormal) {
+            list = this._lists[GLAttributeHelper.NORMAL.NAME];
+            this.pushVector3(list, this._normal);
+        }
+        // color
+        if (this._hasColor) {
+            list = this._lists[GLAttributeHelper.COLOR.NAME];
+            this.pushColor(list, this._color);
+        }
+    }
+    
+    /**
+     * 截取buffer数据。
+     * @param {IGLAttribute} attribute
+     * @param {GLAttributeOffsetMap} offsets
+     * @param {boolean} has
+     * @private
+     */
+    private bufferSubData(attribute: IGLAttribute, offsets: GLAttributeOffsetMap, has: boolean = true): void {
+        let list = this._lists[attribute.NAME];
+        this.gl.bufferSubData(this.gl.ARRAY_BUFFER, offsets[attribute.NAME], list.subArray());
+    }
+    
+    
+    /**
+     * 绑定buffer数据。
+     * @param {IGLAttribute} attribute
+     * @param has
+     * @private
+     */
+    private bindBufferData(attribute: IGLAttribute, has: boolean = true): void {
+        if (!has) return;
+        let buffer: WebGLBuffer = this._buffers[attribute.NAME];
+        let list: TypedArrayList<Float32Array> = this._lists[attribute.NAME];
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, list.subArray(), this.gl.DYNAMIC_DRAW);
+    }
+    
+    /**
+     * 压入二维向量数据
+     * @param {TypedArrayList<Float32Array>} list
+     * @param {Vector2} source
+     * @private
+     */
+    private pushVector2(list: TypedArrayList<Float32Array>, source: Vector2): void {
+        list.push(source.x);
+        list.push(source.y);
+    }
+    
+    /**
+     * 压入三维向量数据
+     * @param {TypedArrayList<Float32Array>} list
+     * @param source
+     * @private
+     */
+    private pushVector3(list: TypedArrayList<Float32Array>, source: Vector3): void {
+        list.push(source.x);
+        list.push(source.y);
+        list.push(source.z);
+    }
+    
+    /**
+     * 压缩颜色数据
+     * @param {TypedArrayList<Float32Array>} list
+     * @param {Vector4} color
+     * @private
+     */
+    private pushColor(list: TypedArrayList<Float32Array>, color: Vector4): void {
+        list.push(color.r);
+        list.push(color.g);
+        list.push(color.b);
+        list.push(color.a);
+    }
+    
+    /**
+     * 初始化布局属性。
+     * @private
+     */
+    private initLayoutAttribute(): void {
+        let indexBuffer: WebGLBuffer | null = this.gl.createBuffer();
+        if (!indexBuffer) throw new Error('WebGLBuffer创建不成功!');
+        switch (this._layout) {
+            case EGLVertexLayoutType.INTERLEAVED:
+                this.initInterleavedLayoutAttribute(indexBuffer);
+                break;
+            case EGLVertexLayoutType.SEQUENCED:
+                this.initSequencedLayoutAttribute();
+                break;
+            case EGLVertexLayoutType.SEPARATED:
+            default:
+                this.initSeperatedLayoutAttribute(indexBuffer);
+                break;
+        }
+    }
+    
+    /**
+     * 初始化交错布局顶点属性
+     * @param {WebGLBuffer} indexBuffer
+     * @private
+     */
+    private initInterleavedLayoutAttribute(indexBuffer: WebGLBuffer): void {
+        // interleaved的话：
+        // 使用一个arraylist,一个顶点缓存
+        // 调用的是GLAttribState.getInterleavedLayoutAttribOffsetMap方法
+        this._lists[GLMeshBuilder.INTERLEAVED] = new TypedArrayList<Float32Array>(Float32Array);
+        this._buffers[GLMeshBuilder.INTERLEAVED] = indexBuffer;
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, indexBuffer);
+        const offsetMap: GLAttributeOffsetMap = GLAttributeHelper.getInterleavedLayoutAttributeOffsetMap(this._attributesState);
+        // 调用如下两个方法
+        GLAttributeHelper.setAttributeVertexArrayPointer(this.gl, offsetMap);
+        GLAttributeHelper.setAttributeVertexArrayState(this.gl, this._attributesState);
+    }
+    
+    
+    /**
+     * 初始化顺序布局顶点属性
+     * @private
+     */
+    private initSequencedLayoutAttribute(): void {
+        // sequenced的话：
+        // 使用n个arraylist,一个顶点缓存
+        // 无法在初始化时调用的是getSequencedLayoutAttribOffsetMap方法
+        // 无法使用GLAttribState.setAttribVertexArrayPointer方法预先固定地址
+        // 能够使用GLAttribState.setAttribVertexArrayState开启顶点属性寄存器
+        this._lists[GLAttributeHelper.POSITION.NAME] = new TypedArrayList<Float32Array>(Float32Array);
+        if (this._hasColor) {
+            this._lists[GLAttributeHelper.COLOR.NAME] = new TypedArrayList<Float32Array>(Float32Array);
+        }
+        if (this._hasTexCoordinate) {
+            this._lists[GLAttributeHelper.TEX_COORDINATE_0.NAME] = new TypedArrayList<Float32Array>(Float32Array);
+        }
+        if (this._hasNormal) {
+            this._lists[GLAttributeHelper.NORMAL.NAME] = new TypedArrayList<Float32Array>(Float32Array);
+        }
+        let indexBuffer = this.gl.createBuffer();
+        if (!indexBuffer) throw new Error('WebGLBuffer创建不成功!');
+        this._buffers[GLMeshBuilder.SEQUENCED] = indexBuffer;
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, indexBuffer);
+        // sequenced没法预先设置指针，因为是动态的
+        // 但是可以预先设置顶点属性状态
+        GLAttributeHelper.setAttributeVertexArrayState(this.gl, this._attributesState);
+    }
+    
+    /**
+     * 初始化分离布局顶点属性
+     * @param {WebGLBuffer} indexBuffer
+     * @private
+     */
+    private initSeperatedLayoutAttribute(indexBuffer: WebGLBuffer): void {
+        // seperated的话：
+        // 使用n个arraylist,n个顶点缓存
+        // 调用的是getSeperatedLayoutAttribOffsetMap方法
+        // 能够使用能够使用GLAttribState.setAttribVertexArrayPointer方法预先固定地址
+        // 能够使用GLAttribState.setAttribVertexArrayState开启顶点属性寄存器
+        // 肯定要有的是位置数据
+        this.initVertexAttribute(GLAttributeHelper.POSITION, indexBuffer, 3);
+        this.initVertexAttribute(GLAttributeHelper.COLOR, indexBuffer, 4, this._hasColor, true);
+        this.initVertexAttribute(GLAttributeHelper.TEX_COORDINATE_0, indexBuffer, 2, this._hasTexCoordinate);
+        this.initVertexAttribute(GLAttributeHelper.NORMAL, indexBuffer, 3, this._hasNormal, true);
+    }
+    
+    /**
+     * 初始化顶点属性
+     * @param {IGLAttribute} attribute
+     * @param {WebGLBuffer} indexBuffer
+     * @param {number} size
+     * @param {boolean} has
+     * @private
+     */
+    private initVertexAttribute(attribute: IGLAttribute, indexBuffer: WebGLBuffer | null, size: number, has: boolean = true, optionCreateBuffer: boolean = false): void {
+        if (!has) return;
+        this._lists[attribute.NAME] = new TypedArrayList<Float32Array>(Float32Array);
+        if (optionCreateBuffer) indexBuffer = this.gl.createBuffer();
+        if (!indexBuffer) throw new Error('WebGLBuffer创建不成功!');
+        this._buffers[attribute.NAME] = indexBuffer;
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, indexBuffer);
+        this.gl.vertexAttribPointer(attribute.BIT, size, this.gl.FLOAT, false, 0, 0);
+        this.gl.enableVertexAttribArray(attribute.BIT);
     }
 }

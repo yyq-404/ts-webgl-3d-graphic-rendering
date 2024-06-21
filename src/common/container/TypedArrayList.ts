@@ -8,7 +8,7 @@ export class TypedArrayList<T extends Uint16Array | Float32Array | Uint8Array> {
     private _array: T;
     /** 类型数组构造函数签名。 */
     private readonly _typedArrayConstructor: (new (length: number) => T);
-
+    
     /**
      * 构造。
      * @param typedArrayConstructor

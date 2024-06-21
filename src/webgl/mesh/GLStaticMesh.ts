@@ -58,7 +58,6 @@ export class GLStaticMesh extends GLMeshBase {
         this.setIBO(ibo);
         // 必须放在这里
         this.unbind();
-        
         this.mins = new Vector3();
         this.maxs = new Vector3();
     }
@@ -70,12 +69,7 @@ export class GLStaticMesh extends GLMeshBase {
         this.bind(); // 绘制前先要绑定VAO
         if (this._ibo) {
             // 如果有IBO，使用drawElements方法绘制静态网格对象
-            this.gl.drawElements(
-                this.drawMode,
-                this._indexCount,
-                this.gl.UNSIGNED_SHORT,
-                0
-            );
+            this.gl.drawElements(this.drawMode, this._indexCount, this.gl.UNSIGNED_SHORT, 0);
         } else {
             // 如果没有IBO，则使用drawArrays方法绘制静态网格对象
             this.gl.drawArrays(this.drawMode, 0, this._vertCount);

@@ -1,12 +1,12 @@
-import {GLMeshBuilder} from "../webgl/mesh/GLMeshBuilder";
-import {BaseApplication} from "./BaseApplication";
-import {GLHelper} from "../webgl/GLHelper";
-import {GLTextureCache} from "../webgl/texture/GLTextureCache";
-import {GLProgramCache} from "../webgl/program/GLProgramCache";
-import {GLAttributeHelper} from "../webgl/attribute/GLAttributeHelper";
-import {GLProgram} from "../webgl/program/GLProgram";
-import {GLTexture} from "../webgl/texture/GLTexture";
-import {GLWorldMatrixStack} from "../webgl/matrix/GLWorldMatrixStack";
+import {GLMeshBuilder} from '../webgl/mesh/GLMeshBuilder';
+import {BaseApplication} from './BaseApplication';
+import {GLHelper} from '../webgl/GLHelper';
+import {GLTextureCache} from '../webgl/texture/GLTextureCache';
+import {GLProgramCache} from '../webgl/program/GLProgramCache';
+import {GLAttributeHelper} from '../webgl/attribute/GLAttributeHelper';
+import {GLProgram} from '../webgl/program/GLProgram';
+import {GLTexture} from '../webgl/texture/GLTexture';
+import {GLWorldMatrixStack} from '../webgl/matrix/GLWorldMatrixStack';
 
 /**
  * WebGL应用。
@@ -21,7 +21,7 @@ export class WebGLApplication extends BaseApplication {
     /** 为了在3D环境中同时支持Canvas2D绘制，特别是为了实现文字绘制 */
     protected canvas2D: HTMLCanvasElement | null = null;
     protected ctx2D: CanvasRenderingContext2D | null = null;
-
+    
     /**
      * 构造
      * @param canvas
@@ -56,7 +56,7 @@ export class WebGLApplication extends BaseApplication {
         // 初始化时，创建颜色GLMeshBuilder对象
         this.builder = new GLMeshBuilder(this.gl, GLAttributeHelper.POSITION.BIT | GLAttributeHelper.COLOR.BIT, GLProgramCache.instance.getMust('color'));
     }
-
+    
     /**
      * 获取顶点属性。
      * @param gl
