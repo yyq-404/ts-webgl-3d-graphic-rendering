@@ -36,9 +36,7 @@ export abstract class GLMeshBase {
         this.gl = gl;
         // 获取VAO的步骤
         // 1．使用gl.getExtension( "OES_vertex_array_object" )方式获取 VAO 扩展
-        const vaoExtension: OES_vertex_array_object | null = this.gl.getExtension(
-            'OES_vertex_array_object'
-        );
+        const vaoExtension: OES_vertex_array_object | null = this.gl.getExtension('OES_vertex_array_object');
         if (!vaoExtension) throw new Error('Not Support OES_vertex_array_object');
         this._vaoExtension = vaoExtension;
         // 2．调用createVertexArrayOES获取 `WebGLVertexArrayObject` 对象

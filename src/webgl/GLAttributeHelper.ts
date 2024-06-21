@@ -1,11 +1,10 @@
 import {GLAttributeBits, GLAttributeOffsetMap} from './GLTypes';
-import {GLAttributePosition} from './attribute/GLAttributePosition';
-import {GLAttributeCoordinate0} from './attribute/GLAttributeCoordinate0';
-import {GLAttributeCoordinate1} from './attribute/GLAttributeCoordinate1';
 import {GLAttributeNormal} from './attribute/GLAttributeNormal';
 import {GLAttributeTangent} from './attribute/GLAttributeTangent';
 import {GLAttributeColor} from './attribute/GLAttributeColor';
 import {IGLAttribute} from './attribute/IGLAttribute';
+import {GLAttributePosition} from './attribute/GLAttributePosition';
+import {GLAttributeCoordinate} from './attribute/GLAttributeCoordinate';
 
 /**
  * `GLAttributeHelper` 类封装顶点属性相关的操作方法
@@ -13,17 +12,17 @@ import {IGLAttribute} from './attribute/IGLAttribute';
 export class GLAttributeHelper {
     // 一般常用的顶点属性包括：位置坐标值、颜色值、纹理坐标值、法线值和切向量值等
     /** 顶点属性：位置坐标 */
-    public static readonly POSITION: GLAttributePosition = new GLAttributePosition();
+    public static readonly POSITION: GLAttributePosition = GLAttributePosition.create('aPosition,', 1 << 0, 3, 0);
     /** 顶点属性：纹理坐标0 */
-    public static readonly TEX_COORDINATE_0: GLAttributeCoordinate0 = new GLAttributeCoordinate0();
+    public static readonly TEX_COORDINATE_0: GLAttributeCoordinate = GLAttributeCoordinate.create('aTexCoord', 1 << 1, 2, 1);
     /** 顶点属性：纹理坐标1 */
-    public static readonly TEX_COORDINATE_1: GLAttributeCoordinate1 = new GLAttributeCoordinate1();
-    /** 顶点属性：法向量 */
-    public static readonly NORMAL: GLAttributeNormal = new GLAttributeNormal();
-    /** 顶点属性：切向量 */
-    public static readonly TANGENT: GLAttributeTangent = new GLAttributeTangent();
+    public static readonly TEX_COORDINATE_1: GLAttributeCoordinate = GLAttributeCoordinate.create('aTexCoord1', 1 << 2, 2, 2);
+    /** 顶点属性：法向量 xyz Vector3*/
+    public static readonly NORMAL: GLAttributeNormal = GLAttributeNormal.create('aNormal', 1 << 3, 3, 3);
+    /** 顶点属性：切向量  xyzw Vector4*/
+    public static readonly TANGENT: GLAttributeTangent = GLAttributeTangent.create('aTangent', 1 << 4, 4, 4);
     /** 顶点属性：颜色 */
-    public static readonly COLOR: GLAttributeColor = new GLAttributeColor();
+    public static readonly COLOR: GLAttributeColor = GLAttributeColor.create('aColor', 1 << 5, 4, 5);
     /*
     static readonly WEIGHT0_BIT: 0b00_010_000_000 = (1 << 7) as 0b00_010_000_000;
     static readonly WEIGHT1_BIT: 0b00_100_000_000 = (1 << 8) as 0b00_100_000_000;
@@ -70,11 +69,11 @@ export class GLAttributeHelper {
         const offsets: GLAttributeOffsetMap = {}; // 初始化顶点属性偏移表
         // 初始化时的首地址为0
         let byteOffset: number = GLAttributeHelper.getInterleavedLayoutAttributeOffset(attributeBits, GLAttributeHelper.POSITION, 0, offsets);
-        byteOffset += GLAttributeHelper.getInterleavedLayoutAttributeOffset(attributeBits, GLAttributeHelper.NORMAL, byteOffset, offsets);
         byteOffset += GLAttributeHelper.getInterleavedLayoutAttributeOffset(attributeBits, GLAttributeHelper.TEX_COORDINATE_0, byteOffset, offsets);
         byteOffset += GLAttributeHelper.getInterleavedLayoutAttributeOffset(attributeBits, GLAttributeHelper.TEX_COORDINATE_1, byteOffset, offsets);
-        byteOffset += GLAttributeHelper.getInterleavedLayoutAttributeOffset(attributeBits, GLAttributeHelper.COLOR, byteOffset, offsets);
+        byteOffset += GLAttributeHelper.getInterleavedLayoutAttributeOffset(attributeBits, GLAttributeHelper.NORMAL, byteOffset, offsets);
         byteOffset += GLAttributeHelper.getInterleavedLayoutAttributeOffset(attributeBits, GLAttributeHelper.TANGENT, byteOffset, offsets);
+        byteOffset += GLAttributeHelper.getInterleavedLayoutAttributeOffset(attributeBits, GLAttributeHelper.COLOR, byteOffset, offsets);
         // stride和length相等
         offsets[GLAttributeHelper.COLOR.STRIDE] = byteOffset;
         // 间隔数组方法存储的话，顶点的stride非常重要
@@ -93,11 +92,11 @@ export class GLAttributeHelper {
         const offsets: GLAttributeOffsetMap = {};
         // 初始化时的首地址为0
         let byteOffset: number = GLAttributeHelper.getSequencedLayoutAttributeOffset(attributeBits, GLAttributeHelper.POSITION, 0, offsets, vertexCount);
-        byteOffset += GLAttributeHelper.getSequencedLayoutAttributeOffset(attributeBits, GLAttributeHelper.NORMAL, byteOffset, offsets, vertexCount);
         byteOffset += GLAttributeHelper.getSequencedLayoutAttributeOffset(attributeBits, GLAttributeHelper.TEX_COORDINATE_0, byteOffset, offsets, vertexCount);
         byteOffset += GLAttributeHelper.getSequencedLayoutAttributeOffset(attributeBits, GLAttributeHelper.TEX_COORDINATE_1, byteOffset, offsets, vertexCount);
-        byteOffset += GLAttributeHelper.getSequencedLayoutAttributeOffset(attributeBits, GLAttributeHelper.COLOR, byteOffset, offsets, vertexCount);
+        byteOffset += GLAttributeHelper.getSequencedLayoutAttributeOffset(attributeBits, GLAttributeHelper.NORMAL, byteOffset, offsets, vertexCount);
         byteOffset += GLAttributeHelper.getSequencedLayoutAttributeOffset(attributeBits, GLAttributeHelper.TANGENT, byteOffset, offsets, vertexCount);
+        byteOffset += GLAttributeHelper.getSequencedLayoutAttributeOffset(attributeBits, GLAttributeHelper.COLOR, byteOffset, offsets, vertexCount);
         //SequencedLayout具有ATTRIBSTRIDE和ATTRIBSTRIDE属性
         offsets[GLAttributeHelper.COLOR.STRIDE] = byteOffset / vertexCount;
         // 总的字节数 / 顶点数量  = 每个顶点的stride，实际上顺序存储时不需要这个值
@@ -116,11 +115,11 @@ export class GLAttributeHelper {
         // 并且offsets的length = vbo的个数，不需要顶点stride和byteLength属性
         let offsets: GLAttributeOffsetMap = {};
         GLAttributeHelper.getSeparatedLayoutAttributeOffset(attributeBits, GLAttributeHelper.POSITION, offsets);
-        GLAttributeHelper.getSeparatedLayoutAttributeOffset(attributeBits, GLAttributeHelper.NORMAL, offsets);
         GLAttributeHelper.getSeparatedLayoutAttributeOffset(attributeBits, GLAttributeHelper.TEX_COORDINATE_0, offsets);
         GLAttributeHelper.getSeparatedLayoutAttributeOffset(attributeBits, GLAttributeHelper.TEX_COORDINATE_1, offsets);
-        GLAttributeHelper.getSeparatedLayoutAttributeOffset(attributeBits, GLAttributeHelper.COLOR, offsets);
+        GLAttributeHelper.getSeparatedLayoutAttributeOffset(attributeBits, GLAttributeHelper.NORMAL, offsets);
         GLAttributeHelper.getSeparatedLayoutAttributeOffset(attributeBits, GLAttributeHelper.TANGENT, offsets);
+        GLAttributeHelper.getSeparatedLayoutAttributeOffset(attributeBits, GLAttributeHelper.COLOR, offsets);
         return offsets;
     }
     
@@ -142,11 +141,11 @@ export class GLAttributeHelper {
      */
     public static getVertexByteStride(attributeBits: GLAttributeBits): number {
         let byteOffset: number = GLAttributeHelper.computeVertexByteStride(attributeBits, GLAttributeHelper.POSITION);
-        byteOffset += GLAttributeHelper.computeVertexByteStride(attributeBits, GLAttributeHelper.NORMAL);
         byteOffset += GLAttributeHelper.computeVertexByteStride(attributeBits, GLAttributeHelper.TEX_COORDINATE_0);
         byteOffset += GLAttributeHelper.computeVertexByteStride(attributeBits, GLAttributeHelper.TEX_COORDINATE_1);
-        byteOffset += GLAttributeHelper.computeVertexByteStride(attributeBits, GLAttributeHelper.COLOR);
+        byteOffset += GLAttributeHelper.computeVertexByteStride(attributeBits, GLAttributeHelper.NORMAL);
         byteOffset += GLAttributeHelper.computeVertexByteStride(attributeBits, GLAttributeHelper.TANGENT);
+        byteOffset += GLAttributeHelper.computeVertexByteStride(attributeBits, GLAttributeHelper.COLOR);
         return byteOffset;
     }
     
@@ -163,11 +162,11 @@ export class GLAttributeHelper {
         if (stride !== offsetMap[GLAttributeHelper.ATTRIB_BYTE_LENGTH]) stride = 0;
         if (stride === undefined) stride = 0;
         GLAttributeHelper.vertexAttribPointer(gl, offsetMap, GLAttributeHelper.POSITION, stride);
-        GLAttributeHelper.vertexAttribPointer(gl, offsetMap, GLAttributeHelper.NORMAL, stride);
         GLAttributeHelper.vertexAttribPointer(gl, offsetMap, GLAttributeHelper.TEX_COORDINATE_0, stride);
         GLAttributeHelper.vertexAttribPointer(gl, offsetMap, GLAttributeHelper.TEX_COORDINATE_1, stride);
-        GLAttributeHelper.vertexAttribPointer(gl, offsetMap, GLAttributeHelper.COLOR, stride);
+        GLAttributeHelper.vertexAttribPointer(gl, offsetMap, GLAttributeHelper.NORMAL, stride);
         GLAttributeHelper.vertexAttribPointer(gl, offsetMap, GLAttributeHelper.TANGENT, stride);
+        GLAttributeHelper.vertexAttribPointer(gl, offsetMap, GLAttributeHelper.COLOR, stride);
     }
     
     /**
@@ -178,11 +177,11 @@ export class GLAttributeHelper {
      */
     public static setAttributeVertexArrayState(gl: WebGLRenderingContext, attributeBits: GLAttributeBits, enable: boolean = true): void {
         GLAttributeHelper.setAttributeVertexState(gl, attributeBits, GLAttributeHelper.POSITION, enable);
-        GLAttributeHelper.setAttributeVertexState(gl, attributeBits, GLAttributeHelper.NORMAL, enable);
         GLAttributeHelper.setAttributeVertexState(gl, attributeBits, GLAttributeHelper.TEX_COORDINATE_0, enable);
         GLAttributeHelper.setAttributeVertexState(gl, attributeBits, GLAttributeHelper.TEX_COORDINATE_1, enable);
-        GLAttributeHelper.setAttributeVertexState(gl, attributeBits, GLAttributeHelper.COLOR, enable);
+        GLAttributeHelper.setAttributeVertexState(gl, attributeBits, GLAttributeHelper.NORMAL, enable);
         GLAttributeHelper.setAttributeVertexState(gl, attributeBits, GLAttributeHelper.TANGENT, enable);
+        GLAttributeHelper.setAttributeVertexState(gl, attributeBits, GLAttributeHelper.COLOR, enable);
     }
     
     /**

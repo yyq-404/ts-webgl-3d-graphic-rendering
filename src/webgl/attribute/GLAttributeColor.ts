@@ -1,17 +1,35 @@
-import {IGLAttribute} from './IGLAttribute';
+import {GLAttribute} from './GLAttribute';
 
 /**
  * 顶点属性：颜色。
  */
-export class GLAttributeColor implements IGLAttribute {
-    /** 着色器中的名称 */
-    public readonly NAME: 'aColor' = 'aColor' as const;
-    /** 标记位 */
-    public readonly BIT: 0b00_000_100_000 = (1 << 5) as 0b00_000_100_000;
-    /** 数据所占内存字节数， rgba Vector4 */
-    public readonly COMPONENT: 4 = 4 as const;
-    /** 全局位置 */
-    public readonly LOCATION: 5 = 5 as const;
+export class GLAttributeColor extends GLAttribute {
     /** stride */
-    public readonly STRIDE: 'STRIDE' = 'STRIDE' as const;
+    public readonly STRIDE: string;
+    
+    /**
+     * 构造
+     * @param {string} name
+     * @param {number} bit
+     * @param {number} component
+     * @param {number} location
+     * @param {'STRIDE'} stride
+     */
+    private constructor(name: string, bit: number, component: number, location: number, stride: string = 'STRIDE') {
+        super(name, bit, component, location);
+        this.STRIDE = stride;
+    }
+    
+    /**
+     * 创建
+     * @param {string} name
+     * @param {number} bit
+     * @param {number} component
+     * @param {number} location
+     * @param {string} stride
+     * @return {GLAttributeColor}
+     */
+    public static create(name: string, bit: number, component: number, location: number, stride?: string): GLAttributeColor {
+        return new GLAttributeColor(name, bit, component, location, stride);
+    }
 }
