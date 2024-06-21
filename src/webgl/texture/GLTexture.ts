@@ -154,27 +154,22 @@ export class GLTexture {
         this.bind(unit);
         // 否则贴图会倒过来
         this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, 1);
-        this.width = source.width;
-        this.height = source.height;
         if (mipmap) {
             // 使用mipmap生成纹理
             const isWidthPowerOfTwo: boolean = MathHelper.isPowerOfTwo(this.width);
             const isHeightPowerOfTwo: boolean = MathHelper.isPowerOfTwo(this.height);
-            // 如果源图像的宽度和高度都是2的n次方格式，则直接载入像素数据然后调用generateMipmap方法
-            if (isWidthPowerOfTwo && isHeightPowerOfTwo) {
-                this.gl.texImage2D(this.target, 0, this.format, this.format, this.type, source);
-                this.gl.generateMipmap(this.target);
-            } else { // 否则说明至少有一个不是2的n次方，需要特别处理
-                const canvas: HTMLCanvasElement = GLTexture.createPowerOfTwoCanvas(source);
-                this.gl.texImage2D(this.target, 0, this.format, this.format, this.type, canvas);
-                GLRenderHelper.checkGLError(this.gl);
-                this.gl.generateMipmap(this.target);
-                GLRenderHelper.checkGLError(this.gl);
-                this.width = canvas.width;
-                this.height = canvas.height;
-            }
+            // 获取一个长宽都为2的n次方的画布对象
+            const canvas = (isWidthPowerOfTwo && isHeightPowerOfTwo) ? source : GLTexture.createPowerOfTwoCanvas(source);
+            this.width = canvas.width;
+            this.height = canvas.height;
+            this.gl.texImage2D(this.target, 0, this.format, this.format, this.type, canvas);
+            GLRenderHelper.checkGLError(this.gl);
+            this.gl.generateMipmap(this.target);
+            GLRenderHelper.checkGLError(this.gl);
             this.isMipmap = true;
         } else {
+            this.width = source.width;
+            this.height = source.height;
             this.isMipmap = false;
             this.gl.texImage2D(this.target, 0, this.format, this.format, this.type, source);
         }
@@ -225,7 +220,7 @@ export class GLTexture {
      */
     public wrap(mode: EGLTexWrapType = EGLTexWrapType.GL_REPEAT): void {
         this.gl.bindTexture(this.target, this.texture);
-        let param: GLint = this.texParameters.get(mode) || this.gl.MIRRORED_REPEAT;
+        let param: GLint = this.texParameters.get(mode) || this.gl.REPEAT;
         this.gl.texParameteri(this.target, this.gl.TEXTURE_WRAP_S, param);
         this.gl.texParameteri(this.target, this.gl.TEXTURE_WRAP_T, param);
     }
