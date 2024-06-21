@@ -1,5 +1,5 @@
 /**
- * GL铺贴方式
+ * 包裹方式
  * 设置为gl对应的常量
  */
 export enum EGLTexWrapType {
@@ -7,6 +7,6 @@ export enum EGLTexWrapType {
     GL_REPEAT,
     /** 镜像重复 */
     GL_MIRRORED_REPEAT,
-    /** */
+    /** 切割 */
     GL_CLAMP_TO_EDGE,
 }

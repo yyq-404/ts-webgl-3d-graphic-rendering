@@ -1,6 +1,6 @@
-import {GLRenderHelper} from "../GLRenderHelper";
-import {EGLTexWrapType} from "../../enum/EGLTexWrapType";
-import {MathHelper} from "../../common/math/MathHelper";
+import {GLRenderHelper} from '../GLRenderHelper';
+import {EGLTexWrapType} from '../../enum/EGLTexWrapType';
+import {MathHelper} from '../../common/math/MathHelper';
 
 /**
  * CSS标准颜色定义
@@ -69,7 +69,9 @@ export class GLTexture {
     public texture: WebGLTexture;
     /** 为 `gl.TEXTURE_2D`（另外一个可以是TEXTURE_CUBE_MAP，本书不使用TEXTURE_CUBE_MAP相关内容） */
     public target: number;
-
+    /** 纹理参数 */
+    private texParameters: Map<EGLTexWrapType, GLint>;
+    
     /**
      * 构造
      * @param gl WebGLRenderingContext
@@ -88,8 +90,13 @@ export class GLTexture {
         this.name = name;
         this.wrap();
         this.filter();
+        this.texParameters = new Map<EGLTexWrapType, GLint>([
+            [EGLTexWrapType.GL_REPEAT, this.gl.REPEAT],
+            [EGLTexWrapType.GL_MIRRORED_REPEAT, this.gl.MIRRORED_REPEAT],
+            [EGLTexWrapType.GL_CLAMP_TO_EDGE, this.gl.CLAMP_TO_EDGE]
+        ]);
     }
-
+    
     /**
      * 将非2的n次方的`srcImage`转换成`2`的`n`次方的`CanvasRenderingContext2D`对象，
      * 然后后续用来生成`mipmap`纹理
@@ -106,7 +113,7 @@ export class GLTexture {
         ctx.drawImage(srcImage, 0, 0, srcImage.width, srcImage.height, 0, 0, canvas.width, canvas.height);
         return canvas;
     }
-
+    
     /**
      * 创建默认的2的n次方的纹理对象
      * @param gl
@@ -135,7 +142,7 @@ export class GLTexture {
         tex.upload(canvas);
         return tex;
     }
-
+    
     /**
      * 载入相关图像数据
      * @param source
@@ -143,7 +150,8 @@ export class GLTexture {
      * @param mipmap
      */
     public upload(source: HTMLImageElement | HTMLCanvasElement, unit: number = 0, mipmap: boolean = false): void {
-        this.bind(unit); // 先绑定当前要操作的WebGLTexture对象，默认为0
+        // 先绑定当前要操作的WebGLTexture对象，默认为0
+        this.bind(unit);
         // 否则贴图会倒过来
         this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, 1);
         this.width = source.width;
@@ -171,9 +179,10 @@ export class GLTexture {
             this.gl.texImage2D(this.target, 0, this.format, this.format, this.type, source);
         }
         console.log('当前纹理尺寸为： ', this.width, this.height);
-        this.unbind(); // 解绑当前要操作的WebGLTexture对象
+        // 解绑当前要操作的WebGLTexture对象
+        this.unbind();
     }
-
+    
     /**
      * 绑定纹理
      * @param unit
@@ -184,7 +193,7 @@ export class GLTexture {
             this.gl.bindTexture(this.target, this.texture);
         }
     }
-
+    
     /**
      * 解绑纹理
      */
@@ -193,7 +202,7 @@ export class GLTexture {
             this.gl.bindTexture(this.target, null);
         }
     }
-
+    
     /**
      * 调用`WebGLRenderingContext.texParameteri()`方法设置纹理参数
      * @param minLinear
@@ -209,18 +218,15 @@ export class GLTexture {
         }
         this.gl.texParameteri(this.target, this.gl.TEXTURE_MIN_FILTER, magLinear ? this.gl.LINEAR : this.gl.NEAREST);
     }
-
+    
+    /**
+     * 纹理包裹
+     * @param {EGLTexWrapType} mode
+     */
     public wrap(mode: EGLTexWrapType = EGLTexWrapType.GL_REPEAT): void {
         this.gl.bindTexture(this.target, this.texture);
-        if (mode === EGLTexWrapType.GL_CLAMP_TO_EDGE) {
-            this.gl.texParameteri(this.target, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
-            this.gl.texParameteri(this.target, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
-        } else if (mode === EGLTexWrapType.GL_REPEAT) {
-            this.gl.texParameteri(this.target, this.gl.TEXTURE_WRAP_S, this.gl.REPEAT);
-            this.gl.texParameteri(this.target, this.gl.TEXTURE_WRAP_T, this.gl.REPEAT);
-        } else {
-            this.gl.texParameteri(this.target, this.gl.TEXTURE_WRAP_S, this.gl.MIRRORED_REPEAT);
-            this.gl.texParameteri(this.target, this.gl.TEXTURE_WRAP_T, this.gl.MIRRORED_REPEAT);
-        }
+        let param: GLint = this.texParameters.get(mode) || this.gl.MIRRORED_REPEAT;
+        this.gl.texParameteri(this.target, this.gl.TEXTURE_WRAP_S, param);
+        this.gl.texParameteri(this.target, this.gl.TEXTURE_WRAP_T, param);
     }
 }
