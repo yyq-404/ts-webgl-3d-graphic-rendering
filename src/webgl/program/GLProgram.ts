@@ -1,5 +1,5 @@
-import {GLAttributeHelper} from '../attribute/GLAttributeHelper';
-import {GLHelper} from '../GLHelper';
+import {GLAttributeHelper} from '../GLAttributeHelper';
+import {GLRenderHelper} from '../GLRenderHelper';
 import {Vector2} from '../../common/math/vector/Vector2';
 import {Vector3} from '../../common/math/vector/Vector3';
 import {Vector4} from '../../common/math/vector/Vector4';
@@ -48,16 +48,16 @@ export class GLProgram {
         this.bindCallback = null;
         this.unbindCallback = null;
         // 创建Vertex Shaders
-        let shader: WebGLShader | null = GLHelper.createShader(this.gl, EShaderType.VS_SHADER);
+        let shader: WebGLShader | null = GLRenderHelper.createShader(this.gl, EShaderType.VS_SHADER);
         if (!shader) throw new Error('Create Vertex Shader Object Fail! ! ! ');
         this.vsShader = shader;
         // 创建Fragment Shader
         shader = null;
-        shader = GLHelper.createShader(this.gl, EShaderType.FS_SHADER);
+        shader = GLRenderHelper.createShader(this.gl, EShaderType.FS_SHADER);
         if (!shader) throw new Error('Create Fragment Shader Object Fail! ! ! ');
         this.fsShader = shader;
         // 创建WebGLProgram链接器对象
-        const program: WebGLProgram | null = GLHelper.createProgram(this.gl);
+        const program: WebGLProgram | null = GLRenderHelper.createProgram(this.gl);
         if (!program) throw new Error('Create WebGLProgram Object Fail! ! ! ');
         this.program = program;
         // 如果构造函数参数包含GLSL ES源码，就调用loadShaders方法
@@ -131,16 +131,16 @@ export class GLProgram {
      */
     public loadShaders(vs: string, fs: string): void {
         this.programBeforeLink(this.gl, this.program);
-        if (!GLHelper.compileShader(this.gl, vs, this.vsShader)) {
+        if (!GLRenderHelper.compileShader(this.gl, vs, this.vsShader)) {
             throw new Error(' WebGL顶点Shader链接不成功! ');
         }
-        if (!GLHelper.compileShader(this.gl, fs, this.fsShader)) {
+        if (!GLRenderHelper.compileShader(this.gl, fs, this.fsShader)) {
             throw new Error(' WebGL像素片段Shader链接不成功! ');
         }
-        if (!GLHelper.linkProgram(this.gl, this.program, this.vsShader, this.fsShader, this.programBeforeLink.bind(this), GLHelper.printProgramActiveInfos)) {
+        if (!GLRenderHelper.linkProgram(this.gl, this.program, this.vsShader, this.fsShader, this.programBeforeLink.bind(this), GLRenderHelper.printProgramActiveInfos)) {
             throw new Error(' WebGLProgram链接不成功! ');
         }
-        GLHelper.printProgramActiveInfos(this.gl, this.program);
+        GLRenderHelper.printProgramActiveInfos(this.gl, this.program);
     }
     
     /**

@@ -1,5 +1,5 @@
 import {BaseApplication} from '../base/BaseApplication';
-import {GLHelper} from '../webgl/GLHelper';
+import {GLRenderHelper} from '../webgl/GLRenderHelper';
 import {Matrix4} from '../common/math/matrix/Matrix4';
 import {Vector3} from '../common/math/vector/Vector3';
 import {EShaderType} from '../enum/EShaderType';
@@ -92,7 +92,7 @@ export class BasicWebGLApplication extends BaseApplication {
         }, false);
         // GLHelper.triggerContextLostEvent(this.gl);
         // 打印WebGL状态
-        GLHelper.printStates(this.gl);
+        GLRenderHelper.printStates(this.gl);
         this.projectMatrix = Matrix4.perspective(45, this.canvas.width / this.canvas.height, 0.1, 100);
         // 构造视矩阵，摄像机沿着世界坐标系z轴移动5个单位，并且看着世界坐标系的原点
         this.viewMatrix = Matrix4.lookAt(new Vector3([0, 0, 5]), new Vector3());
@@ -105,32 +105,32 @@ export class BasicWebGLApplication extends BaseApplication {
         // 需要开启裁剪测试
         this.gl.enable(this.gl.SCISSOR_TEST);
         // 打印WebGL信息
-        GLHelper.printWebGLInfo(this.gl);
+        GLRenderHelper.printWebGLInfo(this.gl);
         // 创建顶点着色器
-        this.vsShader = GLHelper.createShader(this.gl, EShaderType.VS_SHADER);
+        this.vsShader = GLRenderHelper.createShader(this.gl, EShaderType.VS_SHADER);
         // 编译顶点着色器
-        GLHelper.compileShader(this.gl, this.colorShader_vs, this.vsShader);
+        GLRenderHelper.compileShader(this.gl, this.colorShader_vs, this.vsShader);
         // 创建片元着色器
-        this.fsShader = GLHelper.createShader(this.gl, EShaderType.FS_SHADER);
+        this.fsShader = GLRenderHelper.createShader(this.gl, EShaderType.FS_SHADER);
         // 编译片元着色器
-        GLHelper.compileShader(this.gl, this.colorShader_fs, this.fsShader);
+        GLRenderHelper.compileShader(this.gl, this.colorShader_fs, this.fsShader);
         // 创建着色器链接程序
-        this.program = GLHelper.createProgram(this.gl);
-        GLHelper.linkProgram(this.gl, this.program, this.vsShader, this.fsShader, GLHelper.printProgramActiveInfos, GLHelper.printProgramActiveInfos);
+        this.program = GLRenderHelper.createProgram(this.gl);
+        GLRenderHelper.linkProgram(this.gl, this.program, this.vsShader, this.fsShader, GLRenderHelper.printProgramActiveInfos, GLRenderHelper.printProgramActiveInfos);
         // 创建顶点数据
         this.verts = new TypedArrayList<Float32Array>(Float32Array, 6 * 7);
         // 创建顶点缓存冲对象
-        this.ivbo = GLHelper.createBuffer(this.gl);
+        this.ivbo = GLRenderHelper.createBuffer(this.gl);
         // 初始化evbo
         this.indices = new TypedArrayList(Uint16Array, 6);
-        this.evbo = GLHelper.createBuffer(this.gl);
+        this.evbo = GLRenderHelper.createBuffer(this.gl);
         // this.gl.frontFace(this.gl.CCW);
         this.gl.enable(this.gl.CULL_FACE);
         // this.gl.cullFace(this.gl.BACK);
         this.coordinateSystem9s = GLCoordinateSystem.makeViewportCoordinateSystems(this.canvas.width, this.canvas.height, 3, 3);
         this.coordinateSystem4s = GLCoordinateSystem.makeViewportCoordinateSystems(this.canvas.width, this.canvas.height, 2, 2);
-        this.attributeMap = GLHelper.getProgramActiveAttributes(this.gl, this.program);
-        this.uniformMap = GLHelper.getProgramActiveUniforms(this.gl, this.program);
+        this.attributeMap = GLRenderHelper.getProgramActiveAttributes(this.gl, this.program);
+        this.uniformMap = GLRenderHelper.getProgramActiveUniforms(this.gl, this.program);
     }
     
     /**
@@ -138,25 +138,25 @@ export class BasicWebGLApplication extends BaseApplication {
      */
     public render9Viewports(): void {
         // 从下到上第一列
-        GLHelper.setViewport(this.gl, this.coordinateSystem9s[0].viewport);
+        GLRenderHelper.setViewport(this.gl, this.coordinateSystem9s[0].viewport);
         this.drawRectByInterleavedVBO(0, 6, this.gl.TRIANGLES);
-        GLHelper.setViewport(this.gl, this.coordinateSystem9s[1].viewport);
+        GLRenderHelper.setViewport(this.gl, this.coordinateSystem9s[1].viewport);
         this.drawRectByInterleavedVBO(0, 3, this.gl.TRIANGLES);
-        GLHelper.setViewport(this.gl, this.coordinateSystem9s[2].viewport);
+        GLRenderHelper.setViewport(this.gl, this.coordinateSystem9s[2].viewport);
         this.drawRectByInterleavedVBO(3, 3, this.gl.TRIANGLES);
         // 从下到上第二列
-        GLHelper.setViewport(this.gl, this.coordinateSystem9s[3].viewport);
+        GLRenderHelper.setViewport(this.gl, this.coordinateSystem9s[3].viewport);
         this.drawRectByInterleavedVBO(0, 4, this.gl.TRIANGLE_FAN);
-        GLHelper.setViewport(this.gl, this.coordinateSystem9s[4].viewport);
+        GLRenderHelper.setViewport(this.gl, this.coordinateSystem9s[4].viewport);
         this.drawRectByInterleavedVBO(0, 4, this.gl.TRIANGLE_STRIP);
-        GLHelper.setViewport(this.gl, this.coordinateSystem9s[5].viewport);
+        GLRenderHelper.setViewport(this.gl, this.coordinateSystem9s[5].viewport);
         this.drawRectByInterleavedVBO(0, 4, this.gl.POINTS);
         // 从下到上第三列
-        GLHelper.setViewport(this.gl, this.coordinateSystem9s[6].viewport);
+        GLRenderHelper.setViewport(this.gl, this.coordinateSystem9s[6].viewport);
         this.drawRectByInterleavedVBO(0, 4, this.gl.LINE_STRIP);
-        GLHelper.setViewport(this.gl, this.coordinateSystem9s[7].viewport);
+        GLRenderHelper.setViewport(this.gl, this.coordinateSystem9s[7].viewport);
         this.drawRectByInterleavedVBO(0, 4, this.gl.LINE_LOOP);
-        GLHelper.setViewport(this.gl, this.coordinateSystem9s[8].viewport);
+        GLRenderHelper.setViewport(this.gl, this.coordinateSystem9s[8].viewport);
         this.drawRectByInterleavedVBO(0, 4, this.gl.LINES);
     }
     
@@ -164,13 +164,13 @@ export class BasicWebGLApplication extends BaseApplication {
      * 4视图，使用drawElements
      */
     public render4Viewports(): void {
-        GLHelper.setViewport(this.gl, this.coordinateSystem4s[0].viewport);
+        GLRenderHelper.setViewport(this.gl, this.coordinateSystem4s[0].viewport);
         this.drawRectByInterleavedVBOWithEBO(0, 6, this.gl.TRIANGLES);
-        GLHelper.setViewport(this.gl, this.coordinateSystem4s[1].viewport);
+        GLRenderHelper.setViewport(this.gl, this.coordinateSystem4s[1].viewport);
         this.drawRectByInterleavedVBOWithEBO(0, 6, this.gl.TRIANGLE_FAN);
-        GLHelper.setViewport(this.gl, this.coordinateSystem4s[2].viewport);
+        GLRenderHelper.setViewport(this.gl, this.coordinateSystem4s[2].viewport);
         this.drawRectByInterleavedVBOWithEBO(0, 6, this.gl.TRIANGLE_STRIP);
-        GLHelper.setViewport(this.gl, this.coordinateSystem4s[3].viewport);
+        GLRenderHelper.setViewport(this.gl, this.coordinateSystem4s[3].viewport);
         this.drawRectByInterleavedVBOWithEBO(2 * 3, 3, this.gl.TRIANGLE_STRIP);
     }
     

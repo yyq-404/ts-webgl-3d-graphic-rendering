@@ -1,9 +1,9 @@
 import {GLMeshBuilder} from '../webgl/mesh/GLMeshBuilder';
 import {BaseApplication} from './BaseApplication';
-import {GLHelper} from '../webgl/GLHelper';
+import {GLRenderHelper} from '../webgl/GLRenderHelper';
 import {GLTextureCache} from '../webgl/texture/GLTextureCache';
 import {GLProgramCache} from '../webgl/program/GLProgramCache';
-import {GLAttributeHelper} from '../webgl/attribute/GLAttributeHelper';
+import {GLAttributeHelper} from '../webgl/GLAttributeHelper';
 import {GLProgram} from '../webgl/program/GLProgram';
 import {GLTexture} from '../webgl/texture/GLTexture';
 import {GLWorldMatrixStack} from '../webgl/matrix/GLWorldMatrixStack';
@@ -45,7 +45,7 @@ export class WebGLApplication extends BaseApplication {
         }
         this.matStack = new GLWorldMatrixStack();
         // 初始化渲染状态
-        GLHelper.setDefaultState(this.gl);
+        GLRenderHelper.setDefaultState(this.gl);
         // 由于Canvas是左手系，而webGL是右手系，需要FilpYCoord
         this.isFlipYCoordinate = true;
         // 初始化时，创建default纹理

@@ -2,7 +2,7 @@ import {Vector4} from '../../common/math/vector/Vector4';
 import {Vector2} from '../../common/math/vector/Vector2';
 import {Vector3} from '../../common/math/vector/Vector3';
 import {TypedArrayList} from '../../common/container/TypedArrayList';
-import {GLAttributeHelper} from '../attribute/GLAttributeHelper';
+import {GLAttributeHelper} from '../GLAttributeHelper';
 import {GLMeshBase} from './GLMeshBase';
 import {GLProgram} from '../program/GLProgram';
 import {Matrix4} from '../../common/math/matrix/Matrix4';
@@ -43,7 +43,7 @@ export class GLMeshBuilder extends GLMeshBase {
     /** 渲染用的`VBO` */
     private _buffers: { [key: string]: WebGLBuffer } = {};
     /** 要渲染的顶点数量  */
-    private _vertCount: number = 0;
+    private _vertexCount: number = 0;
     /** 当前使用的`GLProgram`对象 */
     private program: GLProgram;
     /** 如果使用了纹理坐标，那么需要设置当前使用的纹理对象，否则将`texture`变量设置为`null` */
@@ -162,7 +162,7 @@ export class GLMeshBuilder extends GLMeshBase {
             this.otherVertex(x, y, z);
         }
         // 记录更新后的顶点数量
-        this._vertCount++;
+        this._vertexCount++;
         return this;
     }
     
@@ -174,7 +174,7 @@ export class GLMeshBuilder extends GLMeshBase {
         // 设置要绘制的mode,7种基本几何图元
         this.drawMode = drawMode;
         // 清空顶点数为0
-        this._vertCount = 0;
+        this._vertexCount = 0;
         // let list: TypedArrayList<Float32Array> = new TypedArrayList<Float32Array>(Float32Array);
         if (this._layout !== EGLVertexLayoutType.INTERLEAVED) {
             // 使用自己实现的动态类型数组，重用
@@ -218,7 +218,7 @@ export class GLMeshBuilder extends GLMeshBase {
             //this.gl.bufferData( this.gl.ELEMENT_ARRAY_BUFFER, this._indices.subArray(), this._indexCount );
             this.gl.drawElements(this.drawMode, this._indexCount, this.gl.UNSIGNED_SHORT, 0);
         } else {
-            this.gl.drawArrays(this.drawMode, 0, this._vertCount);
+            this.gl.drawArrays(this.drawMode, 0, this._vertexCount);
         }
         // 解绑VAO
         this.unbind();
@@ -269,8 +269,8 @@ export class GLMeshBuilder extends GLMeshBase {
         const buffer: WebGLBuffer = this._buffers[GLMeshBuilder.SEQUENCED];
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
         //用的是预先分配显存机制
-        this.gl.bufferData(this.gl.ARRAY_BUFFER, this._attributeStride * this._vertCount, this.gl.DYNAMIC_DRAW);
-        const offsets: GLAttributeOffsetMap = GLAttributeHelper.getSequencedLayoutAttributeOffsetMap(this._attributesState, this._vertCount);
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, this._attributeStride * this._vertexCount, this.gl.DYNAMIC_DRAW);
+        const offsets: GLAttributeOffsetMap = GLAttributeHelper.getSequencedLayoutAttributeOffsetMap(this._attributesState, this._vertexCount);
         this.bufferSubData(GLAttributeHelper.POSITION, offsets);
         this.bufferSubData(GLAttributeHelper.TEX_COORDINATE_0, offsets, this._hasTexCoordinate);
         this.bufferSubData(GLAttributeHelper.NORMAL, offsets, this._hasNormal);

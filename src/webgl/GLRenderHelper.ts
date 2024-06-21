@@ -4,7 +4,7 @@ import {EShaderType} from '../enum/EShaderType';
 /**
  * GL渲染工具类。
  */
-export class GLHelper {
+export class GLRenderHelper {
     /**
      * 打印渲染状态
      * @param gl
@@ -75,7 +75,7 @@ export class GLHelper {
         gl.shaderSource(shader, code); // 载入shader源码
         gl.compileShader(shader); // 编译shader源码
         // 检查编译错误
-        if (gl.getShaderParameter(shader, gl.COMPILE_STATUS) === false) {
+        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
             // 如果编译出现错误，则弹出对话框，了解错误的原因
             alert(gl.getShaderInfoLog(shader));
             // 然后将shader删除，防止内存泄漏
@@ -116,26 +116,18 @@ export class GLHelper {
         gl.linkProgram(program);
         // 4．使用带gl.LINK_STATUS参数的getProgramParameter方法，进行链接状态检查
         if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-            // 4.1 如果链接出错，调用getProgramInfoLog方法将错误信息以弹框方式通知调用者
-            alert(gl.getProgramInfoLog(program));
-            // 4.2 删除掉相关资源，防止内存泄漏
-            gl.deleteShader(vsShader);
-            gl.deleteShader(fsShader);
-            gl.deleteProgram(program);
-            // 4.3 返回链接失败状态
+            // 4.1 删除掉相关资源，防止内存泄漏
+            GLRenderHelper.deleteLink(gl, program, vsShader, fsShader);
+            // 4.2 返回链接失败状态
             return false;
         }
         // 5．使用validateProgram进行链接验证
         gl.validateProgram(program);
         // 6．使用带gl.VALIDATE_STATUS参数的getProgramParameter方法，进行验证状态检查
         if (!gl.getProgramParameter(program, gl.VALIDATE_STATUS)) {
-            // 6.1 如果验证出错，调用getProgramInfoLog方法将错误信息以弹框方式通知调用者
-            alert(gl.getProgramInfoLog(program));
-            // 6.2 删除相关资源，防止内存泄漏
-            gl.deleteShader(vsShader);
-            gl.deleteShader(fsShader);
-            gl.deleteProgram(program);
-            // 6.3 返回链接失败状态
+            // 6.1 删除相关资源，防止内存泄漏
+            GLRenderHelper.deleteLink(gl, program, vsShader, fsShader);
+            // 6.2 返回链接失败状态
             return false;
         }
         // 7．全部正确，按需调用afterProgramLink回调函数
@@ -154,8 +146,8 @@ export class GLHelper {
     public static printProgramActiveInfos(gl: WebGLRenderingContext, program: WebGLProgram): void {
         // 获取当前active状态的attribute和uniform的数量
         // 很重要的一点，active_attributes/uniforms必须在link后才能获得
-        const attributeMap: GLAttributeMap = GLHelper.getProgramActiveAttributes(gl, program);
-        const uniformMap: GLUniformMap = GLHelper.getProgramActiveUniforms(gl, program);
+        const attributeMap: GLAttributeMap = GLRenderHelper.getProgramActiveAttributes(gl, program);
+        const uniformMap: GLUniformMap = GLRenderHelper.getProgramActiveUniforms(gl, program);
         console.log(JSON.stringify(attributeMap));
         console.log(JSON.stringify(uniformMap));
     }
@@ -247,5 +239,21 @@ export class GLHelper {
             console.log('WebGL Error NO: ', err);
             return true;
         }
+    }
+    
+    /**
+     * 删除链接资源，防止内存泄漏
+     * @param {WebGLRenderingContext} gl
+     * @param {WebGLProgram} program
+     * @param {WebGLShader} vsShader
+     * @param {WebGLShader} fsShader
+     * @private
+     */
+    private static deleteLink(gl: WebGLRenderingContext, program: WebGLProgram, vsShader: WebGLShader, fsShader: WebGLShader): void {
+        // 调用getProgramInfoLog方法将错误信息以弹框方式通知调用者
+        alert(gl.getProgramInfoLog(program));
+        gl.deleteShader(vsShader);
+        gl.deleteShader(fsShader);
+        gl.deleteProgram(program);
     }
 }

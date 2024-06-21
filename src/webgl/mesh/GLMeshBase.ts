@@ -1,4 +1,4 @@
-import {GLAttributeHelper} from '../attribute/GLAttributeHelper';
+import {GLAttributeHelper} from '../GLAttributeHelper';
 import {GLAttributeBits} from '../GLTypes';
 
 /**

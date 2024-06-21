@@ -1,5 +1,5 @@
 import {Vector3} from '../../common/math/vector/Vector3';
-import {GLAttributeHelper} from '../attribute/GLAttributeHelper';
+import {GLAttributeHelper} from '../GLAttributeHelper';
 import {GLMeshBase} from './GLMeshBase';
 import {GLAttributeBits, GLAttributeOffsetMap} from '../GLTypes';
 
@@ -17,7 +17,7 @@ export class GLStaticMesh extends GLMeshBase {
     /** 顶点缓冲区 */
     protected _vbo: WebGLBuffer;
     /** 顶点的数量 */
-    protected _vertCount: number = 0;
+    protected _vertexCount: number = 0;
     // GLStaticMesh内置了一个可选的索引缓冲区
     /** 索引缓冲区 */
     protected _ibo: WebGLBuffer | null = null;
@@ -49,7 +49,7 @@ export class GLStaticMesh extends GLMeshBase {
         // 然后计算出交错存储的顶点属性attribOffsetMap相关的值
         const offsetMap: GLAttributeOffsetMap = GLAttributeHelper.getInterleavedLayoutAttributeOffsetMap(this._attributesState);
         // 计算出顶点的数量
-        this._vertCount = vbo.byteLength / offsetMap[GLAttributeHelper.COLOR.STRIDE];
+        this._vertexCount = vbo.byteLength / offsetMap[GLAttributeHelper.COLOR.STRIDE];
         // 使用VAO后，我们只要初始化时设置一次setAttribVertexArrayPointer和setAttribVertexArrayState就行了
         // 当我们后续调用基类的bind方法绑定VAO对象后，VAO会自动处理顶点地址绑定和顶点属性寄存器开启相关操作，这就简化了很多操作
         GLAttributeHelper.setAttributeVertexArrayPointer(gl, offsetMap);
@@ -72,7 +72,7 @@ export class GLStaticMesh extends GLMeshBase {
             this.gl.drawElements(this.drawMode, this._indexCount, this.gl.UNSIGNED_SHORT, 0);
         } else {
             // 如果没有IBO，则使用drawArrays方法绘制静态网格对象
-            this.gl.drawArrays(this.drawMode, 0, this._vertCount);
+            this.gl.drawArrays(this.drawMode, 0, this._vertexCount);
         }
         this.unbind(); // 绘制好后解除VAO绑定
     }

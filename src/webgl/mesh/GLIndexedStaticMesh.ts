@@ -63,7 +63,7 @@ export class GLIndexedStaticMesh extends GLStaticMesh {
             this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, this._indices.subArray(), this._indexCount);
             this.gl.drawElements(this.drawMode, this._indexCount, this.gl.UNSIGNED_SHORT, 0);
         } else {
-            this.gl.drawArrays(this.drawMode, 0, this._vertCount);
+            this.gl.drawArrays(this.drawMode, 0, this._vertexCount);
         }
         this.unbind();
     }

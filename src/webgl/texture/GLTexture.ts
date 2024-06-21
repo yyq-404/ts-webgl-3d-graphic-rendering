@@ -1,4 +1,4 @@
-import {GLHelper} from "../GLHelper";
+import {GLRenderHelper} from "../GLRenderHelper";
 import {EGLTexWrapType} from "../../enum/EGLTexWrapType";
 import {MathHelper} from "../../common/math/MathHelper";
 
@@ -159,9 +159,9 @@ export class GLTexture {
             } else { // 否则说明至少有一个不是2的n次方，需要特别处理
                 const canvas: HTMLCanvasElement = GLTexture.createPowerOfTwoCanvas(source);
                 this.gl.texImage2D(this.target, 0, this.format, this.format, this.type, canvas);
-                GLHelper.checkGLError(this.gl);
+                GLRenderHelper.checkGLError(this.gl);
                 this.gl.generateMipmap(this.target);
-                GLHelper.checkGLError(this.gl);
+                GLRenderHelper.checkGLError(this.gl);
                 this.width = canvas.width;
                 this.height = canvas.height;
             }

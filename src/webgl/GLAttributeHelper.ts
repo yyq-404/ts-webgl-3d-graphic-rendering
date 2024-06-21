@@ -1,10 +1,10 @@
-import {GLAttributeBits, GLAttributeOffsetMap} from '../GLTypes';
-import {GLAttributeNormal} from './GLAttributeNormal';
-import {GLAttributeTangent} from './GLAttributeTangent';
-import {GLAttributeColor} from './GLAttributeColor';
-import {IGLAttribute} from './IGLAttribute';
-import {GLAttributePosition} from './GLAttributePosition';
-import {GLAttributeCoordinate} from './GLAttributeCoordinate';
+import {GLAttributeBits, GLAttributeOffsetMap} from './GLTypes';
+import {GLAttributeNormal} from './attribute/GLAttributeNormal';
+import {GLAttributeTangent} from './attribute/GLAttributeTangent';
+import {GLAttributeColor} from './attribute/GLAttributeColor';
+import {IGLAttribute} from './attribute/IGLAttribute';
+import {GLAttributePosition} from './attribute/GLAttributePosition';
+import {GLAttributeCoordinate} from './attribute/GLAttributeCoordinate';
 
 /**
  * `GLAttributeHelper` 类封装顶点属性相关的操作方法
