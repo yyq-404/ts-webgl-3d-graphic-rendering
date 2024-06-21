@@ -88,13 +88,13 @@ export class GLTexture {
         this.texture = tex;
         this.target = gl.TEXTURE_2D;
         this.name = name;
-        this.wrap();
-        this.filter();
         this.texParameters = new Map<EGLTexWrapType, GLint>([
             [EGLTexWrapType.GL_REPEAT, this.gl.REPEAT],
             [EGLTexWrapType.GL_MIRRORED_REPEAT, this.gl.MIRRORED_REPEAT],
             [EGLTexWrapType.GL_CLAMP_TO_EDGE, this.gl.CLAMP_TO_EDGE]
         ]);
+        this.wrap();
+        this.filter();
     }
     
     /**
@@ -137,10 +137,10 @@ export class GLTexture {
                 context.restore();
             }
         }
-        const tex: GLTexture = new GLTexture(gl);
-        tex.wrap();
-        tex.upload(canvas);
-        return tex;
+        const texture: GLTexture = new GLTexture(gl);
+        texture.wrap();
+        texture.upload(canvas);
+        return texture;
     }
     
     /**
@@ -156,8 +156,8 @@ export class GLTexture {
         this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, 1);
         if (mipmap) {
             // 使用mipmap生成纹理
-            const isWidthPowerOfTwo: boolean = MathHelper.isPowerOfTwo(this.width);
-            const isHeightPowerOfTwo: boolean = MathHelper.isPowerOfTwo(this.height);
+            const isWidthPowerOfTwo: boolean = MathHelper.isPowerOfTwo(source.width);
+            const isHeightPowerOfTwo: boolean = MathHelper.isPowerOfTwo(source.height);
             // 获取一个长宽都为2的n次方的画布对象
             const canvas = (isWidthPowerOfTwo && isHeightPowerOfTwo) ? source : GLTexture.createPowerOfTwoCanvas(source);
             this.width = canvas.width;
