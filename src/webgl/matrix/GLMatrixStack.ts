@@ -2,26 +2,17 @@ import {Matrix4} from "../../common/math/matrix/Matrix4";
 import {MathHelper} from "../../common/math/MathHelper";
 import {Matrix4Adapter} from "../../common/math/MathAdapter";
 import {Vector3} from "../../common/math/vector/Vector3";
-
-
-/**
- * 矩阵模式
- */
-export enum EMatrixMode {
-    MODEL_VIEW,
-    PROJECTION,
-    TEXTURE,
-}
+import {EGLMatrixMode} from '../enum/EGLMatrixMode';
 
 /**
  * 实现 `OpenGL 1.x` 中矩阵堆栈的相关功能
  */
 export class GLMatrixStack {
     /** 矩阵模式 */
-    private matrixMode: EMatrixMode;
+    private matrixMode: EGLMatrixMode;
     /** 模型矩阵栈 */
     private readonly _mvStack: Matrix4[];
-    /** 正交矩阵栈 */
+    /** 投影矩阵栈 */
     private readonly _projStack: Matrix4[];
     /** 纹理矩阵栈 */
     private readonly _texStack: Matrix4[];
@@ -37,7 +28,7 @@ export class GLMatrixStack {
         this._projStack.push(new Matrix4().setIdentity());
         this._texStack = [];
         this._texStack.push(new Matrix4().setIdentity());
-        this.matrixMode = EMatrixMode.MODEL_VIEW;
+        this.matrixMode = EGLMatrixMode.MODEL;
     }
 
     /**
@@ -51,7 +42,7 @@ export class GLMatrixStack {
     }
 
     /**
-     * 获取正交矩阵
+     * 获取投影矩阵。
      */
     get projectionMatrix(): Matrix4 {
         if (this._projStack.length <= 0) {
@@ -100,15 +91,15 @@ export class GLMatrixStack {
         const proj = new Matrix4().setIdentity();
         const tex: Matrix4 = new Matrix4().setIdentity();
         switch (this.matrixMode) {
-            case EMatrixMode.MODEL_VIEW:
+            case EGLMatrixMode.MODEL:
                 this.modelViewMatrix.copy(mv);
                 this._mvStack.push(mv);
                 break;
-            case EMatrixMode.PROJECTION:
+            case EGLMatrixMode.PROJECTION:
                 this.projectionMatrix.copy(proj);
                 this._projStack.push(proj);
                 break;
-            case EMatrixMode.TEXTURE:
+            case EGLMatrixMode.TEXTURE:
                 this.textureMatrix.copy(tex);
                 this._texStack.push(tex);
                 break;
@@ -121,13 +112,13 @@ export class GLMatrixStack {
      */
     public popMatrix(): GLMatrixStack {
         switch (this.matrixMode) {
-            case EMatrixMode.MODEL_VIEW:
+            case EGLMatrixMode.MODEL:
                 this._mvStack.pop();
                 break;
-            case EMatrixMode.PROJECTION:
+            case EGLMatrixMode.PROJECTION:
                 this._projStack.pop();
                 break;
-            case EMatrixMode.TEXTURE:
+            case EGLMatrixMode.TEXTURE:
                 this._texStack.pop();
                 break;
         }
@@ -139,13 +130,13 @@ export class GLMatrixStack {
      */
     public loadIdentity(): GLMatrixStack {
         switch (this.matrixMode) {
-            case EMatrixMode.MODEL_VIEW:
+            case EGLMatrixMode.MODEL:
                 this.modelViewMatrix.setIdentity();
                 break;
-            case EMatrixMode.PROJECTION:
+            case EGLMatrixMode.PROJECTION:
                 this.projectionMatrix.setIdentity();
                 break;
-            case EMatrixMode.TEXTURE:
+            case EGLMatrixMode.TEXTURE:
                 this.textureMatrix.setIdentity();
                 break;
         }
@@ -158,13 +149,13 @@ export class GLMatrixStack {
      */
     public loadMatrix(mat: Matrix4): GLMatrixStack {
         switch (this.matrixMode) {
-            case EMatrixMode.MODEL_VIEW:
+            case EGLMatrixMode.MODEL:
                 mat.copy(this.modelViewMatrix);
                 break;
-            case EMatrixMode.PROJECTION:
+            case EGLMatrixMode.PROJECTION:
                 mat.copy(this.projectionMatrix);
                 break;
-            case EMatrixMode.TEXTURE:
+            case EGLMatrixMode.TEXTURE:
                 mat.copy(this.textureMatrix);
                 break;
         }
@@ -180,13 +171,13 @@ export class GLMatrixStack {
      * @param isRadians
      */
     public perspective(fov: number, aspect: number, near: number, far: number, isRadians: boolean = false): GLMatrixStack {
-        this.matrixMode = EMatrixMode.PROJECTION;
+        this.matrixMode = EGLMatrixMode.PROJECTION;
         if (!isRadians) {
             fov = MathHelper.toRadian(fov);
         }
         const mat: Matrix4 = Matrix4Adapter.perspective(fov, aspect, near, far);
         this.loadMatrix(mat);
-        this.matrixMode = EMatrixMode.MODEL_VIEW;
+        this.matrixMode = EGLMatrixMode.MODEL;
         // 是否要调用loadIdentity方法???
         this.loadIdentity();
         return this;
@@ -202,10 +193,10 @@ export class GLMatrixStack {
      * @param far
      */
     public frustum(left: number, right: number, bottom: number, top: number, near: number, far: number): GLMatrixStack {
-        this.matrixMode = EMatrixMode.PROJECTION;
+        this.matrixMode = EGLMatrixMode.PROJECTION;
         const mat: Matrix4 = Matrix4.frustum(left, right, bottom, top, near, far);
         this.loadMatrix(mat);
-        this.matrixMode = EMatrixMode.MODEL_VIEW;
+        this.matrixMode = EGLMatrixMode.MODEL;
         // 是否要调用loadIdentity方法???
         this.loadIdentity();
         return this;
@@ -221,10 +212,10 @@ export class GLMatrixStack {
      * @param far
      */
     public orthographic(left: number, right: number, bottom: number, top: number, near: number, far: number): GLMatrixStack {
-        this.matrixMode = EMatrixMode.PROJECTION;
+        this.matrixMode = EGLMatrixMode.PROJECTION;
         const mat: Matrix4 = Matrix4.orthographic(left, right, bottom, top, near, far);
         this.loadMatrix(mat);
-        this.matrixMode = EMatrixMode.MODEL_VIEW;
+        this.matrixMode = EGLMatrixMode.MODEL;
         // 是否要调用loadIdentity方法???
         this.loadIdentity();
         return this;
@@ -237,7 +228,7 @@ export class GLMatrixStack {
      * @param up
      */
     public lookAt(pos: Vector3, target: Vector3, up: Vector3 = Vector3.up): GLMatrixStack {
-        this.matrixMode = EMatrixMode.MODEL_VIEW;
+        this.matrixMode = EGLMatrixMode.MODEL;
         const mat: Matrix4 = Matrix4.lookAt(pos, target, up);
         this.loadMatrix(mat);
         return this;
@@ -283,13 +274,13 @@ export class GLMatrixStack {
      */
     public multiplyMatrix(mat: Matrix4): GLMatrixStack {
         switch (this.matrixMode) {
-            case EMatrixMode.MODEL_VIEW:
+            case EGLMatrixMode.MODEL:
                 this.modelViewMatrix.multiply(mat);
                 break;
-            case EMatrixMode.PROJECTION:
+            case EGLMatrixMode.PROJECTION:
                 this.projectionMatrix.multiply(mat);
                 break;
-            case EMatrixMode.TEXTURE:
+            case EGLMatrixMode.TEXTURE:
                 this.textureMatrix.multiply(mat);
                 break;
         }
@@ -302,13 +293,13 @@ export class GLMatrixStack {
      */
     public translate(pos: Vector3): GLMatrixStack {
         switch (this.matrixMode) {
-            case EMatrixMode.MODEL_VIEW:
+            case EGLMatrixMode.MODEL:
                 this.modelViewMatrix.translate(pos);
                 break;
-            case EMatrixMode.PROJECTION:
+            case EGLMatrixMode.PROJECTION:
                 this.projectionMatrix.translate(pos);
                 break;
-            case EMatrixMode.TEXTURE:
+            case EGLMatrixMode.TEXTURE:
                 this.textureMatrix.translate(pos);
                 break;
         }
@@ -326,13 +317,13 @@ export class GLMatrixStack {
             angle = MathHelper.toRadian(angle);
         }
         switch (this.matrixMode) {
-            case EMatrixMode.MODEL_VIEW:
+            case EGLMatrixMode.MODEL:
                 this.modelViewMatrix.rotate(angle, axis);
                 break;
-            case EMatrixMode.PROJECTION:
+            case EGLMatrixMode.PROJECTION:
                 this.projectionMatrix.rotate(angle, axis);
                 break;
-            case EMatrixMode.TEXTURE:
+            case EGLMatrixMode.TEXTURE:
                 this.textureMatrix.rotate(angle, axis);
                 break;
         }
@@ -345,13 +336,13 @@ export class GLMatrixStack {
      */
     public scale(s: Vector3): GLMatrixStack {
         switch (this.matrixMode) {
-            case EMatrixMode.MODEL_VIEW:
+            case EGLMatrixMode.MODEL:
                 this.modelViewMatrix.scale(s);
                 break;
-            case EMatrixMode.PROJECTION:
+            case EGLMatrixMode.PROJECTION:
                 this.projectionMatrix.scale(s);
                 break;
-            case EMatrixMode.TEXTURE:
+            case EGLMatrixMode.TEXTURE:
                 this.textureMatrix.scale(s);
                 break;
         }

@@ -5,7 +5,7 @@ import {Vector3} from '../../common/math/vector/Vector3';
 import {Vector4} from '../../common/math/vector/Vector4';
 import {Matrix4} from '../../common/math/matrix/Matrix4';
 import {Quaternion} from '../../common/math/Quaternion';
-import {EShaderType} from '../../enum/EShaderType';
+import {EGLShaderType} from '../enum/EGLShaderType';
 import {CLShaderConstants} from '../CLShaderConstants';
 import {GLShaderSource} from '../GLShaderSource';
 import {GLAttributeBits} from '../GLTypes';
@@ -48,12 +48,12 @@ export class GLProgram {
         this.bindCallback = null;
         this.unbindCallback = null;
         // 创建Vertex Shaders
-        let shader: WebGLShader | null = GLRenderHelper.createShader(this.gl, EShaderType.VS_SHADER);
+        let shader: WebGLShader | null = GLRenderHelper.createShader(this.gl, EGLShaderType.VS_SHADER);
         if (!shader) throw new Error('Create Vertex Shader Object Fail! ! ! ');
         this.vsShader = shader;
         // 创建Fragment Shader
         shader = null;
-        shader = GLRenderHelper.createShader(this.gl, EShaderType.FS_SHADER);
+        shader = GLRenderHelper.createShader(this.gl, EGLShaderType.FS_SHADER);
         if (!shader) throw new Error('Create Fragment Shader Object Fail! ! ! ');
         this.fsShader = shader;
         // 创建WebGLProgram链接器对象

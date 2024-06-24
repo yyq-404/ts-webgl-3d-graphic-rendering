@@ -51,7 +51,7 @@ export class Matrix4 {
     }
     
     /**
-     * 创建一个视锥矩阵，常用于透视投影。
+     * 创建透视投影矩阵。
      * @param fov 角度
      * @param aspect
      * @param near
@@ -64,7 +64,7 @@ export class Matrix4 {
     }
     
     /**
-     * 创建一个视锥矩阵，常用于透视投影。
+     * 创建正交投影矩阵。
      * @param left
      * @param right
      * @param bottom
@@ -85,7 +85,7 @@ export class Matrix4 {
     }
     
     /**
-     * 创建一个视锥矩阵，常用于透视投影。
+     * 创建摄影机矩阵。
      * @param position
      * @param target
      * @param up
@@ -94,14 +94,14 @@ export class Matrix4 {
         if (position.equals(target)) {
             return this.identity;
         }
-        const z = Vector3.difference(position, target).normalize();
-        const x = Vector3.cross(up, z).normalize();
-        const y = Vector3.cross(z, x).normalize();
+        const zAxis = Vector3.difference(position, target).normalize();
+        const xAxis = Vector3.cross(up, zAxis).normalize();
+        const yAxis = Vector3.cross(zAxis, xAxis).normalize();
         return new Matrix4([
-            x.x, y.x, z.x, 0,
-            x.y, y.y, z.y, 0,
-            x.z, y.z, z.z, 0,
-            -Vector3.dot(x, position), -Vector3.dot(y, position), -Vector3.dot(z, position), 1
+            xAxis.x, yAxis.x, zAxis.x, 0,
+            xAxis.y, yAxis.y, zAxis.y, 0,
+            xAxis.z, yAxis.z, zAxis.z, 0,
+            -Vector3.dot(xAxis, position), -Vector3.dot(yAxis, position), -Vector3.dot(zAxis, position), 1
         ]);
     }
     

@@ -1,5 +1,5 @@
 import {GLAttributeInfo, GLAttributeMap, GLProgramLinkHook, GLUniformInfo, GLUniformMap} from './GLTypes';
-import {EShaderType} from '../enum/EShaderType';
+import {EGLShaderType} from './enum/EGLShaderType';
 
 /**
  * GL渲染工具类。
@@ -48,9 +48,9 @@ export class GLRenderHelper {
      * @param gl
      * @param type
      */
-    public static createShader(gl: WebGLRenderingContext, type: EShaderType): WebGLShader {
+    public static createShader(gl: WebGLRenderingContext, type: EGLShaderType): WebGLShader {
         let shader: WebGLShader | null;
-        if (type === EShaderType.VS_SHADER) {
+        if (type === EGLShaderType.VS_SHADER) {
             shader = gl.createShader(gl.VERTEX_SHADER);
         } else {
             shader = gl.createShader(gl.FRAGMENT_SHADER);

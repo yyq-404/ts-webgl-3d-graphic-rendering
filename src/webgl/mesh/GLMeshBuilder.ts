@@ -8,7 +8,7 @@ import {GLProgram} from '../program/GLProgram';
 import {Matrix4} from '../../common/math/matrix/Matrix4';
 import {GLAttributeBits, GLAttributeOffsetMap} from '../GLTypes';
 import {GLTexture} from '../texture/GLTexture';
-import {EGLVertexLayoutType} from '../../enum/EGLVertexLayoutType';
+import {EGLVertexLayoutType} from '../enum/EGLVertexLayoutType';
 import {CLShaderConstants} from '../CLShaderConstants';
 import {IGLAttribute} from '../attribute/IGLAttribute';
 

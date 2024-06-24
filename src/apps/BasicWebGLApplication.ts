@@ -2,7 +2,7 @@ import {BaseApplication} from '../base/BaseApplication';
 import {GLRenderHelper} from '../webgl/GLRenderHelper';
 import {Matrix4} from '../common/math/matrix/Matrix4';
 import {Vector3} from '../common/math/vector/Vector3';
-import {EShaderType} from '../enum/EShaderType';
+import {EGLShaderType} from '../webgl/enum/EGLShaderType';
 import {TypedArrayList} from '../common/container/TypedArrayList';
 import {GLCoordinateSystem} from '../webgl/GLCoordinateSystem';
 import {GLAttributeMap, GLUniformMap} from '../webgl/GLTypes';
@@ -107,11 +107,11 @@ export class BasicWebGLApplication extends BaseApplication {
         // 打印WebGL信息
         GLRenderHelper.printWebGLInfo(this.gl);
         // 创建顶点着色器
-        this.vsShader = GLRenderHelper.createShader(this.gl, EShaderType.VS_SHADER);
+        this.vsShader = GLRenderHelper.createShader(this.gl, EGLShaderType.VS_SHADER);
         // 编译顶点着色器
         GLRenderHelper.compileShader(this.gl, this.colorShader_vs, this.vsShader);
         // 创建片元着色器
-        this.fsShader = GLRenderHelper.createShader(this.gl, EShaderType.FS_SHADER);
+        this.fsShader = GLRenderHelper.createShader(this.gl, EGLShaderType.FS_SHADER);
         // 编译片元着色器
         GLRenderHelper.compileShader(this.gl, this.colorShader_fs, this.fsShader);
         // 创建着色器链接程序

@@ -1,5 +1,5 @@
 import {GLRenderHelper} from '../GLRenderHelper';
-import {EGLTexWrapType} from '../../enum/EGLTexWrapType';
+import {EGLTextureWrapType} from '../enum/EGLTextureWrapType';
 import {MathHelper} from '../../common/math/MathHelper';
 
 /**
@@ -70,7 +70,7 @@ export class GLTexture {
     /** 为 `gl.TEXTURE_2D`（另外一个可以是TEXTURE_CUBE_MAP，本书不使用TEXTURE_CUBE_MAP相关内容） */
     public target: number;
     /** 纹理参数 */
-    private texParameters: Map<EGLTexWrapType, GLint>;
+    private texParameters: Map<EGLTextureWrapType, GLint>;
     
     /**
      * 构造
@@ -88,10 +88,10 @@ export class GLTexture {
         this.texture = tex;
         this.target = gl.TEXTURE_2D;
         this.name = name;
-        this.texParameters = new Map<EGLTexWrapType, GLint>([
-            [EGLTexWrapType.GL_REPEAT, this.gl.REPEAT],
-            [EGLTexWrapType.GL_MIRRORED_REPEAT, this.gl.MIRRORED_REPEAT],
-            [EGLTexWrapType.GL_CLAMP_TO_EDGE, this.gl.CLAMP_TO_EDGE]
+        this.texParameters = new Map<EGLTextureWrapType, GLint>([
+            [EGLTextureWrapType.GL_REPEAT, this.gl.REPEAT],
+            [EGLTextureWrapType.GL_MIRRORED_REPEAT, this.gl.MIRRORED_REPEAT],
+            [EGLTextureWrapType.GL_CLAMP_TO_EDGE, this.gl.CLAMP_TO_EDGE]
         ]);
         this.wrap();
         this.filter();
@@ -216,9 +216,9 @@ export class GLTexture {
     
     /**
      * 纹理包裹
-     * @param {EGLTexWrapType} mode
+     * @param {EGLTextureWrapType} mode
      */
-    public wrap(mode: EGLTexWrapType = EGLTexWrapType.GL_REPEAT): void {
+    public wrap(mode: EGLTextureWrapType = EGLTextureWrapType.GL_REPEAT): void {
         this.gl.bindTexture(this.target, this.texture);
         let param: GLint = this.texParameters.get(mode) || this.gl.REPEAT;
         this.gl.texParameteri(this.target, this.gl.TEXTURE_WRAP_S, param);
