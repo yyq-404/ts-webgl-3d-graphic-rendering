@@ -42,10 +42,12 @@ export class GLWorldMatrixStack {
      * 在矩阵堆栈中添加一个矩阵
      */
     public pushMatrix(): GLWorldMatrixStack {
-        const mv: Matrix4 = new Matrix4().setIdentity(); // 要新增的矩阵复制了父矩阵的值
-        this.worldMatrix.copy(mv); // 然后添加到堆栈的顶部
+        // 要新增的矩阵复制了父矩阵的值
+        const mv: Matrix4 = new Matrix4().setIdentity();
+        // 然后添加到堆栈的顶部
+        this.worldMatrix.copy(mv);
         this._worldMatrixStack.push(mv);
-        return this; // 返回this，可用于链式操作
+        return this;
     }
 
     /**
@@ -53,7 +55,7 @@ export class GLWorldMatrixStack {
      */
     public popMatrix(): GLWorldMatrixStack {
         this._worldMatrixStack.pop();
-        return this; // 返回this，可用于链式操作
+        return this;
     }
 
     /**
@@ -61,7 +63,8 @@ export class GLWorldMatrixStack {
      */
     public loadIdentity(): GLWorldMatrixStack {
         this.worldMatrix.setIdentity();
-        return this; // 返回this，可用于链式操作
+        // 返回this，可用于链式操作
+        return this;
     }
 
     /**
@@ -70,7 +73,6 @@ export class GLWorldMatrixStack {
      */
     public loadMatrix(mat: Matrix4): GLWorldMatrixStack {
         mat.copy(this.worldMatrix);
-        // 返回this，可用于链式操作
         return this;
     }
 
@@ -80,7 +82,6 @@ export class GLWorldMatrixStack {
      */
     public multiplyMatrix(mat: Matrix4): GLWorldMatrixStack {
         this.worldMatrix.multiply(mat);
-        // 返回this，可用于链式操作
         return this;
     }
 
@@ -90,7 +91,6 @@ export class GLWorldMatrixStack {
      */
     public translate(pos: Vector3): GLWorldMatrixStack {
         this.worldMatrix.translate(pos);
-        // 返回this，可用于链式操作
         return this;
     }
 
@@ -105,7 +105,7 @@ export class GLWorldMatrixStack {
             angle = MathHelper.toRadian(angle);
         }
         this.worldMatrix.rotate(angle, axis);
-        return this; // 返回this，可用于链式操作
+        return this;
     }
 
     /**
@@ -114,7 +114,6 @@ export class GLWorldMatrixStack {
      */
     public scale(scale: Vector3): GLWorldMatrixStack {
         this.worldMatrix.scale(scale);
-        // 返回this，可用于链式操作
         return this;
     }
 }
