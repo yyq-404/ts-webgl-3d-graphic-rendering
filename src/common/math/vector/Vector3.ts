@@ -342,7 +342,7 @@ export class Vector3 {
      * @param {number} threshold
      * @return {boolean}
      */
-    public equals(vector: Vector3, threshold = epsilon): boolean {
+    public equals(vector: Vector3, threshold: number = epsilon): boolean {
         if (Math.abs(this.x - vector.x) > threshold) {
             return false;
         }
