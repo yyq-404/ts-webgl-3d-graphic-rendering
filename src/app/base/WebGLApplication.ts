@@ -1,12 +1,12 @@
-import {GLMeshBuilder} from '../webgl/mesh/GLMeshBuilder';
+import {GLMeshBuilder} from '../../webgl/mesh/GLMeshBuilder';
 import {BaseApplication} from './BaseApplication';
-import {GLRenderHelper} from '../webgl/GLRenderHelper';
-import {GLTextureCache} from '../webgl/texture/GLTextureCache';
-import {GLProgramCache} from '../webgl/program/GLProgramCache';
-import {GLAttributeHelper} from '../webgl/GLAttributeHelper';
-import {GLProgram} from '../webgl/program/GLProgram';
-import {GLTexture} from '../webgl/texture/GLTexture';
-import {GLWorldMatrixStack} from '../webgl/matrix/GLWorldMatrixStack';
+import {GLRenderHelper} from '../../webgl/GLRenderHelper';
+import {GLTextureCache} from '../../webgl/texture/GLTextureCache';
+import {GLProgramCache} from '../../webgl/program/GLProgramCache';
+import {GLAttributeHelper} from '../../webgl/GLAttributeHelper';
+import {GLProgram} from '../../webgl/program/GLProgram';
+import {GLTexture} from '../../webgl/texture/GLTexture';
+import {GLWorldMatrixStack} from '../../webgl/matrix/GLWorldMatrixStack';
 
 /**
  * WebGL应用。

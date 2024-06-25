@@ -1,11 +1,11 @@
 import {BaseApplication} from '../base/BaseApplication';
-import {GLRenderHelper} from '../webgl/GLRenderHelper';
-import {Matrix4} from '../common/math/matrix/Matrix4';
-import {Vector3} from '../common/math/vector/Vector3';
-import {EGLShaderType} from '../webgl/enum/EGLShaderType';
-import {TypedArrayList} from '../common/container/TypedArrayList';
-import {GLCoordinateSystem} from '../webgl/GLCoordinateSystem';
-import {GLAttributeMap, GLUniformMap} from '../webgl/GLTypes';
+import {GLRenderHelper} from '../../webgl/GLRenderHelper';
+import {Matrix4} from '../../common/math/matrix/Matrix4';
+import {Vector3} from '../../common/math/vector/Vector3';
+import {EGLShaderType} from '../../webgl/enum/EGLShaderType';
+import {TypedArrayList} from '../../common/container/TypedArrayList';
+import {GLCoordinateSystem} from '../../webgl/GLCoordinateSystem';
+import {GLAttributeMap, GLUniformMap} from '../../webgl/GLTypes';
 
 /**
  * 基础WEBGL应用。

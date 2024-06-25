@@ -1,6 +1,6 @@
 import {WebGLApplication} from "./WebGLApplication";
-import {Camera} from "../lib/camera/Camera";
-import {CanvasKeyboardEvent} from "../event/CanvasKeyboardEvent";
+import {Camera} from "../../lib/camera/Camera";
+import {CanvasKeyboardEvent} from "../../event/CanvasKeyboardEvent";
 
 /**
  * 摄像机应用。

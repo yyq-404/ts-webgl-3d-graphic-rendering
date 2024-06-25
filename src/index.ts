@@ -1,7 +1,7 @@
-import {BaseApplication} from './base/BaseApplication';
-import {RotatingCubeApplication} from './apps/RotationCubeApplication';
-import {BasicWebGLApplication} from './apps/BasicWebGLApplication';
-import {CoordinateSystemApplication} from './apps/CoordinateSystemApplication';
+import {BaseApplication} from './app/base/BaseApplication';
+import {RotatingCubeApplication} from './app/demo/RotationCubeApplication';
+import {BasicWebGLApplication} from './app/demo/BasicWebGLApplication';
+import {CoordinateSystemApplication} from './app/demo/CoordinateSystemApplication';
 
 /** 选择器控件 */
 let select: HTMLSelectElement = document.getElementById('select') as HTMLSelectElement;

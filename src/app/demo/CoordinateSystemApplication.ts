@@ -1,13 +1,13 @@
 import {CameraApplication} from '../base/CameraApplication';
-import {GLCoordinateSystem} from '../webgl/GLCoordinateSystem';
-import {Matrix4} from '../common/math/matrix/Matrix4';
-import {Vector3} from '../common/math/vector/Vector3';
-import {CanvasKeyboardEvent} from '../event/CanvasKeyboardEvent';
-import {EAxisType} from '../enum/EAxisType';
-import {MathHelper} from '../common/math/MathHelper';
-import {DrawHelper} from '../lib/DrawHelper';
-import {Vector4Adapter} from '../common/math/MathAdapter';
-import {Vector4} from '../common/math/vector/Vector4';
+import {GLCoordinateSystem} from '../../webgl/GLCoordinateSystem';
+import {Matrix4} from '../../common/math/matrix/Matrix4';
+import {Vector3} from '../../common/math/vector/Vector3';
+import {CanvasKeyboardEvent} from '../../event/CanvasKeyboardEvent';
+import {EAxisType} from '../../enum/EAxisType';
+import {MathHelper} from '../../common/math/MathHelper';
+import {DrawHelper} from '../../lib/DrawHelper';
+import {Vector4Adapter} from '../../common/math/MathAdapter';
+import {Vector4} from '../../common/math/vector/Vector4';
 
 /**
  * 坐标系统应用。

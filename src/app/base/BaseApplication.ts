@@ -1,10 +1,10 @@
-import {ECanvasInputEventType} from '../enum/ECanvasInputEventType';
-import {CanvasMouseEvent} from '../event/CanvasMouseEvent';
-import {CanvasKeyboardEvent} from '../event/CanvasKeyboardEvent';
-import {Vector2} from '../common/math/vector/Vector2';
-import {TimerManager} from '../timer/TimerManager';
-import {ICanvasInputEventListener} from '../interface/ICanvasInputEventListener';
-import {IBaseApplication} from '../interface/IBaseApplication';
+import {ECanvasInputEventType} from '../../enum/ECanvasInputEventType';
+import {CanvasMouseEvent} from '../../event/CanvasMouseEvent';
+import {CanvasKeyboardEvent} from '../../event/CanvasKeyboardEvent';
+import {Vector2} from '../../common/math/vector/Vector2';
+import {TimerManager} from '../../timer/TimerManager';
+import {ICanvasInputEventListener} from '../../interface/ICanvasInputEventListener';
+import {IBaseApplication} from '../../interface/IBaseApplication';
 
 /**
  * 基础应用
