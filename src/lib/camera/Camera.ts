@@ -14,8 +14,8 @@ export class Camera {
     /** 投影矩阵 */
     private _projectionMatrix: Matrix4;
     /** view_matrix矩阵及其逆矩阵 */
-    private _invViewProMatrix: Matrix4;
-
+    private _invViewProjectionMatrix: Matrix4;
+    
     /**
      * 构造
      * @param gl
@@ -34,7 +34,7 @@ export class Camera {
         this._viewMatrix = new Matrix4();
         this._projectionMatrix = new Matrix4();
         this._viewProjectionMatrix = new Matrix4();
-        this._invViewProMatrix = new Matrix4();
+        this._invViewProjectionMatrix = new Matrix4();
     }
     
     /** 投影矩阵*摄像机矩阵及其逆矩阵 */
@@ -321,6 +321,18 @@ export class Camera {
     }
     
     /**
+     * X轴旋转，局部坐标轴的上下旋转，角度表示。
+     * @param degree
+     */
+    public pitch(degree: number): void {
+        Matrix4Adapter.m0.setIdentity();
+        let radian = MathHelper.toRadian(degree);
+        Matrix4Adapter.m0.rotate(radian, this.xAxis);
+        this.yAxis = Matrix4Adapter.m0.multiplyVector3(this.yAxis);
+        this.zAxis = Matrix4Adapter.m0.multiplyVector3(this.zAxis);
+    }
+    
+    /**
      * Y轴旋转，局部坐标轴的左右旋转， 角度表示。
      * @param degree
      */
@@ -337,19 +349,7 @@ export class Camera {
     }
     
     /**
-     * X轴旋转，上下旋转
-     * @param degree
-     */
-    public pitch(degree: number): void {
-        Matrix4Adapter.m0.setIdentity();
-        let radian = MathHelper.toRadian(degree);
-        Matrix4Adapter.m0.rotate(radian, this.xAxis);
-        this.yAxis = Matrix4Adapter.m0.multiplyVector3(this.yAxis);
-        this.zAxis = Matrix4Adapter.m0.multiplyVector3(this.zAxis);
-    }
-    
-    /**
-     * Z轴旋转，倾斜旋转
+     * Z轴旋转，局部坐标系的倾斜旋转，角度表示。
      * @param degree
      */
     public roll(degree: number): void {
@@ -372,12 +372,14 @@ export class Camera {
      * @param intervalSec
      */
     public update(intervalSec: number): void {
+        // 使用mat4的perspective静态方法计算投影矩阵
         this._projectionMatrix = Matrix4Adapter.perspective(this.fovY, this.aspectRatio, this.near, this.far);
+        // 计算视图矩阵
         this.calcViewMatrix();
+        // 使用 _projectionMatrix * _viewMatrix顺序合成_viewProjectionMatrix，注意矩阵相乘的顺序
         Matrix4.product(this._projectionMatrix, this._viewMatrix, this._viewProjectionMatrix);
-        this._invViewProMatrix.inverse();
-        new Matrix4().setIdentity().init(this._viewProjectionMatrix.all()).inverse()?.all();
-        this.viewProjectionMatrix.all();
+        // 然后再计算出_viewProjMatrix的逆矩阵
+        // this._invViewProjectionMatrix.inverse();
     }
     
     /**

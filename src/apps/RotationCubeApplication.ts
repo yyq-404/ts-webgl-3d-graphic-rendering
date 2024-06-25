@@ -159,7 +159,6 @@ export class RotatingCubeApplication extends CameraApplication {
                     this.ctx2D.fillText('Z', out.x, out.y);
                 }
             }
-            
             this.ctx2D.restore(); // 恢复原来的渲染状态
         }
     }
@@ -168,9 +167,7 @@ export class RotatingCubeApplication extends CameraApplication {
      * 执行
      */
     public override async runAsync(): Promise<void> {
-        if (!this.gl) {
-            throw new Error('this.gl is not defined');
-        }
+        if (!this.gl) throw new Error('this.gl is not defined');
         let img: HTMLImageElement = await HttpHelper.loadImageAsync('data/pic0.png');
         let tex: GLTexture = new GLTexture(this.gl);
         tex.upload(img, 0, true);
