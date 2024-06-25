@@ -1,6 +1,6 @@
-import {WebGLApplication} from "./WebGLApplication";
-import {Camera} from "../../lib/camera/Camera";
-import {CanvasKeyboardEvent} from "../../event/CanvasKeyboardEvent";
+import {WebGLApplication} from './WebGLApplication';
+import {Camera} from '../../lib/camera/Camera';
+import {CanvasKeyboardEvent} from '../../event/CanvasKeyboardEvent';
 
 /**
  * 摄像机应用。
@@ -8,7 +8,7 @@ import {CanvasKeyboardEvent} from "../../event/CanvasKeyboardEvent";
 export class CameraApplication extends WebGLApplication {
     /** 摄像机 */
     public camera: Camera;
-
+    
     /**
      * 构造。
      * @param canvas
@@ -19,16 +19,7 @@ export class CameraApplication extends WebGLApplication {
         super(canvas, attributes, option2d);
         this.camera = new Camera(this.gl, canvas.width, canvas.height, 45, 1);
     }
-
-    /**
-     * 更新。
-     * @param elapsedMsec
-     * @param intervalSec
-     */
-    public override update(elapsedMsec: number, intervalSec: number): void {
-        this.camera.update(intervalSec);
-    }
-
+    
     /**
      * 按键按下。
      * @param event
@@ -42,10 +33,10 @@ export class CameraApplication extends WebGLApplication {
                 this.camera.moveForward(1);
                 break;
             case 'a':
-                this.camera.moveRightward(1);
+                this.camera.moveRightward(-1);
                 break;
             case 'd':
-                this.camera.moveRightward(-1);
+                this.camera.moveRightward(1);
                 break;
             case 'z':
                 this.camera.moveUpward(1);
@@ -63,7 +54,16 @@ export class CameraApplication extends WebGLApplication {
                 this.camera.pitch(1);
                 break;
             default:
-                break
+                break;
         }
+    }
+    
+    /**
+     * 更新。
+     * @param elapsedMsec
+     * @param intervalSec
+     */
+    public override update(elapsedMsec: number, intervalSec: number): void {
+        this.camera.update(intervalSec);
     }
 }

@@ -41,6 +41,64 @@ export class CoordinateSystemApplication extends CameraApplication {
     }
     
     /**
+     * 按键按下。
+     * @param {CanvasKeyboardEvent} evt
+     */
+    public override onKeyPress(evt: CanvasKeyboardEvent): void {
+        // 调用基类方法，这样摄像机键盘事件全部有效了
+        super.onKeyPress(evt);
+        if (evt.key === '1') {
+            // 将currentDrawMethod函数指针指向drawCoordinateSystem
+            this._currentDrawMethod = this.drawCoordinateSystem;
+        } else if (evt.key === '2') {
+            // 将currentDrawMethod函数指针指向drawFullCoordinateSystem
+            this._currentDrawMethod = this.drawFullCoordinateSystem;
+        } else if (evt.key === '3') {
+            // 将currentDrawMethod函数指针指向drawFullCoordinateSystemWithRotatedCube
+            this._currentDrawMethod = this.drawFullCoordinateSystemWithRotatedCube;
+        } else if (evt.key === 'c') {
+            this._isOneViewport = !this._isOneViewport;
+            if (this._isOneViewport) {
+                // 切换到单视口渲染
+                this.makeOneGLCoordinateSystem();
+            } else {
+                // 切换到多视口渲染
+                this.makeFourGLCoordinateSystems();
+            }
+        }
+    }
+    
+    /**
+     * 更新。
+     * @param {number} elapsedMsec
+     * @param {number} intervalSec
+     */
+    public override update(elapsedMsec: number, intervalSec: number): void {
+        // s = vt，根据两帧间隔更新角速度和角位移
+        this._coordinateSystems.forEach((s: GLCoordinateSystem) => (s.angle += this._speed));
+        // 我们在CameraApplication中也覆写（override）的update方法
+        // CameraApplication的update方法用来计算摄像机的投影矩阵以及视图矩阵
+        // 所以我们必须要调用基类方法，用于控制摄像机更新
+        // 否则你将什么都看不到，切记!
+        super.update(elapsedMsec, intervalSec);
+    }
+    
+    /**
+     * 渲染
+     */
+    public override render(): void {
+        // 使用了 preserveDrawingBuffer: false 创建WebGLRenderingContext，因此可以不用每帧调用clear方法清屏
+        // this.gl.clear( this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT );
+        // 由于要使用Canvas2D绘制文字，所以必须要有ctx2D对象
+        if (!this.ctx2D) return;
+        // 对Canvas2D上下文渲染对象进行清屏操作
+        this.ctx2D.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        // 遍历整个坐标系视口数组
+        // 使用当前的坐标系及视口数据作为参数，调用currentDrawMethod回调函数
+        this._coordinateSystems.forEach((s) => this._currentDrawMethod(s));
+    }
+    
+    /**
      * 产生四个坐标轴系统。
      */
     private makeFourGLCoordinateSystems(): void {
@@ -60,7 +118,6 @@ export class CoordinateSystemApplication extends CameraApplication {
         this._coordinateSystems.push(new GLCoordinateSystem([hw, 0, hw, hh], Vector3.zero, dir, 0, true));
         this._isD3dMode = false;
     }
-    
     
     /**
      * 绘制带文字指示的三轴坐标系
@@ -272,63 +329,5 @@ export class CoordinateSystemApplication extends CameraApplication {
         // 如果只有一个坐标系的话，其视口和裁剪区与canvas元素尺寸一致， 右下
         this._coordinateSystems.push(new GLCoordinateSystem([0, 0, this.canvas.width, this.canvas.height], Vector3.zero, new Vector3([1, 1, 0]).normalize(), 45, true));
         this._isD3dMode = false;
-    }
-    
-    /**
-     * 更新。
-     * @param {number} elapsedMsec
-     * @param {number} intervalSec
-     */
-    public override update(elapsedMsec: number, intervalSec: number): void {
-        // s = vt，根据两帧间隔更新角速度和角位移
-        this._coordinateSystems.forEach((s: GLCoordinateSystem) => (s.angle += this._speed));
-        // 我们在CameraApplication中也覆写（override）的update方法
-        // CameraApplication的update方法用来计算摄像机的投影矩阵以及视图矩阵
-        // 所以我们必须要调用基类方法，用于控制摄像机更新
-        // 否则你将什么都看不到，切记!
-        super.update(elapsedMsec, intervalSec);
-    }
-    
-    /**
-     * 渲染
-     */
-    public override render(): void {
-        // 使用了 preserveDrawingBuffer: false 创建WebGLRenderingContext，因此可以不用每帧调用clear方法清屏
-        // this.gl.clear( this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT );
-        // 由于要使用Canvas2D绘制文字，所以必须要有ctx2D对象
-        if (!this.ctx2D) return;
-        // 对Canvas2D上下文渲染对象进行清屏操作
-        this.ctx2D.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        // 遍历整个坐标系视口数组
-        // 使用当前的坐标系及视口数据作为参数，调用currentDrawMethod回调函数
-        this._coordinateSystems.forEach((s) => this._currentDrawMethod(s));
-    }
-    
-    /**
-     * 按键按下。
-     * @param {CanvasKeyboardEvent} evt
-     */
-    public override onKeyPress(evt: CanvasKeyboardEvent): void {
-        // 调用基类方法，这样摄像机键盘事件全部有效了
-        super.onKeyPress(evt);
-        if (evt.key === '1') {
-            // 将currentDrawMethod函数指针指向drawCoordinateSystem
-            this._currentDrawMethod = this.drawCoordinateSystem;
-        } else if (evt.key === '2') {
-            // 将currentDrawMethod函数指针指向drawFullCoordinateSystem
-            this._currentDrawMethod = this.drawFullCoordinateSystem;
-        } else if (evt.key === '3') {
-            // 将currentDrawMethod函数指针指向drawFullCoordinateSystemWithRotatedCube
-            this._currentDrawMethod = this.drawFullCoordinateSystemWithRotatedCube;
-        } else if (evt.key === 'c') {
-            this._isOneViewport = !this._isOneViewport;
-            if (this._isOneViewport) {
-                // 切换到单视口渲染
-                this.makeOneGLCoordinateSystem();
-            } else {
-                // 切换到多视口渲染
-                this.makeFourGLCoordinateSystems();
-            }
-        }
     }
 }
