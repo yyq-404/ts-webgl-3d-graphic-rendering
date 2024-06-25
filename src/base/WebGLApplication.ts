@@ -20,6 +20,7 @@ export class WebGLApplication extends BaseApplication {
     protected builder: GLMeshBuilder;
     /** 为了在3D环境中同时支持Canvas2D绘制，特别是为了实现文字绘制 */
     protected canvas2D: HTMLCanvasElement | null = null;
+    /** 2D渲染环境 */
     protected ctx2D: CanvasRenderingContext2D | null = null;
     
     /**
@@ -37,16 +38,12 @@ export class WebGLApplication extends BaseApplication {
         }
         // 从canvas元素中获得webgl上下文渲染对象，WebGL API都通过该上下文渲染对象进行调用
         if (option2d) {
-            const parent: HTMLElement | null = this.canvas.parentElement;
-            if (!parent) throw new Error('canvas元素必须要有父亲!!');
-            this.ctx2D = this.canvas.getContext('2d');
-            parent.appendChild(this.canvas);
-            this.canvas2D = this.canvas;
+            this.create2dCanvas();
         }
         this.matStack = new GLWorldMatrixStack();
         // 初始化渲染状态
         GLRenderHelper.setDefaultState(this.gl);
-        // 由于Canvas是左手系，而webGL是右手系，需要FilpYCoord
+        // 由于Canvas是左手系，而webGL是右手系，需要FlipYCoordinate
         this.isFlipYCoordinate = true;
         // 初始化时，创建default纹理
         GLTextureCache.instance.set('default', GLTexture.createDefaultTexture(this.gl));
@@ -63,5 +60,24 @@ export class WebGLApplication extends BaseApplication {
      */
     public static getMaxVertexAttributes(gl: WebGLRenderingContext): number {
         return gl.getParameter(gl.MAX_VERTEX_ATTRIBS) as number;
+    }
+    
+    /**
+     * 创建2D画布。
+     * @private
+     */
+    private create2dCanvas(): void {
+        const canvasElement: HTMLCanvasElement = document.createElement('canvas') as HTMLCanvasElement;
+        canvasElement.width = this.canvas.width;
+        canvasElement.height = this.canvas.height;
+        canvasElement.style.backgroundColor = 'transparent';
+        canvasElement.style.position = 'absolute';
+        canvasElement.style.left = '0px';
+        canvasElement.style.top = '0px';
+        const parent: HTMLElement | null = this.canvas.parentElement;
+        if (!parent) throw new Error('canvas元素必须要有父亲!!');
+        this.ctx2D = canvasElement.getContext('2d');
+        parent.appendChild(canvasElement);
+        this.canvas2D = canvasElement;
     }
 }
