@@ -19,7 +19,7 @@ export class CoordinateSystemApplication extends CameraApplication {
     /** 用于切换三种不同的绘制方法 */
     private _currentDrawMethod: (s: GLCoordinateSystem) => void;
     /** 用来切换是否单视口还是多视口（4个视口）绘制 */
-    private _isOneViewport: boolean = true;
+    private _isOneViewport: boolean = false;
     /** 旋转速度 */
     private _speed: number = 1;
     /** 用来标记是D3D坐标系 */
@@ -38,6 +38,8 @@ export class CoordinateSystemApplication extends CameraApplication {
         super(canvas, {preserveDrawingBuffer: false}, true);
         this.makeFourGLCoordinateSystems();
         this._currentDrawMethod = this.drawCoordinateSystem;
+        // 调整摄影机位置
+        this.camera.z = 5;
     }
     
     /**
@@ -121,50 +123,29 @@ export class CoordinateSystemApplication extends CameraApplication {
     
     /**
      * 绘制带文字指示的三轴坐标系
-     * @param {GLCoordinateSystem} s
+     * @param {GLCoordinateSystem} glCoordinateSystem
      * @private
      */
-    private drawCoordinateSystem(s: GLCoordinateSystem): void {
-        // 设置当前的视口
-        this.camera.setViewport(s.viewport[0], s.viewport[1], s.viewport[2], s.viewport[3]);
-        // 1、绘制三轴坐标系
-        this.matStack.pushMatrix();
-        // 将坐标系平移到s.pos位置
-        this.matStack.translate(s.position);
-        // 绕着s.axis轴旋转s.angle度
-        this.matStack.rotate(s.angle, s.axis, false);
-        this._mvp = Matrix4.product(this.camera.viewProjectionMatrix, this.matStack.modelViewMatrix);
-        // 合成model-view-project矩阵
+    private drawCoordinateSystem(glCoordinateSystem: GLCoordinateSystem): void {
+        // 计算模型视图投影矩阵。
+        this.calcModelViewProjectionMatrix(glCoordinateSystem);
         // 调用DrawHelper.drawCoordinateSystem的方法绘制X / Y / Z坐标系
-        DrawHelper.drawCoordinateSystem(this.builder, this._mvp, EAxisType.NONE, 1, s.isDrawAxis ? s.axis : null, s.isD3D);
+        DrawHelper.drawCoordinateSystem(this.builder, this._mvp, EAxisType.NONE, 1, glCoordinateSystem.isDrawAxis ? glCoordinateSystem.axis : null, glCoordinateSystem.isD3D);
         this.matStack.popMatrix();
         // 绘制坐标系的标示文字，调用drawText方法
-        this.drawText(Vector3.right, EAxisType.X_AXIS, this._mvp, false); // X
-        this.drawText(Vector3.up, EAxisType.Y_AXIS, this._mvp, false); // Y
-        if (!this._isD3dMode) {
-            this.drawText(Vector3.forward, EAxisType.Z_AXIS, this._mvp, false); // Z
-        }
+        this.drawCoordinateSystemText(false);
     }
     
     /**
      绘制带文字指示的六轴坐标系
-     * @param {GLCoordinateSystem} s
+     * @param {GLCoordinateSystem} glCoordinateSystem
      * @private
      */
-    private drawFullCoordinateSystem(s: GLCoordinateSystem): void {
-        // 设置当前的视口
-        this.camera.setViewport(s.viewport[0], s.viewport[1], s.viewport[2], s.viewport[3]);
-        // 1、绘制六轴坐标系
-        // 矩阵进栈
-        this.matStack.pushMatrix();
-        // 将坐标系平移到s.pos位置
-        this.matStack.translate(s.position);
-        // 坐标系绕着s.axis轴旋转s.angle度
-        this.matStack.rotate(s.angle, s.axis, false);
-        // 合成model-view-project矩阵
-        this._mvp = Matrix4.product(this.camera.viewProjectionMatrix, this.matStack.modelViewMatrix);
+    private drawFullCoordinateSystem(glCoordinateSystem: GLCoordinateSystem): void {
+        // 计算模型视图投影矩阵
+        this.calcModelViewProjectionMatrix(glCoordinateSystem);
         // 使用mvp矩阵绘制六轴坐标系，调用的是DrawHelper.drawFullCoordinateSystem的静态辅助方法
-        DrawHelper.drawFullCoordinateSystem(this.builder, this._mvp, 1, s.isDrawAxis ? s.axis : null);
+        DrawHelper.drawFullCoordinateSystem(this.builder, this._mvp, 1, glCoordinateSystem.isDrawAxis ? glCoordinateSystem.axis : null);
         // 矩阵出栈
         this.matStack.popMatrix();
         // 绘制坐标系的标示文字,调用的是本类的drawText方法
@@ -173,149 +154,238 @@ export class CoordinateSystemApplication extends CameraApplication {
     
     /**
      * 使用旋转立方体绘制坐标系
-     * @param {GLCoordinateSystem} s
+     * @param {GLCoordinateSystem} glCoordinateSystem
      * @private
      */
-    private drawFullCoordinateSystemWithRotatedCube(s: GLCoordinateSystem): void {
-        // 设置当前的视口
-        this.camera.setViewport(s.viewport[0], s.viewport[1], s.viewport[2], s.viewport[3]);
-        this.matStack.pushMatrix();
-        // 第一步：绘制旋转的坐标系
-        // 平移到当前坐标系的原点
-        this.matStack.translate(s.position);
-        // 绕着当前坐标系的轴旋转angle度
-        this.matStack.rotate(s.angle, s.axis, false);
-        // 合成坐标系的model-view-project矩阵
-        Matrix4.product(this.camera.viewProjectionMatrix, this.matStack.modelViewMatrix, this._mvp);
+    private drawFullCoordinateSystemWithRotatedCube(glCoordinateSystem: GLCoordinateSystem): void {
+        //计算模型视图投影矩阵
+        this.calcModelViewProjectionMatrix(glCoordinateSystem);
         // 绘制坐标系
-        DrawHelper.drawFullCoordinateSystem(this.builder, this._mvp, 1, s.isDrawAxis ? s.axis : null);
+        DrawHelper.drawFullCoordinateSystem(this.builder, this._mvp, 1, glCoordinateSystem.isDrawAxis ? glCoordinateSystem.axis : null);
         // 第二步：绘制绕x轴旋转的线框立方体
-        this.matStack.pushMatrix();
-        this.matStack.rotate(s.angle, Vector3.right, false);
-        this.matStack.translate(new Vector3([0.8, 0.4, 0]));
-        this.matStack.rotate(s.angle * 2, Vector3.right, false);
-        Matrix4.product(this.camera.viewProjectionMatrix, this.matStack.modelViewMatrix, this.cubeMVP);
-        DrawHelper.drawWireFrameCubeBox(this.builder, this.cubeMVP, 0.1);
-        this.matStack.popMatrix();
+        this.drawXAxisWithRotatedCube(glCoordinateSystem);
         // 第三步：绘制绕y轴旋转的线框立方体
-        this.matStack.pushMatrix();
-        this.matStack.rotate(s.angle, Vector3.up, false);
-        this.matStack.translate(new Vector3([0.2, 0.8, 0]));
-        this.matStack.rotate(s.angle * 2, Vector3.up, false);
-        Matrix4.product(this.camera.viewProjectionMatrix, this.matStack.modelViewMatrix, this.cubeMVP);
-        DrawHelper.drawWireFrameCubeBox(this.builder, this.cubeMVP, 0.1, Vector4Adapter.green);
-        this.matStack.popMatrix();
+        this.drawYAxisWithRotatedCube(glCoordinateSystem);
         // 第四步：绘制绕z轴旋转的线框立方体
-        this.matStack.pushMatrix();
-        this.matStack.translate(new Vector3([0.0, 0.0, 0.8]));
-        this.matStack.rotate(s.angle * 2, Vector3.forward, false);
-        Matrix4.product(this.camera.viewProjectionMatrix, this.matStack.modelViewMatrix, this.cubeMVP);
-        DrawHelper.drawWireFrameCubeBox(this.builder, this.cubeMVP, 0.1, Vector4Adapter.blue);
-        this.matStack.popMatrix();
+        this.drawZAxisWithRotatedCube(glCoordinateSystem);
         // 第五步：绘制绕坐标系旋转轴（s.axis）旋转的线框立方体
-        this.matStack.pushMatrix();
-        const len: Vector3 = new Vector3();
-        this.matStack.translate(s.axis.scale(0.8, len));
-        this.matStack.translate(new Vector3([0, 0.3, 0]));
-        this.matStack.rotate(s.angle, s.axis, false);
-        Matrix4.product(this.camera.viewProjectionMatrix, this.matStack.modelViewMatrix, this.cubeMVP);
-        DrawHelper.drawWireFrameCubeBox(this.builder, this.cubeMVP, 0.1, new Vector4());
-        this.matStack.popMatrix();
+        this.drawCubeWithRotatedAxis(glCoordinateSystem);
         this.matStack.popMatrix();
         // 第六步：绘制坐标系的标示文字
         this.drawCoordinateSystemText();
     }
     
     /**
+     * 使用旋转立方体绘制X轴。
+     * @param {GLCoordinateSystem} glCoordinateSystem
+     * @private
+     */
+    private drawXAxisWithRotatedCube(glCoordinateSystem: GLCoordinateSystem): void {
+        this.matStack.pushMatrix();
+        this.matStack.rotate(glCoordinateSystem.angle, Vector3.right, false);
+        this.matStack.translate(new Vector3([0.8, 0.4, 0]));
+        this.matStack.rotate(glCoordinateSystem.angle * 2, Vector3.right, false);
+        Matrix4.product(this.camera.viewProjectionMatrix, this.matStack.modelViewMatrix, this.cubeMVP);
+        DrawHelper.drawWireFrameCubeBox(this.builder, this.cubeMVP, 0.1);
+        this.matStack.popMatrix();
+    }
+    
+    /**
+     * 使用旋转立方体绘制Y轴。
+     * @param {GLCoordinateSystem} glCoordinateSystem
+     * @private
+     */
+    private drawYAxisWithRotatedCube(glCoordinateSystem: GLCoordinateSystem): void {
+        this.matStack.pushMatrix();
+        this.matStack.rotate(glCoordinateSystem.angle, Vector3.up, false);
+        this.matStack.translate(new Vector3([0.2, 0.8, 0]));
+        this.matStack.rotate(glCoordinateSystem.angle * 2, Vector3.up, false);
+        Matrix4.product(this.camera.viewProjectionMatrix, this.matStack.modelViewMatrix, this.cubeMVP);
+        DrawHelper.drawWireFrameCubeBox(this.builder, this.cubeMVP, 0.1, Vector4Adapter.green);
+        this.matStack.popMatrix();
+    }
+    
+    /**
+     * 使用旋转立方体绘制Z轴。
+     * @param {GLCoordinateSystem} glCoordinateSystem
+     * @private
+     */
+    private drawZAxisWithRotatedCube(glCoordinateSystem: GLCoordinateSystem): void {
+        this.matStack.translate(new Vector3([0.0, 0.0, 0.8]));
+        this.matStack.rotate(glCoordinateSystem.angle * 2, Vector3.forward, false);
+        Matrix4.product(this.camera.viewProjectionMatrix, this.matStack.modelViewMatrix, this.cubeMVP);
+        DrawHelper.drawWireFrameCubeBox(this.builder, this.cubeMVP, 0.1, Vector4Adapter.blue);
+        this.matStack.popMatrix();
+    }
+    
+    /**
+     * 绘制绕坐标系旋转轴（s.axis）旋转的线框立方体
+     * @param {GLCoordinateSystem} glCoordinateSystem
+     * @private
+     */
+    private drawCubeWithRotatedAxis(glCoordinateSystem: GLCoordinateSystem): void {
+        this.matStack.pushMatrix();
+        const len: Vector3 = new Vector3();
+        this.matStack.translate(glCoordinateSystem.axis.scale(0.8, len));
+        this.matStack.translate(new Vector3([0, 0.3, 0]));
+        this.matStack.rotate(glCoordinateSystem.angle, glCoordinateSystem.axis, false);
+        Matrix4.product(this.camera.viewProjectionMatrix, this.matStack.modelViewMatrix, this.cubeMVP);
+        DrawHelper.drawWireFrameCubeBox(this.builder, this.cubeMVP, 0.1, new Vector4());
+        this.matStack.popMatrix();
+    }
+    
+    /**
+     * 坐标系的model-view-project矩阵
+     * @param {GLCoordinateSystem} glCoordinateSystem
+     * @private
+     */
+    private calcModelViewProjectionMatrix(glCoordinateSystem: GLCoordinateSystem): void {
+        // 设置当前的视口
+        this.camera.setViewport(glCoordinateSystem.viewport[0], glCoordinateSystem.viewport[1], glCoordinateSystem.viewport[2], glCoordinateSystem.viewport[3]);
+        // 1、绘制六轴坐标系
+        // 矩阵进栈
+        this.matStack.pushMatrix();
+        // 将坐标系平移到s.pos位置
+        this.matStack.translate(glCoordinateSystem.position);
+        // 坐标系绕着s.axis轴旋转s.angle度
+        this.matStack.rotate(glCoordinateSystem.angle, glCoordinateSystem.axis, false);
+        // 合成model-view-project矩阵
+        this._mvp = Matrix4.product(this.camera.viewProjectionMatrix, this.matStack.modelViewMatrix);
+    }
+    
+    /**
      * 绘制坐标轴文字
      * @private
      */
-    private drawCoordinateSystemText(): void {
+    private drawCoordinateSystemText(optionFull: boolean = true): void {
         // X
-        this.drawText(Vector3.right, EAxisType.X_AXIS, this._mvp, false);
-        // -X
-        this.drawText(new Vector3([-1, 0, 0]), EAxisType.X_AXIS, this._mvp, true);
+        this.drawAxisText(Vector3.right, EAxisType.X_AXIS, this._mvp, false);
         // Y
-        this.drawText(Vector3.up, EAxisType.Y_AXIS, this._mvp, false);
-        // -Y
-        this.drawText(new Vector3([0, -1, 0]), EAxisType.Y_AXIS, this._mvp, true);
+        this.drawAxisText(Vector3.up, EAxisType.Y_AXIS, this._mvp, false);
         if (!this._isD3dMode) {
             // Z
-            this.drawText(Vector3.forward, EAxisType.Z_AXIS, this._mvp, false);
+            this.drawAxisText(Vector3.forward, EAxisType.Z_AXIS, this._mvp, false);
+        }
+        if (!optionFull) return;
+        // -X
+        this.drawAxisText(new Vector3([1, 0, 0]), EAxisType.X_AXIS, this._mvp, true);
+        // -Y
+        this.drawAxisText(new Vector3([0, -1, 0]), EAxisType.Y_AXIS, this._mvp, true);
+        if (!this._isD3dMode) {
             // -Z
-            this.drawText(new Vector3([0, 0, -1]), EAxisType.Z_AXIS, this._mvp, true);
+            this.drawAxisText(new Vector3([0, 0, -1]), EAxisType.Z_AXIS, this._mvp, true);
         }
     }
     
     /**
-     * 绘制文字。
+     * 绘制坐标轴文字。
      * @param {Vector3} pos
      * @param {EAxisType} axis
      * @param {Matrix4} mvp
      * @param {boolean} inverse
      * @private
      */
-    private drawText(pos: Vector3, axis: EAxisType, mvp: Matrix4, inverse: boolean = false): void {
+    private drawAxisText(pos: Vector3, axis: EAxisType, mvp: Matrix4, inverse: boolean = false): void {
         if (!this.ctx2D) return;
         const out: Vector3 = new Vector3();
         // 调用 MathHelper.obj2ScreenSpace这个核心函数，将局部坐标系标示的一个点变换到屏幕坐标系上
-        if (MathHelper.obj2GLViewportSpace(pos, mvp, this.camera.getViewport(), out)) {
-            // 变换到屏幕坐标系，左手系，原点在左上角，x向右，y向下
-            out.y = this.canvas.height - out.y;
-            // 渲染状态进栈
-            this.ctx2D.save();
-            // 使用大一点的Arial字体对象
-            this.ctx2D.font = '30px Arial';
-            if (axis === EAxisType.X_AXIS) {
-                // Y轴为top对齐
-                this.ctx2D.textBaseline = 'top';
-                // 红色
-                this.ctx2D.fillStyle = 'red';
-                if (inverse) {
-                    this.ctx2D.textAlign = 'right';
-                    // 进行文字绘制
-                    this.ctx2D.fillText('-X', out.x, out.y);
-                } else {
-                    // X轴居中对齐
-                    this.ctx2D.textAlign = 'left';
-                    // 进行文字绘制
-                    this.ctx2D.fillText('X', out.x, out.y);
-                }
-            } else if (axis === EAxisType.Y_AXIS) {
-                // X轴居中对齐
-                this.ctx2D.textAlign = 'center';
-                // 绿色
-                this.ctx2D.fillStyle = 'green';
-                if (inverse) {
-                    // -Y轴为top对齐
-                    this.ctx2D.textBaseline = 'top';
-                    // 行文字绘制
-                    this.ctx2D.fillText('-Y', out.x, out.y);
-                } else {
-                    // Y轴为bottom对齐
-                    this.ctx2D.textBaseline = 'bottom';
-                    // 进行文字绘制
-                    this.ctx2D.fillText('Y', out.x, out.y);
-                }
-            } else {
-                // 绿色
-                this.ctx2D.fillStyle = 'blue';
-                // Y轴为top对齐
-                this.ctx2D.textBaseline = 'top';
-                if (inverse) {
-                    // X轴居中对齐
-                    this.ctx2D.textAlign = 'right';
-                    // 进行文字绘制
-                    this.ctx2D.fillText('-Z', out.x, out.y);
-                } else {
-                    // X轴居中对齐
-                    this.ctx2D.textAlign = 'left';
-                    // 进行文字绘制
-                    this.ctx2D.fillText('Z', out.x, out.y);
-                }
-            }
-            // 恢复原来的渲染状态
-            this.ctx2D.restore();
+        if (!MathHelper.obj2GLViewportSpace(pos, mvp, this.camera.getViewport(), out)) return;
+        // 变换到屏幕坐标系，左手系，原点在左上角，x向右，y向下
+        out.y = this.canvas.height - out.y;
+        // 渲染状态进栈
+        this.ctx2D.save();
+        // 使用大一点的Arial字体对象
+        this.ctx2D.font = '14px Arial';
+        switch (axis) {
+            case EAxisType.X_AXIS:
+                this.drawXAxisText(out, inverse);
+                break;
+            case EAxisType.Y_AXIS:
+                this.drawYAxisText(out, inverse);
+                break;
+            case EAxisType.Z_AXIS:
+                this.drawZAxisText(out, inverse);
+                break;
+            case EAxisType.NONE:
+            default:
+                break;
+        }
+        // 恢复原来的渲染状态
+        this.ctx2D.restore();
+        
+    }
+    
+    /**
+     * 绘制X轴文字。
+     * @param {Vector3} out
+     * @param {boolean} inverse
+     * @private
+     */
+    private drawXAxisText(out: Vector3, inverse: boolean): void {
+        if (!this.ctx2D) return;
+        // Y轴为top对齐
+        this.ctx2D.textBaseline = 'top';
+        // 红色
+        this.ctx2D.fillStyle = 'red';
+        if (inverse) {
+            this.ctx2D.textAlign = 'right';
+            // 进行文字绘制
+            this.ctx2D.fillText('-X', out.x, out.y);
+        } else {
+            // X轴居中对齐
+            this.ctx2D.textAlign = 'left';
+            // 进行文字绘制
+            this.ctx2D.fillText('X', out.x, out.y);
+        }
+    }
+    
+    /**
+     * 绘制Y轴文字。
+     * @param {Vector3} out
+     * @param {boolean} inverse
+     * @private
+     */
+    private drawYAxisText(out: Vector3, inverse: boolean): void {
+        if (!this.ctx2D) return;
+        // X轴居中对齐
+        this.ctx2D.textAlign = 'center';
+        // 绿色
+        this.ctx2D.fillStyle = 'green';
+        if (inverse) {
+            // -Y轴为top对齐
+            this.ctx2D.textBaseline = 'top';
+            // 行文字绘制
+            this.ctx2D.fillText('-Y', out.x, out.y);
+        } else {
+            // Y轴为bottom对齐
+            this.ctx2D.textBaseline = 'bottom';
+            // 进行文字绘制
+            this.ctx2D.fillText('Y', out.x, out.y);
+        }
+    }
+    
+    /**
+     *绘制Z轴文字。
+     * @param {Vector3} out
+     * @param {boolean} inverse
+     * @private
+     */
+    private drawZAxisText(out: Vector3, inverse: boolean): void {
+        if (!this.ctx2D) return;
+        // 绿色
+        this.ctx2D.fillStyle = 'blue';
+        // Y轴为top对齐
+        this.ctx2D.textBaseline = 'top';
+        if (inverse) {
+            // X轴居中对齐
+            this.ctx2D.textAlign = 'right';
+            // 进行文字绘制
+            this.ctx2D.fillText('-Z', out.x, out.y);
+        } else {
+            // X轴居中对齐
+            this.ctx2D.textAlign = 'left';
+            // 进行文字绘制
+            this.ctx2D.fillText('Z', out.x, out.y);
         }
     }
     
