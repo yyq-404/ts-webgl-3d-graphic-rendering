@@ -1,4 +1,4 @@
-import {Timer, TimerCallback} from "./Timer";
+import {Timer, TimerCallback} from './Timer';
 
 /**
  * 定时器管理器
@@ -8,32 +8,24 @@ export class TimerManager {
     private timers: Timer[] = [];
     /** 定时器编号 */
     private _timeId: number = -1;
-
+    
     /**
      * 增加定时器。
      *
      * @param callback
      * @param timeout
      * @param onlyOnce
-     * @param data
+     * @param callbackData
      */
-    public add(callback: TimerCallback, timeout: number = 1.0, onlyOnce: boolean = false, data: any = undefined): number {
+    public add(callback: TimerCallback, timeout: number = 1.0, onlyOnce: boolean = false, callbackData: any = undefined): number {
         let timer = this.timers.find(item => !item.enabled);
         if (!timer) {
-            timer = new Timer(callback);
-        } else {
-            timer.callback = callback;
-            timer.id = ++this._timeId;
+            timer = new Timer().setup(++this._timeId, callback, timeout, onlyOnce, callbackData);
+            this.timers.push(timer);
         }
-        timer.callbackData = data;
-        timer.timeout = timeout;
-        timer.countdown = timeout;
-        timer.enabled = true;
-        timer.onlyOnce = onlyOnce;
-        this.timers.push(timer);
         return timer.id;
     }
-
+    
     /**
      * 移除定时器。
      * @param id
@@ -46,7 +38,7 @@ export class TimerManager {
         }
         return false;
     }
-
+    
     /**
      * 更新。
      * @param intervalSec
@@ -58,9 +50,9 @@ export class TimerManager {
             if (!timer.enabled) continue;
             timer.countdown -= intervalSec;
             if (timer.countdown < 0) {
-                timer.callback(timer.id, timer.callbackData);
+                timer.callback && timer.callback(timer.id, timer.callbackData);
                 if (timer.onlyOnce) {
-                    this.remove(timer.id)
+                    this.remove(timer.id);
                 } else {
                     timer.countdown = timer.timeout;
                 }

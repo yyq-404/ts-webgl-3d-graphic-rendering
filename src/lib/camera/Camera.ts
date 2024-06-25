@@ -377,7 +377,7 @@ export class Camera {
         // 计算视图矩阵
         this.calcViewMatrix();
         // 使用 _projectionMatrix * _viewMatrix顺序合成_viewProjectionMatrix，注意矩阵相乘的顺序
-        Matrix4.product(this._projectionMatrix, this._viewMatrix, this._viewProjectionMatrix);
+        this._viewProjectionMatrix = Matrix4.product(this._projectionMatrix, this._viewMatrix);
         // 然后再计算出_viewProjMatrix的逆矩阵
         // this._invViewProjectionMatrix.inverse();
     }
