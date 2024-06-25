@@ -3,7 +3,6 @@ import {GLProgram} from '../webgl/program/GLProgram';
 import {GLTexture} from '../webgl/texture/GLTexture';
 import {Cube} from '../lib/geometry/Cube';
 import {GLStaticMesh} from '../webgl/mesh/GLStaticMesh';
-import {MathHelper} from '../common/math/MathHelper';
 import {Matrix4} from '../common/math/matrix/Matrix4';
 import {GLProgramCache} from '../webgl/program/GLProgramCache';
 import {Geometry} from '../lib/geometry/Geometry';
@@ -40,7 +39,7 @@ export class RotatingCubeApplication extends CameraApplication {
     /** cube的角速度 */
     private readonly _cubeSpeed: number;
     /** 合成的cube的世界矩阵 */
-    private readonly _cubeMatrix: Matrix4;
+    private _cubeMatrix: Matrix4;
     // 三角形
     /** 三角形的角位移 */
     private _triangleAngle: number;
@@ -88,79 +87,6 @@ export class RotatingCubeApplication extends CameraApplication {
         this._triangleMatrix = new Matrix4().setIdentity();
         // 调整摄像机的位置
         this.camera.z = 8;
-    }
-    
-    /**
-     * 绘制文本
-     * @param pos
-     * @param axis
-     * @param mvp
-     * @param inverse
-     */
-    public drawText(pos: Vector3, axis: EAxisType, mvp: Matrix4, inverse: boolean = false): void {
-        if (this.ctx2D === null) {
-            return;
-        }
-        const out: Vector3 = new Vector3();
-        // 调用 MathHelper.obj2ScreenSpace这个核心函数，将局部坐标系标示的一个点变换到屏幕坐标系上
-        if (MathHelper.obj2GLViewportSpace(pos, mvp, this.camera.getViewport(), out)) {
-            // 变换到屏幕坐标系，左手系，原点在左上角，x向右，y向下
-            out.y = this.canvas.height - out.y;
-            // 渲染状态进栈
-            this.ctx2D.save();
-            // 使用大一点的Arial字体对象
-            this.ctx2D.font = '30px Arial';
-            if (axis === EAxisType.X_AXIS) {
-                // Y轴为top对齐
-                this.ctx2D.textBaseline = 'top';
-                // 红色
-                this.ctx2D.fillStyle = 'red';
-                if (inverse) {
-                    this.ctx2D.textAlign = 'right';
-                    // 进行文字绘制
-                    this.ctx2D.fillText('-X', out.x, out.y);
-                } else {
-                    // X轴居中对齐
-                    this.ctx2D.textAlign = 'left';
-                    // 进行文字绘制
-                    this.ctx2D.fillText('X', out.x, out.y);
-                }
-            } else if (axis === EAxisType.Y_AXIS) {
-                // X轴居中对齐
-                this.ctx2D.textAlign = 'center';
-                // 绿色
-                this.ctx2D.fillStyle = 'green';
-                if (inverse) {
-                    // -Y轴为top对齐
-                    this.ctx2D.textBaseline = 'top';
-                    // 行文字绘制
-                    this.ctx2D.fillText('-Y', out.x, out.y);
-                } else {
-                    // Y轴为bottom对齐
-                    this.ctx2D.textBaseline = 'bottom';
-                    // 进行文字绘制
-                    this.ctx2D.fillText('Y', out.x, out.y);
-                }
-            } else {
-                // 绿色
-                this.ctx2D.fillStyle = 'blue';
-                // Y轴为top对齐
-                this.ctx2D.textBaseline = 'top';
-                if (inverse) {
-                    // X轴居中对齐
-                    this.ctx2D.textAlign = 'right';
-                    // 进行文字绘制
-                    this.ctx2D.fillText('-Z', out.x, out.y);
-                } else {
-                    // X轴居中对齐
-                    this.ctx2D.textAlign = 'left';
-                    // 进行文字绘制
-                    this.ctx2D.fillText('Z', out.x, out.y);
-                }
-            }
-            // 恢复原来的渲染状态
-            this.ctx2D.restore();
-        }
     }
     
     /**
@@ -271,7 +197,7 @@ export class RotatingCubeApplication extends CameraApplication {
         // 以角度(非弧度)为单位，每帧旋转
         this.matStack.rotate(this._cubeAngle, Vector3.up, false);
         // 合成modelViewProjection矩阵
-        Matrix4.product(this.camera.viewProjectionMatrix, this.matStack.modelViewMatrix, this._cubeMatrix);
+        this._cubeMatrix = Matrix4.product(this.camera.viewProjectionMatrix, this.matStack.modelViewMatrix);
         // 将合成的矩阵给GLProgram对象
         this._textureProgram.setMatrix4(CLShaderConstants.MVPMatrix, this._cubeMatrix);
         // 使用当前绑定的texture和program绘制cubeVao对象

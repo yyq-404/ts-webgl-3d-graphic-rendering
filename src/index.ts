@@ -1,6 +1,7 @@
 import {BaseApplication} from './base/BaseApplication';
 import {RotatingCubeApplication} from './apps/RotationCubeApplication';
 import {BasicWebGLApplication} from './apps/BasicWebGLApplication';
+import {CoordinateSystemApplication} from './apps/CoordinateSystemApplication';
 
 /** 选择器控件 */
 let select: HTMLSelectElement = document.getElementById('select') as HTMLSelectElement;
@@ -10,7 +11,8 @@ let canvas: HTMLCanvasElement | null = document.getElementById('webgl') as HTMLC
 /** 应用集合 */
 const apps = {
     'chapter 3: RotatingCubeApplication': RotatingCubeApplication,
-    'chapter 4: BasicWebGLApplication': BasicWebGLApplication
+    'chapter 5: BasicWebGLApplication': BasicWebGLApplication,
+    'chapter 6: CoordinateSystemApplication': CoordinateSystemApplication
 };
 
 /** 调试信息 */
