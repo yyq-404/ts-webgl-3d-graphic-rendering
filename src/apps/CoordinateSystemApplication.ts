@@ -281,7 +281,7 @@ export class CoordinateSystemApplication extends CameraApplication {
      */
     public override update(elapsedMsec: number, intervalSec: number): void {
         // s = vt，根据两帧间隔更新角速度和角位移
-        // this._coordinateSystems.forEach((s: GLCoordinateSystem) => (s.angle += this._speed));
+        this._coordinateSystems.forEach((s: GLCoordinateSystem) => (s.angle += this._speed));
         // 我们在CameraApplication中也覆写（override）的update方法
         // CameraApplication的update方法用来计算摄像机的投影矩阵以及视图矩阵
         // 所以我们必须要调用基类方法，用于控制摄像机更新
