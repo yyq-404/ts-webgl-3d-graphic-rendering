@@ -21,7 +21,7 @@ export class Vector4Adapter {
     public static green: Vector4 = new Vector4([0.0, 1.0, 0.0, 1.0]);
     /** 蓝色 */
     public static blue: Vector4 = new Vector4([0.0, 0.0, 1.0, 1.0]);
-    /** 色 */
+    /** 黑色 */
     public static black: Vector4 = new Vector4([0, 0, 0, 0]);
 }
 

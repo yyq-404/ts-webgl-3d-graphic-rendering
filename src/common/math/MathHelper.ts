@@ -6,16 +6,6 @@ import {Matrix4} from './matrix/Matrix4';
 import {MathAdapter} from './MathAdapter';
 
 /**
- * 坐标轴类型
- */
-export enum EAxisType {
-    NONE = -1,
-    X_AXIS,
-    Y_AXIS,
-    Z_AXIS,
-}
-
-/**
  * 点与平面之间的关系
  */
 export enum EPlaneLoc {
@@ -75,9 +65,8 @@ export class MathHelper {
      * @param left
      * @param right
      */
-    static numberEquals(left: number, right: number): boolean {
+    public static numberEquals(left: number, right: number): boolean {
         return Math.abs(left - right) <= MathAdapter.EPSILON;
-        
     }
     
     /**
@@ -95,21 +84,21 @@ export class MathHelper {
      * @param a
      * @param b
      * @param c
-     * @param result
-     * @param result
+     * @param dest
+     * @param dest
      */
-    static planeFromPoints(a: Vector3, b: Vector3, c: Vector3, result: Vector4 | null = null): Vector4 {
-        if (!result) result = new Vector4();
+    public static planeFromPoints(a: Vector3, b: Vector3, c: Vector3, dest?: Vector4): Vector4 {
+        if (!dest) dest = new Vector4();
         const normal: Vector3 = new Vector3();
         // 计算三个点构成的三角形的法线
         this.computeNormal(a, b, c, normal);
         // 计算ax+by+cz+d=0中的d
         const d: number = -Vector3.dot(normal, a);
-        result.x = normal.x;
-        result.y = normal.y;
-        result.z = normal.z;
-        result.w = d;
-        return result;
+        dest.x = normal.x;
+        dest.y = normal.y;
+        dest.z = normal.z;
+        dest.w = d;
+        return dest;
     }
     
     /**
@@ -134,15 +123,15 @@ export class MathHelper {
      * 通过一条法线和一个点来构造一个平面，平面的隐式方程：ax+by+cz+d=0
      * @param point
      * @param normal
-     * @param result
+     * @param dest
      */
-    public static planeFromPointNormal(point: Vector3, normal: Vector3, result: Vector4 | null = null): Vector4 {
-        if (!result) result = new Vector4();
-        result.x = normal.x;
-        result.y = normal.y;
-        result.z = normal.z;
-        result.w = -Vector3.dot(normal, point);
-        return result;
+    public static planeFromPointNormal(point: Vector3, normal: Vector3, dest?: Vector4): Vector4 {
+        if (!dest) dest = new Vector4();
+        dest.x = normal.x;
+        dest.y = normal.y;
+        dest.z = normal.z;
+        dest.w = -Vector3.dot(normal, point);
+        return dest;
     }
     
     /**
@@ -185,7 +174,8 @@ export class MathHelper {
             // 小于负容差数（-0.0001），点在平面的背面
             return EPlaneLoc.BACK;
         } else {
-            return EPlaneLoc.COPLANAR; // 有向距离在-0.0001～+0.0001之间，表示点与平面共面
+            // 有向距离在-0.0001～+0.0001之间，表示点与平面共面
+            return EPlaneLoc.COPLANAR;
         }
     }
     
@@ -236,28 +226,16 @@ export class MathHelper {
      * @param maxs
      */
     public static boundBoxAddPoint(v: Vector3, mins: Vector3, maxs: Vector3): void {
-        if (v.x < mins.x) {
-            mins.x = v.x;
-        }
+        if (v.x < mins.x) mins.x = v.x;
         // v的x轴分量小于小的，就更新mins.x分量值
-        if (v.x > maxs.x) {
-            maxs.x = v.x;
-        }
+        if (v.x > maxs.x) maxs.x = v.x;
         // v的x轴分量大于大的，就更新maxs.x分量值
         // 原理同上
-        if (v.y < mins.y) {
-            mins.y = v.y;
-        }
-        if (v.y > maxs.y) {
-            maxs.y = v.y;
-        }
+        if (v.y < mins.y) mins.y = v.y;
+        if (v.y > maxs.y) maxs.y = v.y;
         // 原理同上
-        if (v.z < mins.z) {
-            mins.z = v.z;
-        }
-        if (v.z > maxs.z) {
-            maxs.z = v.z;
-        }
+        if (v.z < mins.z) mins.z = v.z;
+        if (v.z > maxs.z) maxs.z = v.z;
     }
     
     /**
@@ -267,8 +245,10 @@ export class MathHelper {
      * @param value
      */
     public static boundBoxClear(mins: Vector3, maxs: Vector3, value: number = Infinity): void {
-        mins.x = mins.y = mins.z = value; // 初始化时，让mins表示浮点数的最大范围
-        maxs.x = maxs.y = maxs.z = -value; // 初始化是，让maxs表示浮点数的最小范围
+        // 初始化时，让mins表示浮点数的最大范围
+        mins.x = mins.y = mins.z = value;
+        // 初始化是，让maxs表示浮点数的最小范围
+        maxs.x = maxs.y = maxs.z = -value;
     }
     
     /**
@@ -375,8 +355,8 @@ export class MathHelper {
      * @param v
      * @param scale
      */
-    public static convertVector3IDCoord2GLCoord(v: Vector3, scale: number = 10.0): void {
-        // opengl right = dooom3 x
+    public static convertVector3IDCoordinate2GLCoordinate(v: Vector3, scale: number = 10.0): void {
+        // opengl right = doom3 x
         const f: number = v.y;
         //opengl up = doom3 z
         v.y = v.z;
@@ -405,9 +385,7 @@ export class MathHelper {
      * @param dest
      */
     public static matrixFrom(pos: Vector3, q: Quaternion, dest: Matrix4 | null = null): Matrix4 {
-        if (!dest) {
-            dest = new Matrix4().setIdentity();
-        }
+        if (!dest) dest = new Matrix4().setIdentity();
         q.toMatrix4(dest);
         // 调用quaternion的toMatrix4方法，再放入平移部分数据
         return dest.init([...dest.all().slice(0, 12), pos.x, pos.y, pos.z, dest.all()[15]]);

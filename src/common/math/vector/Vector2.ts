@@ -13,7 +13,7 @@ export class Vector2 {
     /** 单位向量 */
     public static readonly one = new Vector2([1, 1]);
     /** 值 */
-    private values = new Float32Array(2);
+    private _values = new Float32Array(2);
     
     /**
      * 构造
@@ -30,7 +30,7 @@ export class Vector2 {
      * @return {number}
      */
     get x(): number {
-        return this.values[0];
+        return this._values[0];
     }
     
     /**
@@ -38,7 +38,7 @@ export class Vector2 {
      * @param {number} value
      */
     set x(value: number) {
-        this.values[0] = value;
+        this._values[0] = value;
     }
     
     /**
@@ -46,7 +46,7 @@ export class Vector2 {
      * @return {number}
      */
     get y(): number {
-        return this.values[1];
+        return this._values[1];
     }
     
     /**
@@ -54,7 +54,7 @@ export class Vector2 {
      * @param {number} value
      */
     set y(value: number) {
-        this.values[1] = value;
+        this._values[1] = value;
     }
     
     /**
@@ -62,7 +62,7 @@ export class Vector2 {
      * @return {[number, number]}
      */
     get xy(): [number, number] {
-        return [this.values[0], this.values[1]];
+        return [this._values[0], this._values[1]];
     }
     
     /**
@@ -70,8 +70,8 @@ export class Vector2 {
      * @param {[number, number]} values
      */
     set xy(values: [number, number]) {
-        this.values[0] = values[0];
-        this.values[1] = values[1];
+        this._values[0] = values[0];
+        this._values[1] = values[1];
     }
     
     /**
@@ -82,9 +82,7 @@ export class Vector2 {
      * @return {Vector3}
      */
     public static cross(vector: Vector2, vector2: Vector2, dest?: Vector3): Vector3 {
-        if (!dest) {
-            dest = new Vector3();
-        }
+        if (!dest) dest = new Vector3();
         const x = vector.x;
         const y = vector.y;
         const x2 = vector2.x;
@@ -136,9 +134,7 @@ export class Vector2 {
      * @return {Vector2}
      */
     public static direction(vector: Vector2, vector2: Vector2, dest?: Vector2): Vector2 {
-        if (!dest) {
-            dest = new Vector2();
-        }
+        if (!dest) dest = new Vector2();
         const x = vector.x - vector2.x;
         const y = vector.y - vector2.y;
         let length = Math.sqrt(x * x + y * y);
@@ -162,9 +158,7 @@ export class Vector2 {
      * @return {Vector2}
      */
     public static mix(vector: Vector2, vector2: Vector2, time: number, dest?: Vector2): Vector2 {
-        if (!dest) {
-            dest = new Vector2();
-        }
+        if (!dest) dest = new Vector2();
         const x = vector.x;
         const y = vector.y;
         const x2 = vector2.x;
@@ -182,9 +176,7 @@ export class Vector2 {
      * @return {Vector2}
      */
     public static sum(vector: Vector2, vector2: Vector2, dest?: Vector2): Vector2 {
-        if (!dest) {
-            dest = new Vector2();
-        }
+        if (!dest) dest = new Vector2();
         dest.x = vector.x + vector2.x;
         dest.y = vector.y + vector2.y;
         return dest;
@@ -198,9 +190,7 @@ export class Vector2 {
      * @return {Vector2}
      */
     public static difference(vector: Vector2, vector2: Vector2, dest?: Vector2): Vector2 {
-        if (!dest) {
-            dest = new Vector2();
-        }
+        if (!dest) dest = new Vector2();
         dest.x = vector.x - vector2.x;
         dest.y = vector.y - vector2.y;
         return dest;
@@ -214,9 +204,7 @@ export class Vector2 {
      * @return {Vector2}
      */
     public static product(vector: Vector2, vector2: Vector2, dest?: Vector2): Vector2 {
-        if (!dest) {
-            dest = new Vector2();
-        }
+        if (!dest) dest = new Vector2();
         dest.x = vector.x * vector2.x;
         dest.y = vector.y * vector2.y;
         return dest;
@@ -230,9 +218,7 @@ export class Vector2 {
      * @return {Vector2}
      */
     public static quotient(vector: Vector2, vector2: Vector2, dest?: Vector2): Vector2 {
-        if (!dest) {
-            dest = new Vector2();
-        }
+        if (!dest) dest = new Vector2();
         dest.x = vector.x / vector2.x;
         dest.y = vector.y / vector2.y;
         return dest;
@@ -244,7 +230,7 @@ export class Vector2 {
      * @return {number}
      */
     public at(index: number): number {
-        return this.values[index];
+        return this._values[index];
     }
     
     /**
@@ -261,9 +247,7 @@ export class Vector2 {
      * @return {Vector2}
      */
     public copy(dest?: Vector2): Vector2 {
-        if (!dest) {
-            dest = new Vector2();
-        }
+        if (!dest) dest = new Vector2();
         dest.x = this.x;
         dest.y = this.y;
         return dest;
@@ -275,9 +259,7 @@ export class Vector2 {
      * @return {Vector2}
      */
     public negate(dest?: Vector2): Vector2 {
-        if (!dest) {
-            dest = this;
-        }
+        if (!dest) dest = this;
         dest.x = -this.x;
         dest.y = -this.y;
         return dest;
@@ -365,9 +347,7 @@ export class Vector2 {
      * @return {Vector2}
      */
     public scale(value: number, dest?: Vector2): Vector2 {
-        if (!dest) {
-            dest = this;
-        }
+        if (!dest) dest = this;
         dest.x *= value;
         dest.y *= value;
         return dest;
@@ -379,9 +359,7 @@ export class Vector2 {
      * @return {Vector2}
      */
     public normalize(dest?: Vector2): Vector2 {
-        if (!dest) {
-            dest = this;
-        }
+        if (!dest) dest = this;
         let length = this.length();
         if (length === 1) {
             return this;
@@ -404,9 +382,7 @@ export class Vector2 {
      * @return {Vector2}
      */
     public multiplyMatrix2(matrix: Matrix2, dest?: Vector2): Vector2 {
-        if (!dest) {
-            dest = this;
-        }
+        if (!dest) dest = this;
         return matrix.multiplyVec2(this, dest);
     }
     
@@ -417,9 +393,7 @@ export class Vector2 {
      * @return {Vector2}
      */
     public multiplyMatrix3(matrix: Matrix3, dest?: Vector2): Vector2 {
-        if (!dest) {
-            dest = this;
-        }
+        if (!dest) dest = this;
         return matrix.multiplyVector2(this, dest);
     }
 }

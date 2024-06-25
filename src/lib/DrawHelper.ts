@@ -1,9 +1,9 @@
-import {EAxisType} from '../common/math/MathHelper';
-import {GLMeshBuilder} from "../webgl/mesh/GLMeshBuilder";
-import {Matrix4} from "../common/math/matrix/Matrix4";
-import {Vector3} from "../common/math/vector/Vector3";
-import {Vector4} from "../common/math/vector/Vector4";
-import {Vector4Adapter} from "../common/math/MathAdapter";
+import {GLMeshBuilder} from '../webgl/mesh/GLMeshBuilder';
+import {Matrix4} from '../common/math/matrix/Matrix4';
+import {Vector3} from '../common/math/vector/Vector3';
+import {Vector4} from '../common/math/vector/Vector4';
+import {Vector4Adapter} from '../common/math/MathAdapter';
+import {EAxisType} from '../enum/EAxisType';
 
 /**
  *绘制助手
@@ -11,7 +11,7 @@ import {Vector4Adapter} from "../common/math/MathAdapter";
 export class DrawHelper {
     // FIXME static defaultHitColor: Vector4 = new Vector4([1, 1, 0]);
     public static defaultHitColor: Vector4 = new Vector4([1, 1, 0, 0]);
-
+    
     /**
      * 绘制立方体
      * @param builder
@@ -24,7 +24,7 @@ export class DrawHelper {
         const maxs: Vector3 = new Vector3([halfLen, halfLen, halfLen]);
         DrawHelper.drawBoundBox(builder, mat, mins, maxs, color);
     }
-
+    
     /**
      * 根据 `mins` 点（下图中的顶点2，左下后）和 `maxs`（下图中的顶点5，右上前）点的坐标，
      * 使用参数指定的颜色绘制线框绑定盒，它是一个立方体
@@ -73,7 +73,7 @@ export class DrawHelper {
             builder.end(mat);
         }
     }
-
+    
     /**
      * 绘制纹理立方体
      * ```plaintext
@@ -98,8 +98,8 @@ export class DrawHelper {
                                          ...[0, 0, 1, 0, 1, 1, 0, 1], // 后面
                                          ...[0, 0, 1, 0, 1, 1, 0, 1], // 左面
                                          ...[0, 0, 1, 0, 1, 1, 0, 1], // 上面
-                                         ...[0, 0, 1, 0, 1, 1, 0, 1], // 下面
-                                     ],
+                                         ...[0, 0, 1, 0, 1, 1, 0, 1] // 下面
+                                     ]
     ): void {
         // 前面
         builder.begin(builder.gl.TRIANGLE_FAN);
@@ -144,7 +144,7 @@ export class DrawHelper {
         builder.texCoordinate(tc[46], tc[47]).vertex(halfLen, -halfLen, halfLen); // 4   + - +
         builder.end(mat);
     }
-
+    
     /**
      * 绘制完全坐标系
      * @param builder
@@ -196,7 +196,7 @@ export class DrawHelper {
         builder.gl.lineWidth(1); // 恢复线宽为1个像素
         builder.gl.enable(builder.gl.DEPTH_TEST); // 恢复开始帧缓存深度测试
     }
-
+    
     /**
      * 绘制坐标系。
      * @param builder
@@ -211,8 +211,8 @@ export class DrawHelper {
         builder.gl.disable(builder.gl.DEPTH_TEST);
         builder.begin(builder.gl.LINES);
         if (hitAxis === EAxisType.X_AXIS) {
-            builder.color(DrawHelper.defaultHitColor.r, DrawHelper.defaultHitColor.g, DrawHelper.defaultHitColor.b,).vertex(0.0, 0.0, 0.0);
-            builder.color(DrawHelper.defaultHitColor.r, DrawHelper.defaultHitColor.g, DrawHelper.defaultHitColor.b,).vertex(len, 0, 0);
+            builder.color(DrawHelper.defaultHitColor.r, DrawHelper.defaultHitColor.g, DrawHelper.defaultHitColor.b).vertex(0.0, 0.0, 0.0);
+            builder.color(DrawHelper.defaultHitColor.r, DrawHelper.defaultHitColor.g, DrawHelper.defaultHitColor.b).vertex(len, 0, 0);
         } else {
             builder.color(1.0, 0.0, 0.0).vertex(0.0, 0.0, 0.0);
             builder.color(1.0, 0.0, 0.0).vertex(len, 0, 0);

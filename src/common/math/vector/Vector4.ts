@@ -11,7 +11,7 @@ export class Vector4 {
     /** 单位向量 */
     public static readonly one = new Vector4([1, 1, 1, 1]);
     /** 值*/
-    private values = new Float32Array(4);
+    private _values = new Float32Array(4);
     
     /**
      * 构造
@@ -28,7 +28,7 @@ export class Vector4 {
      * @return {number}
      */
     public get x(): number {
-        return this.values[0];
+        return this._values[0];
     }
     
     /**
@@ -36,7 +36,7 @@ export class Vector4 {
      * @param {number} value
      */
     public set x(value: number) {
-        this.values[0] = value;
+        this._values[0] = value;
     }
     
     /**
@@ -44,7 +44,7 @@ export class Vector4 {
      * @return {number}
      */
     public get y(): number {
-        return this.values[1];
+        return this._values[1];
     }
     
     /**
@@ -52,7 +52,7 @@ export class Vector4 {
      * @param {number} value
      */
     public set y(value: number) {
-        this.values[1] = value;
+        this._values[1] = value;
     }
     
     /**
@@ -60,7 +60,7 @@ export class Vector4 {
      * @return {number}
      */
     public get z(): number {
-        return this.values[2];
+        return this._values[2];
     }
     
     /**
@@ -68,7 +68,7 @@ export class Vector4 {
      * @param {number} value
      */
     public set z(value: number) {
-        this.values[2] = value;
+        this._values[2] = value;
     }
     
     /**
@@ -76,7 +76,7 @@ export class Vector4 {
      * @return {number}
      */
     public get w(): number {
-        return this.values[3];
+        return this._values[3];
     }
     
     /**
@@ -84,7 +84,7 @@ export class Vector4 {
      * @param {number} value
      */
     public set w(value: number) {
-        this.values[3] = value;
+        this._values[3] = value;
     }
     
     /**
@@ -92,7 +92,7 @@ export class Vector4 {
      * @return {[number, number]}
      */
     public get xy(): [number, number] {
-        return [this.values[0], this.values[1]];
+        return [this._values[0], this._values[1]];
     }
     
     /**
@@ -100,8 +100,8 @@ export class Vector4 {
      * @param {[number, number]} values
      */
     public set xy(values: [number, number]) {
-        this.values[0] = values[0];
-        this.values[1] = values[1];
+        this._values[0] = values[0];
+        this._values[1] = values[1];
     }
     
     /**
@@ -109,7 +109,7 @@ export class Vector4 {
      * @return {[number, number, number]}
      */
     public get xyz(): [number, number, number] {
-        return [this.values[0], this.values[1], this.values[2]];
+        return [this._values[0], this._values[1], this._values[2]];
     }
     
     /**
@@ -117,9 +117,9 @@ export class Vector4 {
      * @param {[number, number, number]} values
      */
     public set xyz(values: [number, number, number]) {
-        this.values[0] = values[0];
-        this.values[1] = values[1];
-        this.values[2] = values[2];
+        this._values[0] = values[0];
+        this._values[1] = values[1];
+        this._values[2] = values[2];
     }
     
     /**
@@ -127,7 +127,7 @@ export class Vector4 {
      * @return {[number, number, number, number]}
      */
     public get xyzw(): [number, number, number, number] {
-        return [this.values[0], this.values[1], this.values[2], this.values[3]];
+        return [this._values[0], this._values[1], this._values[2], this._values[3]];
     }
     
     /**
@@ -135,10 +135,10 @@ export class Vector4 {
      * @param {[number, number, number, number]} values
      */
     public set xyzw(values: [number, number, number, number]) {
-        this.values[0] = values[0];
-        this.values[1] = values[1];
-        this.values[2] = values[2];
-        this.values[3] = values[3];
+        this._values[0] = values[0];
+        this._values[1] = values[1];
+        this._values[2] = values[2];
+        this._values[3] = values[3];
     }
     
     /**
@@ -146,7 +146,7 @@ export class Vector4 {
      * @return {number}
      */
     public get r(): number {
-        return this.values[0];
+        return this._values[0];
     }
     
     /**
@@ -154,7 +154,7 @@ export class Vector4 {
      * @param {number} value
      */
     set r(value: number) {
-        this.values[0] = value;
+        this._values[0] = value;
     }
     
     /**
@@ -162,7 +162,7 @@ export class Vector4 {
      * @return {number}
      */
     get g(): number {
-        return this.values[1];
+        return this._values[1];
     }
     
     /**
@@ -170,7 +170,7 @@ export class Vector4 {
      * @param {number} value
      */
     set g(value: number) {
-        this.values[1] = value;
+        this._values[1] = value;
     }
     
     /**
@@ -178,7 +178,7 @@ export class Vector4 {
      * @return {number}
      */
     get b(): number {
-        return this.values[2];
+        return this._values[2];
     }
     
     /**
@@ -186,7 +186,7 @@ export class Vector4 {
      * @param {number} value
      */
     set b(value: number) {
-        this.values[2] = value;
+        this._values[2] = value;
     }
     
     /**
@@ -194,7 +194,7 @@ export class Vector4 {
      * @return {number}
      */
     get a(): number {
-        return this.values[3];
+        return this._values[3];
     }
     
     /**
@@ -202,7 +202,7 @@ export class Vector4 {
      * @param {number} value
      */
     set a(value: number) {
-        this.values[3] = value;
+        this._values[3] = value;
     }
     
     /**
@@ -210,7 +210,7 @@ export class Vector4 {
      * @return {[number, number]}
      */
     get rg(): [number, number] {
-        return [this.values[0], this.values[1]];
+        return [this._values[0], this._values[1]];
     }
     
     /**
@@ -218,8 +218,8 @@ export class Vector4 {
      * @param {[number, number]} values
      */
     set rg(values: [number, number]) {
-        this.values[0] = values[0];
-        this.values[1] = values[1];
+        this._values[0] = values[0];
+        this._values[1] = values[1];
     }
     
     /**
@@ -227,7 +227,7 @@ export class Vector4 {
      * @return {[number, number, number]}
      */
     public get rgb(): [number, number, number] {
-        return [this.values[0], this.values[1], this.values[2]];
+        return [this._values[0], this._values[1], this._values[2]];
     }
     
     /**
@@ -235,9 +235,9 @@ export class Vector4 {
      * @param {[number, number, number]} values
      */
     public set rgb(values: [number, number, number]) {
-        this.values[0] = values[0];
-        this.values[1] = values[1];
-        this.values[2] = values[2];
+        this._values[0] = values[0];
+        this._values[1] = values[1];
+        this._values[2] = values[2];
     }
     
     /**
@@ -246,10 +246,10 @@ export class Vector4 {
      */
     public get rgba(): [number, number, number, number] {
         return [
-            this.values[0],
-            this.values[1],
-            this.values[2],
-            this.values[3]
+            this._values[0],
+            this._values[1],
+            this._values[2],
+            this._values[3]
         ];
     }
     
@@ -258,10 +258,10 @@ export class Vector4 {
      * @param {[number, number, number, number]} values
      */
     public set rgba(values: [number, number, number, number]) {
-        this.values[0] = values[0];
-        this.values[1] = values[1];
-        this.values[2] = values[2];
-        this.values[3] = values[3];
+        this._values[0] = values[0];
+        this._values[1] = values[1];
+        this._values[2] = values[2];
+        this._values[3] = values[3];
     }
     
     /**
@@ -273,9 +273,7 @@ export class Vector4 {
      * @return {Vector4}
      */
     public static mix(vector: Vector4, vector2: Vector4, time: number, dest?: Vector4): Vector4 {
-        if (!dest) {
-            dest = new Vector4();
-        }
+        if (!dest) dest = new Vector4();
         dest.x = vector.x + time * (vector2.x - vector.x);
         dest.y = vector.y + time * (vector2.y - vector.y);
         dest.z = vector.z + time * (vector2.z - vector.z);
@@ -291,9 +289,7 @@ export class Vector4 {
      * @return {Vector4}
      */
     public static sum(vector: Vector4, vector2: Vector4, dest?: Vector4): Vector4 {
-        if (!dest) {
-            dest = new Vector4();
-        }
+        if (!dest) dest = new Vector4();
         dest.x = vector.x + vector2.x;
         dest.y = vector.y + vector2.y;
         dest.z = vector.z + vector2.z;
@@ -309,9 +305,7 @@ export class Vector4 {
      * @return {Vector4}
      */
     public static difference(vector: Vector4, vector2: Vector4, dest?: Vector4): Vector4 {
-        if (!dest) {
-            dest = new Vector4();
-        }
+        if (!dest) dest = new Vector4();
         dest.x = vector.x - vector2.x;
         dest.y = vector.y - vector2.y;
         dest.z = vector.z - vector2.z;
@@ -328,9 +322,7 @@ export class Vector4 {
      * @return {Vector4}
      */
     public static product(vector: Vector4, vector2: Vector4, dest?: Vector4): Vector4 {
-        if (!dest) {
-            dest = new Vector4();
-        }
+        if (!dest) dest = new Vector4();
         dest.x = vector.x * vector2.x;
         dest.y = vector.y * vector2.y;
         dest.z = vector.z * vector2.z;
@@ -346,9 +338,7 @@ export class Vector4 {
      * @return {Vector4}
      */
     public static quotient(vector: Vector4, vector2: Vector4, dest?: Vector4): Vector4 {
-        if (!dest) {
-            dest = new Vector4();
-        }
+        if (!dest) dest = new Vector4();
         dest.x = vector.x / vector2.x;
         dest.y = vector.y / vector2.y;
         dest.z = vector.z / vector2.z;
@@ -362,7 +352,7 @@ export class Vector4 {
      * @return {number}
      */
     public at(index: number): number {
-        return this.values[index];
+        return this._values[index];
     }
     
     /**
@@ -381,9 +371,7 @@ export class Vector4 {
      * @return {Vector4}
      */
     public copy(dest?: Vector4): Vector4 {
-        if (!dest) {
-            dest = new Vector4();
-        }
+        if (!dest) dest = new Vector4();
         dest.x = this.x;
         dest.y = this.y;
         dest.z = this.z;
@@ -397,9 +385,7 @@ export class Vector4 {
      * @return {Vector4}
      */
     public negate(dest?: Vector4): Vector4 {
-        if (!dest) {
-            dest = this;
-        }
+        if (!dest) dest = this;
         dest.x = -this.x;
         dest.y = -this.y;
         dest.z = -this.z;
@@ -499,9 +485,7 @@ export class Vector4 {
      * @return {Vector4}
      */
     public scale(value: number, dest?: Vector4): Vector4 {
-        if (!dest) {
-            dest = this;
-        }
+        if (!dest) dest = this;
         dest.x *= value;
         dest.y *= value;
         dest.z *= value;
@@ -515,9 +499,7 @@ export class Vector4 {
      * @return {Vector4}
      */
     public normalize(dest?: Vector4): Vector4 {
-        if (!dest) {
-            dest = this;
-        }
+        if (!dest) dest = this;
         let length = this.length();
         if (length === 1) {
             return this;
@@ -544,9 +526,7 @@ export class Vector4 {
      * @return {Vector4}
      */
     public multiplyMatrix4(matrix: Matrix4, dest?: Vector4): Vector4 {
-        if (!dest) {
-            dest = this;
-        }
+        if (!dest) dest = this;
         return matrix.multiplyVector4(this, dest);
     }
 }

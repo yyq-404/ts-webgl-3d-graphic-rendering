@@ -17,7 +17,7 @@ export class Vector3 {
     /** 前 */
     public static readonly forward = new Vector3([0, 0, 1]);
     /** 值 */
-    private values = new Float32Array(3);
+    private _values = new Float32Array(3);
     
     /**
      * 构造
@@ -34,7 +34,7 @@ export class Vector3 {
      * @return {number}
      */
     get x(): number {
-        return this.values[0];
+        return this._values[0];
     }
     
     /**
@@ -42,7 +42,7 @@ export class Vector3 {
      * @param {number} value
      */
     set x(value: number) {
-        this.values[0] = value;
+        this._values[0] = value;
     }
     
     /**
@@ -50,7 +50,7 @@ export class Vector3 {
      * @return {number}
      */
     get y(): number {
-        return this.values[1];
+        return this._values[1];
     }
     
     /**
@@ -58,7 +58,7 @@ export class Vector3 {
      * @param {number} value
      */
     set y(value: number) {
-        this.values[1] = value;
+        this._values[1] = value;
     }
     
     /**
@@ -66,7 +66,7 @@ export class Vector3 {
      * @return {number}
      */
     get z(): number {
-        return this.values[2];
+        return this._values[2];
     }
     
     /**
@@ -74,7 +74,7 @@ export class Vector3 {
      * @param {number} value
      */
     set z(value: number) {
-        this.values[2] = value;
+        this._values[2] = value;
     }
     
     /**
@@ -82,7 +82,7 @@ export class Vector3 {
      * @return {[number, number]}
      */
     get xy(): [number, number] {
-        return [this.values[0], this.values[1]];
+        return [this._values[0], this._values[1]];
     }
     
     /**
@@ -90,8 +90,8 @@ export class Vector3 {
      * @param {[number, number]} values
      */
     set xy(values: [number, number]) {
-        this.values[0] = values[0];
-        this.values[1] = values[1];
+        this._values[0] = values[0];
+        this._values[1] = values[1];
     }
     
     /**
@@ -99,7 +99,7 @@ export class Vector3 {
      * @return {[number, number, number]}
      */
     get xyz(): [number, number, number] {
-        return [this.values[0], this.values[1], this.values[2]];
+        return [this._values[0], this._values[1], this._values[2]];
     }
     
     /**
@@ -107,9 +107,9 @@ export class Vector3 {
      * @param {[number, number, number]} values
      */
     set xyz(values: [number, number, number]) {
-        this.values[0] = values[0];
-        this.values[1] = values[1];
-        this.values[2] = values[2];
+        this._values[0] = values[0];
+        this._values[1] = values[1];
+        this._values[2] = values[2];
     }
     
     /**
@@ -120,9 +120,7 @@ export class Vector3 {
      * @return {Vector3}
      */
     public static cross(vector: Vector3, vector2: Vector3, dest?: Vector3): Vector3 {
-        if (!dest) {
-            dest = new Vector3();
-        }
+        if (!dest) dest = new Vector3();
         const x = vector.x;
         const y = vector.y;
         const z = vector.z;
@@ -182,9 +180,7 @@ export class Vector3 {
      * @return {Vector3}
      */
     public static direction(vector: Vector3, vector2: Vector3, dest?: Vector3): Vector3 {
-        if (!dest) {
-            dest = new Vector3();
-        }
+        if (!dest) dest = new Vector3();
         const x = vector.x - vector2.x;
         const y = vector.y - vector2.y;
         const z = vector.z - vector2.z;
@@ -211,9 +207,7 @@ export class Vector3 {
      * @return {Vector3}
      */
     public static mix(vector: Vector3, vector2: Vector3, time: number, dest?: Vector3): Vector3 {
-        if (!dest) {
-            dest = new Vector3();
-        }
+        if (!dest) dest = new Vector3();
         dest.x = vector.x + time * (vector2.x - vector.x);
         dest.y = vector.y + time * (vector2.y - vector.y);
         dest.z = vector.z + time * (vector2.z - vector.z);
@@ -228,9 +222,7 @@ export class Vector3 {
      * @return {Vector3}
      */
     public static sum(vector: Vector3, vector2: Vector3, dest?: Vector3): Vector3 {
-        if (!dest) {
-            dest = new Vector3();
-        }
+        if (!dest) dest = new Vector3();
         dest.x = vector.x + vector2.x;
         dest.y = vector.y + vector2.y;
         dest.z = vector.z + vector2.z;
@@ -245,9 +237,7 @@ export class Vector3 {
      * @return {Vector3}
      */
     public static difference(vector: Vector3, vector2: Vector3, dest?: Vector3): Vector3 {
-        if (!dest) {
-            dest = new Vector3();
-        }
+        if (!dest) dest = new Vector3();
         dest.x = vector.x - vector2.x;
         dest.y = vector.y - vector2.y;
         dest.z = vector.z - vector2.z;
@@ -262,9 +252,7 @@ export class Vector3 {
      * @return {Vector3}
      */
     public static product(vector: Vector3, vector2: Vector3, dest?: Vector3): Vector3 {
-        if (!dest) {
-            dest = new Vector3();
-        }
+        if (!dest) dest = new Vector3();
         dest.x = vector.x * vector2.x;
         dest.y = vector.y * vector2.y;
         dest.z = vector.z * vector2.z;
@@ -279,9 +267,7 @@ export class Vector3 {
      * @return {Vector3}
      */
     public static quotient(vector: Vector3, vector2: Vector3, dest?: Vector3): Vector3 {
-        if (!dest) {
-            dest = new Vector3();
-        }
+        if (!dest) dest = new Vector3();
         dest.x = vector.x / vector2.x;
         dest.y = vector.y / vector2.y;
         dest.z = vector.z / vector2.z;
@@ -294,7 +280,7 @@ export class Vector3 {
      * @return {number}
      */
     public at(index: number): number {
-        return this.values[index];
+        return this._values[index];
     }
     
     /**
@@ -312,9 +298,7 @@ export class Vector3 {
      * @return {Vector3}
      */
     public copy(dest?: Vector3): Vector3 {
-        if (!dest) {
-            dest = new Vector3();
-        }
+        if (!dest) dest = new Vector3();
         dest.x = this.x;
         dest.y = this.y;
         dest.z = this.z;
@@ -327,9 +311,7 @@ export class Vector3 {
      * @return {Vector3}
      */
     public negate(dest?: Vector3): Vector3 {
-        if (!dest) {
-            dest = this;
-        }
+        if (!dest) dest = this;
         dest.x = -this.x;
         dest.y = -this.y;
         dest.z = -this.z;
@@ -426,14 +408,10 @@ export class Vector3 {
      * @return {Vector3}
      */
     public scale(value: number, dest?: Vector3): Vector3 {
-        if (!dest) {
-            dest = this;
-        }
-        
+        if (!dest) dest = this;
         dest.x *= value;
         dest.y *= value;
         dest.z *= value;
-        
         return dest;
     }
     
@@ -443,9 +421,7 @@ export class Vector3 {
      * @return {Vector3}
      */
     public normalize(dest?: Vector3): Vector3 {
-        if (!dest) {
-            dest = this;
-        }
+        if (!dest) dest = this;
         let length = this.length();
         if (length === 1) {
             return this;
@@ -470,9 +446,7 @@ export class Vector3 {
      * @return {Vector3}
      */
     public multiplyMatrix3(matrix: Matrix3, dest?: Vector3): Vector3 {
-        if (!dest) {
-            dest = this;
-        }
+        if (!dest) dest = this;
         return matrix.multiplyVector3(this, dest);
     }
     
@@ -483,9 +457,7 @@ export class Vector3 {
      * @return {Vector3}
      */
     public multiplyQuaternion(quaternion: Quaternion, dest?: Vector3): Vector3 {
-        if (!dest) {
-            dest = this;
-        }
+        if (!dest) dest = this;
         return quaternion.multiplyVec3(this, dest);
     }
     
@@ -495,9 +467,7 @@ export class Vector3 {
      * @return {Quaternion}
      */
     public toQuaternion(dest?: Quaternion): Quaternion {
-        if (!dest) {
-            dest = new Quaternion();
-        }
+        if (!dest) dest = new Quaternion();
         const c = new Vector3();
         const s = new Vector3();
         c.x = Math.cos(this.x * 0.5);

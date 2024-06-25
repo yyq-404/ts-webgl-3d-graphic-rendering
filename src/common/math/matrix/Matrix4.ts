@@ -109,9 +109,9 @@ export class Matrix4 {
      * 计算两个矩阵的乘积，并将结果存储在第三个矩阵中。
      * @param m1
      * @param m2
-     * @param result
+     * @param dest
      */
-    public static product(m1: Matrix4, m2: Matrix4, result?: Matrix4): Matrix4 {
+    public static product(m1: Matrix4, m2: Matrix4, dest?: Matrix4): Matrix4 {
         const a00 = m1.at(0);
         const a01 = m1.at(1);
         const a02 = m1.at(2);
@@ -144,8 +144,8 @@ export class Matrix4 {
         const b31 = m2.at(13);
         const b32 = m2.at(14);
         const b33 = m2.at(15);
-        if (!result) result = new Matrix4();
-        return result.init([
+        if (!dest) dest = new Matrix4();
+        return dest.init([
             b00 * a00 + b01 * a10 + b02 * a20 + b03 * a30,
             b00 * a01 + b01 * a11 + b02 * a21 + b03 * a31,
             b00 * a02 + b01 * a12 + b02 * a22 + b03 * a32,
@@ -198,9 +198,7 @@ export class Matrix4 {
      * @param dest
      */
     public copy(dest?: Matrix4): Matrix4 {
-        if (!dest) {
-            dest = new Matrix4();
-        }
+        if (!dest) dest = new Matrix4();
         for (let i = 0; i < 16; i++) {
             dest._values[i] = this._values[i];
         }
@@ -364,9 +362,7 @@ export class Matrix4 {
         const det10 = a21 * a33 - a23 * a31;
         const det11 = a22 * a33 - a23 * a32;
         let det = (det00 * det11 - det01 * det10 + det02 * det09 + det03 * det08 - det04 * det07 + det05 * det06);
-        if (!det) {
-            return null;
-        }
+        if (!det) return null;
         det = 1.0 / det;
         this._values[0] = (a11 * det11 - a12 * det10 + a13 * det09) * det;
         this._values[1] = (-a01 * det11 + a02 * det10 - a03 * det09) * det;
@@ -464,9 +460,7 @@ export class Matrix4 {
      * @param dest
      */
     public multiplyVector4(vector: Vector4, dest?: Vector4): Vector4 {
-        if (!dest) {
-            dest = new Vector4();
-        }
+        if (!dest) dest = new Vector4();
         const x = vector.x;
         const y = vector.y;
         const z = vector.z;
@@ -512,9 +506,7 @@ export class Matrix4 {
         const det11 = -a22 * a10 + a12 * a20;
         const det21 = a21 * a10 - a11 * a20;
         let det = a00 * det01 + a01 * det11 + a02 * det21;
-        if (!det) {
-            return null;
-        }
+        if (!det) return null;
         det = 1.0 / det;
         return new Matrix3([
             det01 * det,
@@ -577,9 +569,7 @@ export class Matrix4 {
         let y = axis.y;
         let z = axis.z;
         let length = Math.sqrt(x * x + y * y + z * z);
-        if (!length) {
-            return null;
-        }
+        if (!length) return null;
         if (length !== 1) {
             length = 1 / length;
             x *= length;

@@ -1,18 +1,19 @@
-import {CameraApplication} from "../base/CameraApplication";
-import {GLProgram} from "../webgl/program/GLProgram";
-import {GLTexture} from "../webgl/texture/GLTexture";
-import {Cube} from "../lib/geometry/Cube";
-import {GLStaticMesh} from "../webgl/mesh/GLStaticMesh";
-import {EAxisType, MathHelper} from "../common/math/MathHelper";
-import {Matrix4} from "../common/math/matrix/Matrix4";
-import {GLProgramCache} from "../webgl/program/GLProgramCache";
-import {Geometry} from "../lib/geometry/Geometry";
-import {GLTextureCache} from "../webgl/texture/GLTextureCache";
-import {Vector3} from "../common/math/vector/Vector3";
-import {DrawHelper} from "../lib/DrawHelper";
-import {HttpHelper} from "../net/HttpHelper";
-import {CanvasKeyboardEvent} from "../event/CanvasKeyboardEvent";
-import {CLShaderConstants} from "../webgl/CLShaderConstants";
+import {CameraApplication} from '../base/CameraApplication';
+import {GLProgram} from '../webgl/program/GLProgram';
+import {GLTexture} from '../webgl/texture/GLTexture';
+import {Cube} from '../lib/geometry/Cube';
+import {GLStaticMesh} from '../webgl/mesh/GLStaticMesh';
+import {MathHelper} from '../common/math/MathHelper';
+import {Matrix4} from '../common/math/matrix/Matrix4';
+import {GLProgramCache} from '../webgl/program/GLProgramCache';
+import {Geometry} from '../lib/geometry/Geometry';
+import {GLTextureCache} from '../webgl/texture/GLTextureCache';
+import {Vector3} from '../common/math/vector/Vector3';
+import {DrawHelper} from '../lib/DrawHelper';
+import {HttpHelper} from '../net/HttpHelper';
+import {CanvasKeyboardEvent} from '../event/CanvasKeyboardEvent';
+import {CLShaderConstants} from '../webgl/CLShaderConstants';
+import {EAxisType} from '../enum/EAxisType';
 
 /**
  * 立方体旋转应用
@@ -51,7 +52,7 @@ export class RotatingCubeApplication extends CameraApplication {
     private readonly triMatrix: Matrix4;
     /** 为了支持鼠标点选，记录选中的坐标轴的enum值 */
     private readonly _hitAxis: EAxisType;
-
+    
     /**
      * 构造
      * @param canvas
@@ -90,107 +91,7 @@ export class RotatingCubeApplication extends CameraApplication {
         // 调整摄像机的位置
         this.camera.z = 8;
     }
-
-    /**
-     * 渲染立方体
-     * @private
-     */
-    private renderCube(): void {
-        // 绑定要绘制的texture和program
-        this.textures[this.currTexIdx].bind();
-        this.textureProgram.bind();
-        this.textureProgram.loadSampler();
-        // 绘制立方体
-        this.matStack.loadIdentity();
-        // 第一个渲染堆栈操作
-        {
-            // 矩阵进栈
-            this.matStack.pushMatrix();
-            // 以角度(非弧度)为单位，每帧旋转
-            this.matStack.rotate(this.cubeAngle, Vector3.up, false);
-            // 合成modelViewProjection矩阵
-            Matrix4.product(this.camera.viewProjectionMatrix, this.matStack.modelViewMatrix, this.cubeMatrix);
-            // 将合成的矩阵给GLProgram对象
-            this.textureProgram.setMatrix4(CLShaderConstants.MVPMatrix, this.cubeMatrix);
-            // 使用当前绑定的texture和program绘制cubeVao对象
-            this.cubeVAO.draw();
-            // 使用辅助方法绘制坐标系
-            DrawHelper.drawCoordinateSystem(this.builder, this.cubeMatrix, this._hitAxis, 1);
-            this.matStack.popMatrix(); // 矩阵出栈
-        }
-        // 解除绑定的texture和program
-        this.textureProgram.unbind();
-        this.textures[this.currTexIdx].unbind();
-    }
-
-    /**
-     * 渲染三角形
-     * @private
-     */
-    private renderTriangle(): void {
-        if (!this.gl) {
-            throw new Error('this.gl is not defined');
-        }
-        // 禁止渲染三角形时启用背面剔除功能
-        this.gl.disable(this.gl.CULL_FACE);
-        // 由于三角形使用颜色+位置信息进行绘制，因此要绑定当前的GPU Program为colorProgram
-        this.colorProgram.bind();
-        {
-            this.matStack.pushMatrix(); // 新产生一个矩阵
-            // 立方体绘制在Canvas的中心
-            // 而三角形则绘制在向左（负号）平移2个单位处的位置
-            this.matStack.translate(new Vector3([-2, 0, 0]));
-            // 使用弧度，绕Z轴进行Roll旋转
-            this.matStack.rotate(this.triAngle, Vector3.forward, true);
-            // 使用类似OpenGL1.1的立即绘制模式
-            // 开始绘制，default使用gl.TRIANGLES方式绘制
-            this.builder.begin();
-            // 三角形第一个点的颜色与坐标
-            this.builder.color(1, 0, 0).vertex(-0.5, 0, 0);
-            // 三角形第二个点的颜色与坐标
-            this.builder.color(0, 1, 0).vertex(0.5, 0, 0);
-            // 三角形第三个点的颜色与坐标
-            this.builder.color(0, 0, 1).vertex(0, 0.5, 0);
-            // 合成model-view-projection matrix
-            Matrix4.product(this.camera.viewProjectionMatrix, this.matStack.modelViewMatrix, this.triMatrix);
-            // 将mvpMatrix传递给GLMeshBuilder的end方法，该方法会正确的显示图形
-            this.builder.end(this.triMatrix);
-            this.matStack.popMatrix(); // 删除一个矩阵
-        }
-        this.colorProgram.unbind();
-        // 恢复背面剔除功能
-        this.gl.enable(this.gl.CULL_FACE);
-    }
-
-    /**
-     * 渲染文本
-     * 关于Canvas2D的详细应用，可以参考本书的姐妹篇：TypeScript图形渲染实战：2D架构设计与实现
-     * @param text
-     * @param x
-     * @param y
-     * @private
-     */
-    private renderText(text: string, x: number = this.canvas.width * 0.5, y: number = 150): void {
-        if (!this.ctx2D) {
-            return;
-        }
-        this.ctx2D.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        // 渲染状态进栈
-        this.ctx2D.save();
-        // 红色
-        this.ctx2D.fillStyle = 'red';
-        // X轴居中对齐
-        this.ctx2D.textAlign = 'center';
-        // Y轴为top对齐
-        this.ctx2D.textBaseline = 'top';
-        // 使用大一点的Arial字体对象
-        this.ctx2D.font = '30px Arial';
-        // 进行文字绘制
-        this.ctx2D.fillText(text, x, y);
-        // 恢复原来的渲染状态
-        this.ctx2D.restore();
-    }
-
+    
     /**
      * 绘制文本
      * @param pos
@@ -258,40 +159,11 @@ export class RotatingCubeApplication extends CameraApplication {
                     this.ctx2D.fillText('Z', out.x, out.y);
                 }
             }
-
+            
             this.ctx2D.restore(); // 恢复原来的渲染状态
         }
     }
-
-    /**
-     * 渲染
-     */
-    public override render(): void {
-        if (!this.gl) {
-            throw new Error('this.gl is not defined');
-        }
-        // FIXME: 切记，一定要先清屏（清除掉颜色缓冲区和深度缓冲区）(书上有，随书源码中无？？？)
-        this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
-        this.renderCube();
-        this.renderTriangle();
-        this.renderText('第一个WebGL Demo');
-    }
-
-    /**
-     * 更新
-     * @param elapsedMsec
-     * @param intervalSec
-     */
-    public override update(elapsedMsec: number, intervalSec: number): void {
-        // s = vt，根据两帧间隔更新角速度和角位移
-        this.cubeAngle += this.cubeSpeed * intervalSec;
-        // 我们在 CameraApplication 中也覆写（override）的update方法
-        // CameraApplication的update方法用来计算摄像机的投影矩阵以及视图矩阵
-        // 所以我们必须要调用基类方法，用于控制摄像机更新
-        // 否则你将什么都看不到，切记!
-        super.update(elapsedMsec, intervalSec);
-    }
-
+    
     /**
      * 执行
      */
@@ -317,24 +189,7 @@ export class RotatingCubeApplication extends CameraApplication {
         // 调用基类的run方法，基类run方法内部调用了start方法
         await super.runAsync();
     }
-
-    /**
-     * 立方体定时回调
-     */
-    public cubeTimeCallback(): void {
-        // 定时让计数器+1
-        this.currTexIdx++;
-        // 取模操作，让currTexIdx的取值范围为[ 0, 2 ]之间（当前有3个纹理）
-        this.currTexIdx %= this.textures.length;
-    }
-
-    /**
-     * 三角形定时回调
-     */
-    public triTimeCallback(): void {
-        this.triAngle += this.triSpeed;
-    }
-
+    
     /**
      * 按键按下
      * @param evt
@@ -356,5 +211,151 @@ export class RotatingCubeApplication extends CameraApplication {
             default:
                 break;
         }
+    }
+    
+    /**
+     * 更新
+     * @param elapsedMsec
+     * @param intervalSec
+     */
+    public override update(elapsedMsec: number, intervalSec: number): void {
+        // s = vt，根据两帧间隔更新角速度和角位移
+        this.cubeAngle += this.cubeSpeed * intervalSec;
+        // 我们在 CameraApplication 中也覆写（override）的update方法
+        // CameraApplication的update方法用来计算摄像机的投影矩阵以及视图矩阵
+        // 所以我们必须要调用基类方法，用于控制摄像机更新
+        // 否则你将什么都看不到，切记!
+        super.update(elapsedMsec, intervalSec);
+    }
+    
+    /**
+     * 渲染
+     */
+    public override render(): void {
+        if (!this.gl) {
+            throw new Error('this.gl is not defined');
+        }
+        // FIXME: 切记，一定要先清屏（清除掉颜色缓冲区和深度缓冲区）(书上有，随书源码中无？？？)
+        this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+        this.renderCube();
+        this.renderTriangle();
+        this.renderText('第一个WebGL Demo');
+    }
+    
+    /**
+     * 立方体定时回调
+     */
+    public cubeTimeCallback(): void {
+        // 定时让计数器+1
+        this.currTexIdx++;
+        // 取模操作，让currTexIdx的取值范围为[ 0, 2 ]之间（当前有3个纹理）
+        this.currTexIdx %= this.textures.length;
+    }
+    
+    /**
+     * 三角形定时回调
+     */
+    public triTimeCallback(): void {
+        this.triAngle += this.triSpeed;
+    }
+    
+    /**
+     * 渲染立方体
+     * @private
+     */
+    private renderCube(): void {
+        // 绑定要绘制的texture和program
+        this.textures[this.currTexIdx].bind();
+        this.textureProgram.bind();
+        this.textureProgram.loadSampler();
+        // 绘制立方体
+        this.matStack.loadIdentity();
+        // 第一个渲染堆栈操作
+        {
+            // 矩阵进栈
+            this.matStack.pushMatrix();
+            // 以角度(非弧度)为单位，每帧旋转
+            this.matStack.rotate(this.cubeAngle, Vector3.up, false);
+            // 合成modelViewProjection矩阵
+            Matrix4.product(this.camera.viewProjectionMatrix, this.matStack.modelViewMatrix, this.cubeMatrix);
+            // 将合成的矩阵给GLProgram对象
+            this.textureProgram.setMatrix4(CLShaderConstants.MVPMatrix, this.cubeMatrix);
+            // 使用当前绑定的texture和program绘制cubeVao对象
+            this.cubeVAO.draw();
+            // 使用辅助方法绘制坐标系
+            DrawHelper.drawCoordinateSystem(this.builder, this.cubeMatrix, this._hitAxis, 1);
+            this.matStack.popMatrix(); // 矩阵出栈
+        }
+        // 解除绑定的texture和program
+        this.textureProgram.unbind();
+        this.textures[this.currTexIdx].unbind();
+    }
+    
+    /**
+     * 渲染三角形
+     * @private
+     */
+    private renderTriangle(): void {
+        if (!this.gl) {
+            throw new Error('this.gl is not defined');
+        }
+        // 禁止渲染三角形时启用背面剔除功能
+        this.gl.disable(this.gl.CULL_FACE);
+        // 由于三角形使用颜色+位置信息进行绘制，因此要绑定当前的GPU Program为colorProgram
+        this.colorProgram.bind();
+        {
+            this.matStack.pushMatrix(); // 新产生一个矩阵
+            // 立方体绘制在Canvas的中心
+            // 而三角形则绘制在向左（负号）平移2个单位处的位置
+            this.matStack.translate(new Vector3([-2, 0, 0]));
+            // 使用弧度，绕Z轴进行Roll旋转
+            this.matStack.rotate(this.triAngle, Vector3.forward, true);
+            // 使用类似OpenGL1.1的立即绘制模式
+            // 开始绘制，default使用gl.TRIANGLES方式绘制
+            this.builder.begin();
+            // 三角形第一个点的颜色与坐标
+            this.builder.color(1, 0, 0).vertex(-0.5, 0, 0);
+            // 三角形第二个点的颜色与坐标
+            this.builder.color(0, 1, 0).vertex(0.5, 0, 0);
+            // 三角形第三个点的颜色与坐标
+            this.builder.color(0, 0, 1).vertex(0, 0.5, 0);
+            // 合成model-view-projection matrix
+            Matrix4.product(this.camera.viewProjectionMatrix, this.matStack.modelViewMatrix, this.triMatrix);
+            // 将mvpMatrix传递给GLMeshBuilder的end方法，该方法会正确的显示图形
+            this.builder.end(this.triMatrix);
+            this.matStack.popMatrix(); // 删除一个矩阵
+        }
+        this.colorProgram.unbind();
+        // 恢复背面剔除功能
+        this.gl.enable(this.gl.CULL_FACE);
+    }
+    
+    /**
+     * 渲染文本
+     * 关于Canvas2D的详细应用，可以参考本书的姐妹篇：TypeScript图形渲染实战：2D架构设计与实现
+     * @param text
+     * @param x
+     * @param y
+     * @private
+     */
+    private renderText(text: string, x: number = this.canvas.width * 0.5, y: number = 150): void {
+        if (!this.ctx2D) {
+            return;
+        }
+        this.ctx2D.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        // 渲染状态进栈
+        this.ctx2D.save();
+        // 红色
+        this.ctx2D.fillStyle = 'red';
+        // X轴居中对齐
+        this.ctx2D.textAlign = 'center';
+        // Y轴为top对齐
+        this.ctx2D.textBaseline = 'top';
+        // 使用大一点的Arial字体对象
+        this.ctx2D.font = '30px Arial';
+        // 进行文字绘制
+        this.ctx2D.fillText(text, x, y);
+        // 恢复原来的渲染状态
+        this.ctx2D.restore();
     }
 }
