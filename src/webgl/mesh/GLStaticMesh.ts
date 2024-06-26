@@ -44,8 +44,8 @@ export class GLStaticMesh extends GLMeshBase {
         const vb: WebGLBuffer | null = gl.createBuffer();
         if (!vb) throw new Error('vbo creation fail');
         this._vbo = vb;
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this._vbo); // 绑定VBO
-        this.gl.bufferData(this.gl.ARRAY_BUFFER, vbo, this.gl.STATIC_DRAW); // 将顶点数据载入到VBO中
+        this.webglContext.bindBuffer(this.webglContext.ARRAY_BUFFER, this._vbo); // 绑定VBO
+        this.webglContext.bufferData(this.webglContext.ARRAY_BUFFER, vbo, this.webglContext.STATIC_DRAW); // 将顶点数据载入到VBO中
         // 然后计算出交错存储的顶点属性attribOffsetMap相关的值
         const offsetMap: GLAttributeOffsetMap = GLAttributeHelper.getInterleavedLayoutAttributeOffsetMap(this._attributesState);
         // 计算出顶点的数量
@@ -70,10 +70,10 @@ export class GLStaticMesh extends GLMeshBase {
         this.bind();
         if (this._ibo) {
             // 如果有IBO，使用drawElements方法绘制静态网格对象
-            this.gl.drawElements(this.drawMode, this._indexCount, this.gl.UNSIGNED_SHORT, 0);
+            this.webglContext.drawElements(this.drawMode, this._indexCount, this.webglContext.UNSIGNED_SHORT, 0);
         } else {
             // 如果没有IBO，则使用drawArrays方法绘制静态网格对象
-            this.gl.drawArrays(this.drawMode, 0, this._vertexCount);
+            this.webglContext.drawArrays(this.drawMode, 0, this._vertexCount);
         }
         // 绘制好后解除VAO绑定
         this.unbind();
@@ -93,9 +93,9 @@ export class GLStaticMesh extends GLMeshBase {
      */
     public drawRange(offset: number, count: number): void {
         if (this._ibo) {
-            this.gl.drawElements(this.drawMode, count, this.gl.UNSIGNED_SHORT, offset);
+            this.webglContext.drawElements(this.drawMode, count, this.webglContext.UNSIGNED_SHORT, offset);
         } else {
-            this.gl.drawArrays(this.drawMode, offset, count);
+            this.webglContext.drawArrays(this.drawMode, offset, count);
         }
     }
     
@@ -106,11 +106,11 @@ export class GLStaticMesh extends GLMeshBase {
     protected setIBO(ibo: Uint16Array | null): void {
         if (!ibo) return; // 按需创建IBO
         // 创建IBO
-        this._ibo = this.gl.createBuffer();
+        this._ibo = this.webglContext.createBuffer();
         if (!this._ibo) throw new Error('IBO creation fail');
         // 绑定IBO
-        this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this._ibo); // 将索引数据上传到IBO中
-        this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, ibo, this.gl.STATIC_DRAW); // 计算出索引个数
+        this.webglContext.bindBuffer(this.webglContext.ELEMENT_ARRAY_BUFFER, this._ibo); // 将索引数据上传到IBO中
+        this.webglContext.bufferData(this.webglContext.ELEMENT_ARRAY_BUFFER, ibo, this.webglContext.STATIC_DRAW); // 计算出索引个数
         this._indexCount = ibo.length;
     }
 }

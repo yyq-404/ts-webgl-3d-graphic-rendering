@@ -95,14 +95,14 @@ export class GLMeshBuilder extends GLMeshBase {
      */
     public setIBO(data: Uint16Array): void {
         // 创建ibo
-        this._ibo = this.gl.createBuffer();
+        this._ibo = this.webglContext.createBuffer();
         if (this._ibo === null) {
             throw new Error('IBO creation fail');
         }
         // 绑定ibo
-        this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this._ibo);
+        this.webglContext.bindBuffer(this.webglContext.ELEMENT_ARRAY_BUFFER, this._ibo);
         // 将索引数据上传到ibo中
-        this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, data, this.gl.STATIC_DRAW);
+        this.webglContext.bufferData(this.webglContext.ELEMENT_ARRAY_BUFFER, data, this.webglContext.STATIC_DRAW);
         this._indexCount = data.length;
     }
     
@@ -170,7 +170,7 @@ export class GLMeshBuilder extends GLMeshBase {
      *  每次调用上述几个添加顶点属性的方法之前，必须要先调用 `begin` 方法，返回 `this`
      *  @param drawMode
      */
-    public begin(drawMode: number = this.gl.TRIANGLES): GLMeshBuilder {
+    public begin(drawMode: number = this.webglContext.TRIANGLES): GLMeshBuilder {
         // 设置要绘制的mode,7种基本几何图元
         this.drawMode = drawMode;
         // 清空顶点数为0
@@ -207,7 +207,7 @@ export class GLMeshBuilder extends GLMeshBase {
         // 载入MVPMatrix uniform变量
         this.program.setMatrix4(CLShaderConstants.MVPMatrix, mvp);
         if (this.texture) {
-            this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture);
+            this.webglContext.bindTexture(this.webglContext.TEXTURE_2D, this.texture);
             this.program.loadSampler();
         }
         // 绑定VAO
@@ -216,11 +216,11 @@ export class GLMeshBuilder extends GLMeshBase {
         this.bindBuffer();
         // GLMeshBuilder不使用索引缓冲区绘制方式，因此调用drawArrays方法
         if (this._ibo) {
-            this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this._ibo);
+            this.webglContext.bindBuffer(this.webglContext.ELEMENT_ARRAY_BUFFER, this._ibo);
             //this.gl.bufferData( this.gl.ELEMENT_ARRAY_BUFFER, this._indices.subArray(), this._indexCount );
-            this.gl.drawElements(this.drawMode, this._indexCount, this.gl.UNSIGNED_SHORT, 0);
+            this.webglContext.drawElements(this.drawMode, this._indexCount, this.webglContext.UNSIGNED_SHORT, 0);
         } else {
-            this.gl.drawArrays(this.drawMode, 0, this._vertexCount);
+            this.webglContext.drawArrays(this.drawMode, 0, this._vertexCount);
         }
         // 解绑VAO
         this.unbind();
@@ -257,9 +257,9 @@ export class GLMeshBuilder extends GLMeshBase {
         // 获取VBO
         const buffer: WebGLBuffer = this._buffers[GLMeshBuilder.INTERLEAVED];
         // 绑定VBO
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
+        this.webglContext.bindBuffer(this.webglContext.ARRAY_BUFFER, buffer);
         // 上传渲染数据到VBO中
-        this.gl.bufferData(this.gl.ARRAY_BUFFER, list.subArray(), this.gl.DYNAMIC_DRAW);
+        this.webglContext.bufferData(this.webglContext.ARRAY_BUFFER, list.subArray(), this.webglContext.DYNAMIC_DRAW);
     }
     
     /**
@@ -269,16 +269,16 @@ export class GLMeshBuilder extends GLMeshBase {
     private bindSequencedBuffer(): void {
         // 针对sequenced存储方式的渲染处理
         const buffer: WebGLBuffer = this._buffers[GLMeshBuilder.SEQUENCED];
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
+        this.webglContext.bindBuffer(this.webglContext.ARRAY_BUFFER, buffer);
         //用的是预先分配显存机制
-        this.gl.bufferData(this.gl.ARRAY_BUFFER, this._attributeStride * this._vertexCount, this.gl.DYNAMIC_DRAW);
+        this.webglContext.bufferData(this.webglContext.ARRAY_BUFFER, this._attributeStride * this._vertexCount, this.webglContext.DYNAMIC_DRAW);
         const offsets: GLAttributeOffsetMap = GLAttributeHelper.getSequencedLayoutAttributeOffsetMap(this._attributesState, this._vertexCount);
         this.bufferSubData(GLAttributeHelper.POSITION, offsets);
         this.bufferSubData(GLAttributeHelper.TEX_COORDINATE_0, offsets, this._hasTexCoordinate);
         this.bufferSubData(GLAttributeHelper.NORMAL, offsets, this._hasNormal);
         this.bufferSubData(GLAttributeHelper.COLOR, offsets, this._hasColor);
         // 每次都要重新计算和绑定顶点属性数组的首地址
-        GLAttributeHelper.setAttributeVertexArrayPointer(this.gl, offsets);
+        GLAttributeHelper.setAttributeVertexArrayPointer(this.webglContext, offsets);
     }
     
     /**
@@ -359,7 +359,7 @@ export class GLMeshBuilder extends GLMeshBase {
      */
     private bufferSubData(attribute: IGLAttribute, offsets: GLAttributeOffsetMap, has: boolean = true): void {
         let list = this._lists[attribute.NAME];
-        this.gl.bufferSubData(this.gl.ARRAY_BUFFER, offsets[attribute.NAME], list.subArray());
+        this.webglContext.bufferSubData(this.webglContext.ARRAY_BUFFER, offsets[attribute.NAME], list.subArray());
     }
     
     
@@ -373,8 +373,8 @@ export class GLMeshBuilder extends GLMeshBase {
         if (!has) return;
         let buffer: WebGLBuffer = this._buffers[attribute.NAME];
         let list: TypedArrayList<Float32Array> = this._lists[attribute.NAME];
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
-        this.gl.bufferData(this.gl.ARRAY_BUFFER, list.subArray(), this.gl.DYNAMIC_DRAW);
+        this.webglContext.bindBuffer(this.webglContext.ARRAY_BUFFER, buffer);
+        this.webglContext.bufferData(this.webglContext.ARRAY_BUFFER, list.subArray(), this.webglContext.DYNAMIC_DRAW);
     }
     
     /**
@@ -418,7 +418,7 @@ export class GLMeshBuilder extends GLMeshBase {
      * @private
      */
     private initLayoutAttribute(): void {
-        let indexBuffer: WebGLBuffer | null = this.gl.createBuffer();
+        let indexBuffer: WebGLBuffer | null = this.webglContext.createBuffer();
         if (!indexBuffer) throw new Error('WebGLBuffer创建不成功!');
         switch (this._layout) {
             case EGLVertexLayoutType.INTERLEAVED:
@@ -445,11 +445,11 @@ export class GLMeshBuilder extends GLMeshBase {
         // 调用的是GLAttribState.getInterleavedLayoutAttribOffsetMap方法
         this._lists[GLMeshBuilder.INTERLEAVED] = new TypedArrayList<Float32Array>(Float32Array);
         this._buffers[GLMeshBuilder.INTERLEAVED] = indexBuffer;
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, indexBuffer);
+        this.webglContext.bindBuffer(this.webglContext.ARRAY_BUFFER, indexBuffer);
         const offsetMap: GLAttributeOffsetMap = GLAttributeHelper.getInterleavedLayoutAttributeOffsetMap(this._attributesState);
         // 调用如下两个方法
-        GLAttributeHelper.setAttributeVertexArrayPointer(this.gl, offsetMap);
-        GLAttributeHelper.setAttributeVertexArrayState(this.gl, this._attributesState);
+        GLAttributeHelper.setAttributeVertexArrayPointer(this.webglContext, offsetMap);
+        GLAttributeHelper.setAttributeVertexArrayState(this.webglContext, this._attributesState);
     }
     
     
@@ -473,13 +473,13 @@ export class GLMeshBuilder extends GLMeshBase {
         if (this._hasNormal) {
             this._lists[GLAttributeHelper.NORMAL.NAME] = new TypedArrayList<Float32Array>(Float32Array);
         }
-        let indexBuffer = this.gl.createBuffer();
+        let indexBuffer = this.webglContext.createBuffer();
         if (!indexBuffer) throw new Error('WebGLBuffer创建不成功!');
         this._buffers[GLMeshBuilder.SEQUENCED] = indexBuffer;
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, indexBuffer);
+        this.webglContext.bindBuffer(this.webglContext.ARRAY_BUFFER, indexBuffer);
         // sequenced没法预先设置指针，因为是动态的
         // 但是可以预先设置顶点属性状态
-        GLAttributeHelper.setAttributeVertexArrayState(this.gl, this._attributesState);
+        GLAttributeHelper.setAttributeVertexArrayState(this.webglContext, this._attributesState);
     }
     
     /**
@@ -511,11 +511,11 @@ export class GLMeshBuilder extends GLMeshBase {
     private initVertexAttribute(attribute: IGLAttribute, indexBuffer: WebGLBuffer | null, size: number, has: boolean = true, optionCreateBuffer: boolean = false): void {
         if (!has) return;
         this._lists[attribute.NAME] = new TypedArrayList<Float32Array>(Float32Array);
-        if (optionCreateBuffer) indexBuffer = this.gl.createBuffer();
+        if (optionCreateBuffer) indexBuffer = this.webglContext.createBuffer();
         if (!indexBuffer) throw new Error('WebGLBuffer创建不成功!');
         this._buffers[attribute.NAME] = indexBuffer;
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, indexBuffer);
-        this.gl.vertexAttribPointer(attribute.BIT, size, this.gl.FLOAT, false, 0, 0);
-        this.gl.enableVertexAttribArray(attribute.BIT);
+        this.webglContext.bindBuffer(this.webglContext.ARRAY_BUFFER, indexBuffer);
+        this.webglContext.vertexAttribPointer(attribute.BIT, size, this.webglContext.FLOAT, false, 0, 0);
+        this.webglContext.enableVertexAttribArray(attribute.BIT);
     }
 }

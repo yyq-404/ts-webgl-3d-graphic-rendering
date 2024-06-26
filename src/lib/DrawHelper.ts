@@ -10,7 +10,7 @@ import {MathHelper} from '../common/math/MathHelper';
  *绘制助手
  */
 export class DrawHelper {
-    // FIXME static defaultHitColor: Vector4 = new Vector4([1, 1, 0]);
+    /** 默认颜色 */
     public static defaultHitColor: Vector4 = new Vector4([1, 1, 0, 0]);
     
     /**
@@ -43,7 +43,7 @@ export class DrawHelper {
      */
     public static drawBoundBox(builder: GLMeshBuilder, mat: Matrix4, mins: Vector3, maxs: Vector3, color: Vector4 = Vector4Adapter.red): void {
         // 使用LINE_LOOP绘制底面，注意顶点顺序，逆时针方向，根据右手螺旋定则可知，法线朝外
-        builder.begin(builder.gl.LINE_LOOP); // 使用的是LINE_LOOP图元绘制模式
+        builder.begin(builder.webglContext.LINE_LOOP); // 使用的是LINE_LOOP图元绘制模式
         {
             builder.color(color.r, color.g, color.b).vertex(mins.x, mins.y, mins.z); // 2   - - -
             builder.color(color.r, color.g, color.b).vertex(mins.x, mins.y, maxs.z); // 0   - - +
@@ -52,7 +52,7 @@ export class DrawHelper {
             builder.end(mat);
         }
         // 使用LINE_LOOP绘制顶面，注意顶点顺序，逆时针方向，根据右手螺旋定则可知，法线朝外
-        builder.begin(builder.gl.LINE_LOOP); // 使用的是LINE_LOOP图元绘制模式
+        builder.begin(builder.webglContext.LINE_LOOP); // 使用的是LINE_LOOP图元绘制模式
         {
             builder.color(color.r, color.g, color.b).vertex(mins.x, maxs.y, mins.z); // 3   - + -
             builder.color(color.r, color.g, color.b).vertex(maxs.x, maxs.y, mins.z); // 7   + + -
@@ -61,7 +61,7 @@ export class DrawHelper {
             builder.end(mat);
         }
         // 使用LINES绘制
-        builder.begin(builder.gl.LINES); // 使用的是LINES图元绘制模式
+        builder.begin(builder.webglContext.LINES); // 使用的是LINES图元绘制模式
         {
             builder.color(color.r, color.g, color.b).vertex(mins.x, mins.y, mins.z); // 2   - - -
             builder.color(color.r, color.g, color.b).vertex(mins.x, maxs.y, mins.z); // 3   - + -
@@ -103,42 +103,42 @@ export class DrawHelper {
                                      ]
     ): void {
         // 前面
-        builder.begin(builder.gl.TRIANGLE_FAN);
+        builder.begin(builder.webglContext.TRIANGLE_FAN);
         builder.texCoordinate(tc[0], tc[1]).vertex(-halfLen, -halfLen, halfLen); // 0   - - +
         builder.texCoordinate(tc[2], tc[3]).vertex(halfLen, -halfLen, halfLen); // 4   + - +
         builder.texCoordinate(tc[4], tc[5]).vertex(halfLen, halfLen, halfLen); // 5   + + +
         builder.texCoordinate(tc[6], tc[7]).vertex(-halfLen, halfLen, halfLen); // 1   - + +
         builder.end(mat);
         // 右面
-        builder.begin(builder.gl.TRIANGLE_FAN);
+        builder.begin(builder.webglContext.TRIANGLE_FAN);
         builder.texCoordinate(tc[8], tc[9]).vertex(halfLen, -halfLen, halfLen); // 4   + - +
         builder.texCoordinate(tc[10], tc[11]).vertex(halfLen, -halfLen, -halfLen); // 6   + - -
         builder.texCoordinate(tc[12], tc[13]).vertex(halfLen, halfLen, -halfLen); // 7   + + -
         builder.texCoordinate(tc[14], tc[15]).vertex(halfLen, halfLen, halfLen); // 5   + + +
         builder.end(mat);
         // 后面
-        builder.begin(builder.gl.TRIANGLE_FAN);
+        builder.begin(builder.webglContext.TRIANGLE_FAN);
         builder.texCoordinate(tc[16], tc[17]).vertex(halfLen, -halfLen, -halfLen); // 6   + - -
         builder.texCoordinate(tc[18], tc[19]).vertex(-halfLen, -halfLen, -halfLen); // 2   - - -
         builder.texCoordinate(tc[20], tc[21]).vertex(-halfLen, halfLen, -halfLen); // 3   - + -
         builder.texCoordinate(tc[22], tc[23]).vertex(halfLen, halfLen, -halfLen); // 7   + + -
         builder.end(mat);
         // 左面
-        builder.begin(builder.gl.TRIANGLE_FAN);
+        builder.begin(builder.webglContext.TRIANGLE_FAN);
         builder.texCoordinate(tc[24], tc[25]).vertex(-halfLen, -halfLen, -halfLen); // 2   - - -
         builder.texCoordinate(tc[26], tc[27]).vertex(-halfLen, -halfLen, halfLen); // 0   - - +
         builder.texCoordinate(tc[28], tc[29]).vertex(-halfLen, halfLen, halfLen); // 1   - + +
         builder.texCoordinate(tc[30], tc[31]).vertex(-halfLen, halfLen, -halfLen); // 3   - + -
         builder.end(mat);
         // 上面
-        builder.begin(builder.gl.TRIANGLE_FAN);
+        builder.begin(builder.webglContext.TRIANGLE_FAN);
         builder.texCoordinate(tc[32], tc[33]).vertex(-halfLen, halfLen, halfLen); // 1   - + +
         builder.texCoordinate(tc[34], tc[35]).vertex(halfLen, halfLen, halfLen); // 5   + + +
         builder.texCoordinate(tc[36], tc[37]).vertex(halfLen, halfLen, -halfLen); // 7   + + -
         builder.texCoordinate(tc[38], tc[39]).vertex(-halfLen, halfLen, -halfLen); // 3   - + -
         builder.end(mat);
         // 下面
-        builder.begin(builder.gl.TRIANGLE_FAN);
+        builder.begin(builder.webglContext.TRIANGLE_FAN);
         builder.texCoordinate(tc[40], tc[41]).vertex(-halfLen, -halfLen, halfLen); // 0   - - +
         builder.texCoordinate(tc[42], tc[43]).vertex(-halfLen, -halfLen, -halfLen); // 2   - - -
         builder.texCoordinate(tc[44], tc[45]).vertex(halfLen, -halfLen, -halfLen); // 6   + - -
@@ -154,9 +154,9 @@ export class DrawHelper {
      * @param rotateAxis
      */
     public static drawFullCoordinateSystem(builder: GLMeshBuilder, mat: Matrix4, len: number = 1, rotateAxis: Vector3 | null = null): void {
-        builder.gl.lineWidth(5); // 用5个像素大小的直径绘制线段，但目前仅Safari浏览器实现
-        builder.gl.disable(builder.gl.DEPTH_TEST); // 关闭帧缓存深度测试
-        builder.begin(builder.gl.LINES);
+        builder.webglContext.lineWidth(5); // 用5个像素大小的直径绘制线段，但目前仅Safari浏览器实现
+        builder.webglContext.disable(builder.webglContext.DEPTH_TEST); // 关闭帧缓存深度测试
+        builder.begin(builder.webglContext.LINES);
         // 正x轴
         {
             builder.color(1.0, 0.0, 0.0).vertex(0.0, 0.0, 0.0);
@@ -196,9 +196,9 @@ export class DrawHelper {
         // 将渲染数据提交给GPU进行渲染
         builder.end(mat);
         // 恢复线宽为1个像素
-        builder.gl.lineWidth(1);
+        builder.webglContext.lineWidth(1);
         // 恢复开始帧缓存深度测试
-        builder.gl.enable(builder.gl.DEPTH_TEST);
+        builder.webglContext.enable(builder.webglContext.DEPTH_TEST);
     }
     
     /**
@@ -211,9 +211,9 @@ export class DrawHelper {
      * @param isLeftHardness
      */
     public static drawCoordinateSystem(builder: GLMeshBuilder, mvp: Matrix4, hitAxis: EAxisType, len: number = 5, rotateAxis: Vector3 | null = null, isLeftHardness: boolean = false): void {
-        builder.gl.lineWidth(5);
-        builder.gl.disable(builder.gl.DEPTH_TEST);
-        builder.begin(builder.gl.LINES);
+        builder.webglContext.lineWidth(5);
+        builder.webglContext.disable(builder.webglContext.DEPTH_TEST);
+        builder.begin(builder.webglContext.LINES);
         switch (hitAxis) {
             case EAxisType.X_AXIS:
                 builder.color(DrawHelper.defaultHitColor.r, DrawHelper.defaultHitColor.g, DrawHelper.defaultHitColor.b).vertex(0.0, 0.0, 0.0);
@@ -246,8 +246,8 @@ export class DrawHelper {
             builder.color(0.0, 0.0, 0.0).vertex(scale.x, scale.y, isLeftHardness ? -scale.z : scale.z);
         }
         builder.end(mvp);
-        builder.gl.lineWidth(1);
-        builder.gl.enable(builder.gl.DEPTH_TEST);
+        builder.webglContext.lineWidth(1);
+        builder.webglContext.enable(builder.webglContext.DEPTH_TEST);
     }
     
     /**

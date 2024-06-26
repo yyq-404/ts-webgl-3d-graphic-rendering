@@ -60,7 +60,7 @@ export class RotatingCubeApplication extends WebGLApplication {
         // 调用基类构造函数，最后一个参数为true，意味着我们要创建一个Canvas2D上下文渲染对象
         // 这样我们才能使用该上下文对象进行2D文字渲染
         super(canvas, {premultipliedAlpha: false}, true);
-        if (!this.gl) throw new Error('this.gl is not defined');
+        if (!this.webglContext) throw new Error('this.gl is not defined');
         this.clearBuffer();
         // 初始化角位移和角速度
         this._cubeAngle = 0;
@@ -80,7 +80,7 @@ export class RotatingCubeApplication extends WebGLApplication {
         // 对于三角形的渲染数据，我们使用GLMeshBuilder中立即模式绘制方式
         this._cube = new Cube(0.5, 0.5, 0.5);
         const data: Geometry = this._cube.makeGeometry();
-        this._cubeVAO = data.makeStaticVAO(this.gl);
+        this._cubeVAO = data.makeStaticVAO(this.webglContext);
         // 初始化时没选中任何一条坐标轴
         this._hitAxis = EAxisType.NONE;
         // 初始化时，世界矩阵都为归一化矩阵
@@ -94,15 +94,15 @@ export class RotatingCubeApplication extends WebGLApplication {
      * 执行
      */
     public override async runAsync(): Promise<void> {
-        if (!this.gl) throw new Error('this.gl is not defined');
+        if (!this.webglContext) throw new Error('this.gl is not defined');
         let img: HTMLImageElement = await HttpHelper.loadImageAsync('data/pic0.png');
-        let tex: GLTexture = new GLTexture(this.gl);
+        let tex: GLTexture = new GLTexture(this.webglContext);
         tex.upload(img, 0, true);
         tex.filter();
         this._textures.push(tex);
         console.log('1、第一个纹理载入成功!');
         img = await HttpHelper.loadImageAsync('data/pic1.jpg');
-        tex = new GLTexture(this.gl);
+        tex = new GLTexture(this.webglContext);
         tex.upload(img, 0, true);
         tex.filter();
         this._textures.push(tex);
@@ -156,7 +156,7 @@ export class RotatingCubeApplication extends WebGLApplication {
      * 渲染
      */
     public override render(): void {
-        if (!this.gl) throw new Error('this.gl is not defined');
+        if (!this.webglContext) throw new Error('this.gl is not defined');
         if (this.context2d) {
             this.context2d.clearRect(0, 0, this.canvas.width, this.canvas.height);
         }
@@ -226,9 +226,9 @@ export class RotatingCubeApplication extends WebGLApplication {
      * @private
      */
     private renderTriangle(): void {
-        if (!this.gl) throw new Error('this.gl is not defined');
+        if (!this.webglContext) throw new Error('this.gl is not defined');
         // 禁止渲染三角形时启用背面剔除功能
-        this.gl.disable(this.gl.CULL_FACE);
+        this.webglContext.disable(this.webglContext.CULL_FACE);
         // 由于三角形使用颜色+位置信息进行绘制，因此要绑定当前的GPU Program为colorProgram
         this._colorProgram.bind();
         // 新产生一个矩阵
@@ -255,7 +255,7 @@ export class RotatingCubeApplication extends WebGLApplication {
         this.matStack.popMatrix();
         this._colorProgram.unbind();
         // 恢复背面剔除功能
-        this.gl.enable(this.gl.CULL_FACE);
+        this.webglContext.enable(this.webglContext.CULL_FACE);
     }
     
     /**

@@ -17,7 +17,7 @@ export class WebGLApplication extends BaseApplication {
     /** 摄像机 */
     protected camera: CameraComponent;
     /* 可以直接操作WebGL相关内容 */
-    protected gl: WebGLRenderingContext | null;
+    protected webglContext: WebGLRenderingContext | null;
     /** 模拟 `OpenGL1.1` 中的矩阵堆栈, 封装在 `GLWorldMatrixStack` 类中 */
     protected matStack: GLWorldMatrixStack;
     /** 模拟OpenGL1.1中的立即绘制模式, 封装在GLMeshBuilder类中 */
@@ -35,8 +35,8 @@ export class WebGLApplication extends BaseApplication {
      */
     public constructor(canvas: HTMLCanvasElement, contextAttributes: WebGLContextAttributes = {premultipliedAlpha: false}, option2d: boolean = false) {
         super(canvas);
-        this.gl = this.canvas.getContext('webgl', contextAttributes);
-        if (!this.gl) {
+        this.webglContext = this.canvas.getContext('webgl', contextAttributes);
+        if (!this.webglContext) {
             alert(' 无法创建WebGLRenderingContext上下文对象 ');
             throw new Error(' 无法创建WebGLRenderingContext上下文对象 ');
         }
@@ -44,19 +44,19 @@ export class WebGLApplication extends BaseApplication {
         if (option2d) {
             this.create2dCanvas();
         }
-        this.camera = new CameraComponent(this.gl, canvas.width, canvas.height, 45, 1);
+        this.camera = new CameraComponent(this.webglContext, canvas.width, canvas.height, 45, 1);
         this.matStack = new GLWorldMatrixStack();
         // 初始化渲染状态
-        GLRenderHelper.setDefaultState(this.gl);
+        GLRenderHelper.setDefaultState(this.webglContext);
         // 由于Canvas是左手系，而webGL是右手系，需要FlipYCoordinate
         this.isFlipYCoordinate = true;
         // 初始化时，创建default纹理
-        GLTextureCache.instance.set('default', GLTexture.createDefaultTexture(this.gl));
+        GLTextureCache.instance.set('default', GLTexture.createDefaultTexture(this.webglContext));
         // 初始化时，创建颜色和纹理Program
-        GLProgramCache.instance.set('color', GLProgram.createDefaultColorProgram(this.gl));
-        GLProgramCache.instance.set('texture', GLProgram.createDefaultTextureProgram(this.gl));
+        GLProgramCache.instance.set('color', GLProgram.createDefaultColorProgram(this.webglContext));
+        GLProgramCache.instance.set('texture', GLProgram.createDefaultTextureProgram(this.webglContext));
         // 初始化时，创建颜色GLMeshBuilder对象
-        this.builder = new GLMeshBuilder(this.gl, GLAttributeHelper.POSITION.BIT | GLAttributeHelper.COLOR.BIT, GLProgramCache.instance.getMust('color'));
+        this.builder = new GLMeshBuilder(this.webglContext, GLAttributeHelper.POSITION.BIT | GLAttributeHelper.COLOR.BIT, GLProgramCache.instance.getMust('color'));
     }
     
     /**
@@ -134,8 +134,8 @@ export class WebGLApplication extends BaseApplication {
      * @protected
      */
     protected clearBuffer(): void {
-        if (this.gl) {
-            this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+        if (this.webglContext) {
+            this.webglContext.clear(this.webglContext.COLOR_BUFFER_BIT | this.webglContext.DEPTH_BUFFER_BIT);
         }
     }
     
