@@ -13,7 +13,7 @@ import {WebGLApplication} from '../base/WebGLApplication';
  */
 export class CoordinateSystemApplication extends WebGLApplication {
     /** 存储当前使用的坐标系、视口以及旋转轴、旋转角度等信息的数组 */
-    public cubeMVP: Matrix4 = new Matrix4();
+    private _cubeMVP: Matrix4 = new Matrix4();
     // 下面两个成员变量排列组合后，形成6种不同的绘制方式
     /** 用于切换三种不同的绘制方法 */
     private _currentDrawMethod: (s: GLCoordinateSystem) => void;
@@ -195,13 +195,13 @@ export class CoordinateSystemApplication extends WebGLApplication {
         // 绘制坐标系
         DrawHelper.drawFullCoordinateSystem(this.builder, this._mvp, 1, glCoordinateSystem.isDrawAxis ? glCoordinateSystem.axis : null);
         // 第二步：绘制绕x轴旋转的线框立方体
-        this.drawXAxisWithRotatedCube(glCoordinateSystem);
+        this.drawXAxisRotatedCube(glCoordinateSystem);
         // 第三步：绘制绕y轴旋转的线框立方体
-        this.drawYAxisWithRotatedCube(glCoordinateSystem);
+        this.drawYAxisRotatedCube(glCoordinateSystem);
         // 第四步：绘制绕z轴旋转的线框立方体
-        this.drawZAxisWithRotatedCube(glCoordinateSystem);
+        this.drawZAxisRotatedCube(glCoordinateSystem);
         // 第五步：绘制绕坐标系旋转轴（s.axis）旋转的线框立方体
-        this.drawCubeWithRotatedAxis(glCoordinateSystem);
+        this.drawFixedAxisRotatedCube(glCoordinateSystem);
         // 矩阵出栈
         this.matStack.popMatrix();
         // 第六步：绘制坐标系的标示文字
@@ -209,61 +209,62 @@ export class CoordinateSystemApplication extends WebGLApplication {
     }
     
     /**
-     * 使用旋转立方体绘制X轴。
+     * 绘制X轴旋转立方体。
      * @param {GLCoordinateSystem} glCoordinateSystem
      * @private
      */
-    private drawXAxisWithRotatedCube(glCoordinateSystem: GLCoordinateSystem): void {
+    private drawXAxisRotatedCube(glCoordinateSystem: GLCoordinateSystem): void {
         this.matStack.pushMatrix();
         this.matStack.rotate(glCoordinateSystem.angle, Vector3.right, false);
         this.matStack.translate(new Vector3([0.8, 0.4, 0]));
         this.matStack.rotate(glCoordinateSystem.angle * 2, Vector3.right, false);
-        Matrix4.product(this.camera.viewProjectionMatrix, this.matStack.modelViewMatrix, this.cubeMVP);
-        DrawHelper.drawWireFrameCubeBox(this.builder, this.cubeMVP, 0.1);
+        this._cubeMVP = Matrix4.product(this.camera.viewProjectionMatrix, this.matStack.modelViewMatrix);
+        DrawHelper.drawWireFrameCubeBox(this.builder, this._cubeMVP, 0.1);
         this.matStack.popMatrix();
     }
     
     /**
-     * 使用旋转立方体绘制Y轴。
+     * 绘制Y轴旋转立方体。
      * @param {GLCoordinateSystem} glCoordinateSystem
      * @private
      */
-    private drawYAxisWithRotatedCube(glCoordinateSystem: GLCoordinateSystem): void {
+    private drawYAxisRotatedCube(glCoordinateSystem: GLCoordinateSystem): void {
         this.matStack.pushMatrix();
         this.matStack.rotate(glCoordinateSystem.angle, Vector3.up, false);
         this.matStack.translate(new Vector3([0.2, 0.8, 0]));
         this.matStack.rotate(glCoordinateSystem.angle * 2, Vector3.up, false);
-        Matrix4.product(this.camera.viewProjectionMatrix, this.matStack.modelViewMatrix, this.cubeMVP);
-        DrawHelper.drawWireFrameCubeBox(this.builder, this.cubeMVP, 0.1, Vector4Adapter.green);
+        this._cubeMVP = Matrix4.product(this.camera.viewProjectionMatrix, this.matStack.modelViewMatrix);
+        DrawHelper.drawWireFrameCubeBox(this.builder, this._cubeMVP, 0.1, Vector4Adapter.green);
         this.matStack.popMatrix();
     }
     
     /**
-     * 使用旋转立方体绘制Z轴。
+     * 绘制Z轴旋转立方体。
      * @param {GLCoordinateSystem} glCoordinateSystem
      * @private
      */
-    private drawZAxisWithRotatedCube(glCoordinateSystem: GLCoordinateSystem): void {
+    private drawZAxisRotatedCube(glCoordinateSystem: GLCoordinateSystem): void {
+        this.matStack.pushMatrix();
         this.matStack.translate(new Vector3([0.0, 0.0, 0.8]));
         this.matStack.rotate(glCoordinateSystem.angle * 2, Vector3.forward, false);
-        Matrix4.product(this.camera.viewProjectionMatrix, this.matStack.modelViewMatrix, this.cubeMVP);
-        DrawHelper.drawWireFrameCubeBox(this.builder, this.cubeMVP, 0.1, Vector4Adapter.blue);
+        this._cubeMVP = Matrix4.product(this.camera.viewProjectionMatrix, this.matStack.modelViewMatrix);
+        DrawHelper.drawWireFrameCubeBox(this.builder, this._cubeMVP, 0.1, Vector4Adapter.blue);
         this.matStack.popMatrix();
     }
     
     /**
-     * 绘制绕坐标系旋转轴（s.axis）旋转的线框立方体
+     * 绘制绕坐标系旋转轴（glCoordinateSystem.axis）旋转的线框立方体
      * @param {GLCoordinateSystem} glCoordinateSystem
      * @private
      */
-    private drawCubeWithRotatedAxis(glCoordinateSystem: GLCoordinateSystem): void {
+    private drawFixedAxisRotatedCube(glCoordinateSystem: GLCoordinateSystem): void {
         this.matStack.pushMatrix();
         const len: Vector3 = new Vector3();
         this.matStack.translate(glCoordinateSystem.axis.scale(0.8, len));
         this.matStack.translate(new Vector3([0, 0.3, 0]));
         this.matStack.rotate(glCoordinateSystem.angle, glCoordinateSystem.axis, false);
-        Matrix4.product(this.camera.viewProjectionMatrix, this.matStack.modelViewMatrix, this.cubeMVP);
-        DrawHelper.drawWireFrameCubeBox(this.builder, this.cubeMVP, 0.1, new Vector4());
+        this._cubeMVP = Matrix4.product(this.camera.viewProjectionMatrix, this.matStack.modelViewMatrix);
+        DrawHelper.drawWireFrameCubeBox(this.builder, this._cubeMVP, 0.1, new Vector4());
         this.matStack.popMatrix();
     }
     

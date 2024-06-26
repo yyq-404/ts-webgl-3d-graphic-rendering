@@ -8,9 +8,9 @@ let canvas: HTMLCanvasElement | null = document.getElementById('webgl') as HTMLC
 
 /** 应用集合 */
 const apps = {
-    '1: RotatingCubeApplication': RotatingCubeApplication,
-    '2: BasicWebGLApplication': BasicWebGLApplication,
-    '3: CoordinateSystemApplication': CoordinateSystemApplication
+    '1: RotatingCube': RotatingCubeApplication,
+    '2: BasicWebGL': BasicWebGLApplication,
+    '3: CoordinateSystem': CoordinateSystemApplication
 };
 
 /** 当前正在运行的App */
@@ -27,9 +27,7 @@ select.onchange = () => {
         currentApp.dispose();
     }
     const app: BaseApplication = new apps[appName](canvas);
-    runAppAsync(app).then().catch((reason) => {
-        console.log(reason);
-    });
+    runAppAsync(app).then().catch((reason) => console.log(reason));
 };
 
 /** 调试信息 */
