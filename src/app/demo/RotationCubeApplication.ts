@@ -27,7 +27,7 @@ export class RotatingCubeApplication extends CameraApplication {
     /** 由于cube会进行周而复始的换纹理操作，因此需要记录当前纹理的索引号 */
     private _currentTexIdx: number;
     /** 需要一个数组保存多个纹理 */
-    private _textures: GLTexture[];
+    private readonly _textures: GLTexture[];
     // 立方体渲染数据，后续章节详解
     /** 几何体的数据表达式 */
     private _cube: Cube;
@@ -61,6 +61,7 @@ export class RotatingCubeApplication extends CameraApplication {
         // 这样我们才能使用该上下文对象进行2D文字渲染
         super(canvas, {premultipliedAlpha: false}, true);
         if (!this.gl) throw new Error('this.gl is not defined');
+        this.clearBuffer();
         // 初始化角位移和角速度
         this._cubeAngle = 0;
         this._triangleAngle = 0;
@@ -157,7 +158,7 @@ export class RotatingCubeApplication extends CameraApplication {
     public override render(): void {
         if (!this.gl) throw new Error('this.gl is not defined');
         // FIXME: 切记，一定要先清屏（清除掉颜色缓冲区和深度缓冲区）(书上有，随书源码中无？？？)
-        this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+        this.clearBuffer();
         this.renderCube();
         this.renderTriangle();
         this.renderText('第一个WebGL Demo');
@@ -185,8 +186,11 @@ export class RotatingCubeApplication extends CameraApplication {
      * @private
      */
     private renderCube(): void {
+        let texture = this._textures[this._currentTexIdx];
         // 绑定要绘制的texture和program
-        this._textures[this._currentTexIdx].bind();
+        if (texture) {
+            texture.bind();
+        }
         this._textureProgram.bind();
         this._textureProgram.loadSampler();
         // 绘制立方体
@@ -208,7 +212,9 @@ export class RotatingCubeApplication extends CameraApplication {
         this.matStack.popMatrix();
         // 解除绑定的texture和program
         this._textureProgram.unbind();
-        this._textures[this._currentTexIdx].unbind();
+        if (texture) {
+            texture.unbind();
+        }
     }
     
     /**
