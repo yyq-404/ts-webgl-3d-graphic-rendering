@@ -193,9 +193,12 @@ export class DrawHelper {
             builder.color(0.0, 0.0, 0.0).vertex(0, 0, 0);
             builder.color(0.0, 0.0, 0.0).vertex(scale.x, scale.y, scale.z);
         }
-        builder.end(mat); // 将渲染数据提交给GPU进行渲染
-        builder.gl.lineWidth(1); // 恢复线宽为1个像素
-        builder.gl.enable(builder.gl.DEPTH_TEST); // 恢复开始帧缓存深度测试
+        // 将渲染数据提交给GPU进行渲染
+        builder.end(mat);
+        // 恢复线宽为1个像素
+        builder.gl.lineWidth(1);
+        // 恢复开始帧缓存深度测试
+        builder.gl.enable(builder.gl.DEPTH_TEST);
     }
     
     /**
@@ -211,27 +214,31 @@ export class DrawHelper {
         builder.gl.lineWidth(5);
         builder.gl.disable(builder.gl.DEPTH_TEST);
         builder.begin(builder.gl.LINES);
-        if (hitAxis === EAxisType.X_AXIS) {
-            builder.color(DrawHelper.defaultHitColor.r, DrawHelper.defaultHitColor.g, DrawHelper.defaultHitColor.b).vertex(0.0, 0.0, 0.0);
-            builder.color(DrawHelper.defaultHitColor.r, DrawHelper.defaultHitColor.g, DrawHelper.defaultHitColor.b).vertex(len, 0, 0);
-        } else {
-            builder.color(1.0, 0.0, 0.0).vertex(0.0, 0.0, 0.0);
-            builder.color(1.0, 0.0, 0.0).vertex(len, 0, 0);
-        }
-        if (hitAxis === EAxisType.Y_AXIS) {
-            builder.color(DrawHelper.defaultHitColor.r, DrawHelper.defaultHitColor.g, DrawHelper.defaultHitColor.b).vertex(0.0, 0.0, 0.0);
-            builder.color(DrawHelper.defaultHitColor.r, DrawHelper.defaultHitColor.g, DrawHelper.defaultHitColor.b).vertex(0, len, 0);
-        } else {
-            builder.color(0.0, 1.0, 0.0).vertex(0.0, 0.0, 0.0);
-            builder.color(0.0, 1.0, 0.0).vertex(0.0, len, 0.0);
-        }
-        if (hitAxis === EAxisType.Z_AXIS) {
-            builder.color(DrawHelper.defaultHitColor.r, DrawHelper.defaultHitColor.g, DrawHelper.defaultHitColor.b).vertex(0.0, 0.0, 0.0);
-            builder.color(DrawHelper.defaultHitColor.r, DrawHelper.defaultHitColor.g, DrawHelper.defaultHitColor.b).vertex(0, 0, isLeftHardness ? -len : len);
-            builder.color(DrawHelper.defaultHitColor.r, DrawHelper.defaultHitColor.g, DrawHelper.defaultHitColor.b).vertex(0, 0, len);
-        } else {
-            builder.color(0.0, 0.0, 1.0).vertex(0.0, 0.0, 0.0);
-            builder.color(0.0, 0.0, 1.0).vertex(0.0, 0.0, isLeftHardness ? -len : len);
+        switch (hitAxis) {
+            case EAxisType.X_AXIS:
+                builder.color(DrawHelper.defaultHitColor.r, DrawHelper.defaultHitColor.g, DrawHelper.defaultHitColor.b).vertex(0.0, 0.0, 0.0);
+                builder.color(DrawHelper.defaultHitColor.r, DrawHelper.defaultHitColor.g, DrawHelper.defaultHitColor.b).vertex(len, 0, 0);
+                break;
+            case EAxisType.Y_AXIS:
+                builder.color(DrawHelper.defaultHitColor.r, DrawHelper.defaultHitColor.g, DrawHelper.defaultHitColor.b).vertex(0.0, 0.0, 0.0);
+                builder.color(DrawHelper.defaultHitColor.r, DrawHelper.defaultHitColor.g, DrawHelper.defaultHitColor.b).vertex(0, len, 0);
+                break;
+            case EAxisType.Z_AXIS:
+                builder.color(DrawHelper.defaultHitColor.r, DrawHelper.defaultHitColor.g, DrawHelper.defaultHitColor.b).vertex(0.0, 0.0, 0.0);
+                builder.color(DrawHelper.defaultHitColor.r, DrawHelper.defaultHitColor.g, DrawHelper.defaultHitColor.b).vertex(0, 0, isLeftHardness ? -len : len);
+                break;
+            default: {
+                // X
+                builder.color(1.0, 0.0, 0.0).vertex(0.0, 0.0, 0.0);
+                builder.color(1.0, 0.0, 0.0).vertex(len, 0, 0);
+                // Y
+                builder.color(0.0, 1.0, 0.0).vertex(0.0, 0.0, 0.0);
+                builder.color(0.0, 1.0, 0.0).vertex(0.0, len, 0.0);
+                // Z
+                builder.color(0.0, 0.0, 1.0).vertex(0.0, 0.0, 0.0);
+                builder.color(0.0, 0.0, 1.0).vertex(0.0, 0.0, isLeftHardness ? -len : len);
+            }
+                break;
         }
         if (rotateAxis) {
             const scale: Vector3 = rotateAxis.scale(len);
@@ -265,6 +272,16 @@ export class DrawHelper {
         if (!isLeftHardness) {
             DrawHelper.drawAxisText(context, Vector3.forward.negate(new Vector3()), EAxisType.Z_AXIS, mvp, viewport, canvasHeight, inverse);
         }
+    }
+    
+    /**
+     * 设置坐标轴颜色。
+     * @param {GLMeshBuilder} builder
+     * @param {Vector4} color
+     * @param {number} len
+     * @private
+     */
+    private static setAxisColor(builder: GLMeshBuilder, color: Vector4, len: number): void {
     }
     
     /**

@@ -204,6 +204,7 @@ export class BaseApplication implements EventListenerObject, IBaseApplication, I
      * @protected
      */
     protected step(timeStamp: number): void {
+        if (!this._start) return;
         if (this.startTime === -1) {
             this.startTime = timeStamp;
         }
