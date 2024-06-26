@@ -6,6 +6,7 @@ import {EGLShaderType} from '../../webgl/enum/EGLShaderType';
 import {TypedArrayList} from '../../common/container/TypedArrayList';
 import {GLCoordinateSystem} from '../../webgl/GLCoordinateSystem';
 import {GLAttributeMap, GLUniformMap} from '../../webgl/GLTypes';
+import {CanvasKeyboardEvent} from '../../event/CanvasKeyboardEvent';
 
 /**
  * 基础WEBGL应用。
@@ -69,6 +70,8 @@ export class BasicWebGLApplication extends BaseApplication {
         // 4．直接将vColor写入gl_FragColor变量中
         gl_FragColor = vColor;
     }`;
+    /** 用来切换是否4视口还是9视口绘制 */
+    private _isFourViewport: boolean = false;
     
     /**
      * 构造
@@ -87,8 +90,8 @@ export class BasicWebGLApplication extends BaseApplication {
         // 从canvas元素中获得webgl上下文渲染对象，WebGL API都通过该上下文渲染对象进行调用
         this.gl = ctx;
         canvas.addEventListener('webglcontextlost', function (e) {
-            console.log(JSON.stringify(e));
             // 当触发WebGLContextLost事件时，将该事件相关信息打印到控制台
+            console.log(JSON.stringify(e));
         }, false);
         // GLHelper.triggerContextLostEvent(this.gl);
         // 打印WebGL状态
@@ -124,13 +127,13 @@ export class BasicWebGLApplication extends BaseApplication {
         // 初始化evbo
         this.indices = new TypedArrayList(Uint16Array, 6);
         this.evbo = GLRenderHelper.createBuffer(this.gl);
-        // this.gl.frontFace(this.gl.CCW);
+        this.attributeMap = GLRenderHelper.getProgramActiveAttributes(this.gl, this.program);
+        this.uniformMap = GLRenderHelper.getProgramActiveUniforms(this.gl, this.program);
+        this.gl.frontFace(this.gl.CCW);
         this.gl.enable(this.gl.CULL_FACE);
         // this.gl.cullFace(this.gl.BACK);
         this.coordinateSystem9s = GLCoordinateSystem.makeViewportCoordinateSystems(this.canvas.width, this.canvas.height, 3, 3);
         this.coordinateSystem4s = GLCoordinateSystem.makeViewportCoordinateSystems(this.canvas.width, this.canvas.height, 2, 2);
-        this.attributeMap = GLRenderHelper.getProgramActiveAttributes(this.gl, this.program);
-        this.uniformMap = GLRenderHelper.getProgramActiveUniforms(this.gl, this.program);
     }
     
     /**
@@ -212,37 +215,18 @@ export class BasicWebGLApplication extends BaseApplication {
             ];
         }
         this.verts.pushArray(data);
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.ivbo);
-        // 使用我们自己实现的动态类型数组的subArray方法，该方法不会重新创建Float32Array对象
-        // 而是返回一个子数组的引用，这样效率比较高
-        this.gl.bufferData(this.gl.ARRAY_BUFFER, this.verts.subArray(), this.gl.DYNAMIC_DRAW);
-        // vertexAttribPointer方法参数说明：
-        // 1、使用VertexShader中的attribute变量名aPosition,在attribMap中查找到我们自己封装的GLAttribInfo对象,该对象中存储了顶点属性寄存器的索引号
-        // 2、aPosition的类型为vec3,而vec3由3个float类型组成，因此第二个参数为3,第三个参数为gl.FLOAT常量值
-        // 但是aColor的类型为vec4,,而vec4由4个float类型组成,因此第二个参数为4,第三个参数为gl.FLOAT常量值
-        // 3、第四个参数用来指明attribute变量是否使用需要normalized，
-        // 由于normalize只对gl.BYTE / gl.SHORT [-1 , 1 ]和gl.UNSIGNED_BYTE / gl.UNSIGNED_SHORT [ 0 , 1 ]有效
-        // 而我们的aPosition和aColor在WebGLBuffer被定义为FLOAT表示的vec3和vec4,因此直接设置false
-        // 4、关于最后两个参数，需要参考图5.12，因此请参考本书内容
-        this.gl.vertexAttribPointer(this.attributeMap['aPosition'].location, 3, this.gl.FLOAT, false, Float32Array.BYTES_PER_ELEMENT * 7, Float32Array.BYTES_PER_ELEMENT * 0);
-        this.gl.vertexAttribPointer(this.attributeMap['aColor'].location, 4, this.gl.FLOAT, false, Float32Array.BYTES_PER_ELEMENT * 7, Float32Array.BYTES_PER_ELEMENT * 3);
+        this.bindVertexBufferObject();
         // 默认情况下，是关闭vertexAttribArray对象的，因此需要开启
         // 一旦开启后，当我们调用draw开头的WebGL方法时，WebGL驱动会自动将VBO中的顶点数据上传到对应的Vertex Shader中
         this.gl.enableVertexAttribArray(this.attributeMap['aPosition'].location);
         this.gl.enableVertexAttribArray(this.attributeMap['aColor'].location);
         // 绘制阶段
-        this.gl.useProgram(this.program); // 设置要使用的WebGLProgram对象
-        const mat: Matrix4 = new Matrix4().setIdentity().scale(new Vector3([2, 2, 2]));
-        Matrix4.product(this.viewProjectMatrix, mat, mat);
-        // 将vMVPMatrix uniform变量上传（upload）到着色器重
-        this.gl.uniformMatrix4fv(this.uniformMap['uMVPMatrix'].location, false, mat.all());
+        // 设置要使用的WebGLProgram对象
+        this.setProgram();
         // 调用drawArrays对象
         this.gl.drawArrays(mode, first, count); // 几个顶点
         // 将渲染状态恢复的未设置之前
-        this.gl.useProgram(null);
-        this.gl.disableVertexAttribArray(this.attributeMap['aPosition'].location);
-        this.gl.disableVertexAttribArray(this.attributeMap['aColor'].location);
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
+        this.resetProgram();
     }
     
     /**
@@ -253,6 +237,8 @@ export class BasicWebGLApplication extends BaseApplication {
      * @param isCCW
      */
     public drawRectByInterleavedVBOWithEBO(byteOffset: number, count: number, mode: number = this.gl.TRIANGLES, isCCW: boolean = true): void {
+        // 简单起见，本方法就只演示三角形相关内容。
+        if (mode !== this.gl.TRIANGLES && mode !== this.gl.TRIANGLE_FAN && mode !== this.gl.TRIANGLE_STRIP) return;
         // 重用动态数组，因此调用clear方法，将当前索引reset到0位置
         this.verts.clear();
         // 声明interleaved存储的顶点数组。
@@ -275,30 +261,33 @@ export class BasicWebGLApplication extends BaseApplication {
         } else if (mode === this.gl.TRIANGLE_STRIP) {
             // 如果是TRIANGLE_STRIP方式
             this.indices.pushArray([0, 1, 2, 2, 3, 0]);
-        } else {
-            // 简单起见，本方法就只演示三角形相关内容。
-            return;
         }
         // 绑定VBO
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.ivbo);
-        this.gl.bufferData(this.gl.ARRAY_BUFFER, this.verts.subArray(), this.gl.DYNAMIC_DRAW);
-        this.gl.vertexAttribPointer(this.attributeMap['aPosition'].location, 3, this.gl.FLOAT, false, Float32Array.BYTES_PER_ELEMENT * 7, Float32Array.BYTES_PER_ELEMENT * 0);
-        this.gl.vertexAttribPointer(this.attributeMap['aColor'].location, 4, this.gl.FLOAT, false, Float32Array.BYTES_PER_ELEMENT * 7, Float32Array.BYTES_PER_ELEMENT * 3);
-        this.gl.enableVertexAttribArray(this.attributeMap['aPosition'].location);
-        this.gl.enableVertexAttribArray(this.attributeMap['aColor'].location);
+        this.bindVertexBufferObject();
         // 绑定EBO
         this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.evbo);
         this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, this.indices.subArray(), this.gl.DYNAMIC_DRAW);
-        this.gl.useProgram(this.program);
-        const mat: Matrix4 = new Matrix4().setIdentity().scale(new Vector3([2, 2, 2]));
-        Matrix4.product(this.viewProjectMatrix, mat, mat);
-        this.gl.uniformMatrix4fv(this.uniformMap['uMVPMatrix'].location, false, mat.all());
+        this.setProgram();
         // 调用drawElements方法
         this.gl.drawElements(mode, count, this.gl.UNSIGNED_SHORT, byteOffset);
-        this.gl.useProgram(null);
-        this.gl.disableVertexAttribArray(this.attributeMap['aPosition'].location);
-        this.gl.disableVertexAttribArray(this.attributeMap['aColor'].location);
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
+        // 将渲染状态恢复的未设置之前
+        this.resetProgram();
+    }
+    
+    /**
+     * 按键按下。
+     * @param {CanvasKeyboardEvent} evt
+     */
+    public override onKeyPress(evt: CanvasKeyboardEvent): void {
+        // 调用基类方法，这样摄像机键盘事件全部有效了
+        super.onKeyPress(evt);
+        switch (evt.key) {
+            case 'c':
+                this._isFourViewport = !this._isFourViewport;
+                break;
+            default:
+                break;
+        }
     }
     
     /**
@@ -313,8 +302,21 @@ export class BasicWebGLApplication extends BaseApplication {
      * 渲染处理。
      */
     public override render(): void {
-        this.render9Viewports();
-        // this.render4Viewports();
+        if (this._isFourViewport) {
+            this.render4Viewports();
+        } else {
+            this.render9Viewports();
+        }
+    }
+    
+    /**
+     * 释放
+     */
+    public override dispose(): void {
+        if (this.gl) {
+            this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT | this.gl.STENCIL_BUFFER_BIT);
+        }
+        super.dispose();
     }
     
     /**
@@ -323,8 +325,8 @@ export class BasicWebGLApplication extends BaseApplication {
      * @protected
      */
     protected getContextAttributes(): WebGLContextAttributes {
+        // WebGL上下文渲染对象需要创建深度和模版缓冲区
         return {
-            // WebGL上下文渲染对象需要创建深度和模版缓冲区
             // 创建深度缓冲区，default为true
             depth: true,
             // 创建模版缓冲区，default为false，我们这里设置为true
@@ -339,5 +341,52 @@ export class BasicWebGLApplication extends BaseApplication {
             // 帧缓冲区抗锯齿及是否保留上一帧的内容，default为true
             preserveDrawingBuffer: false
         } as WebGLContextAttributes;
+    }
+    
+    /**
+     * 设置渲染
+     * @private
+     */
+    private setProgram() {
+        this.gl.useProgram(this.program);
+        let mat: Matrix4 = new Matrix4().setIdentity().scale(new Vector3([2, 2, 2]));
+        mat = Matrix4.product(this.viewProjectMatrix, mat);
+        this.gl.uniformMatrix4fv(this.uniformMap['uMVPMatrix'].location, false, mat.all());
+    }
+    
+    /**
+     * 还原渲染之前的状态。
+     * @private
+     */
+    private resetProgram() {
+        this.gl.useProgram(null);
+        this.gl.disableVertexAttribArray(this.attributeMap['aPosition'].location);
+        this.gl.disableVertexAttribArray(this.attributeMap['aColor'].location);
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
+    }
+    
+    /**
+     * 绑定顶点缓冲对象。
+     * @private
+     */
+    private bindVertexBufferObject(): void {
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.ivbo);
+        // 使用我们自己实现的动态类型数组的subArray方法，该方法不会重新创建Float32Array对象
+        // 而是返回一个子数组的引用，这样效率比较高
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, this.verts.subArray(), this.gl.DYNAMIC_DRAW);
+        // vertexAttribPointer方法参数说明：
+        // 1、使用VertexShader中的attribute变量名aPosition,在attribMap中查找到我们自己封装的GLAttribInfo对象,该对象中存储了顶点属性寄存器的索引号
+        // 2、aPosition的类型为vec3,而vec3由3个float类型组成，因此第二个参数为3,第三个参数为gl.FLOAT常量值
+        // 但是aColor的类型为vec4,,而vec4由4个float类型组成,因此第二个参数为4,第三个参数为gl.FLOAT常量值
+        // 3、第四个参数用来指明attribute变量是否使用需要normalized，
+        // 由于normalize只对gl.BYTE / gl.SHORT [-1 , 1 ]和gl.UNSIGNED_BYTE / gl.UNSIGNED_SHORT [ 0 , 1 ]有效
+        // 而我们的aPosition和aColor在WebGLBuffer被定义为FLOAT表示的vec3和vec4,因此直接设置false
+        // 4、关于最后两个参数，需要参考图5.12，因此请参考本书内容
+        this.gl.vertexAttribPointer(this.attributeMap['aPosition'].location, 3, this.gl.FLOAT, false, Float32Array.BYTES_PER_ELEMENT * 7, Float32Array.BYTES_PER_ELEMENT * 0);
+        this.gl.vertexAttribPointer(this.attributeMap['aColor'].location, 4, this.gl.FLOAT, false, Float32Array.BYTES_PER_ELEMENT * 7, Float32Array.BYTES_PER_ELEMENT * 3);
+        // 默认情况下，是关闭vertexAttribArray对象的，因此需要开启
+        // 一旦开启后，当我们调用draw开头的WebGL方法时，WebGL驱动会自动将VBO中的顶点数据上传到对应的Vertex Shader中
+        this.gl.enableVertexAttribArray(this.attributeMap['aPosition'].location);
+        this.gl.enableVertexAttribArray(this.attributeMap['aColor'].location);
     }
 }
