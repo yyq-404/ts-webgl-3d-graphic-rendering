@@ -302,6 +302,7 @@ export class BasicWebGLApplication extends BaseApplication {
      * 渲染处理。
      */
     public override render(): void {
+        this.clearBuffer();
         if (this._isFourViewport) {
             this.render4Viewports();
         } else {
@@ -313,9 +314,7 @@ export class BasicWebGLApplication extends BaseApplication {
      * 释放
      */
     public override dispose(): void {
-        if (this.gl) {
-            this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT | this.gl.STENCIL_BUFFER_BIT);
-        }
+        this.clearBuffer();
         super.dispose();
     }
     
@@ -388,5 +387,15 @@ export class BasicWebGLApplication extends BaseApplication {
         // 一旦开启后，当我们调用draw开头的WebGL方法时，WebGL驱动会自动将VBO中的顶点数据上传到对应的Vertex Shader中
         this.gl.enableVertexAttribArray(this.attributeMap['aPosition'].location);
         this.gl.enableVertexAttribArray(this.attributeMap['aColor'].location);
+    }
+    
+    /**
+     * 清理缓冲数据。
+     * @protected
+     */
+    private clearBuffer(): void {
+        if (this.gl) {
+            this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+        }
     }
 }
