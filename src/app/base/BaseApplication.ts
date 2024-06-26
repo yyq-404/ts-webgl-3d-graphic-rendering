@@ -189,6 +189,16 @@ export class BaseApplication implements EventListenerObject, IBaseApplication, I
     }
     
     /**
+     * 释放
+     */
+    public dispose(): void {
+        this.timerManager.clear();
+        this.frameCallback = null;
+        this.unregisterMouseEvents();
+        this.unregisterKeyBoardEvents();
+    }
+    
+    /**
      * 配置
      * @param timeStamp
      * @protected
@@ -327,6 +337,16 @@ export class BaseApplication implements EventListenerObject, IBaseApplication, I
     }
     
     /**
+     * 注销鼠标事件。
+     * @private
+     */
+    private unregisterMouseEvents(): void {
+        this.canvas.removeEventListener('mousedown', this, false);
+        this.canvas.removeEventListener('mouseup', this, false);
+        this.canvas.removeEventListener('mousemove', this, false);
+    }
+    
+    /**
      * 注册键盘事件。
      * @private
      */
@@ -334,6 +354,16 @@ export class BaseApplication implements EventListenerObject, IBaseApplication, I
         window.addEventListener('keydown', this, false);
         window.addEventListener('keyup', this, false);
         window.addEventListener('keypress', this, false);
+    }
+    
+    /**
+     * 注销键盘事件。
+     * @private
+     */
+    private unregisterKeyBoardEvents(): void {
+        window.removeEventListener('keydown', this, false);
+        window.removeEventListener('keyup', this, false);
+        window.removeEventListener('keypress', this, false);
     }
     
     /**

@@ -63,6 +63,31 @@ export class WebGLApplication extends BaseApplication {
     }
     
     /**
+     * 释放
+     */
+    public override dispose(): void {
+        this.matStack.clear();
+        // GLRenderHelper.triggerContextLostEvent(this.gl);
+        this.clearBuffer();
+        GLProgramCache.instance.clear();
+        GLTextureCache.instance.clear();
+        if (this.canvas2D && this.canvas2D.parentElement) {
+            this.canvas2D.parentElement.removeChild(this.canvas2D);
+        }
+        super.dispose();
+    }
+    
+    /**
+     * 清理缓冲数据。
+     * @protected
+     */
+    protected clearBuffer(): void {
+        if (this.gl) {
+            this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+        }
+    }
+    
+    /**
      * 创建2D画布。
      * @private
      */
