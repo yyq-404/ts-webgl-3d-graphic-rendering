@@ -48,7 +48,7 @@ export class RotatingCubeApplication extends CameraApplication {
     /** 由于三角形使用键盘控制的更新方式，需要添加和删除操作，需要定时器id */
     private _triangleTimerId: number;
     /** 合成的三角形的世界矩阵 */
-    private readonly _triangleMatrix: Matrix4;
+    private _triangleMatrix: Matrix4;
     /** 为了支持鼠标点选，记录选中的坐标轴的enum值 */
     private readonly _hitAxis: EAxisType;
     
@@ -157,15 +157,14 @@ export class RotatingCubeApplication extends CameraApplication {
      */
     public override render(): void {
         if (!this.gl) throw new Error('this.gl is not defined');
+        if (this.context2d) {
+            this.context2d.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        }
         // FIXME: 切记，一定要先清屏（清除掉颜色缓冲区和深度缓冲区）(书上有，随书源码中无？？？)
         this.clearBuffer();
         this.renderCube();
         this.renderTriangle();
         this.renderText('First WebGL Demo');
-        // 绘制坐标轴文字
-        if (this.context2d) {
-            DrawHelper.drawCoordinateSystemText(this.context2d, this._cubeMatrix, this.camera.getViewport(), this.canvas.height, false);
-        }
     }
     
     /**
@@ -212,6 +211,9 @@ export class RotatingCubeApplication extends CameraApplication {
         this._cubeVAO.draw();
         // 使用辅助方法绘制坐标系
         DrawHelper.drawCoordinateSystem(this.builder, this._cubeMatrix, this._hitAxis, 1);
+        if (this.context2d) {
+            DrawHelper.drawCoordinateSystemText(this.context2d, this._cubeMatrix, this.camera.getViewport(), this.canvas.height, false);
+        }
         // 矩阵出栈
         this.matStack.popMatrix();
         // 解除绑定的texture和program
@@ -248,7 +250,7 @@ export class RotatingCubeApplication extends CameraApplication {
         // 三角形第三个点的颜色与坐标
         this.builder.color(0, 0, 1).vertex(0, 0.5, 0);
         // 合成model-view-projection matrix
-        Matrix4.product(this.camera.viewProjectionMatrix, this.matStack.modelViewMatrix, this._triangleMatrix);
+        this._triangleMatrix = Matrix4.product(this.camera.viewProjectionMatrix, this.matStack.modelViewMatrix);
         // 将mvpMatrix传递给GLMeshBuilder的end方法，该方法会正确的显示图形
         this.builder.end(this._triangleMatrix);
         // 删除一个矩阵
@@ -268,7 +270,6 @@ export class RotatingCubeApplication extends CameraApplication {
      */
     private renderText(text: string, x: number = this.canvas.width * 0.5, y: number = 150): void {
         if (!this.context2d) return;
-        this.context2d.clearRect(0, 0, this.canvas.width, this.canvas.height);
         // 渲染状态进栈
         this.context2d.save();
         // 红色
