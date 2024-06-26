@@ -161,7 +161,7 @@ export class CoordinateSystemApplication extends WebGLApplication {
         DrawHelper.drawCoordinateSystem(this.builder, this._mvp, EAxisType.NONE, 1, glCoordinateSystem.isDrawAxis ? glCoordinateSystem.axis : null, glCoordinateSystem.isD3D);
         this.matStack.popMatrix();
         // 绘制坐标系的标示文字，调用drawText方法
-        this.drawCoordinateSystemText(false);
+        this.drawCoordinateSystemText();
     }
     
     /**
@@ -179,7 +179,7 @@ export class CoordinateSystemApplication extends WebGLApplication {
         // 矩阵出栈
         this.matStack.popMatrix();
         // 绘制坐标系的标示文字,调用的是本类的drawText方法
-        this.drawCoordinateSystemText();
+        this.drawCoordinateSystemText(true);
     }
     
     /**
@@ -205,7 +205,7 @@ export class CoordinateSystemApplication extends WebGLApplication {
         // 矩阵出栈
         this.matStack.popMatrix();
         // 第六步：绘制坐标系的标示文字
-        this.drawCoordinateSystemText();
+        this.drawCoordinateSystemText(true);
     }
     
     /**
@@ -288,7 +288,7 @@ export class CoordinateSystemApplication extends WebGLApplication {
      * @param {boolean} inverse
      * @private
      */
-    private drawCoordinateSystemText(inverse: boolean = true): void {
+    private drawCoordinateSystemText(inverse: boolean = false): void {
         if (!this.context2d) return;
         DrawHelper.drawCoordinateSystemText(this.context2d, this._mvp, this.camera.getViewport(), this.canvas.height, inverse);
     }

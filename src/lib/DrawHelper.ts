@@ -253,11 +253,11 @@ export class DrawHelper {
      * @param {boolean} isLeftHardness
      * @private
      */
-    public static drawCoordinateSystemText(context: CanvasRenderingContext2D, mvp: Matrix4, viewport: Int32Array, canvasHeight: number, inverse: boolean = true, isLeftHardness: boolean = false): void {
-        DrawHelper.drawAxisText(context, Vector3.right, EAxisType.X_AXIS, mvp, viewport, canvasHeight, inverse);
-        DrawHelper.drawAxisText(context, Vector3.up, EAxisType.Y_AXIS, mvp, viewport, canvasHeight, inverse);
+    public static drawCoordinateSystemText(context: CanvasRenderingContext2D, mvp: Matrix4, viewport: Int32Array, canvasHeight: number, inverse: boolean = false, isLeftHardness: boolean = false): void {
+        DrawHelper.drawAxisText(context, Vector3.right, EAxisType.X_AXIS, mvp, viewport, canvasHeight);
+        DrawHelper.drawAxisText(context, Vector3.up, EAxisType.Y_AXIS, mvp, viewport, canvasHeight);
         if (!isLeftHardness) {
-            DrawHelper.drawAxisText(context, Vector3.forward, EAxisType.Z_AXIS, mvp, viewport, canvasHeight, inverse);
+            DrawHelper.drawAxisText(context, Vector3.forward, EAxisType.Z_AXIS, mvp, viewport, canvasHeight);
         }
         if (!inverse) return;
         DrawHelper.drawAxisText(context, Vector3.right.negate(new Vector3()), EAxisType.X_AXIS, mvp, viewport, canvasHeight, inverse);
