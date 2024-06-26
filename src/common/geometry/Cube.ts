@@ -1,5 +1,5 @@
-import {Vector3} from "../../common/math/vector/Vector3";
-import {Vector2} from "../../common/math/vector/Vector2";
+import {Vector3} from "../math/vector/Vector3";
+import {Vector2} from "../math/vector/Vector2";
 import {Geometry} from "./Geometry";
 
 /**

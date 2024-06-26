@@ -1,10 +1,10 @@
 import {GLMeshBuilder} from '../webgl/mesh/GLMeshBuilder';
-import {Matrix4} from '../common/math/matrix/Matrix4';
-import {Vector3} from '../common/math/vector/Vector3';
-import {Vector4} from '../common/math/vector/Vector4';
-import {Vector4Adapter} from '../common/math/MathAdapter';
+import {Matrix4} from './math/matrix/Matrix4';
+import {Vector3} from './math/vector/Vector3';
+import {Vector4} from './math/vector/Vector4';
+import {Vector4Adapter} from './math/MathAdapter';
 import {EAxisType} from '../enum/EAxisType';
-import {MathHelper} from '../common/math/MathHelper';
+import {MathHelper} from './math/MathHelper';
 
 /**
  *绘制助手
@@ -12,7 +12,7 @@ import {MathHelper} from '../common/math/MathHelper';
 export class DrawHelper {
     /** 默认颜色 */
     public static defaultHitColor: Vector4 = new Vector4([1, 1, 0, 0]);
-    
+
     /**
      * 绘制立方体
      * @param builder
@@ -25,7 +25,7 @@ export class DrawHelper {
         const maxs: Vector3 = new Vector3([halfLen, halfLen, halfLen]);
         DrawHelper.drawBoundBox(builder, mat, mins, maxs, color);
     }
-    
+
     /**
      * 根据 `mins` 点（下图中的顶点2，左下后）和 `maxs`（下图中的顶点5，右上前）点的坐标，
      * 使用参数指定的颜色绘制线框绑定盒，它是一个立方体
@@ -74,7 +74,7 @@ export class DrawHelper {
             builder.end(mat);
         }
     }
-    
+
     /**
      * 绘制纹理立方体
      * ```plaintext
@@ -145,103 +145,101 @@ export class DrawHelper {
         builder.texCoordinate(tc[46], tc[47]).vertex(halfLen, -halfLen, halfLen); // 4   + - +
         builder.end(mat);
     }
-    
+
     /**
      * 绘制完全坐标系
      * @param builder
-     * @param mat
-     * @param len
+     * @param mvp
+     * @param length
      * @param rotateAxis
+     * @param isLeftHardness
      */
-    public static drawFullCoordinateSystem(builder: GLMeshBuilder, mat: Matrix4, len: number = 1, rotateAxis: Vector3 | null = null): void {
-        builder.webglContext.lineWidth(5); // 用5个像素大小的直径绘制线段，但目前仅Safari浏览器实现
-        builder.webglContext.disable(builder.webglContext.DEPTH_TEST); // 关闭帧缓存深度测试
+    public static drawFullCoordinateSystem(builder: GLMeshBuilder, mvp: Matrix4, length: number = 1, rotateAxis: Vector3 | null = null, inverse: boolean = false,isLeftHardness: boolean = false): void {
+        // 用5个像素大小的直径绘制线段，但目前仅Safari浏览器实现
+        builder.webglContext.lineWidth(5);
+        // 关闭帧缓存深度测试
+        builder.webglContext.disable(builder.webglContext.DEPTH_TEST);
         builder.begin(builder.webglContext.LINES);
         // 正x轴
         {
             builder.color(1.0, 0.0, 0.0).vertex(0.0, 0.0, 0.0);
-            builder.color(1.0, 0.0, 0.0).vertex(len, 0, 0);
+            builder.color(1.0, 0.0, 0.0).vertex(length, 0, 0);
         }
         // 负x轴
         {
             builder.color(1.0, 0.0, 0.0).vertex(0.0, 0.0, 0.0);
-            builder.color(1.0, 0.0, 0.0).vertex(-len, 0, 0);
+            builder.color(1.0, 0.0, 0.0).vertex(-length, 0, 0);
         }
         // 正y轴
         {
             builder.color(0.0, 1.0, 0.0).vertex(0.0, 0.0, 0.0);
-            builder.color(0.0, 1.0, 0.0).vertex(0.0, len, 0.0);
+            builder.color(0.0, 1.0, 0.0).vertex(0.0, length, 0.0);
         }
         // 负y轴
         {
             builder.color(0.0, 1.0, 0.0).vertex(0.0, 0.0, 0.0);
-            builder.color(0.0, 1.0, 0.0).vertex(0.0, -len, 0.0);
+            builder.color(0.0, 1.0, 0.0).vertex(0.0, -length, 0.0);
         }
         // 正z轴
         {
             builder.color(0.0, 0.0, 1.0).vertex(0.0, 0.0, 0.0);
-            builder.color(0.0, 0.0, 1.0).vertex(0.0, 0.0, len);
+            builder.color(0.0, 0.0, 1.0).vertex(0.0, 0.0, length);
         }
         // 负z轴
         {
             builder.color(0.0, 0.0, 1.0).vertex(0.0, 0.0, 0.0);
-            builder.color(0.0, 0.0, 1.0).vertex(0.0, 0.0, -len);
+            builder.color(0.0, 0.0, 1.0).vertex(0.0, 0.0, -length);
         }
-        if (rotateAxis !== null) {
+        if (rotateAxis) {
             // 如果要绘制旋转轴，则绘制出来
-            const scale: Vector3 = rotateAxis.scale(len);
+            const scale: Vector3 = rotateAxis.scale(length);
             builder.color(0.0, 0.0, 0.0).vertex(0, 0, 0);
-            builder.color(0.0, 0.0, 0.0).vertex(scale.x, scale.y, scale.z);
+            builder.color(0.0, 0.0, 0.0).vertex(scale.x, scale.y, isLeftHardness ? -scale.z : scale.z);
         }
         // 将渲染数据提交给GPU进行渲染
-        builder.end(mat);
+        builder.end(mvp);
         // 恢复线宽为1个像素
         builder.webglContext.lineWidth(1);
         // 恢复开始帧缓存深度测试
         builder.webglContext.enable(builder.webglContext.DEPTH_TEST);
     }
-    
+
     /**
      * 绘制坐标系。
      * @param builder
      * @param mvp
      * @param hitAxis
-     * @param len
+     * @param length
      * @param rotateAxis
      * @param isLeftHardness
      */
-    public static drawCoordinateSystem(builder: GLMeshBuilder, mvp: Matrix4, hitAxis: EAxisType, len: number = 5, rotateAxis: Vector3 | null = null, isLeftHardness: boolean = false): void {
+    public static drawCoordinateSystem(builder: GLMeshBuilder, mvp: Matrix4, hitAxis: EAxisType, length: number = 1, rotateAxis: Vector3 | null = null, inverse: boolean = false, isLeftHardness: boolean = false): void {
         builder.webglContext.lineWidth(5);
         builder.webglContext.disable(builder.webglContext.DEPTH_TEST);
         builder.begin(builder.webglContext.LINES);
-        switch (hitAxis) {
-            case EAxisType.X_AXIS:
-                builder.color(DrawHelper.defaultHitColor.r, DrawHelper.defaultHitColor.g, DrawHelper.defaultHitColor.b).vertex(0.0, 0.0, 0.0);
-                builder.color(DrawHelper.defaultHitColor.r, DrawHelper.defaultHitColor.g, DrawHelper.defaultHitColor.b).vertex(len, 0, 0);
-                break;
-            case EAxisType.Y_AXIS:
-                builder.color(DrawHelper.defaultHitColor.r, DrawHelper.defaultHitColor.g, DrawHelper.defaultHitColor.b).vertex(0.0, 0.0, 0.0);
-                builder.color(DrawHelper.defaultHitColor.r, DrawHelper.defaultHitColor.g, DrawHelper.defaultHitColor.b).vertex(0, len, 0);
-                break;
-            case EAxisType.Z_AXIS:
-                builder.color(DrawHelper.defaultHitColor.r, DrawHelper.defaultHitColor.g, DrawHelper.defaultHitColor.b).vertex(0.0, 0.0, 0.0);
-                builder.color(DrawHelper.defaultHitColor.r, DrawHelper.defaultHitColor.g, DrawHelper.defaultHitColor.b).vertex(0, 0, isLeftHardness ? -len : len);
-                break;
-            default: {
-                // X
-                builder.color(1.0, 0.0, 0.0).vertex(0.0, 0.0, 0.0);
-                builder.color(1.0, 0.0, 0.0).vertex(len, 0, 0);
-                // Y
-                builder.color(0.0, 1.0, 0.0).vertex(0.0, 0.0, 0.0);
-                builder.color(0.0, 1.0, 0.0).vertex(0.0, len, 0.0);
-                // Z
-                builder.color(0.0, 0.0, 1.0).vertex(0.0, 0.0, 0.0);
-                builder.color(0.0, 0.0, 1.0).vertex(0.0, 0.0, isLeftHardness ? -len : len);
-            }
-                break;
+        if(hitAxis===EAxisType.X_AXIS){
+            builder.color(DrawHelper.defaultHitColor.r, DrawHelper.defaultHitColor.g, DrawHelper.defaultHitColor.b).vertex(0.0, 0.0, 0.0);
+            builder.color(DrawHelper.defaultHitColor.r, DrawHelper.defaultHitColor.g, DrawHelper.defaultHitColor.b).vertex(length, 0, 0);
+        }else {
+            builder.color(1.0, 0.0, 0.0).vertex(0.0, 0.0, 0.0);
+            builder.color(1.0, 0.0, 0.0).vertex(length, 0, 0);
+        }
+        if(hitAxis===EAxisType.Y_AXIS){
+            builder.color(DrawHelper.defaultHitColor.r, DrawHelper.defaultHitColor.g, DrawHelper.defaultHitColor.b).vertex(0.0, 0.0, 0.0);
+            builder.color(DrawHelper.defaultHitColor.r, DrawHelper.defaultHitColor.g, DrawHelper.defaultHitColor.b).vertex(0, length, 0);
+        }else {
+            builder.color(0.0, 1.0, 0.0).vertex(0.0, 0.0, 0.0);
+            builder.color(0.0, 1.0, 0.0).vertex(0.0, length, 0.0);
+        }
+        if(hitAxis===EAxisType.Z_AXIS){
+            builder.color(DrawHelper.defaultHitColor.r, DrawHelper.defaultHitColor.g, DrawHelper.defaultHitColor.b).vertex(0.0, 0.0, 0.0);
+            builder.color(DrawHelper.defaultHitColor.r, DrawHelper.defaultHitColor.g, DrawHelper.defaultHitColor.b).vertex(0, 0, isLeftHardness ? -length : length);
+        }else{
+            builder.color(0.0, 0.0, 1.0).vertex(0.0, 0.0, 0.0);
+            builder.color(0.0, 0.0, 1.0).vertex(0.0, 0.0, isLeftHardness ? -length : length);
         }
         if (rotateAxis) {
-            const scale: Vector3 = rotateAxis.scale(len);
+            const scale: Vector3 = rotateAxis.scale(length);
             builder.color(0.0, 0.0, 0).vertex(0, 0, 0);
             builder.color(0.0, 0.0, 0.0).vertex(scale.x, scale.y, isLeftHardness ? -scale.z : scale.z);
         }
@@ -249,7 +247,7 @@ export class DrawHelper {
         builder.webglContext.lineWidth(1);
         builder.webglContext.enable(builder.webglContext.DEPTH_TEST);
     }
-    
+
     /**
      * 绘制坐标轴文字
      * @param {CanvasRenderingContext2D} context
@@ -273,7 +271,7 @@ export class DrawHelper {
             DrawHelper.drawAxisText(context, Vector3.forward.negate(new Vector3()), EAxisType.Z_AXIS, mvp, viewport, canvasHeight, inverse);
         }
     }
-    
+
     /**
      * 设置坐标轴颜色。
      * @param {GLMeshBuilder} builder
@@ -283,7 +281,7 @@ export class DrawHelper {
      */
     private static setAxisColor(builder: GLMeshBuilder, color: Vector4, len: number): void {
     }
-    
+
     /**
      * 绘制坐标轴文字。
      * @param {CanvasRenderingContext2D} context
@@ -322,7 +320,7 @@ export class DrawHelper {
         // 恢复原来的渲染状态
         context.restore();
     }
-    
+
     /**
      * 绘制X轴文字。
      * @param {CanvasRenderingContext2D} context
@@ -346,7 +344,7 @@ export class DrawHelper {
             context.fillText('X', pos.x, pos.y);
         }
     }
-    
+
     /**
      * 绘制Y轴文字。
      * @param {CanvasRenderingContext2D} context
@@ -371,7 +369,7 @@ export class DrawHelper {
             context.fillText('Y', pos.x, pos.y);
         }
     }
-    
+
     /**
      *绘制Z轴文字。
      * @param {CanvasRenderingContext2D} context

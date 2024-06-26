@@ -1,9 +1,9 @@
-import {Vector3} from '../../common/math/vector/Vector3';
-import {Vector2} from '../../common/math/vector/Vector2';
+import {Vector3} from '../math/vector/Vector3';
+import {Vector2} from '../math/vector/Vector2';
 import {GLAttributeHelper} from '../../webgl/GLAttributeHelper';
-import {Vector4} from '../../common/math/vector/Vector4';
+import {Vector4} from '../math/vector/Vector4';
 import {GLStaticMesh} from '../../webgl/mesh/GLStaticMesh';
-import {MathHelper} from '../../common/math/MathHelper';
+import {MathHelper} from '../math/MathHelper';
 import {GLAttributeBits} from '../../webgl/GLTypes';
 
 /**

@@ -3,7 +3,7 @@ import {Matrix4} from '../../common/math/matrix/Matrix4';
 import {Vector3} from '../../common/math/vector/Vector3';
 import {CanvasKeyboardEvent} from '../../event/CanvasKeyboardEvent';
 import {EAxisType} from '../../enum/EAxisType';
-import {DrawHelper} from '../../lib/DrawHelper';
+import {DrawHelper} from '../../common/DrawHelper';
 import {Vector4Adapter} from '../../common/math/MathAdapter';
 import {Vector4} from '../../common/math/vector/Vector4';
 import {WebGLApplication} from '../base/WebGLApplication';
