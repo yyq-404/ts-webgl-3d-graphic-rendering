@@ -196,8 +196,6 @@ export class RotatingCubeApplication extends WebGLApplication {
         }
         this._textureProgram.bind();
         this._textureProgram.loadSampler();
-        // 绘制立方体
-        this.matStack.loadIdentity();
         // 第一个渲染堆栈操作
         // 矩阵进栈
         this.matStack.pushMatrix();
