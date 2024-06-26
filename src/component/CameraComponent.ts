@@ -1,13 +1,13 @@
-import {ECameraType} from '../../enum/ECameraType';
-import {Vector3} from '../../common/math/vector/Vector3';
-import {Matrix4} from '../../common/math/matrix/Matrix4';
-import {MathHelper} from '../../common/math/MathHelper';
-import {Matrix4Adapter} from '../../common/math/MathAdapter';
+import {ECameraType} from '../enum/ECameraType';
+import {Vector3} from '../common/math/vector/Vector3';
+import {Matrix4} from '../common/math/matrix/Matrix4';
+import {MathHelper} from '../common/math/MathHelper';
+import {Matrix4Adapter} from '../common/math/MathAdapter';
 
 /**
  * 摄像机。
  */
-export class Camera {
+export class CameraComponent {
     public gl: WebGLRenderingContext | null = null;
     /** 视图矩阵 */
     private _viewMatrix: Matrix4;
@@ -35,6 +35,7 @@ export class Camera {
         this._projectionMatrix = new Matrix4();
         this._viewProjectionMatrix = new Matrix4();
         this._invViewProjectionMatrix = new Matrix4();
+        this.setViewport(0, 0, width, height);
     }
     
     /** 投影矩阵*摄像机矩阵及其逆矩阵 */

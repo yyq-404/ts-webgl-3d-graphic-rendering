@@ -1,4 +1,3 @@
-import {CameraApplication} from '../base/CameraApplication';
 import {GLCoordinateSystem} from '../../webgl/GLCoordinateSystem';
 import {Matrix4} from '../../common/math/matrix/Matrix4';
 import {Vector3} from '../../common/math/vector/Vector3';
@@ -7,11 +6,12 @@ import {EAxisType} from '../../enum/EAxisType';
 import {DrawHelper} from '../../lib/DrawHelper';
 import {Vector4Adapter} from '../../common/math/MathAdapter';
 import {Vector4} from '../../common/math/vector/Vector4';
+import {WebGLApplication} from '../base/WebGLApplication';
 
 /**
  * 坐标系统应用。
  */
-export class CoordinateSystemApplication extends CameraApplication {
+export class CoordinateSystemApplication extends WebGLApplication {
     /** 存储当前使用的坐标系、视口以及旋转轴、旋转角度等信息的数组 */
     public cubeMVP: Matrix4 = new Matrix4();
     // 下面两个成员变量排列组合后，形成6种不同的绘制方式

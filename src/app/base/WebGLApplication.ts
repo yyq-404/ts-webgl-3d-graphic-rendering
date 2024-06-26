@@ -7,12 +7,16 @@ import {GLAttributeHelper} from '../../webgl/GLAttributeHelper';
 import {GLProgram} from '../../webgl/program/GLProgram';
 import {GLTexture} from '../../webgl/texture/GLTexture';
 import {GLWorldMatrixStack} from '../../webgl/matrix/GLWorldMatrixStack';
+import {CameraComponent} from '../../component/CameraComponent';
+import {CanvasKeyboardEvent} from '../../event/CanvasKeyboardEvent';
 
 /**
  * WebGL应用。
  */
 export class WebGLApplication extends BaseApplication {
-    // 可以直接操作WebGL相关内容
+    /** 摄像机 */
+    protected camera: CameraComponent;
+    /* 可以直接操作WebGL相关内容 */
     protected gl: WebGLRenderingContext | null;
     /** 模拟 `OpenGL1.1` 中的矩阵堆栈, 封装在 `GLWorldMatrixStack` 类中 */
     protected matStack: GLWorldMatrixStack;
@@ -40,6 +44,7 @@ export class WebGLApplication extends BaseApplication {
         if (option2d) {
             this.create2dCanvas();
         }
+        this.camera = new CameraComponent(this.gl, canvas.width, canvas.height, 45, 1);
         this.matStack = new GLWorldMatrixStack();
         // 初始化渲染状态
         GLRenderHelper.setDefaultState(this.gl);
@@ -60,6 +65,53 @@ export class WebGLApplication extends BaseApplication {
      */
     public static getMaxVertexAttributes(gl: WebGLRenderingContext): number {
         return gl.getParameter(gl.MAX_VERTEX_ATTRIBS) as number;
+    }
+    
+    /**
+     * 按键按下。
+     * @param event
+     */
+    public override onKeyPress(event: CanvasKeyboardEvent): void {
+        switch (event.key) {
+            case 'w':
+                this.camera.moveForward(-1);
+                break;
+            case 's':
+                this.camera.moveForward(1);
+                break;
+            case 'a':
+                this.camera.moveRightward(-1);
+                break;
+            case 'd':
+                this.camera.moveRightward(1);
+                break;
+            case 'z':
+                this.camera.moveUpward(1);
+                break;
+            case 'x':
+                this.camera.moveUpward(-1);
+                break;
+            case 'y':
+                this.camera.yaw(1);
+                break;
+            case 'r':
+                this.camera.roll(1);
+                break;
+            case 'p':
+                this.camera.pitch(1);
+                break;
+            default:
+                break;
+        }
+    }
+    
+    /**
+     * 更新。
+     * @param elapsedMsec
+     * @param intervalSec
+     */
+    public override update(elapsedMsec: number, intervalSec: number): void {
+        this.camera.update(intervalSec);
     }
     
     /**

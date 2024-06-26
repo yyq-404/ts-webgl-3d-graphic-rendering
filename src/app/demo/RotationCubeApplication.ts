@@ -1,4 +1,3 @@
-import {CameraApplication} from '../base/CameraApplication';
 import {GLProgram} from '../../webgl/program/GLProgram';
 import {GLTexture} from '../../webgl/texture/GLTexture';
 import {Cube} from '../../lib/geometry/Cube';
@@ -13,11 +12,12 @@ import {HttpHelper} from '../../net/HttpHelper';
 import {CanvasKeyboardEvent} from '../../event/CanvasKeyboardEvent';
 import {CLShaderConstants} from '../../webgl/CLShaderConstants';
 import {EAxisType} from '../../enum/EAxisType';
+import {WebGLApplication} from '../base/WebGLApplication';
 
 /**
  * 立方体旋转应用
  */
-export class RotatingCubeApplication extends CameraApplication {
+export class RotatingCubeApplication extends WebGLApplication {
     // GPU可编程管线对象，后面章节详解
     /** 使用纹理GPU Program对象 */
     private _colorProgram: GLProgram;
