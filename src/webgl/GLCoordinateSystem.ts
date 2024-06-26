@@ -4,7 +4,6 @@ import {Vector3} from "../common/math/vector/Vector3";
  *  `GLCoordinateSystem` 类用来描述和显示WebGL的坐标系结构，支持多视口的绘制
  */
 export class GLCoordinateSystem {
-    // 此处更改参见 https://www.typescriptlang.org/docs/handbook/2/classes.html#parameter-properties
     /** 当前坐标系被绘制在哪个视口中 */
     public viewport: number[] = [];
     /** 当前坐标系的位置，如果是多视口渲染的话，就为 `[0,0,0]` */
@@ -16,7 +15,7 @@ export class GLCoordinateSystem {
     /** 是否绘制旋转轴 */
     public isDrawAxis: boolean = false;
     /** 是否绘制为 `Direct3D` 左手系 */
-    public isD3D: boolean = false;
+    public isLeftHardness: boolean = false;
 
     /**
      * 构造
@@ -25,15 +24,15 @@ export class GLCoordinateSystem {
      * @param axis
      * @param angle
      * @param isDrawAxis
-     * @param isD3D
+     * @param isLeftHardness
      */
-    public constructor(viewport: number[], position: Vector3 = Vector3.zero, axis: Vector3 = Vector3.up, angle: number = 0, isDrawAxis: boolean = false, isD3D: boolean = false) {
+    public constructor(viewport: number[], position: Vector3 = Vector3.zero, axis: Vector3 = Vector3.up, angle: number = 0, isDrawAxis: boolean = false, isLeftHardness: boolean = false) {
         this.viewport = viewport;
         this.position = position;
         this.axis = axis;
         this.angle = angle;
         this.isDrawAxis = isDrawAxis;
-        this.isD3D = isD3D;
+        this.isLeftHardness = isLeftHardness;
     }
 
     /**
@@ -60,4 +59,3 @@ export class GLCoordinateSystem {
         return coords;
     }
 }
-

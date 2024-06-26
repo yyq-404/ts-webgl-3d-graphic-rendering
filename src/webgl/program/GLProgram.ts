@@ -6,8 +6,8 @@ import {Vector4} from '../../common/math/vector/Vector4';
 import {Matrix4} from '../../common/math/matrix/Matrix4';
 import {Quaternion} from '../../common/math/Quaternion';
 import {EGLShaderType} from '../enum/EGLShaderType';
-import {CLShaderConstants} from '../CLShaderConstants';
-import {GLShaderSource} from '../GLShaderSource';
+import {CLShaderConstants} from '../shader/CLShaderConstants';
+import {GLShaderSource} from '../shader/GLShaderSource';
 import {GLAttributeBits} from '../GLTypes';
 import {IGLAttribute} from '../attribute/IGLAttribute';
 

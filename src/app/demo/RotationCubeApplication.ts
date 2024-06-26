@@ -7,12 +7,13 @@ import {GLProgramCache} from '../../webgl/program/GLProgramCache';
 import {Geometry} from '../../common/geometry/Geometry';
 import {GLTextureCache} from '../../webgl/texture/GLTextureCache';
 import {Vector3} from '../../common/math/vector/Vector3';
-import {DrawHelper} from '../../common/DrawHelper';
 import {HttpHelper} from '../../net/HttpHelper';
 import {CanvasKeyboardEvent} from '../../event/CanvasKeyboardEvent';
-import {CLShaderConstants} from '../../webgl/CLShaderConstants';
+import {CLShaderConstants} from '../../webgl/shader/CLShaderConstants';
 import {EAxisType} from '../../enum/EAxisType';
 import {WebGLApplication} from '../base/WebGLApplication';
+import {GLCoordinateSystem} from "../../webgl/GLCoordinateSystem";
+import {GLCoordinateSystemHelper} from "../../webgl/GLCoordinateSystemHelper";
 
 /**
  * 立方体旋转应用
@@ -51,7 +52,7 @@ export class RotatingCubeApplication extends WebGLApplication {
     private _triangleMatrix: Matrix4;
     /** 为了支持鼠标点选，记录选中的坐标轴的enum值 */
     private readonly _hitAxis: EAxisType;
-    
+
     /**
      * 构造
      * @param canvas
@@ -89,7 +90,7 @@ export class RotatingCubeApplication extends WebGLApplication {
         // 调整摄像机的位置
         this.camera.z = 8;
     }
-    
+
     /**
      * 执行
      */
@@ -113,7 +114,7 @@ export class RotatingCubeApplication extends WebGLApplication {
         // 调用基类的run方法，基类run方法内部调用了start方法
         await super.runAsync();
     }
-    
+
     /**
      * 按键按下
      * @param evt
@@ -136,7 +137,7 @@ export class RotatingCubeApplication extends WebGLApplication {
                 break;
         }
     }
-    
+
     /**
      * 更新
      * @param elapsedMsec
@@ -151,7 +152,7 @@ export class RotatingCubeApplication extends WebGLApplication {
         // 否则你将什么都看不到，切记!
         super.update(elapsedMsec, intervalSec);
     }
-    
+
     /**
      * 渲染
      */
@@ -166,7 +167,7 @@ export class RotatingCubeApplication extends WebGLApplication {
         this.renderTriangle();
         this.renderText('First WebGL Demo');
     }
-    
+
     /**
      * 立方体定时回调
      */
@@ -176,14 +177,14 @@ export class RotatingCubeApplication extends WebGLApplication {
         // 取模操作，让currTexIdx的取值范围为[ 0, 2 ]之间（当前有3个纹理）
         this._currentTexIdx %= this._textures.length;
     }
-    
+
     /**
      * 三角形定时回调
      */
     public triangleTimeCallback(): void {
         this._triangleAngle += this._triangleSpeed;
     }
-    
+
     /**
      * 渲染立方体
      * @private
@@ -208,9 +209,9 @@ export class RotatingCubeApplication extends WebGLApplication {
         // 使用当前绑定的texture和program绘制cubeVao对象
         this._cubeVAO.draw();
         // 使用辅助方法绘制坐标系
-        DrawHelper.drawCoordinateSystem(this.builder, this._cubeMatrix, this._hitAxis, 1);
+        GLCoordinateSystemHelper.drawAxis(this.builder, this._cubeMatrix, this._hitAxis, 1);
         if (this.context2d) {
-            DrawHelper.drawCoordinateSystemText(this.context2d, this._cubeMatrix, this.camera.getViewport(), this.canvas.height, false);
+            GLCoordinateSystemHelper.drawText(this.context2d, this._cubeMatrix, this.camera.getViewport(), this.canvas.height, false);
         }
         // 矩阵出栈
         this.matStack.popMatrix();
@@ -220,7 +221,7 @@ export class RotatingCubeApplication extends WebGLApplication {
             texture.unbind();
         }
     }
-    
+
     /**
      * 渲染三角形
      * @private
@@ -257,7 +258,7 @@ export class RotatingCubeApplication extends WebGLApplication {
         // 恢复背面剔除功能
         this.webglContext.enable(this.webglContext.CULL_FACE);
     }
-    
+
     /**
      * 渲染文本
      * 关于Canvas2D的详细应用，可以参考本书的姐妹篇：TypeScript图形渲染实战：2D架构设计与实现

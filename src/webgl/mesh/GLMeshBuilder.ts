@@ -9,7 +9,7 @@ import {Matrix4} from '../../common/math/matrix/Matrix4';
 import {GLAttributeBits, GLAttributeOffsetMap} from '../GLTypes';
 import {GLTexture} from '../texture/GLTexture';
 import {EGLVertexLayoutType} from '../enum/EGLVertexLayoutType';
-import {CLShaderConstants} from '../CLShaderConstants';
+import {CLShaderConstants} from '../shader/CLShaderConstants';
 import {IGLAttribute} from '../attribute/IGLAttribute';
 
 /**
