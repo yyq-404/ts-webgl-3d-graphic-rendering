@@ -1,6 +1,6 @@
-import {Matrix4} from "../../common/math/matrix/Matrix4";
-import {Vector3} from "../../common/math/vector/Vector3";
-import {MathHelper} from "../../common/math/MathHelper";
+import {Matrix4} from '../../common/math/matrix/Matrix4';
+import {Vector3} from '../../common/math/vector/Vector3';
+import {MathHelper} from '../../common/math/MathHelper';
 
 /**
  * 该类用于将**局部坐标系**表示的顶点变换到**世界坐标系**, 以`Matrix4`矩阵为栈中的元素
@@ -8,7 +8,7 @@ import {MathHelper} from "../../common/math/MathHelper";
 export class GLWorldMatrixStack {
     /** 内置一个矩阵数组 */
     private readonly _worldMatrixStack: Matrix4[];
-
+    
     /**
      * 构造
      */
@@ -17,7 +17,7 @@ export class GLWorldMatrixStack {
         this._worldMatrixStack = [];
         this._worldMatrixStack.push(new Matrix4().setIdentity());
     }
-
+    
     /**
      * 获取堆栈顶部的世界矩阵
      */
@@ -27,7 +27,7 @@ export class GLWorldMatrixStack {
         }
         return this._worldMatrixStack[this._worldMatrixStack.length - 1];
     }
-
+    
     /**
      * 获取堆栈顶部的模型矩阵
      */
@@ -37,7 +37,7 @@ export class GLWorldMatrixStack {
         }
         return this._worldMatrixStack[this._worldMatrixStack.length - 1];
     }
-
+    
     /**
      * 在矩阵堆栈中添加一个矩阵
      */
@@ -49,7 +49,7 @@ export class GLWorldMatrixStack {
         this._worldMatrixStack.push(mv);
         return this;
     }
-
+    
     /**
      * remove掉堆栈顶部的矩阵并返回this
      */
@@ -57,7 +57,7 @@ export class GLWorldMatrixStack {
         this._worldMatrixStack.pop();
         return this;
     }
-
+    
     /**
      * 将栈顶的矩阵重置为单位矩阵
      */
@@ -66,7 +66,7 @@ export class GLWorldMatrixStack {
         // 返回this，可用于链式操作
         return this;
     }
-
+    
     /**
      * 将参数矩阵mat的值复制到栈顶矩阵
      * @param mat
@@ -75,7 +75,7 @@ export class GLWorldMatrixStack {
         mat.copy(this.worldMatrix);
         return this;
     }
-
+    
     /**
      * 栈顶矩阵 = 栈顶矩阵 ＊ 参数矩阵mat
      * @param mat
@@ -84,7 +84,7 @@ export class GLWorldMatrixStack {
         this.worldMatrix.multiply(mat);
         return this;
     }
-
+    
     /**
      * 栈顶矩阵 = 栈顶矩阵 ＊ 平移矩阵
      * @param pos
@@ -93,7 +93,7 @@ export class GLWorldMatrixStack {
         this.worldMatrix.translate(pos);
         return this;
     }
-
+    
     /**
      * 栈顶矩阵 = 栈顶矩阵 ＊ 轴角对表示的旋转矩阵
      * @param angle
@@ -107,7 +107,7 @@ export class GLWorldMatrixStack {
         this.worldMatrix.rotate(angle, axis);
         return this;
     }
-
+    
     /**
      * 栈顶矩阵 = 栈顶矩阵 ＊ 缩放矩阵
      * @param scale
@@ -115,5 +115,12 @@ export class GLWorldMatrixStack {
     public scale(scale: Vector3): GLWorldMatrixStack {
         this.worldMatrix.scale(scale);
         return this;
+    }
+    
+    /**
+     * 清理。
+     */
+    public clear(): void {
+        this._worldMatrixStack.length = 0;
     }
 }

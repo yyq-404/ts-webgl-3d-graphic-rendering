@@ -27,9 +27,10 @@ export class GLRenderHelper {
      * 模拟触发 `WebGLRenderingContext` 上下文渲染对象丢失
      * @param gl
      */
-    public static triggerContextLostEvent(gl: WebGLRenderingContext): void {
-        const ret: WEBGL_lose_context | null = gl.getExtension('WEBGL_lose_context');
-        if (ret) ret.loseContext();
+    public static triggerContextLostEvent(gl: WebGLRenderingContext | null): void {
+        if (!gl) return;
+        const glExt: WEBGL_lose_context | null = gl.getExtension('WEBGL_lose_context');
+        if (glExt) glExt.loseContext();
     }
     
     /**

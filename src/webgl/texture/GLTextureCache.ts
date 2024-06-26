@@ -1,5 +1,5 @@
-import {GLTexture} from "./GLTexture";
-import {Dictionary} from "../../common/container/Dictionary";
+import {GLTexture} from './GLTexture';
+import {Dictionary} from '../../common/container/Dictionary';
 
 /**
  * 纹理缓存
@@ -9,7 +9,7 @@ export class GLTextureCache {
     static readonly instance: GLTextureCache = new GLTextureCache();
     /** 缓存 */
     private _dict: Dictionary<GLTexture>;
-
+    
     /**
      * 私有构造函数
      * @private
@@ -17,7 +17,7 @@ export class GLTextureCache {
     private constructor() {
         this._dict = new Dictionary<GLTexture>();
     }
-
+    
     /**
      * 设置
      * @param key
@@ -26,16 +26,16 @@ export class GLTextureCache {
     public set(key: string, value: GLTexture) {
         this._dict.insert(key, value);
     }
-
+    
     /**
      * 获取缓存对象， 可能返回undefined类型
      * @param key
      * @protected
      */
-    protected getMaybe(key: string): GLTexture | undefined {
+    public getMaybe(key: string): GLTexture | undefined {
         return this._dict.find(key);
     }
-
+    
     /**
      * 获取缓存对象，如果返回undefined，直接抛错
      * @param key
@@ -47,12 +47,19 @@ export class GLTextureCache {
         }
         return ret;
     }
-
+    
     /**
      * 删除缓存对象。
      * @param key
      */
     public remove(key: string): boolean {
         return this._dict.remove(key);
+    }
+    
+    /**
+     * 清空
+     */
+    public clear(): void {
+        this._dict.clear();
     }
 }

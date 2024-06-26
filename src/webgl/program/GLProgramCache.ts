@@ -9,7 +9,7 @@ export class GLProgramCache {
     static readonly instance: GLProgramCache = new GLProgramCache();
     /** 可编程管线字典 */
     private _dict: Dictionary<GLProgram>;
-
+    
     /**
      * 构造
      * @private
@@ -18,7 +18,7 @@ export class GLProgramCache {
         this._dict = new Dictionary<GLProgram>();
         console.log('create new GLProgramCache! ! ');
     }
-
+    
     /**
      * 设置
      * @param key
@@ -27,7 +27,7 @@ export class GLProgramCache {
     public set(key: string, value: GLProgram) {
         this._dict.insert(key, value);
     }
-
+    
     /**
      * 获取缓存对象， 可能返回undefined类型
      * @param key
@@ -35,7 +35,7 @@ export class GLProgramCache {
     public getMaybe(key: string): GLProgram | undefined {
         return this._dict.find(key);
     }
-
+    
     /**
      * 获取缓存对象，如果返回undefined，直接抛错
      * @param key
@@ -47,12 +47,19 @@ export class GLProgramCache {
         }
         return ret;
     }
-
+    
     /**
      * 移除缓存对象
      * @param key
      */
     public remove(key: string): boolean {
         return this._dict.remove(key);
+    }
+    
+    /**
+     * 清空
+     */
+    public clear(): void {
+        this._dict.clear();
     }
 }
