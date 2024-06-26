@@ -5,7 +5,7 @@ import {Timer, TimerCallback} from './Timer';
  */
 export class TimerManager {
     /** 定时器集合 */
-    private timers: Timer[] = [];
+    private _timers: Timer[] = [];
     /** 定时器编号 */
     private _timeId: number = -1;
     
@@ -18,10 +18,10 @@ export class TimerManager {
      * @param callbackData
      */
     public add(callback: TimerCallback, timeout: number = 1.0, onlyOnce: boolean = false, callbackData: any = undefined): number {
-        let timer = this.timers.find(item => !item.enabled);
+        let timer = this._timers.find(item => !item.enabled);
         if (!timer) {
             timer = new Timer().setup(++this._timeId, callback, timeout, onlyOnce, callbackData);
-            this.timers.push(timer);
+            this._timers.push(timer);
         }
         return timer.id;
     }
@@ -31,7 +31,7 @@ export class TimerManager {
      * @param id
      */
     public remove(id: number): boolean {
-        let timer = this.timers.find(item => item.id === id);
+        let timer = this._timers.find(item => item.id === id);
         if (timer) {
             timer.enabled = false;
             return true;
@@ -45,8 +45,8 @@ export class TimerManager {
      * @private
      */
     public update(intervalSec: number): void {
-        for (let i = 0; i < this.timers.length; i++) {
-            let timer = this.timers[i];
+        for (let i = 0; i < this._timers.length; i++) {
+            let timer = this._timers[i];
             if (!timer.enabled) continue;
             timer.countdown -= intervalSec;
             if (timer.countdown < 0) {
@@ -58,5 +58,13 @@ export class TimerManager {
                 }
             }
         }
+    }
+    
+    /**
+     * 清空
+     */
+    public clear(): void {
+        this._timers.length = 0;
+        this._timeId = -1;
     }
 }
