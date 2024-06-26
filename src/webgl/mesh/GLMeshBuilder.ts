@@ -202,9 +202,11 @@ export class GLMeshBuilder extends GLMeshBase {
      * @param mvp
      */
     public end(mvp: Matrix4): void {
-        this.program.bind(); // 绑定GLProgram
-        this.program.setMatrix4(CLShaderConstants.MVPMatrix, mvp); // 载入MVPMatrix uniform变量
-        if (this.texture !== null) {
+        // 绑定GLProgram
+        this.program.bind();
+        // 载入MVPMatrix uniform变量
+        this.program.setMatrix4(CLShaderConstants.MVPMatrix, mvp);
+        if (this.texture) {
             this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture);
             this.program.loadSampler();
         }

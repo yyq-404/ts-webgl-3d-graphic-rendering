@@ -19,9 +19,9 @@ export class WebGLApplication extends BaseApplication {
     /** 模拟OpenGL1.1中的立即绘制模式, 封装在GLMeshBuilder类中 */
     protected builder: GLMeshBuilder;
     /** 为了在3D环境中同时支持Canvas2D绘制，特别是为了实现文字绘制 */
-    protected canvas2D: HTMLCanvasElement | null = null;
+    protected canvas2d: HTMLCanvasElement | null = null;
     /** 2D渲染环境 */
-    protected ctx2D: CanvasRenderingContext2D | null = null;
+    protected context2d: CanvasRenderingContext2D | null = null;
     
     /**
      * 构造
@@ -71,8 +71,8 @@ export class WebGLApplication extends BaseApplication {
         this.clearBuffer();
         GLProgramCache.instance.clear();
         GLTextureCache.instance.clear();
-        if (this.canvas2D && this.canvas2D.parentElement) {
-            this.canvas2D.parentElement.removeChild(this.canvas2D);
+        if (this.canvas2d && this.canvas2d.parentElement) {
+            this.canvas2d.parentElement.removeChild(this.canvas2d);
         }
         super.dispose();
     }
@@ -101,8 +101,8 @@ export class WebGLApplication extends BaseApplication {
         canvasElement.style.top = '0px';
         const parent: HTMLElement | null = this.canvas.parentElement;
         if (!parent) throw new Error('canvas元素必须要有父亲!!');
-        this.ctx2D = canvasElement.getContext('2d');
+        this.context2d = canvasElement.getContext('2d');
         parent.appendChild(canvasElement);
-        this.canvas2D = canvasElement;
+        this.canvas2d = canvasElement;
     }
 }

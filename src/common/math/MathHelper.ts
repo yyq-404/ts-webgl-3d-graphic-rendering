@@ -186,14 +186,15 @@ export class MathHelper {
      * @param viewport
      * @param viewportPt
      */
-    public static obj2GLViewportSpace(localPt: Vector3, mvp: Matrix4, viewport: Int32Array | Float32Array, viewportPt: Vector3): boolean {
+    public static obj2GLViewportSpace(localPt: Vector3, mvp: Matrix4, viewport: Int32Array | Float32Array, viewportPt?: Vector3): Vector3 | null {
         const v: Vector4 = new Vector4([localPt.x, localPt.y, localPt.z, 1.0]);
         // 将顶点从local坐标系变换到投影坐标系，或裁剪坐标系
         mvp.multiplyVector4(v, v);
         if (v.w === 0.0) {
             // 如果变换后的w为0，则返回false
-            return false;
+            return null;
         }
+        if (!viewportPt) viewportPt = new Vector3();
         // 将裁剪坐标系的点的x / y / z分量除以w，得到normalized坐标值[ -1 , 1 ]之间
         v.x /= v.w;
         v.y /= v.w;
@@ -206,7 +207,7 @@ export class MathHelper {
         viewportPt.x = v.x * viewport[2] + viewport[0];
         viewportPt.y = v.y * viewport[3] + viewport[1];
         viewportPt.z = v.z;
-        return true;
+        return viewportPt;
     }
     
     /**

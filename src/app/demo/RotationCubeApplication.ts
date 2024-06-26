@@ -161,7 +161,11 @@ export class RotatingCubeApplication extends CameraApplication {
         this.clearBuffer();
         this.renderCube();
         this.renderTriangle();
-        this.renderText('第一个WebGL Demo');
+        this.renderText('First WebGL Demo');
+        // 绘制坐标轴文字
+        if (this.context2d) {
+            DrawHelper.drawCoordinateSystemText(this.context2d, this._cubeMatrix, this.camera.getViewport(), this.canvas.height, false);
+        }
     }
     
     /**
@@ -263,21 +267,21 @@ export class RotatingCubeApplication extends CameraApplication {
      * @private
      */
     private renderText(text: string, x: number = this.canvas.width * 0.5, y: number = 150): void {
-        if (!this.ctx2D) return;
-        this.ctx2D.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        if (!this.context2d) return;
+        this.context2d.clearRect(0, 0, this.canvas.width, this.canvas.height);
         // 渲染状态进栈
-        this.ctx2D.save();
+        this.context2d.save();
         // 红色
-        this.ctx2D.fillStyle = 'red';
+        this.context2d.fillStyle = 'red';
         // X轴居中对齐
-        this.ctx2D.textAlign = 'center';
+        this.context2d.textAlign = 'center';
         // Y轴为top对齐
-        this.ctx2D.textBaseline = 'top';
+        this.context2d.textBaseline = 'top';
         // 使用大一点的Arial字体对象
-        this.ctx2D.font = '30px Arial';
+        this.context2d.font = '30px Arial';
         // 进行文字绘制
-        this.ctx2D.fillText(text, x, y);
+        this.context2d.fillText(text, x, y);
         // 恢复原来的渲染状态
-        this.ctx2D.restore();
+        this.context2d.restore();
     }
 }

@@ -66,7 +66,8 @@ export class GLStaticMesh extends GLMeshBase {
      * 调用 `WebGLRenderingContext.drawElements()` 方法或 `WebGLRenderingContext.drawArrays()` 渲染图元
      */
     public draw(): void {
-        this.bind(); // 绘制前先要绑定VAO
+        // 绘制前先要绑定VAO
+        this.bind();
         if (this._ibo) {
             // 如果有IBO，使用drawElements方法绘制静态网格对象
             this.gl.drawElements(this.drawMode, this._indexCount, this.gl.UNSIGNED_SHORT, 0);
@@ -74,7 +75,8 @@ export class GLStaticMesh extends GLMeshBase {
             // 如果没有IBO，则使用drawArrays方法绘制静态网格对象
             this.gl.drawArrays(this.drawMode, 0, this._vertexCount);
         }
-        this.unbind(); // 绘制好后解除VAO绑定
+        // 绘制好后解除VAO绑定
+        this.unbind();
     }
     
     /**

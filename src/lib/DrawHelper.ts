@@ -4,6 +4,7 @@ import {Vector3} from '../common/math/vector/Vector3';
 import {Vector4} from '../common/math/vector/Vector4';
 import {Vector4Adapter} from '../common/math/MathAdapter';
 import {EAxisType} from '../enum/EAxisType';
+import {MathHelper} from '../common/math/MathHelper';
 
 /**
  *绘制助手
@@ -200,13 +201,13 @@ export class DrawHelper {
     /**
      * 绘制坐标系。
      * @param builder
-     * @param mat
+     * @param mvp
      * @param hitAxis
      * @param len
      * @param rotateAxis
      * @param isLeftHardness
      */
-    public static drawCoordinateSystem(builder: GLMeshBuilder, mat: Matrix4, hitAxis: EAxisType, len: number = 5, rotateAxis: Vector3 | null = null, isLeftHardness: boolean = false): void {
+    public static drawCoordinateSystem(builder: GLMeshBuilder, mvp: Matrix4, hitAxis: EAxisType, len: number = 5, rotateAxis: Vector3 | null = null, isLeftHardness: boolean = false): void {
         builder.gl.lineWidth(5);
         builder.gl.disable(builder.gl.DEPTH_TEST);
         builder.begin(builder.gl.LINES);
@@ -226,30 +227,156 @@ export class DrawHelper {
         }
         if (hitAxis === EAxisType.Z_AXIS) {
             builder.color(DrawHelper.defaultHitColor.r, DrawHelper.defaultHitColor.g, DrawHelper.defaultHitColor.b).vertex(0.0, 0.0, 0.0);
-            if (isLeftHardness) {
-                builder.color(DrawHelper.defaultHitColor.r, DrawHelper.defaultHitColor.g, DrawHelper.defaultHitColor.b).vertex(0, 0, -len);
-            } else {
-                builder.color(DrawHelper.defaultHitColor.r, DrawHelper.defaultHitColor.g, DrawHelper.defaultHitColor.b).vertex(0, 0, len);
-            }
+            builder.color(DrawHelper.defaultHitColor.r, DrawHelper.defaultHitColor.g, DrawHelper.defaultHitColor.b).vertex(0, 0, isLeftHardness ? -len : len);
+            builder.color(DrawHelper.defaultHitColor.r, DrawHelper.defaultHitColor.g, DrawHelper.defaultHitColor.b).vertex(0, 0, len);
         } else {
             builder.color(0.0, 0.0, 1.0).vertex(0.0, 0.0, 0.0);
-            if (isLeftHardness) {
-                builder.color(0.0, 0.0, 1.0).vertex(0.0, 0.0, -len);
-            } else {
-                builder.color(0.0, 0.0, 1.0).vertex(0.0, 0.0, len);
-            }
+            builder.color(0.0, 0.0, 1.0).vertex(0.0, 0.0, isLeftHardness ? -len : len);
         }
-        if (rotateAxis !== null) {
+        if (rotateAxis) {
             const scale: Vector3 = rotateAxis.scale(len);
             builder.color(0.0, 0.0, 0).vertex(0, 0, 0);
-            if (isLeftHardness) {
-                builder.color(0.0, 0.0, 0.0).vertex(scale.x, scale.y, -scale.z);
-            } else {
-                builder.color(0.0, 0.0, 0.0).vertex(scale.x, scale.y, scale.z);
-            }
+            builder.color(0.0, 0.0, 0.0).vertex(scale.x, scale.y, isLeftHardness ? -scale.z : scale.z);
         }
-        builder.end(mat);
+        builder.end(mvp);
         builder.gl.lineWidth(1);
         builder.gl.enable(builder.gl.DEPTH_TEST);
+    }
+    
+    /**
+     * 绘制坐标轴文字
+     * @param {CanvasRenderingContext2D} context
+     * @param {Matrix4} mvp
+     * @param {Int32Array} viewport
+     * @param {number} canvasHeight
+     * @param {boolean} inverse
+     * @param {boolean} isLeftHardness
+     * @private
+     */
+    public static drawCoordinateSystemText(context: CanvasRenderingContext2D, mvp: Matrix4, viewport: Int32Array, canvasHeight: number, inverse: boolean = true, isLeftHardness: boolean = false): void {
+        DrawHelper.drawAxisText(context, Vector3.right, EAxisType.X_AXIS, mvp, viewport, canvasHeight, inverse);
+        DrawHelper.drawAxisText(context, Vector3.up, EAxisType.Y_AXIS, mvp, viewport, canvasHeight, inverse);
+        if (!isLeftHardness) {
+            DrawHelper.drawAxisText(context, Vector3.forward, EAxisType.Z_AXIS, mvp, viewport, canvasHeight, inverse);
+        }
+        if (!inverse) return;
+        DrawHelper.drawAxisText(context, Vector3.right.negate(new Vector3()), EAxisType.X_AXIS, mvp, viewport, canvasHeight, inverse);
+        DrawHelper.drawAxisText(context, Vector3.up.negate(new Vector3()), EAxisType.Y_AXIS, mvp, viewport, canvasHeight, inverse);
+        if (!isLeftHardness) {
+            DrawHelper.drawAxisText(context, Vector3.forward.negate(new Vector3()), EAxisType.Z_AXIS, mvp, viewport, canvasHeight, inverse);
+        }
+    }
+    
+    /**
+     * 绘制坐标轴文字。
+     * @param {CanvasRenderingContext2D} context
+     * @param {Vector3} direction
+     * @param {EAxisType} axis
+     * @param {Matrix4} mvp
+     * @param {Int32Array} viewport
+     * @param {number} canvasHeight
+     * @param {boolean} inverse
+     * @private
+     */
+    private static drawAxisText(context: CanvasRenderingContext2D, direction: Vector3, axis: EAxisType, mvp: Matrix4, viewport: Int32Array, canvasHeight: number, inverse: boolean = false): void {
+        // 调用 MathHelper.obj2ScreenSpace这个核心函数，将局部坐标系标示的一个点变换到屏幕坐标系上
+        let pos: Vector3 | null = MathHelper.obj2GLViewportSpace(direction, mvp, viewport);
+        if (!pos) return;
+        // 变换到屏幕坐标系，左手系，原点在左上角，x向右，y向下
+        pos.y = canvasHeight - pos.y;
+        // 渲染状态进栈
+        context.save();
+        // 使用大一点的Arial字体对象
+        context.font = '14px Arial';
+        switch (axis) {
+            case EAxisType.X_AXIS:
+                DrawHelper.drawXAxisText(context, pos, inverse);
+                break;
+            case EAxisType.Y_AXIS:
+                DrawHelper.drawYAxisText(context, pos, inverse);
+                break;
+            case EAxisType.Z_AXIS:
+                DrawHelper.drawZAxisText(context, pos, inverse);
+                break;
+            case EAxisType.NONE:
+            default:
+                break;
+        }
+        // 恢复原来的渲染状态
+        context.restore();
+    }
+    
+    /**
+     * 绘制X轴文字。
+     * @param {CanvasRenderingContext2D} context
+     * @param {Vector3} pos
+     * @param {boolean} inverse
+     * @private
+     */
+    private static drawXAxisText(context: CanvasRenderingContext2D, pos: Vector3, inverse: boolean): void {
+        // Y轴为top对齐
+        context.textBaseline = 'top';
+        // 红色
+        context.fillStyle = 'red';
+        if (inverse) {
+            context.textAlign = 'right';
+            // 进行文字绘制
+            context.fillText('-X', pos.x, pos.y);
+        } else {
+            // X轴居中对齐
+            context.textAlign = 'left';
+            // 进行文字绘制
+            context.fillText('X', pos.x, pos.y);
+        }
+    }
+    
+    /**
+     * 绘制Y轴文字。
+     * @param {CanvasRenderingContext2D} context
+     * @param {Vector3} pos
+     * @param {boolean} inverse
+     * @private
+     */
+    private static drawYAxisText(context: CanvasRenderingContext2D, pos: Vector3, inverse: boolean): void {
+        // X轴居中对齐
+        context.textAlign = 'center';
+        // 绿色
+        context.fillStyle = 'green';
+        if (inverse) {
+            // -Y轴为top对齐
+            context.textBaseline = 'top';
+            // 行文字绘制
+            context.fillText('-Y', pos.x, pos.y);
+        } else {
+            // Y轴为bottom对齐
+            context.textBaseline = 'bottom';
+            // 进行文字绘制
+            context.fillText('Y', pos.x, pos.y);
+        }
+    }
+    
+    /**
+     *绘制Z轴文字。
+     * @param {CanvasRenderingContext2D} context
+     * @param {Vector3} pos
+     * @param {boolean} inverse
+     * @private
+     */
+    private static drawZAxisText(context: CanvasRenderingContext2D, pos: Vector3, inverse: boolean): void {
+        // 绿色
+        context.fillStyle = 'blue';
+        // Y轴为top对齐
+        context.textBaseline = 'top';
+        if (inverse) {
+            // X轴居中对齐
+            context.textAlign = 'right';
+            // 进行文字绘制
+            context.fillText('-Z', pos.x, pos.y);
+        } else {
+            // X轴居中对齐
+            context.textAlign = 'left';
+            // 进行文字绘制
+            context.fillText('Z', pos.x, pos.y);
+        }
     }
 }

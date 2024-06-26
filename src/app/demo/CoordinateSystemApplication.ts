@@ -4,7 +4,6 @@ import {Matrix4} from '../../common/math/matrix/Matrix4';
 import {Vector3} from '../../common/math/vector/Vector3';
 import {CanvasKeyboardEvent} from '../../event/CanvasKeyboardEvent';
 import {EAxisType} from '../../enum/EAxisType';
-import {MathHelper} from '../../common/math/MathHelper';
 import {DrawHelper} from '../../lib/DrawHelper';
 import {Vector4Adapter} from '../../common/math/MathAdapter';
 import {Vector4} from '../../common/math/vector/Vector4';
@@ -92,11 +91,11 @@ export class CoordinateSystemApplication extends CameraApplication {
      */
     public override render(): void {
         // 由于要使用Canvas2D绘制文字，所以必须要有ctx2D对象
-        if (!this.ctx2D) return;
+        if (!this.context2d) return;
         // 使用了 preserveDrawingBuffer: false 创建WebGLRenderingContext，因此可以不用每帧调用clear方法清屏
         this.clearBuffer();
         // 对Canvas2D上下文渲染对象进行清屏操作
-        this.ctx2D.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.context2d.clearRect(0, 0, this.canvas.width, this.canvas.height);
         // 遍历整个坐标系视口数组
         // 使用当前的坐标系及视口数据作为参数，调用currentDrawMethod回调函数
         this._coordinateSystems.forEach((glCoordinateSystem) => this._currentDrawMethod(glCoordinateSystem));
@@ -118,6 +117,17 @@ export class CoordinateSystemApplication extends CameraApplication {
     }
     
     /**
+     * 产生一个坐标系统
+     * @private
+     */
+    private makeOneGLCoordinateSystem(): void {
+        // 清空坐标系数组内容，用于按需重新生成
+        this._coordinateSystems = [];
+        // 如果只有一个坐标系的话，其视口和裁剪区与canvas元素尺寸一致， 右下
+        this._coordinateSystems.push(new GLCoordinateSystem([0, 0, this.canvas.width, this.canvas.height], Vector3.zero, new Vector3([1, 1, 0]).normalize(), 45, true, this._isD3dMode));
+    }
+    
+    /**
      * 产生四个坐标轴系统。
      */
     private makeFourGLCoordinateSystems(): void {
@@ -134,8 +144,7 @@ export class CoordinateSystemApplication extends CameraApplication {
         // 左下，旋转轴为z轴
         this._coordinateSystems.push(new GLCoordinateSystem([0, 0, hw, hh], Vector3.zero, Vector3.forward, 0));
         // 右下，旋转轴为[ 1 , 1 , 1 ]
-        this._coordinateSystems.push(new GLCoordinateSystem([hw, 0, hw, hh], Vector3.zero, dir, 0, true));
-        this._isD3dMode = false;
+        this._coordinateSystems.push(new GLCoordinateSystem([hw, 0, hw, hh], Vector3.zero, dir, 0, true, this._isD3dMode));
     }
     
     /**
@@ -276,149 +285,11 @@ export class CoordinateSystemApplication extends CameraApplication {
     
     /**
      * 绘制坐标轴文字
-     * @private
-     */
-    private drawCoordinateSystemText(optionFull: boolean = true): void {
-        // X
-        this.drawAxisText(Vector3.right, EAxisType.X_AXIS, this._mvp, false);
-        // Y
-        this.drawAxisText(Vector3.up, EAxisType.Y_AXIS, this._mvp, false);
-        if (!this._isD3dMode) {
-            // Z
-            this.drawAxisText(Vector3.forward, EAxisType.Z_AXIS, this._mvp, false);
-        }
-        if (!optionFull) return;
-        // -X
-        this.drawAxisText(Vector3.right.negate(new Vector3()), EAxisType.X_AXIS, this._mvp, true);
-        // -Y
-        this.drawAxisText(Vector3.up.negate(new Vector3()), EAxisType.Y_AXIS, this._mvp, true);
-        if (!this._isD3dMode) {
-            // -Z
-            this.drawAxisText(Vector3.forward.negate(new Vector3()), EAxisType.Z_AXIS, this._mvp, true);
-        }
-    }
-    
-    /**
-     * 绘制坐标轴文字。
-     * @param {Vector3} pos
-     * @param {EAxisType} axis
-     * @param {Matrix4} mvp
      * @param {boolean} inverse
      * @private
      */
-    private drawAxisText(pos: Vector3, axis: EAxisType, mvp: Matrix4, inverse: boolean = false): void {
-        if (!this.ctx2D) return;
-        const out: Vector3 = new Vector3();
-        // 调用 MathHelper.obj2ScreenSpace这个核心函数，将局部坐标系标示的一个点变换到屏幕坐标系上
-        if (!MathHelper.obj2GLViewportSpace(pos, mvp, this.camera.getViewport(), out)) return;
-        // 变换到屏幕坐标系，左手系，原点在左上角，x向右，y向下
-        out.y = this.canvas.height - out.y;
-        // 渲染状态进栈
-        this.ctx2D.save();
-        // 使用大一点的Arial字体对象
-        this.ctx2D.font = '14px Arial';
-        switch (axis) {
-            case EAxisType.X_AXIS:
-                this.drawXAxisText(out, inverse);
-                break;
-            case EAxisType.Y_AXIS:
-                this.drawYAxisText(out, inverse);
-                break;
-            case EAxisType.Z_AXIS:
-                this.drawZAxisText(out, inverse);
-                break;
-            case EAxisType.NONE:
-            default:
-                break;
-        }
-        // 恢复原来的渲染状态
-        this.ctx2D.restore();
-        
-    }
-    
-    /**
-     * 绘制X轴文字。
-     * @param {Vector3} out
-     * @param {boolean} inverse
-     * @private
-     */
-    private drawXAxisText(out: Vector3, inverse: boolean): void {
-        if (!this.ctx2D) return;
-        // Y轴为top对齐
-        this.ctx2D.textBaseline = 'top';
-        // 红色
-        this.ctx2D.fillStyle = 'red';
-        if (inverse) {
-            this.ctx2D.textAlign = 'right';
-            // 进行文字绘制
-            this.ctx2D.fillText('-X', out.x, out.y);
-        } else {
-            // X轴居中对齐
-            this.ctx2D.textAlign = 'left';
-            // 进行文字绘制
-            this.ctx2D.fillText('X', out.x, out.y);
-        }
-    }
-    
-    /**
-     * 绘制Y轴文字。
-     * @param {Vector3} out
-     * @param {boolean} inverse
-     * @private
-     */
-    private drawYAxisText(out: Vector3, inverse: boolean): void {
-        if (!this.ctx2D) return;
-        // X轴居中对齐
-        this.ctx2D.textAlign = 'center';
-        // 绿色
-        this.ctx2D.fillStyle = 'green';
-        if (inverse) {
-            // -Y轴为top对齐
-            this.ctx2D.textBaseline = 'top';
-            // 行文字绘制
-            this.ctx2D.fillText('-Y', out.x, out.y);
-        } else {
-            // Y轴为bottom对齐
-            this.ctx2D.textBaseline = 'bottom';
-            // 进行文字绘制
-            this.ctx2D.fillText('Y', out.x, out.y);
-        }
-    }
-    
-    /**
-     *绘制Z轴文字。
-     * @param {Vector3} out
-     * @param {boolean} inverse
-     * @private
-     */
-    private drawZAxisText(out: Vector3, inverse: boolean): void {
-        if (!this.ctx2D) return;
-        // 绿色
-        this.ctx2D.fillStyle = 'blue';
-        // Y轴为top对齐
-        this.ctx2D.textBaseline = 'top';
-        if (inverse) {
-            // X轴居中对齐
-            this.ctx2D.textAlign = 'right';
-            // 进行文字绘制
-            this.ctx2D.fillText('-Z', out.x, out.y);
-        } else {
-            // X轴居中对齐
-            this.ctx2D.textAlign = 'left';
-            // 进行文字绘制
-            this.ctx2D.fillText('Z', out.x, out.y);
-        }
-    }
-    
-    /**
-     * 产生一个坐标系统
-     * @private
-     */
-    private makeOneGLCoordinateSystem(): void {
-        // 清空坐标系数组内容，用于按需重新生成
-        this._coordinateSystems = [];
-        // 如果只有一个坐标系的话，其视口和裁剪区与canvas元素尺寸一致， 右下
-        this._coordinateSystems.push(new GLCoordinateSystem([0, 0, this.canvas.width, this.canvas.height], Vector3.zero, new Vector3([1, 1, 0]).normalize(), 45, true));
-        this._isD3dMode = false;
+    private drawCoordinateSystemText(inverse: boolean = true): void {
+        if (!this.context2d) return;
+        DrawHelper.drawCoordinateSystemText(this.context2d, this._mvp, this.camera.getViewport(), this.canvas.height, inverse);
     }
 }

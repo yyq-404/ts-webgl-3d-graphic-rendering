@@ -8,9 +8,9 @@ let canvas: HTMLCanvasElement | null = document.getElementById('webgl') as HTMLC
 
 /** 应用集合 */
 const apps = {
-    'Demo-1: RotatingCubeApplication': RotatingCubeApplication,
-    'Demo-2: BasicWebGLApplication': BasicWebGLApplication,
-    'Demo-3: CoordinateSystemApplication': CoordinateSystemApplication
+    '1: RotatingCubeApplication': RotatingCubeApplication,
+    '2: BasicWebGLApplication': BasicWebGLApplication,
+    '3: CoordinateSystemApplication': CoordinateSystemApplication
 };
 
 /** 当前正在运行的App */
