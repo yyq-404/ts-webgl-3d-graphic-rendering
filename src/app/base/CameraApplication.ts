@@ -66,4 +66,12 @@ export class CameraApplication extends WebGLApplication {
     public override update(elapsedMsec: number, intervalSec: number): void {
         this.camera.update(intervalSec);
     }
+    
+    /**
+     * 释放
+     */
+    public override dispose(): void {
+        this.camera.setViewport(0, 0, this.canvas.width, this.canvas.height);
+        super.dispose();
+    }
 }
