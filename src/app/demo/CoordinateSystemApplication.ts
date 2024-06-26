@@ -28,6 +28,8 @@ export class CoordinateSystemApplication extends CameraApplication {
     private _coordinateSystems: GLCoordinateSystem[] = [];
     /** 当前要绘制的坐标系的model-view-project矩阵 */
     private _mvp: Matrix4 = new Matrix4();
+    /** 坐标系统绘制方法 */
+    private _drawMethods: Map<string, (glCoordinateSystem: GLCoordinateSystem) => void>;
     
     /**
      * 构造。
@@ -36,10 +38,16 @@ export class CoordinateSystemApplication extends CameraApplication {
     public constructor(canvas: HTMLCanvasElement) {
         // 调用基类构造函数
         super(canvas, {preserveDrawingBuffer: false}, true);
+        this.clearBuffer();
         this.makeFourGLCoordinateSystems();
         this._currentDrawMethod = this.drawCoordinateSystem;
         // 调整摄影机位置
         this.camera.z = 5;
+        this._drawMethods = new Map<string, (glCoordinateSystem: GLCoordinateSystem) => void>([
+            ['1', this.drawCoordinateSystem],
+            ['2', this.drawFullCoordinateSystem],
+            ['3', this.drawFullCoordinateSystemWithRotatedCube]
+        ]);
     }
     
     /**
@@ -49,24 +57,18 @@ export class CoordinateSystemApplication extends CameraApplication {
     public override onKeyPress(evt: CanvasKeyboardEvent): void {
         // 调用基类方法，这样摄像机键盘事件全部有效了
         super.onKeyPress(evt);
-        if (evt.key === '1') {
-            // 将currentDrawMethod函数指针指向drawCoordinateSystem
-            this._currentDrawMethod = this.drawCoordinateSystem;
-        } else if (evt.key === '2') {
-            // 将currentDrawMethod函数指针指向drawFullCoordinateSystem
-            this._currentDrawMethod = this.drawFullCoordinateSystem;
-        } else if (evt.key === '3') {
-            // 将currentDrawMethod函数指针指向drawFullCoordinateSystemWithRotatedCube
-            this._currentDrawMethod = this.drawFullCoordinateSystemWithRotatedCube;
-        } else if (evt.key === 'c') {
-            this._isOneViewport = !this._isOneViewport;
-            if (this._isOneViewport) {
-                // 切换到单视口渲染
-                this.makeOneGLCoordinateSystem();
-            } else {
-                // 切换到多视口渲染
-                this.makeFourGLCoordinateSystems();
-            }
+        switch (evt.key) {
+            case '1':
+            case '2':
+            case '3':
+                let drawMethod = this._drawMethods.get(evt.key);
+                if (drawMethod) this._currentDrawMethod = drawMethod;
+                break;
+            case 'c':
+                this.changeGLCoordinateSystemView();
+                break;
+            default:
+                break;
         }
     }
     
@@ -77,7 +79,7 @@ export class CoordinateSystemApplication extends CameraApplication {
      */
     public override update(elapsedMsec: number, intervalSec: number): void {
         // s = vt，根据两帧间隔更新角速度和角位移
-        this._coordinateSystems.forEach((s: GLCoordinateSystem) => (s.angle += this._speed));
+        this._coordinateSystems.forEach((glCoordinateSystem: GLCoordinateSystem) => (glCoordinateSystem.angle += this._speed));
         // 我们在CameraApplication中也覆写（override）的update方法
         // CameraApplication的update方法用来计算摄像机的投影矩阵以及视图矩阵
         // 所以我们必须要调用基类方法，用于控制摄像机更新
@@ -89,15 +91,30 @@ export class CoordinateSystemApplication extends CameraApplication {
      * 渲染
      */
     public override render(): void {
-        // 使用了 preserveDrawingBuffer: false 创建WebGLRenderingContext，因此可以不用每帧调用clear方法清屏
-        // this.gl.clear( this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT );
         // 由于要使用Canvas2D绘制文字，所以必须要有ctx2D对象
         if (!this.ctx2D) return;
+        // 使用了 preserveDrawingBuffer: false 创建WebGLRenderingContext，因此可以不用每帧调用clear方法清屏
+        this.clearBuffer();
         // 对Canvas2D上下文渲染对象进行清屏操作
         this.ctx2D.clearRect(0, 0, this.canvas.width, this.canvas.height);
         // 遍历整个坐标系视口数组
         // 使用当前的坐标系及视口数据作为参数，调用currentDrawMethod回调函数
-        this._coordinateSystems.forEach((s) => this._currentDrawMethod(s));
+        this._coordinateSystems.forEach((glCoordinateSystem) => this._currentDrawMethod(glCoordinateSystem));
+    }
+    
+    /**
+     * 切换展示视图。
+     * @private
+     */
+    private changeGLCoordinateSystemView(): void {
+        this._isOneViewport = !this._isOneViewport;
+        if (this._isOneViewport) {
+            // 切换到单视口渲染
+            this.makeOneGLCoordinateSystem();
+        } else {
+            // 切换到多视口渲染
+            this.makeFourGLCoordinateSystems();
+        }
     }
     
     /**
@@ -127,6 +144,8 @@ export class CoordinateSystemApplication extends CameraApplication {
      * @private
      */
     private drawCoordinateSystem(glCoordinateSystem: GLCoordinateSystem): void {
+        // 矩阵进栈
+        this.matStack.pushMatrix();
         // 计算模型视图投影矩阵。
         this.calcModelViewProjectionMatrix(glCoordinateSystem);
         // 调用DrawHelper.drawCoordinateSystem的方法绘制X / Y / Z坐标系
@@ -142,6 +161,8 @@ export class CoordinateSystemApplication extends CameraApplication {
      * @private
      */
     private drawFullCoordinateSystem(glCoordinateSystem: GLCoordinateSystem): void {
+        // 矩阵进栈
+        this.matStack.pushMatrix();
         // 计算模型视图投影矩阵
         this.calcModelViewProjectionMatrix(glCoordinateSystem);
         // 使用mvp矩阵绘制六轴坐标系，调用的是DrawHelper.drawFullCoordinateSystem的静态辅助方法
@@ -158,6 +179,8 @@ export class CoordinateSystemApplication extends CameraApplication {
      * @private
      */
     private drawFullCoordinateSystemWithRotatedCube(glCoordinateSystem: GLCoordinateSystem): void {
+        // 矩阵进栈
+        this.matStack.pushMatrix();
         //计算模型视图投影矩阵
         this.calcModelViewProjectionMatrix(glCoordinateSystem);
         // 绘制坐标系
@@ -170,6 +193,7 @@ export class CoordinateSystemApplication extends CameraApplication {
         this.drawZAxisWithRotatedCube(glCoordinateSystem);
         // 第五步：绘制绕坐标系旋转轴（s.axis）旋转的线框立方体
         this.drawCubeWithRotatedAxis(glCoordinateSystem);
+        // 矩阵出栈
         this.matStack.popMatrix();
         // 第六步：绘制坐标系的标示文字
         this.drawCoordinateSystemText();
@@ -242,9 +266,6 @@ export class CoordinateSystemApplication extends CameraApplication {
     private calcModelViewProjectionMatrix(glCoordinateSystem: GLCoordinateSystem): void {
         // 设置当前的视口
         this.camera.setViewport(glCoordinateSystem.viewport[0], glCoordinateSystem.viewport[1], glCoordinateSystem.viewport[2], glCoordinateSystem.viewport[3]);
-        // 1、绘制六轴坐标系
-        // 矩阵进栈
-        this.matStack.pushMatrix();
         // 将坐标系平移到s.pos位置
         this.matStack.translate(glCoordinateSystem.position);
         // 坐标系绕着s.axis轴旋转s.angle度
@@ -268,12 +289,12 @@ export class CoordinateSystemApplication extends CameraApplication {
         }
         if (!optionFull) return;
         // -X
-        this.drawAxisText(new Vector3([1, 0, 0]), EAxisType.X_AXIS, this._mvp, true);
+        this.drawAxisText(Vector3.right.negate(new Vector3()), EAxisType.X_AXIS, this._mvp, true);
         // -Y
-        this.drawAxisText(new Vector3([0, -1, 0]), EAxisType.Y_AXIS, this._mvp, true);
+        this.drawAxisText(Vector3.up.negate(new Vector3()), EAxisType.Y_AXIS, this._mvp, true);
         if (!this._isD3dMode) {
             // -Z
-            this.drawAxisText(new Vector3([0, 0, -1]), EAxisType.Z_AXIS, this._mvp, true);
+            this.drawAxisText(Vector3.forward.negate(new Vector3()), EAxisType.Z_AXIS, this._mvp, true);
         }
     }
     
