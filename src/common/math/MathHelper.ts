@@ -211,7 +211,7 @@ export class MathHelper {
     }
     
     /**
-     * 计算 `AABB包围盒` 的 mins 和 `maxs` 值
+     * 计算 `AABB包围盒` 的 min 和 `max` 值
      * ```plaintext
      *    /3--------/7
      *   / |       / |
@@ -223,45 +223,45 @@ export class MathHelper {
      * 0---------4/
      * ```
      * @param v
-     * @param mins
-     * @param maxs
+     * @param min
+     * @param max
      */
-    public static boundBoxAddPoint(v: Vector3, mins: Vector3, maxs: Vector3): void {
-        if (v.x < mins.x) mins.x = v.x;
-        // v的x轴分量小于小的，就更新mins.x分量值
-        if (v.x > maxs.x) maxs.x = v.x;
-        // v的x轴分量大于大的，就更新maxs.x分量值
+    public static boundBoxAddPoint(v: Vector3, min: Vector3, max: Vector3): void {
+        // v的x轴分量小于小的，就更新min.x分量值
+        if (v.x < min.x) min.x = v.x;
+        // v的x轴分量大于大的，就更新max.x分量值
+        if (v.x > max.x) max.x = v.x;
         // 原理同上
-        if (v.y < mins.y) mins.y = v.y;
-        if (v.y > maxs.y) maxs.y = v.y;
+        if (v.y < min.y) min.y = v.y;
+        if (v.y > max.y) max.y = v.y;
         // 原理同上
-        if (v.z < mins.z) mins.z = v.z;
-        if (v.z > maxs.z) maxs.z = v.z;
+        if (v.z < min.z) min.z = v.z;
+        if (v.z > max.z) max.z = v.z;
     }
     
     /**
-     * 初始化 `mins` 和 `maxs`
-     * @param mins
-     * @param maxs
+     * 初始化 `min` 和 `max`
+     * @param min
+     * @param max
      * @param value
      */
-    public static boundBoxClear(mins: Vector3, maxs: Vector3, value: number = Infinity): void {
-        // 初始化时，让mins表示浮点数的最大范围
-        mins.x = mins.y = mins.z = value;
-        // 初始化是，让maxs表示浮点数的最小范围
-        maxs.x = maxs.y = maxs.z = -value;
+    public static boundBoxClear(min: Vector3, max: Vector3, value: number = Infinity): void {
+        // 初始化时，让min表示浮点数的最大范围
+        min.x = min.y = min.z = value;
+        // 初始化是，让max表示浮点数的最小范围
+        max.x = max.y = max.z = -value;
     }
     
     /**
      * 获得AABB包围盒的中心点坐标
-     * @param mins
-     * @param maxs
+     * @param min
+     * @param max
      * @param out
      */
-    public static boundBoxGetCenter(mins: Vector3, maxs: Vector3, out: Vector3 | null = null): Vector3 {
+    public static boundBoxGetCenter(min: Vector3, max: Vector3, out: Vector3 | null = null): Vector3 {
         if (!out) out = new Vector3();
-        // (maxs + mins) ＊ 0.5
-        Vector3.sum(mins, maxs, out);
+        // (max + min) ＊ 0.5
+        Vector3.sum(min, max, out);
         out.scale(0.5);
         return out;
     }
@@ -278,49 +278,51 @@ export class MathHelper {
      * |/        | /
      * 0---------4/
      * ```
-     * @param mins
-     * @param maxs
+     * @param min
+     * @param max
      * @param pts8
      */
-    public static boundBoxGet8Points(mins: Vector3, maxs: Vector3, pts8: Vector3[]): void {
-        const center: Vector3 = MathHelper.boundBoxGetCenter(mins, maxs); // 获取中心点
-        const maxs2center: Vector3 = Vector3.difference(center, maxs); // 获取最大点到中心点之间的距离向量
+    public static boundBoxGet8Points(min: Vector3, max: Vector3, pts8: Vector3[]): void {
+        // 获取中心点
+        const center: Vector3 = MathHelper.boundBoxGetCenter(min, max);
+        // 获取最大点到中心点之间的距离向量
+        const max2center: Vector3 = Vector3.difference(center, max);
         // 0
-        pts8.push(new Vector3([center.x + maxs2center.x, center.y + maxs2center.y, center.z + maxs2center.z]));
+        pts8.push(new Vector3([center.x + max2center.x, center.y + max2center.y, center.z + max2center.z]));
         // 1
-        pts8.push(new Vector3([center.x + maxs2center.x, center.y - maxs2center.y, center.z + maxs2center.z]));
+        pts8.push(new Vector3([center.x + max2center.x, center.y - max2center.y, center.z + max2center.z]));
         // 2
-        pts8.push(new Vector3([center.x + maxs2center.x, center.y + maxs2center.y, center.z - maxs2center.z]));
+        pts8.push(new Vector3([center.x + max2center.x, center.y + max2center.y, center.z - max2center.z]));
         // 3
-        pts8.push(new Vector3([center.x + maxs2center.x, center.y - maxs2center.y, center.z - maxs2center.z]));
+        pts8.push(new Vector3([center.x + max2center.x, center.y - max2center.y, center.z - max2center.z]));
         // 4
-        pts8.push(new Vector3([center.x - maxs2center.x, center.y + maxs2center.y, center.z + maxs2center.z]));
+        pts8.push(new Vector3([center.x - max2center.x, center.y + max2center.y, center.z + max2center.z]));
         // 5
-        pts8.push(new Vector3([center.x - maxs2center.x, center.y - maxs2center.y, center.z + maxs2center.z]));
+        pts8.push(new Vector3([center.x - max2center.x, center.y - max2center.y, center.z + max2center.z]));
         // 6
-        pts8.push(new Vector3([center.x - maxs2center.x, center.y + maxs2center.y, center.z - maxs2center.z]));
+        pts8.push(new Vector3([center.x - max2center.x, center.y + max2center.y, center.z - max2center.z]));
         // 7
-        pts8.push(new Vector3([center.x - maxs2center.x, center.y - maxs2center.y, center.z - maxs2center.z]));
+        pts8.push(new Vector3([center.x - max2center.x, center.y - max2center.y, center.z - max2center.z]));
     }
     
     /**
      * 计算变换后的 `AABB包围盒`
      * @param mat
-     * @param mins
-     * @param maxs
+     * @param min
+     * @param max
      */
-    public static boundBoxTransform(mat: Matrix4, mins: Vector3, maxs: Vector3): void {
+    public static boundBoxTransform(mat: Matrix4, min: Vector3, max: Vector3): void {
         // 分配数组内存，类型为Vector3
         const pts: Vector3[] = [];
         // 获得局部坐标系表示的AABB的8个顶点坐标
-        MathHelper.boundBoxGet8Points(mins, maxs, pts);
+        MathHelper.boundBoxGet8Points(min, max, pts);
         const out: Vector3 = new Vector3(); // 变换后的顶点
         // 遍历局部坐标系的8个AABB包围盒的顶点坐标
         pts.forEach((pt) => {
             // 将局部坐标表示的顶点变换到mat坐标空间中去，变换后的结果放在out变量中
             out.xyz = mat.multiplyVector3(pt).xyz;
             // 重新构造新的，与世界坐标系轴对称的AABB包围盒
-            this.boundBoxAddPoint(out, mins, maxs);
+            this.boundBoxAddPoint(out, min, max);
         });
     }
     
@@ -328,11 +330,11 @@ export class MathHelper {
      * 判断一个点是否在AABB包围盒内部，如果在则返回true，否则返回false
      *
      * @param point
-     * @param mins
-     * @param maxs
+     * @param min
+     * @param max
      */
-    public static boundBoxContainsPoint(point: Vector3, mins: Vector3, maxs: Vector3): boolean {
-        return (point.x >= mins.x && point.x <= maxs.x && point.y >= mins.y && point.y <= maxs.y && point.z >= mins.z && point.z <= maxs.z);
+    public static boundBoxContainsPoint(point: Vector3, min: Vector3, max: Vector3): boolean {
+        return (point.x >= min.x && point.x <= max.x && point.y >= min.y && point.y <= max.y && point.z >= min.z && point.z <= max.z);
     }
     
     /**

@@ -12,8 +12,8 @@ import {CanvasKeyboardEvent} from '../../event/CanvasKeyboardEvent';
 import {CLShaderConstants} from '../../webgl/shader/CLShaderConstants';
 import {EAxisType} from '../../enum/EAxisType';
 import {WebGLApplication} from '../base/WebGLApplication';
-import {GLCoordinateSystem} from "../../webgl/GLCoordinateSystem";
-import {GLCoordinateSystemHelper} from "../../webgl/GLCoordinateSystemHelper";
+import {GLCoordinateSystemHelper} from '../../webgl/GLCoordinateSystemHelper';
+import {GLMeshHelper} from '../../webgl/GLMeshHelper';
 
 /**
  * 立方体旋转应用
@@ -52,7 +52,9 @@ export class RotatingCubeApplication extends WebGLApplication {
     private _triangleMatrix: Matrix4;
     /** 为了支持鼠标点选，记录选中的坐标轴的enum值 */
     private readonly _hitAxis: EAxisType;
-
+    /** 贴图路径集合 */
+    private _imageUrls = ['data/pic0.png', 'data/pic1.jpg'];
+    
     /**
      * 构造
      * @param canvas
@@ -81,7 +83,7 @@ export class RotatingCubeApplication extends WebGLApplication {
         // 对于三角形的渲染数据，我们使用GLMeshBuilder中立即模式绘制方式
         this._cube = new Cube(0.5, 0.5, 0.5);
         const data: Geometry = this._cube.makeGeometry();
-        this._cubeVAO = data.makeStaticVAO(this.webglContext);
+        this._cubeVAO = GLMeshHelper.makeStaticMesh(this.webglContext, data);
         // 初始化时没选中任何一条坐标轴
         this._hitAxis = EAxisType.NONE;
         // 初始化时，世界矩阵都为归一化矩阵
@@ -90,31 +92,23 @@ export class RotatingCubeApplication extends WebGLApplication {
         // 调整摄像机的位置
         this.camera.z = 8;
     }
-
+    
     /**
      * 执行
      */
     public override async runAsync(): Promise<void> {
-        if (!this.webglContext) throw new Error('this.gl is not defined');
-        let img: HTMLImageElement = await HttpHelper.loadImageAsync('data/pic0.png');
-        let tex: GLTexture = new GLTexture(this.webglContext);
-        tex.upload(img, 0, true);
-        tex.filter();
-        this._textures.push(tex);
-        console.log('1、第一个纹理载入成功!');
-        img = await HttpHelper.loadImageAsync('data/pic1.jpg');
-        tex = new GLTexture(this.webglContext);
-        tex.upload(img, 0, true);
-        tex.filter();
-        this._textures.push(tex);
-        console.log('2、第二个纹理载入成功!');
-        // 在资源同步加载完成后，直接启动换肤的定时器，每隔2秒，将立方体的皮肤进行周而复始的替换
+        if (!this.webglContext) throw new Error('this.webglContext is not defined');
+        let loadResults = new Array<Promise<boolean>>();
+        this._imageUrls.forEach((url: string) => {
+            loadResults.push(this.loadTextureAsync(url));
+        });
+        await Promise.all(loadResults);
         this.timerManager.add(this.cubeTimeCallback.bind(this), 2, false);
-        console.log('3、启动Application程序');
+        console.log('启动Application程序');
         // 调用基类的run方法，基类run方法内部调用了start方法
         await super.runAsync();
     }
-
+    
     /**
      * 按键按下
      * @param evt
@@ -137,7 +131,7 @@ export class RotatingCubeApplication extends WebGLApplication {
                 break;
         }
     }
-
+    
     /**
      * 更新
      * @param elapsedMsec
@@ -152,7 +146,7 @@ export class RotatingCubeApplication extends WebGLApplication {
         // 否则你将什么都看不到，切记!
         super.update(elapsedMsec, intervalSec);
     }
-
+    
     /**
      * 渲染
      */
@@ -167,7 +161,7 @@ export class RotatingCubeApplication extends WebGLApplication {
         this.renderTriangle();
         this.renderText('First WebGL Demo');
     }
-
+    
     /**
      * 立方体定时回调
      */
@@ -177,14 +171,32 @@ export class RotatingCubeApplication extends WebGLApplication {
         // 取模操作，让currTexIdx的取值范围为[ 0, 2 ]之间（当前有3个纹理）
         this._currentTexIdx %= this._textures.length;
     }
-
+    
     /**
      * 三角形定时回调
      */
     public triangleTimeCallback(): void {
         this._triangleAngle += this._triangleSpeed;
     }
-
+    
+    /**
+     * 加载材质贴图
+     * @param {string} imgUrl
+     * @return {Promise<void>}
+     * @private
+     */
+    private async loadTextureAsync(imgUrl: string): Promise<boolean> {
+        if (!this.webglContext) return false;
+        let img: HTMLImageElement = await HttpHelper.loadImageAsync(imgUrl);
+        if (!img) return false;
+        let texture: GLTexture = new GLTexture(this.webglContext);
+        texture.upload(img, 0, true);
+        texture.filter();
+        this._textures.push(texture);
+        console.log(`纹理[${imgUrl}]载入成功!`);
+        return true;
+    }
+    
     /**
      * 渲染立方体
      * @private
@@ -221,7 +233,7 @@ export class RotatingCubeApplication extends WebGLApplication {
             texture.unbind();
         }
     }
-
+    
     /**
      * 渲染三角形
      * @private
@@ -258,7 +270,7 @@ export class RotatingCubeApplication extends WebGLApplication {
         // 恢复背面剔除功能
         this.webglContext.enable(this.webglContext.CULL_FACE);
     }
-
+    
     /**
      * 渲染文本
      * 关于Canvas2D的详细应用，可以参考本书的姐妹篇：TypeScript图形渲染实战：2D架构设计与实现

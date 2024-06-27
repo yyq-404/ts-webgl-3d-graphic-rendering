@@ -61,10 +61,10 @@ export class WebGLApplication extends BaseApplication {
     
     /**
      * 获取顶点属性。
-     * @param gl
+     * @param webglContext
      */
-    public static getMaxVertexAttributes(gl: WebGLRenderingContext): number {
-        return gl.getParameter(gl.MAX_VERTEX_ATTRIBS) as number;
+    public static getMaxVertexAttributes(webglContext: WebGLRenderingContext): number {
+        return webglContext.getParameter(webglContext.MAX_VERTEX_ATTRIBS) as number;
     }
     
     /**
@@ -144,17 +144,17 @@ export class WebGLApplication extends BaseApplication {
      * @private
      */
     private create2dCanvas(): void {
-        const canvasElement: HTMLCanvasElement = document.createElement('canvas') as HTMLCanvasElement;
-        canvasElement.width = this.canvas.width;
-        canvasElement.height = this.canvas.height;
-        canvasElement.style.backgroundColor = 'transparent';
-        canvasElement.style.position = 'absolute';
-        canvasElement.style.left = '0px';
-        canvasElement.style.top = '0px';
+        const canvas2d: HTMLCanvasElement = document.createElement('canvas') as HTMLCanvasElement;
+        canvas2d.width = this.canvas.width;
+        canvas2d.height = this.canvas.height;
+        canvas2d.style.backgroundColor = 'transparent';
+        canvas2d.style.position = 'absolute';
+        canvas2d.style.left = '0px';
+        canvas2d.style.top = '0px';
         const parent: HTMLElement | null = this.canvas.parentElement;
         if (!parent) throw new Error('canvas元素必须要有父亲!!');
-        this.context2d = canvasElement.getContext('2d');
-        parent.appendChild(canvasElement);
-        this.canvas2d = canvasElement;
+        this.context2d = canvas2d.getContext('2d');
+        parent.appendChild(canvas2d);
+        this.canvas2d = canvas2d;
     }
 }

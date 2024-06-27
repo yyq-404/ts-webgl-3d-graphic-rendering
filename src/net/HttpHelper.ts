@@ -11,7 +11,6 @@ export class HttpHelper {
         // Promise具有两种状态，即resolve和reject，这两种状态以回调函数的方式体
         return new Promise((resolve, reject): void => {
             const image = new Image();
-
             // 当image从url加载成功时
             image.onload = function () {
                 // 调用成功状态的resolve回调函数
