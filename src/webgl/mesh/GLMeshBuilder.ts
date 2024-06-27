@@ -207,14 +207,16 @@ export class GLMeshBuilder extends GLMeshBase {
             let list: TypedArrayList<Float32Array> = this._lists[GLAttributeHelper.POSITION.NAME];
             if (this._hasTexCoordinate) {
                 list = this._lists[GLAttributeHelper.TEX_COORDINATE_0.NAME];
+                list.clear();
             }
             if (this._hasNormal) {
                 list = this._lists[GLAttributeHelper.NORMAL.NAME];
+                list.clear();
             }
             if (this._hasColor) {
                 list = this._lists[GLAttributeHelper.COLOR.NAME];
+                list.clear();
             }
-            list.clear();
         } else {
             const list: TypedArrayList<Float32Array> = this._lists[GLMeshBuilder.INTERLEAVED];
             // 使用自己实现的动态类型数组，重用
@@ -359,7 +361,7 @@ export class GLMeshBuilder extends GLMeshBase {
         // 针对除interleaved存储方式之外的操作
         let list: TypedArrayList<Float32Array> = this._lists[GLAttributeHelper.POSITION.NAME];
         // position
-        this.pushVector3(list, new Vector3([x, x, z]));
+        this.pushVector3(list, new Vector3([x, y, z]));
         // texCoordinate
         if (this._hasTexCoordinate) {
             list = this._lists[GLAttributeHelper.TEX_COORDINATE_0.NAME];
@@ -385,8 +387,10 @@ export class GLMeshBuilder extends GLMeshBase {
      * @private
      */
     private bufferSubData(attribute: IGLAttribute, offsets: GLAttributeOffsetMap, has: boolean = true): void {
+        if (!has) return;
         let list = this._lists[attribute.NAME];
         this.webglContext.bufferSubData(this.webglContext.ARRAY_BUFFER, offsets[attribute.NAME], list.subArray());
+        
     }
     
     
@@ -533,6 +537,7 @@ export class GLMeshBuilder extends GLMeshBase {
      * @param {WebGLBuffer} indexBuffer
      * @param {number} size
      * @param {boolean} has
+     * @param optionCreateBuffer
      * @private
      */
     private initVertexAttribute(attribute: IGLAttribute, indexBuffer: WebGLBuffer | null, size: number, has: boolean = true, optionCreateBuffer: boolean = false): void {
