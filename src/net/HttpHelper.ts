@@ -1,5 +1,5 @@
 /**
- * HTTP助手
+ * HTTP工具类
  */
 export class HttpHelper {
     /**
@@ -25,7 +25,7 @@ export class HttpHelper {
             image.src = url;
         });
     }
-
+    
     /**
      *  加载文本
      * @param url
@@ -35,17 +35,19 @@ export class HttpHelper {
         return new Promise((resolve, reject): void => {
             let xhr: XMLHttpRequest = new XMLHttpRequest();
             xhr.onreadystatechange = (ev: Event): any => {
-                if (xhr.readyState === 4 && xhr.status === 200) {
-                    resolve(xhr.responseText);
-                } else {
-                    reject(new Error('Could not load text file at ' + url));
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+                        resolve(xhr.responseText);
+                    } else {
+                        reject(new Error('Could not load text file at ' + url));
+                    }
                 }
-            }
-            xhr.open("get", url, true, null, null);
+            };
+            xhr.open('GET', url, true);
             xhr.send();
         });
     }
-
+    
     /**
      * 加载二进制
      * @param url
@@ -54,15 +56,17 @@ export class HttpHelper {
     public static loadArrayBufferAsync(url: string): Promise<ArrayBuffer> {
         return new Promise((resolve, reject): void => {
             let xhr: XMLHttpRequest = new XMLHttpRequest();
-            xhr.responseType = "arraybuffer";
+            xhr.responseType = 'arraybuffer';
             xhr.onreadystatechange = (ev: Event): any => {
-                if (xhr.readyState === 4 && xhr.status === 200) {
-                    resolve(xhr.response as ArrayBuffer);
-                } else {
-                    reject(new Error('Could not load array buffer at ' + url));
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+                        resolve(xhr.response as ArrayBuffer);
+                    } else {
+                        reject(new Error('Could not load array buffer at ' + url));
+                    }
                 }
-            }
-            xhr.open("get", url, true, null, null);
+            };
+            xhr.open('GET', url, true);
             xhr.send();
         });
     }
