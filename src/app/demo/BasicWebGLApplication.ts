@@ -9,6 +9,30 @@ import {GLAttributeMap, GLUniformMap} from '../../webgl/GLTypes';
 import {CanvasKeyboardEvent} from '../../event/CanvasKeyboardEvent';
 
 /**
+ * 9视图参数类型
+ */
+type DrawParameters9s = {
+    /** 指定从哪个点开始绘制 */
+    first: number,
+    /** 指定要渲染的元素数量 */
+    count: number,
+    /** 指定要渲染的图元类型 */
+    mode: number
+}
+
+/**
+ * 4视图参数类型
+ */
+type DrawParameters4s = {
+    /** 指定元素数组缓冲区中的偏移量,必须是给定类型大小的有效倍数 */
+    offset: number,
+    /** 指定要渲染的元素数量 */
+    count: number,
+    /** 指定要渲染的图元类型 */
+    mode: number
+}
+
+/**
  * 基础WEBGL应用。
  */
 export class BasicWebGLApplication extends BaseApplication {
@@ -140,50 +164,46 @@ export class BasicWebGLApplication extends BaseApplication {
      * 9视图，使用drawArray
      */
     public render9Viewports(): void {
-        // 从下到上第一列
-        GLRenderHelper.setViewport(this.gl, this.coordinateSystem9s[0].viewport);
-        this.drawRectByInterleavedVBO(0, 6, this.gl.TRIANGLES);
-        GLRenderHelper.setViewport(this.gl, this.coordinateSystem9s[1].viewport);
-        this.drawRectByInterleavedVBO(0, 3, this.gl.TRIANGLES);
-        GLRenderHelper.setViewport(this.gl, this.coordinateSystem9s[2].viewport);
-        this.drawRectByInterleavedVBO(3, 3, this.gl.TRIANGLES);
-        // 从下到上第二列
-        GLRenderHelper.setViewport(this.gl, this.coordinateSystem9s[3].viewport);
-        this.drawRectByInterleavedVBO(0, 4, this.gl.TRIANGLE_FAN);
-        GLRenderHelper.setViewport(this.gl, this.coordinateSystem9s[4].viewport);
-        this.drawRectByInterleavedVBO(0, 4, this.gl.TRIANGLE_STRIP);
-        GLRenderHelper.setViewport(this.gl, this.coordinateSystem9s[5].viewport);
-        this.drawRectByInterleavedVBO(0, 4, this.gl.POINTS);
-        // 从下到上第三列
-        GLRenderHelper.setViewport(this.gl, this.coordinateSystem9s[6].viewport);
-        this.drawRectByInterleavedVBO(0, 4, this.gl.LINE_STRIP);
-        GLRenderHelper.setViewport(this.gl, this.coordinateSystem9s[7].viewport);
-        this.drawRectByInterleavedVBO(0, 4, this.gl.LINE_LOOP);
-        GLRenderHelper.setViewport(this.gl, this.coordinateSystem9s[8].viewport);
-        this.drawRectByInterleavedVBO(0, 4, this.gl.LINES);
+        const parameters: DrawParameters9s[] = [
+            // 从下到上第一列
+            {first: 0, count: 6, mode: this.gl.TRIANGLES},
+            {first: 0, count: 3, mode: this.gl.TRIANGLES},
+            {first: 3, count: 3, mode: this.gl.TRIANGLES},
+            // 从下到上第二列
+            {first: 0, count: 4, mode: this.gl.TRIANGLE_FAN},
+            {first: 0, count: 4, mode: this.gl.TRIANGLE_STRIP},
+            {first: 0, count: 4, mode: this.gl.POINTS},
+            // 从下到上第三列
+            {first: 0, count: 4, mode: this.gl.LINE_STRIP},
+            {first: 0, count: 4, mode: this.gl.LINE_LOOP},
+            {first: 0, count: 4, mode: this.gl.LINES}
+        ];
+        parameters.forEach((param: DrawParameters9s, index: number) => this.drawRectByInterleavedVBO(param, this.coordinateSystem9s[index]));
     }
+    
     
     /**
      * 4视图，使用drawElements
      */
     public render4Viewports(): void {
-        GLRenderHelper.setViewport(this.gl, this.coordinateSystem4s[0].viewport);
-        this.drawRectByInterleavedVBOWithEBO(0, 6, this.gl.TRIANGLES);
-        GLRenderHelper.setViewport(this.gl, this.coordinateSystem4s[1].viewport);
-        this.drawRectByInterleavedVBOWithEBO(0, 6, this.gl.TRIANGLE_FAN);
-        GLRenderHelper.setViewport(this.gl, this.coordinateSystem4s[2].viewport);
-        this.drawRectByInterleavedVBOWithEBO(0, 6, this.gl.TRIANGLE_STRIP);
-        GLRenderHelper.setViewport(this.gl, this.coordinateSystem4s[3].viewport);
-        this.drawRectByInterleavedVBOWithEBO(2 * 3, 3, this.gl.TRIANGLE_STRIP);
+        const parameters: DrawParameters4s[] = [
+            {offset: 0, count: 6, mode: this.gl.TRIANGLES},
+            {offset: 0, count: 6, mode: this.gl.TRIANGLE_FAN},
+            {offset: 0, count: 6, mode: this.gl.TRIANGLE_STRIP},
+            {offset: 2 * 3, count: 3, mode: this.gl.TRIANGLE_STRIP}
+        ];
+        parameters.forEach((param: DrawParameters4s, index: number) => this.drawRectByInterleavedVBOWithEBO(param, this.coordinateSystem4s[index]));
     }
     
     /**
      * 使用交错布局和··顶点缓存绘制四边形
-     * @param first
-     * @param count
-     * @param mode
+     * @param param
+     * @param glCoordinateSystem
      */
-    public drawRectByInterleavedVBO(first: number, count: number, mode: number = this.gl.TRIANGLES): void {
+    public drawRectByInterleavedVBO(param: DrawParameters9s, glCoordinateSystem: GLCoordinateSystem): void {
+        let {first, count, mode} = param;
+        // 设置视口
+        GLRenderHelper.setViewport(this.gl, glCoordinateSystem.viewport);
         // 重用动态数组，因此调用clear方法，将当前索引reset到0位置
         this.verts.clear();
         // 声明interleaved存储的顶点数组。
@@ -224,21 +244,23 @@ export class BasicWebGLApplication extends BaseApplication {
         // 设置要使用的WebGLProgram对象
         this.setProgram();
         // 调用drawArrays对象
-        this.gl.drawArrays(mode, first, count); // 几个顶点
+        this.gl.drawArrays(mode, first, count);
         // 将渲染状态恢复的未设置之前
         this.resetProgram();
     }
     
     /**
      * 使用交错布局和顶点缓存与索引缓存绘制四边形
-     * @param byteOffset 指定元素数组缓冲区中的偏移量。必须是给定类型大小的有效倍数。
-     * @param count 指定要渲染的元素数量。
-     * @param mode 指定要渲染的图元类型。
+     * @param param
+     * @param glCoordinateSystem
      * @param isCCW
      */
-    public drawRectByInterleavedVBOWithEBO(byteOffset: number, count: number, mode: number = this.gl.TRIANGLES, isCCW: boolean = true): void {
+    public drawRectByInterleavedVBOWithEBO(param: DrawParameters4s, glCoordinateSystem: GLCoordinateSystem, isCCW: boolean = true): void {
+        let {offset, mode, count} = param;
         // 简单起见，本方法就只演示三角形相关内容。
         if (mode !== this.gl.TRIANGLES && mode !== this.gl.TRIANGLE_FAN && mode !== this.gl.TRIANGLE_STRIP) return;
+        // 设置视口
+        GLRenderHelper.setViewport(this.gl, glCoordinateSystem.viewport);
         // 重用动态数组，因此调用clear方法，将当前索引reset到0位置
         this.verts.clear();
         // 声明interleaved存储的顶点数组。
@@ -269,7 +291,7 @@ export class BasicWebGLApplication extends BaseApplication {
         this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, this.indices.subArray(), this.gl.DYNAMIC_DRAW);
         this.setProgram();
         // 调用drawElements方法
-        this.gl.drawElements(mode, count, this.gl.UNSIGNED_SHORT, byteOffset);
+        this.gl.drawElements(mode, count, this.gl.UNSIGNED_SHORT, offset);
         // 将渲染状态恢复的未设置之前
         this.resetProgram();
     }
