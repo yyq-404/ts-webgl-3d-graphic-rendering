@@ -13,8 +13,10 @@ export class AsyncLoadTestApp {
     public static process(): void {
         // 重点关注代码调用顺序与运行后的显示顺序之间的关系
         let app = new AsyncLoadTestApp();
-        app.loadImagesSequenceAsync();                  // 先调用Sequence版加载Image
-        app.loadTextFileAsync();                       // 然后调用文本文件加载方法
+        // 先调用Sequence版加载Image
+        app.loadImagesSequenceAsync();
+        // 然后调用文本文件加载方法
+        app.loadTextFileAsync();
         app.loadImagesParallel();
     }
     
@@ -52,6 +54,4 @@ export class AsyncLoadTestApp {
         let str: string = await HttpHelper.loadTextFileAsync('data/test.txt');
         console.log(str);
     }
-    
-    
 }

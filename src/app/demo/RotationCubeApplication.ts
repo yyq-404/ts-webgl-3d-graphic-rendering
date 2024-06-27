@@ -53,7 +53,7 @@ export class RotatingCubeApplication extends WebGLApplication {
     /** 为了支持鼠标点选，记录选中的坐标轴的enum值 */
     private readonly _hitAxis: EAxisType;
     /** 贴图路径集合 */
-    private _imageUrls = ['data/pic0.png', 'data/pic1.jpg'];
+    private _imageUrls = ['res/image/pic0.png', 'res/image/pic1.jpg'];
     
     /**
      * 构造
