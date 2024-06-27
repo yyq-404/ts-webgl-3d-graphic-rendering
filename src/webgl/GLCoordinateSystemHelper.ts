@@ -3,6 +3,8 @@ import {GLMeshBuilder} from './mesh/GLMeshBuilder';
 import {Matrix4} from '../common/math/matrix/Matrix4';
 import {Vector3} from '../common/math/vector/Vector3';
 import {Vector4} from '../common/math/vector/Vector4';
+import {Vector2} from '../common/math/vector/Vector2';
+import {MathHelper} from '../common/math/MathHelper';
 
 
 /**
@@ -11,6 +13,34 @@ import {Vector4} from '../common/math/vector/Vector4';
 export class GLCoordinateSystemHelper {
     /** 默认颜色 */
     public static defaultHitColor: Vector4 = new Vector4([1, 1, 1, 0]);
+    
+    /**
+     * 三维向量从ID坐标转换为GL坐标
+     * @param v
+     * @param scale
+     */
+    public static convertVector3IDCoordinate2GLCoordinate(v: Vector3, scale: number = 10.0): void {
+        // opengl right = doom3 x
+        const f: number = v.y;
+        //opengl up = doom3 z
+        v.y = v.z;
+        //opengl forward = doom3 -y
+        v.z = -f;
+        if (!MathHelper.numberEquals(scale, 0) && !MathHelper.numberEquals(scale, 1.0)) {
+            v.x /= scale;
+            v.y /= scale;
+            v.z /= scale;
+        }
+    }
+    
+    /**
+     * 二维向量从ID坐标转换为GL坐标
+     * @param v
+     */
+    public static convertVector2IDCoordinate2GLCoordinate(v: Vector2): void {
+        v.x = 1.0 - v.x;
+        v.y = 1.0 - v.y;
+    }
     
     /**
      * 本地坐标系转换到视图坐标系
@@ -95,15 +125,11 @@ export class GLCoordinateSystemHelper {
     public static drawText(context: CanvasRenderingContext2D, mvp: Matrix4, viewport: Int32Array, canvasHeight: number, inverse: boolean = false, isLeftHardness: boolean = false): void {
         GLCoordinateSystemHelper.drawAxisText(context, Vector3.right, EAxisType.X_AXIS, mvp, viewport, canvasHeight);
         GLCoordinateSystemHelper.drawAxisText(context, Vector3.up, EAxisType.Y_AXIS, mvp, viewport, canvasHeight);
-        if (!isLeftHardness) {
-            GLCoordinateSystemHelper.drawAxisText(context, Vector3.forward, EAxisType.Z_AXIS, mvp, viewport, canvasHeight);
-        }
+        GLCoordinateSystemHelper.drawAxisText(context, isLeftHardness ? Vector3.forward.negate(new Vector3()) : Vector3.forward, EAxisType.Z_AXIS, mvp, viewport, canvasHeight);
         if (!inverse) return;
-        GLCoordinateSystemHelper.drawAxisText(context, Vector3.right.negate(new Vector3()), EAxisType.X_AXIS, mvp, viewport, canvasHeight, inverse);
-        GLCoordinateSystemHelper.drawAxisText(context, Vector3.up.negate(new Vector3()), EAxisType.Y_AXIS, mvp, viewport, canvasHeight, inverse);
-        if (!isLeftHardness) {
-            GLCoordinateSystemHelper.drawAxisText(context, Vector3.forward.negate(new Vector3()), EAxisType.Z_AXIS, mvp, viewport, canvasHeight, inverse);
-        }
+        GLCoordinateSystemHelper.drawAxisText(context, Vector3.right.negate(new Vector3()), EAxisType.X_AXIS, mvp, viewport, canvasHeight, true);
+        GLCoordinateSystemHelper.drawAxisText(context, Vector3.up.negate(new Vector3()), EAxisType.Y_AXIS, mvp, viewport, canvasHeight, true);
+        GLCoordinateSystemHelper.drawAxisText(context, isLeftHardness ? Vector3.forward : Vector3.forward.negate(new Vector3()), EAxisType.Z_AXIS, mvp, viewport, canvasHeight, true);
     }
     
     /**
@@ -117,11 +143,10 @@ export class GLCoordinateSystemHelper {
     private static setAxisColor(builder: GLMeshBuilder, color: Vector4, pos: Vector3, inverse: boolean = false): void {
         builder.color(color.r, color.g, color.b).vertex(Vector3.zero.x, Vector3.zero.y, Vector3.zero.z);
         builder.color(color.r, color.g, color.b).vertex(pos.x, pos.y, pos.z);
-        if (inverse) {
-            builder.color(color.r, color.g, color.b).vertex(Vector3.zero.x, Vector3.zero.y, Vector3.zero.z);
-            let negatePos = pos.negate(new Vector3());
-            builder.color(color.r, color.g, color.b).vertex(negatePos.x, negatePos.y, negatePos.z);
-        }
+        if (!inverse) return;
+        builder.color(color.r, color.g, color.b).vertex(Vector3.zero.x, Vector3.zero.y, Vector3.zero.z);
+        let negatePos = pos.negate(new Vector3());
+        builder.color(color.r, color.g, color.b).vertex(negatePos.x, negatePos.y, negatePos.z);
     }
     
     /**

@@ -128,6 +128,7 @@ export class WebGLApplication extends BaseApplication {
     public override dispose(): void {
         this.matStack.clear();
         // GLRenderHelper.triggerContextLostEvent(this.gl);
+        this.camera.setViewport(0, 0, this.canvas.width, this.canvas.height);
         this.clearBuffer();
         GLProgramCache.instance.clear();
         GLTextureCache.instance.clear();

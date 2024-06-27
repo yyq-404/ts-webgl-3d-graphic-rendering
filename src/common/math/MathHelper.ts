@@ -1,6 +1,4 @@
 import {Vector3} from './vector/Vector3';
-import {Vector4} from './vector/Vector4';
-import {Vector2} from './vector/Vector2';
 import {Quaternion} from './Quaternion';
 import {Matrix4} from './matrix/Matrix4';
 import {MathAdapter} from './MathAdapter';
@@ -65,34 +63,6 @@ export class MathHelper {
      */
     public static clamp(x: number, min: number, max: number): number {
         return x < min ? min : x > max ? max : x;
-    }
-    
-    /**
-     * 三维向量从ID坐标转换为GL坐标
-     * @param v
-     * @param scale
-     */
-    public static convertVector3IDCoordinate2GLCoordinate(v: Vector3, scale: number = 10.0): void {
-        // opengl right = doom3 x
-        const f: number = v.y;
-        //opengl up = doom3 z
-        v.y = v.z;
-        //opengl forward = doom3 -y
-        v.z = -f;
-        if (!MathHelper.numberEquals(scale, 0) && !MathHelper.numberEquals(scale, 1.0)) {
-            v.x /= scale;
-            v.y /= scale;
-            v.z /= scale;
-        }
-    }
-    
-    /**
-     * 二维向量从ID坐标转换为GL坐标
-     * @param v
-     */
-    public static convertVector2IDCoordinate2GLCoordinate(v: Vector2): void {
-        v.x = 1.0 - v.x;
-        v.y = 1.0 - v.y;
     }
     
     /**
