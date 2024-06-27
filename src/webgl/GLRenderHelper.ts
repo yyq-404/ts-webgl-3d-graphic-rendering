@@ -1,4 +1,4 @@
-import {GLAttributeInfo, GLAttributeMap, GLProgramLinkHook, GLUniformInfo, GLUniformMap} from './GLTypes';
+import {GLAttributeInfo, GLAttributeMap, GLProgramLinkHook, GLUniformInfo, GLUniformMap} from './common/GLTypes';
 import {EGLShaderType} from './enum/EGLShaderType';
 
 /**

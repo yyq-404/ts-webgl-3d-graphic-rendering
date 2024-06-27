@@ -1,7 +1,7 @@
 /**
  * GL着色器常量定义。
  */
-export class CLShaderConstants {
+export class GLShaderConstants {
     /** 模型视图矩阵 */
     public static readonly MVMatrix: string = 'uMVMatrix';
     /** 模型矩阵 */

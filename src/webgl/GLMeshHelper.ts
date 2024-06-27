@@ -1,5 +1,5 @@
 import {GLStaticMesh} from './mesh/GLStaticMesh';
-import {GLAttributeBits} from './GLTypes';
+import {GLAttributeBits} from './common/GLTypes';
 import {GLAttributeHelper} from './GLAttributeHelper';
 import {Vector3} from '../common/math/vector/Vector3';
 import {Geometry} from '../common/geometry/Geometry';

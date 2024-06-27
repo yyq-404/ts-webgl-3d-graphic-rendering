@@ -1,4 +1,4 @@
-import {GLAttributeBits, GLAttributeOffsetMap} from './GLTypes';
+import {GLAttributeBits, GLAttributeOffsetMap} from './common/GLTypes';
 import {GLAttributeNormal} from './attribute/GLAttributeNormal';
 import {GLAttributeTangent} from './attribute/GLAttributeTangent';
 import {GLAttributeColor} from './attribute/GLAttributeColor';

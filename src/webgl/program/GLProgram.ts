@@ -6,9 +6,8 @@ import {Vector4} from '../../common/math/vector/Vector4';
 import {Matrix4} from '../../common/math/matrix/Matrix4';
 import {Quaternion} from '../../common/math/Quaternion';
 import {EGLShaderType} from '../enum/EGLShaderType';
-import {CLShaderConstants} from '../shader/CLShaderConstants';
-import {GLShaderSource} from '../shader/GLShaderSource';
-import {GLAttributeBits} from '../GLTypes';
+import {GLShaderConstants} from '../GLShaderConstants';
+import {GLAttributeBits} from '../common/GLTypes';
 import {IGLAttribute} from '../attribute/IGLAttribute';
 
 /**
@@ -309,7 +308,7 @@ export class GLProgram {
      * @param unit
      */
     public loadSampler(unit: number = 0): boolean {
-        return this.setSampler(CLShaderConstants.Sampler, unit);
+        return this.setSampler(GLShaderConstants.Sampler, unit);
     }
     
     /**
@@ -317,7 +316,7 @@ export class GLProgram {
      * @param mat
      */
     public loadModelViewMatrix(mat: Matrix4): boolean {
-        return this.setMatrix4(CLShaderConstants.MVMatrix, mat);
+        return this.setMatrix4(GLShaderConstants.MVMatrix, mat);
     }
     
     /**

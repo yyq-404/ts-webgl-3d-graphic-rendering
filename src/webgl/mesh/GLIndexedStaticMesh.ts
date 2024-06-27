@@ -1,6 +1,6 @@
 import {TypedArrayList} from "../../common/container/TypedArrayList";
 import {GLStaticMesh} from "./GLStaticMesh";
-import {GLAttributeBits} from '../GLTypes';
+import {GLAttributeBits} from '../common/GLTypes';
 
 /**
  * 索引化的静态网格

@@ -6,10 +6,10 @@ import {GLAttributeHelper} from '../GLAttributeHelper';
 import {GLMeshBase} from './GLMeshBase';
 import {GLProgram} from '../program/GLProgram';
 import {Matrix4} from '../../common/math/matrix/Matrix4';
-import {GLAttributeBits, GLAttributeOffsetMap} from '../GLTypes';
+import {GLAttributeBits, GLAttributeOffsetMap} from '../common/GLTypes';
 import {GLTexture} from '../texture/GLTexture';
 import {EGLVertexLayoutType} from '../enum/EGLVertexLayoutType';
-import {CLShaderConstants} from '../shader/CLShaderConstants';
+import {GLShaderConstants} from '../GLShaderConstants';
 import {IGLAttribute} from '../attribute/IGLAttribute';
 
 /**
@@ -232,7 +232,7 @@ export class GLMeshBuilder extends GLMeshBase {
         // 绑定GLProgram
         this._program.bind();
         // 载入MVPMatrix uniform变量
-        this._program.setMatrix4(CLShaderConstants.MVPMatrix, mvp);
+        this._program.setMatrix4(GLShaderConstants.MVPMatrix, mvp);
         if (this._texture) {
             this.webglContext.bindTexture(this.webglContext.TEXTURE_2D, this._texture);
             this._program.loadSampler();

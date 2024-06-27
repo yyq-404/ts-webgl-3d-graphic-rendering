@@ -1,5 +1,5 @@
 import {GLAttributeHelper} from '../GLAttributeHelper';
-import {GLAttributeBits} from '../GLTypes';
+import {GLAttributeBits} from '../common/GLTypes';
 
 /**
  * `GLMesh` 网格是渲染数据源，其中，`GLMeshBase` 是一个抽象基类，内部使用

@@ -8,7 +8,7 @@ import {GLTextureCache} from '../../webgl/texture/GLTextureCache';
 import {Vector3} from '../../common/math/vector/Vector3';
 import {HttpHelper} from '../../net/HttpHelper';
 import {CanvasKeyboardEvent} from '../../event/CanvasKeyboardEvent';
-import {CLShaderConstants} from '../../webgl/shader/CLShaderConstants';
+import {GLShaderConstants} from '../../webgl/GLShaderConstants';
 import {EAxisType} from '../../enum/EAxisType';
 import {WebGLApplication} from '../base/WebGLApplication';
 import {GLCoordinateSystemHelper} from '../../webgl/GLCoordinateSystemHelper';
@@ -208,7 +208,7 @@ export class RotatingCubeApplication extends WebGLApplication {
         // 合成modelViewProjection矩阵
         this._cubeMatrix = Matrix4.product(this.camera.viewProjectionMatrix, this.matStack.modelViewMatrix);
         // 将合成的矩阵给GLProgram对象
-        textureProgram.setMatrix4(CLShaderConstants.MVPMatrix, this._cubeMatrix);
+        textureProgram.setMatrix4(GLShaderConstants.MVPMatrix, this._cubeMatrix);
         // 使用当前绑定的texture和program绘制cubeVao对象
         this._cubeVAO.draw();
         // 使用辅助方法绘制坐标系

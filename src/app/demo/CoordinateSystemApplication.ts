@@ -1,4 +1,4 @@
-import {GLCoordinateSystem} from '../../webgl/GLCoordinateSystem';
+import {GLCoordinateSystem} from '../../webgl/common/GLCoordinateSystem';
 import {Matrix4} from '../../common/math/matrix/Matrix4';
 import {Vector3} from '../../common/math/vector/Vector3';
 import {CanvasKeyboardEvent} from '../../event/CanvasKeyboardEvent';

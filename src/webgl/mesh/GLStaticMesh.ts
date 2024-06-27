@@ -1,7 +1,7 @@
 import {Vector3} from '../../common/math/vector/Vector3';
 import {GLAttributeHelper} from '../GLAttributeHelper';
 import {GLMeshBase} from './GLMeshBase';
-import {GLAttributeBits, GLAttributeOffsetMap} from '../GLTypes';
+import {GLAttributeBits, GLAttributeOffsetMap} from '../common/GLTypes';
 
 /**
  * `GLStaticMesh` 类继承自 `GLMeshBase` ，并且持有两个 `WebGLBuffer` 对象，分别表示顶点缓冲区和索引缓冲区。
