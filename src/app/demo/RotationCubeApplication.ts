@@ -1,6 +1,6 @@
 import {GLProgram} from '../../webgl/program/GLProgram';
 import {GLTexture} from '../../webgl/texture/GLTexture';
-import {Cube} from '../../common/geometry/Cube';
+import {Cube} from '../../common/geometry/solid/Cube';
 import {GLStaticMesh} from '../../webgl/mesh/GLStaticMesh';
 import {Matrix4} from '../../common/math/matrix/Matrix4';
 import {GLProgramCache} from '../../webgl/program/GLProgramCache';

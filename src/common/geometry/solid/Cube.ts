@@ -1,6 +1,6 @@
-import {Vector3} from '../math/vector/Vector3';
-import {Vector2} from '../math/vector/Vector2';
-import {Geometry} from './Geometry';
+import {Vector3} from '../../math/vector/Vector3';
+import {Vector2} from '../../math/vector/Vector2';
+import {Geometry} from '../Geometry';
 
 /**
  * 立方体定义

@@ -2,8 +2,8 @@ import {GLStaticMesh} from './mesh/GLStaticMesh';
 import {GLAttributeBits} from './GLTypes';
 import {GLAttributeHelper} from './GLAttributeHelper';
 import {Vector3} from '../common/math/vector/Vector3';
-import {MathHelper} from '../common/math/MathHelper';
 import {Geometry} from '../common/geometry/Geometry';
+import {GeometryHelper} from '../common/geometry/GeometryHelper';
 
 /**
  * GL网格工具类
@@ -18,12 +18,8 @@ export class GLMeshHelper {
      */
     public static makeStaticMesh(webglContext: WebGLRenderingContext, geometry: Geometry, optionNormal: boolean = false, optionUV: boolean = true): GLStaticMesh {
         let bits: GLAttributeBits = GLMeshHelper.getAttribBits(geometry);
-        if (!optionNormal) {
-            bits &= ~GLAttributeHelper.NORMAL.BIT;
-        }
-        if (!optionUV) {
-            bits &= ~GLAttributeHelper.TEX_COORDINATE_0.BIT;
-        }
+        if (!optionNormal) bits &= ~GLAttributeHelper.NORMAL.BIT;
+        if (!optionUV) bits &= ~GLAttributeHelper.TEX_COORDINATE_0.BIT;
         const stride: number = GLAttributeHelper.getVertexByteStride(bits);
         const step: number = stride / Float32Array.BYTES_PER_ELEMENT;
         const arrayBuffer: ArrayBuffer = new ArrayBuffer(stride * geometry.positions.length);
@@ -75,7 +71,7 @@ export class GLMeshHelper {
      */
     private static buildBoundingBox(geometry: Geometry, min: Vector3, max: Vector3): void {
         for (let i: number = 0; i < geometry.positions.length; i++) {
-            MathHelper.boundBoxAddPoint(geometry.positions[i], min, max);
+            GeometryHelper.boundBoxAddPoint(geometry.positions[i], min, max);
         }
     }
     

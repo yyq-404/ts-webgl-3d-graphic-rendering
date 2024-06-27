@@ -119,7 +119,7 @@ export class GLCoordinateSystemHelper {
      */
     private static drawAxisText(context: CanvasRenderingContext2D, direction: Vector3, axis: EAxisType, mvp: Matrix4, viewport: Int32Array, canvasHeight: number, inverse: boolean = false): void {
         // 调用 MathHelper.obj2ScreenSpace这个核心函数，将局部坐标系标示的一个点变换到屏幕坐标系上
-        let pos: Vector3 | null = MathHelper.obj2GLViewportSpace(direction, mvp, viewport);
+        let pos: Vector3 | null = MathHelper.local2GLViewportSpace(direction, mvp, viewport);
         if (!pos) return;
         // 变换到屏幕坐标系，左手系，原点在左上角，x向右，y向下
         pos.y = canvasHeight - pos.y;
