@@ -68,37 +68,6 @@ export class MathHelper {
     }
     
     /**
-     * 本地坐标系转换到视图坐标系
-     * @param localPt
-     * @param mvp
-     * @param viewport
-     * @param viewportPt
-     */
-    public static local2GLViewportSpace(localPt: Vector3, mvp: Matrix4, viewport: Int32Array | Float32Array, viewportPt?: Vector3): Vector3 | null {
-        const v: Vector4 = new Vector4([localPt.x, localPt.y, localPt.z, 1.0]);
-        // 将顶点从local坐标系变换到投影坐标系，或裁剪坐标系
-        mvp.multiplyVector4(v, v);
-        if (v.w === 0.0) {
-            // 如果变换后的w为0，则返回false
-            return null;
-        }
-        if (!viewportPt) viewportPt = new Vector3();
-        // 将裁剪坐标系的点的x / y / z分量除以w，得到normalized坐标值[ -1 , 1 ]之间
-        v.x /= v.w;
-        v.y /= v.w;
-        v.z /= v.w;
-        // [-1 , 1]标示的点变换到视口坐标系
-        v.x = v.x * 0.5 + 0.5;
-        v.y = v.y * 0.5 + 0.5;
-        v.z = v.z * 0.5 + 0.5;
-        // 视口坐标系再变换到屏幕坐标系
-        viewportPt.x = v.x * viewport[2] + viewport[0];
-        viewportPt.y = v.y * viewport[3] + viewport[1];
-        viewportPt.z = v.z;
-        return viewportPt;
-    }
-    
-    /**
      * 三维向量从ID坐标转换为GL坐标
      * @param v
      * @param scale

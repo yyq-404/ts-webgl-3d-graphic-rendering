@@ -1,9 +1,8 @@
-import {EAxisType} from "../enum/EAxisType";
-import {GLMeshBuilder} from "./mesh/GLMeshBuilder";
-import {Matrix4} from "../common/math/matrix/Matrix4";
-import {Vector3} from "../common/math/vector/Vector3";
-import {Vector4} from "../common/math/vector/Vector4";
-import {MathHelper} from "../common/math/MathHelper";
+import {EAxisType} from '../enum/EAxisType';
+import {GLMeshBuilder} from './mesh/GLMeshBuilder';
+import {Matrix4} from '../common/math/matrix/Matrix4';
+import {Vector3} from '../common/math/vector/Vector3';
+import {Vector4} from '../common/math/vector/Vector4';
 
 
 /**
@@ -12,19 +11,38 @@ import {MathHelper} from "../common/math/MathHelper";
 export class GLCoordinateSystemHelper {
     /** 默认颜色 */
     public static defaultHitColor: Vector4 = new Vector4([1, 1, 1, 0]);
-
+    
     /**
-     * 绘制完全坐标系
-     * @param builder
+     * 本地坐标系转换到视图坐标系
+     * @param localPt
      * @param mvp
-     * @param length
-     * @param rotateAxis
-     * @param isLeftHardness
+     * @param viewport
+     * @param viewportPt
      */
-    public static drawFullAxis(builder: GLMeshBuilder, mvp: Matrix4, length: number = 1, rotateAxis: Vector3 | null = null, isLeftHardness: boolean = false): void {
-        GLCoordinateSystemHelper.drawAxis(builder, mvp, EAxisType.NONE, length, rotateAxis, true, isLeftHardness)
+    public static local2GLViewportSpace(localPt: Vector3, mvp: Matrix4, viewport: Int32Array | Float32Array, viewportPt?: Vector3): Vector3 | null {
+        const v: Vector4 = new Vector4([localPt.x, localPt.y, localPt.z, 1.0]);
+        // 将顶点从local坐标系变换到投影坐标系，或裁剪坐标系
+        mvp.multiplyVector4(v, v);
+        if (v.w === 0.0) {
+            // 如果变换后的w为0，则返回false
+            return null;
+        }
+        if (!viewportPt) viewportPt = new Vector3();
+        // 将裁剪坐标系的点的x / y / z分量除以w，得到normalized坐标值[ -1 , 1 ]之间
+        v.x /= v.w;
+        v.y /= v.w;
+        v.z /= v.w;
+        // [-1 , 1]标示的点变换到视口坐标系
+        v.x = v.x * 0.5 + 0.5;
+        v.y = v.y * 0.5 + 0.5;
+        v.z = v.z * 0.5 + 0.5;
+        // 视口坐标系再变换到屏幕坐标系
+        viewportPt.x = v.x * viewport[2] + viewport[0];
+        viewportPt.y = v.y * viewport[3] + viewport[1];
+        viewportPt.z = v.z;
+        return viewportPt;
     }
-
+    
     /**
      * 绘制轴向。
      * @param builder
@@ -43,13 +61,13 @@ export class GLCoordinateSystemHelper {
         builder.begin(builder.webglContext.LINES);
         // X轴
         let xAxisColor: Vector4 = hitAxis === EAxisType.X_AXIS ? GLCoordinateSystemHelper.defaultHitColor : new Vector4([1.0, 0.0, 0.0, 1.0]);
-        this.setAxisColor(builder, xAxisColor, new Vector3([length, 0.0, 0.0]), inverse)
+        this.setAxisColor(builder, xAxisColor, new Vector3([length, 0.0, 0.0]), inverse);
         // Y轴
         let yAxisColor: Vector4 = hitAxis === EAxisType.Y_AXIS ? GLCoordinateSystemHelper.defaultHitColor : new Vector4([0.0, 1.0, 0.0, 1.0]);
-        this.setAxisColor(builder, yAxisColor, new Vector3([0.0, length, 0.0]), inverse)
+        this.setAxisColor(builder, yAxisColor, new Vector3([0.0, length, 0.0]), inverse);
         // Z轴
         let zAxisColor: Vector4 = hitAxis === EAxisType.Z_AXIS ? GLCoordinateSystemHelper.defaultHitColor : new Vector4([0.0, 0.0, 1.0, 1.0]);
-        this.setAxisColor(builder, zAxisColor, new Vector3([0.0, 0.0, length]), inverse)
+        this.setAxisColor(builder, zAxisColor, new Vector3([0.0, 0.0, length]), inverse);
         if (rotateAxis) {
             // 如果要绘制旋转轴，则绘制出来
             const scale: Vector3 = rotateAxis.scale(length);
@@ -63,7 +81,7 @@ export class GLCoordinateSystemHelper {
         // 恢复开始帧缓存深度测试
         builder.webglContext.enable(builder.webglContext.DEPTH_TEST);
     }
-
+    
     /**
      * 绘制坐标轴文字
      * @param {CanvasRenderingContext2D} context
@@ -87,7 +105,7 @@ export class GLCoordinateSystemHelper {
             GLCoordinateSystemHelper.drawAxisText(context, Vector3.forward.negate(new Vector3()), EAxisType.Z_AXIS, mvp, viewport, canvasHeight, inverse);
         }
     }
-
+    
     /**
      * 设置坐标轴颜色。
      * @param {GLMeshBuilder} builder
@@ -98,14 +116,14 @@ export class GLCoordinateSystemHelper {
      */
     private static setAxisColor(builder: GLMeshBuilder, color: Vector4, pos: Vector3, inverse: boolean = false): void {
         builder.color(color.r, color.g, color.b).vertex(Vector3.zero.x, Vector3.zero.y, Vector3.zero.z);
-        builder.color(color.r, color.g, color.b).vertex(pos.x, pos.y, pos.z)
+        builder.color(color.r, color.g, color.b).vertex(pos.x, pos.y, pos.z);
         if (inverse) {
             builder.color(color.r, color.g, color.b).vertex(Vector3.zero.x, Vector3.zero.y, Vector3.zero.z);
-            let negatePos = pos.negate(new Vector3())
-            builder.color(color.r, color.g, color.b).vertex(negatePos.x, negatePos.y, negatePos.z)
+            let negatePos = pos.negate(new Vector3());
+            builder.color(color.r, color.g, color.b).vertex(negatePos.x, negatePos.y, negatePos.z);
         }
     }
-
+    
     /**
      * 绘制坐标轴文字。
      * @param {CanvasRenderingContext2D} context
@@ -119,7 +137,7 @@ export class GLCoordinateSystemHelper {
      */
     private static drawAxisText(context: CanvasRenderingContext2D, direction: Vector3, axis: EAxisType, mvp: Matrix4, viewport: Int32Array, canvasHeight: number, inverse: boolean = false): void {
         // 调用 MathHelper.obj2ScreenSpace这个核心函数，将局部坐标系标示的一个点变换到屏幕坐标系上
-        let pos: Vector3 | null = MathHelper.local2GLViewportSpace(direction, mvp, viewport);
+        let pos: Vector3 | null = GLCoordinateSystemHelper.local2GLViewportSpace(direction, mvp, viewport);
         if (!pos) return;
         // 变换到屏幕坐标系，左手系，原点在左上角，x向右，y向下
         pos.y = canvasHeight - pos.y;
@@ -144,7 +162,7 @@ export class GLCoordinateSystemHelper {
         // 恢复原来的渲染状态
         context.restore();
     }
-
+    
     /**
      * 绘制X轴文字。
      * @param {CanvasRenderingContext2D} context
@@ -153,22 +171,12 @@ export class GLCoordinateSystemHelper {
      * @private
      */
     private static drawXAxisText(context: CanvasRenderingContext2D, pos: Vector3, inverse: boolean): void {
-        // Y轴为top对齐
         context.textBaseline = 'top';
-        // 红色
         context.fillStyle = 'red';
-        if (inverse) {
-            context.textAlign = 'right';
-            // 进行文字绘制
-            context.fillText('-X', pos.x, pos.y);
-        } else {
-            // X轴居中对齐
-            context.textAlign = 'left';
-            // 进行文字绘制
-            context.fillText('X', pos.x, pos.y);
-        }
+        context.textAlign = inverse ? 'right' : 'left';
+        context.fillText(inverse ? '-X' : 'X', pos.x, pos.y);
     }
-
+    
     /**
      * 绘制Y轴文字。
      * @param {CanvasRenderingContext2D} context
@@ -177,23 +185,12 @@ export class GLCoordinateSystemHelper {
      * @private
      */
     private static drawYAxisText(context: CanvasRenderingContext2D, pos: Vector3, inverse: boolean): void {
-        // X轴居中对齐
         context.textAlign = 'center';
-        // 绿色
         context.fillStyle = 'green';
-        if (inverse) {
-            // -Y轴为top对齐
-            context.textBaseline = 'top';
-            // 行文字绘制
-            context.fillText('-Y', pos.x, pos.y);
-        } else {
-            // Y轴为bottom对齐
-            context.textBaseline = 'bottom';
-            // 进行文字绘制
-            context.fillText('Y', pos.x, pos.y);
-        }
+        context.textBaseline = inverse ? 'top' : 'bottom';
+        context.fillText(inverse ? '-Y' : 'Y', pos.x, pos.y);
     }
-
+    
     /**
      *绘制Z轴文字。
      * @param {CanvasRenderingContext2D} context
@@ -202,20 +199,9 @@ export class GLCoordinateSystemHelper {
      * @private
      */
     private static drawZAxisText(context: CanvasRenderingContext2D, pos: Vector3, inverse: boolean): void {
-        // 绿色
-        context.fillStyle = 'blue';
-        // Y轴为top对齐
         context.textBaseline = 'top';
-        if (inverse) {
-            // X轴居中对齐
-            context.textAlign = 'right';
-            // 进行文字绘制
-            context.fillText('-Z', pos.x, pos.y);
-        } else {
-            // X轴居中对齐
-            context.textAlign = 'left';
-            // 进行文字绘制
-            context.fillText('Z', pos.x, pos.y);
-        }
+        context.fillStyle = 'blue';
+        context.textAlign = inverse ? 'right' : 'left';
+        context.fillText(inverse ? '-Z' : 'Z', pos.x, pos.y);
     }
 }
