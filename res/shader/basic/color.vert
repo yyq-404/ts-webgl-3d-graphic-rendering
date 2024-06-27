@@ -1,7 +1,7 @@
 #ifdef GL_ES
-        precision highp float;
+    precision highp float;
 #endif
-    // 1．attribute顶点属性声明
+// 1．attribute顶点属性声明
 attribute vec3 aPosition;
 attribute vec4 aColor;
 // 2．uniform变量声明

@@ -37,36 +37,6 @@ type DrawParameters4s = {
  * 基础WEBGL应用。
  */
 export class BasicWebGLApplication extends BaseApplication {
-    /** 顶点着色器代码 */
-    public colorShader_vs: string = `
-    #ifdef GL_ES
-        precision highp float;
-    #endif
-    // 1．attribute顶点属性声明
-    attribute vec3 aPosition;
-    attribute vec4 aColor;
-    // 2．uniform变量声明
-    uniform mat4 uMVPMatrix;
-    // 3．varying变量声明
-    varying vec4 vColor;
-    // 4．顶点处理入口main函数
-    void main(void){
-       // 5．gl_Position为Vertex Shader内置varying变量，varying变量会被传递到Fragment Shader中
-       // 6．将坐标值从局部坐标系变换到裁剪坐标系
-       gl_Position = uMVPMatrix * vec4(aPosition,1.0);
-       // 7．将颜色属性传递到Fragment Shader中
-       vColor = aColor;
-    }`;
-    /** 片元着色器代码 */
-    public colorShader_fs: string = `
-    // 1．声明varying类型的变量vColor，该变量的数据类型和名称必须要和Vertex Shader中的数据类型和名称一致
-    varying lowp vec4 vColor;
-    // 2．同样需要一个main函数作为入口函数
-    void main(void){
-        // 3．内置了特殊变量：gl_FragColor，其数据类型为float
-        // 4．直接将vColor写入gl_FragColor变量中
-        gl_FragColor = vColor;
-    }`;
     /** gl全局变量信息 */
     private _uniformMap: GLUniformMap = {};
     /** gl属性信息 */
@@ -97,8 +67,8 @@ export class BasicWebGLApplication extends BaseApplication {
     private _isFourViewport: boolean = false;
     /** shader路径集合 */
     private readonly _shaderUrls: Map<EGLShaderType, string> = new Map<EGLShaderType, string>([
-        [EGLShaderType.VS_SHADER, './res/shader/basic/color.vert'],
-        [EGLShaderType.FS_SHADER, './res/shader/basic/color.frag']
+        [EGLShaderType.VS_SHADER, 'res/shader/basic/color.vert'],
+        [EGLShaderType.FS_SHADER, 'res/shader/basic/color.frag']
     ]);
     
     /**
@@ -297,16 +267,9 @@ export class BasicWebGLApplication extends BaseApplication {
         // 创建顶点着色器
         let vsShader = await this.createShaderAsync(EGLShaderType.VS_SHADER);
         if (!vsShader) throw new Error('Vertex shader create failed.');
-        // 编译顶点着色器
-        // GLRenderHelper.compileShader(this.gl, this.colorShader_vs, vsShader);
         // 创建片元着色器
         let fsShader = await this.createShaderAsync(EGLShaderType.FS_SHADER);
         if (!fsShader) throw new Error('Fragment shader create failed.');
-        // let fsShader = GLRenderHelper.createShader(this.gl, EGLShaderType.FS_SHADER);
-        // 编译片元着色器
-        // GLRenderHelper.compileShader(this.gl, this.colorShader_fs, fsShader);
-        // // 创建着色器链接程序
-        // this.program = GLRenderHelper.createProgram(this.gl);
         GLRenderHelper.linkProgram(this._webglContext, this.program, vsShader, fsShader, GLRenderHelper.printProgramActiveInfos, GLRenderHelper.printProgramActiveInfos);
         this._attributeMap = GLRenderHelper.getProgramActiveAttributes(this._webglContext, this.program);
         this._uniformMap = GLRenderHelper.getProgramActiveUniforms(this._webglContext, this.program);

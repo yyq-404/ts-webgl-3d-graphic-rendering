@@ -44,10 +44,6 @@ export class GLMeshBuilder extends GLMeshBase {
     private _buffers: { [key: string]: WebGLBuffer } = {};
     /** 要渲染的顶点数量  */
     private _vertexCount: number = 0;
-    /** 当前使用的`GLProgram`对象 */
-    private program: GLProgram;
-    /** 如果使用了纹理坐标，那么需要设置当前使用的纹理对象，否则将`texture`变量设置为`null` */
-    private texture: WebGLTexture | null;
     /** 渲染buffer数据 */
     private _ibo: WebGLBuffer | null = null;
     /** 索引数量 */
@@ -55,15 +51,15 @@ export class GLMeshBuilder extends GLMeshBase {
     
     /**
      * 构造
-     * @param gl
+     * @param webglContext
      * @param state
      * @param program
      * @param texture
      * @param layout
      */
-    public constructor(gl: WebGLRenderingContext, state: GLAttributeBits, program: GLProgram, texture: WebGLTexture | null = null, layout: EGLVertexLayoutType = EGLVertexLayoutType.INTERLEAVED) {
+    public constructor(webglContext: WebGLRenderingContext, state: GLAttributeBits, program: GLProgram | null = null, texture: WebGLTexture | null = null, layout: EGLVertexLayoutType = EGLVertexLayoutType.INTERLEAVED) {
         // 调用基类的构造方法
-        super(gl, state);
+        super(webglContext, state);
         // 根据attribBits，测试是否使用了下面几种类型的顶点属性格式
         this._hasColor = GLAttributeHelper.hasAttribute(this._attributesState, GLAttributeHelper.COLOR.BIT);
         this._hasTexCoordinate = GLAttributeHelper.hasAttribute(this._attributesState, GLAttributeHelper.TEX_COORDINATE_0.BIT);
@@ -72,8 +68,8 @@ export class GLMeshBuilder extends GLMeshBase {
         // 默认情况下，使用INTERLEAVED存储顶点
         this._layout = layout;
         // 设置当前使用的GLProgram和GLTexture2D对象
-        this.program = program;
-        this.texture = texture;
+        this._program = program;
+        this._texture = texture;
         // 先绑定VAO对象
         this.bind();
         // 初始化顶点属性
@@ -81,12 +77,42 @@ export class GLMeshBuilder extends GLMeshBase {
         this.unbind();
     }
     
+    /** 如果使用了纹理坐标，那么需要设置当前使用的纹理对象，否则将`texture`变量设置为`null` */
+    private _texture: WebGLTexture | null;
+    
+    /**
+     * 获取纹理
+     * @return {GLTexture}
+     */
+    public get texture(): WebGLTexture | null {
+        return this._texture;
+    }
+    
     /**
      * 设置纹理
-     * @param tex
+     * @param value
      */
-    public setTexture(tex: GLTexture): void {
-        this.texture = tex.texture;
+    public set texture(value: GLTexture) {
+        this._texture = value.texture;
+    }
+    
+    /** 当前使用的`GLProgram`对象 */
+    private _program: GLProgram | null;
+    
+    /**
+     * 获取链接器程序
+     * @return {GLProgram}
+     */
+    public get program(): GLProgram | null {
+        return this._program;
+    }
+    
+    /**
+     * 设置链接器程序
+     * @param {GLProgram} value
+     */
+    public set program(value: GLProgram) {
+        this._program = value;
     }
     
     /**
@@ -202,13 +228,14 @@ export class GLMeshBuilder extends GLMeshBase {
      * @param mvp
      */
     public end(mvp: Matrix4): void {
+        if (!this._program) return;
         // 绑定GLProgram
-        this.program.bind();
+        this._program.bind();
         // 载入MVPMatrix uniform变量
-        this.program.setMatrix4(CLShaderConstants.MVPMatrix, mvp);
-        if (this.texture) {
-            this.webglContext.bindTexture(this.webglContext.TEXTURE_2D, this.texture);
-            this.program.loadSampler();
+        this._program.setMatrix4(CLShaderConstants.MVPMatrix, mvp);
+        if (this._texture) {
+            this.webglContext.bindTexture(this.webglContext.TEXTURE_2D, this._texture);
+            this._program.loadSampler();
         }
         // 绑定VAO
         this.bind();
@@ -225,7 +252,7 @@ export class GLMeshBuilder extends GLMeshBase {
         // 解绑VAO
         this.unbind();
         // 解绑GLProgram
-        this.program.unbind();
+        this._program.unbind();
     }
     
     /**

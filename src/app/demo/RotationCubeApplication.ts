@@ -1,4 +1,3 @@
-import {GLProgram} from '../../webgl/program/GLProgram';
 import {GLTexture} from '../../webgl/texture/GLTexture';
 import {Cube} from '../../common/geometry/solid/Cube';
 import {GLStaticMesh} from '../../webgl/mesh/GLStaticMesh';
@@ -19,11 +18,6 @@ import {GLMeshHelper} from '../../webgl/GLMeshHelper';
  * 立方体旋转应用
  */
 export class RotatingCubeApplication extends WebGLApplication {
-    // GPU可编程管线对象，后面章节详解
-    /** 使用纹理GPU Program对象 */
-    private _colorProgram: GLProgram;
-    /** 使用颜色GPU Program对象 */
-    private _textureProgram: GLProgram;
     // 纹理对象
     /** 由于cube会进行周而复始的换纹理操作，因此需要记录当前纹理的索引号 */
     private _currentTexIdx: number;
@@ -75,10 +69,6 @@ export class RotatingCubeApplication extends WebGLApplication {
         this._textures = [];
         // 我们在WebGLApplication基类中内置了default的纹理贴图
         this._textures.push(GLTextureCache.instance.getMust('default'));
-        // 创建封装后的GLProgram类
-        // 我们在WebGLApplication基类中内置texture/color的GLProgram对象
-        this._textureProgram = GLProgramCache.instance.getMust('texture');
-        this._colorProgram = GLProgramCache.instance.getMust('color');
         // 创建cube的渲染数据
         // 对于三角形的渲染数据，我们使用GLMeshBuilder中立即模式绘制方式
         this._cube = new Cube(0.5, 0.5, 0.5);
@@ -207,8 +197,9 @@ export class RotatingCubeApplication extends WebGLApplication {
         if (texture) {
             texture.bind();
         }
-        this._textureProgram.bind();
-        this._textureProgram.loadSampler();
+        let textureProgram = GLProgramCache.instance.getMust('texture');
+        textureProgram.bind();
+        textureProgram.loadSampler();
         // 第一个渲染堆栈操作
         // 矩阵进栈
         this.matStack.pushMatrix();
@@ -217,7 +208,7 @@ export class RotatingCubeApplication extends WebGLApplication {
         // 合成modelViewProjection矩阵
         this._cubeMatrix = Matrix4.product(this.camera.viewProjectionMatrix, this.matStack.modelViewMatrix);
         // 将合成的矩阵给GLProgram对象
-        this._textureProgram.setMatrix4(CLShaderConstants.MVPMatrix, this._cubeMatrix);
+        textureProgram.setMatrix4(CLShaderConstants.MVPMatrix, this._cubeMatrix);
         // 使用当前绑定的texture和program绘制cubeVao对象
         this._cubeVAO.draw();
         // 使用辅助方法绘制坐标系
@@ -228,7 +219,7 @@ export class RotatingCubeApplication extends WebGLApplication {
         // 矩阵出栈
         this.matStack.popMatrix();
         // 解除绑定的texture和program
-        this._textureProgram.unbind();
+        textureProgram.unbind();
         if (texture) {
             texture.unbind();
         }
@@ -240,10 +231,11 @@ export class RotatingCubeApplication extends WebGLApplication {
      */
     private renderTriangle(): void {
         if (!this.webglContext) throw new Error('this.gl is not defined');
+        let colorProgram = GLProgramCache.instance.getMust('texture');
         // 禁止渲染三角形时启用背面剔除功能
         this.webglContext.disable(this.webglContext.CULL_FACE);
         // 由于三角形使用颜色+位置信息进行绘制，因此要绑定当前的GPU Program为colorProgram
-        this._colorProgram.bind();
+        colorProgram.bind();
         // 新产生一个矩阵
         this.matStack.pushMatrix();
         // 立方体绘制在Canvas的中心
@@ -266,7 +258,7 @@ export class RotatingCubeApplication extends WebGLApplication {
         this.builder.end(this._triangleMatrix);
         // 删除一个矩阵
         this.matStack.popMatrix();
-        this._colorProgram.unbind();
+        colorProgram.unbind();
         // 恢复背面剔除功能
         this.webglContext.enable(this.webglContext.CULL_FACE);
     }

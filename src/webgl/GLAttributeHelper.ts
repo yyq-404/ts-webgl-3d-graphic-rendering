@@ -52,6 +52,14 @@ export class GLAttributeHelper {
     }
     
     /**
+     * 获取顶点属性。
+     * @param webglContext
+     */
+    public static getMaxVertexAttributes(webglContext: WebGLRenderingContext): number {
+        return webglContext.getParameter(webglContext.MAX_VERTEX_ATTRIBS) as number;
+    }
+    
+    /**
      * 使用按位与（&）操作符来测试否是指定属性值
      * @param {GLAttributeBits} attributeBits
      * @param {number} attributeSate

@@ -9,6 +9,8 @@ import {GLTexture} from '../../webgl/texture/GLTexture';
 import {GLWorldMatrixStack} from '../../webgl/matrix/GLWorldMatrixStack';
 import {CameraComponent} from '../../component/CameraComponent';
 import {CanvasKeyboardEvent} from '../../event/CanvasKeyboardEvent';
+import {EGLShaderType} from '../../webgl/enum/EGLShaderType';
+import {HttpHelper} from '../../net/HttpHelper';
 
 /**
  * WebGL应用。
@@ -26,6 +28,13 @@ export class WebGLApplication extends BaseApplication {
     protected canvas2d: HTMLCanvasElement | null = null;
     /** 2D渲染环境 */
     protected context2d: CanvasRenderingContext2D | null = null;
+    /** shader路径集合 */
+    private readonly _shaderUrls: Map<string, string> = new Map<string, string>([
+        ['color.vert', 'res/shader/common/color/color.vert'],
+        ['color.frag', 'res/shader/common/color/color.frag'],
+        ['texture.vert', 'res/shader/common/texture/texture.vert'],
+        ['texture.frag', 'res/shader/common/texture/texture.frag']
+    ]);
     
     /**
      * 构造
@@ -52,19 +61,18 @@ export class WebGLApplication extends BaseApplication {
         this.isFlipYCoordinate = true;
         // 初始化时，创建default纹理
         GLTextureCache.instance.set('default', GLTexture.createDefaultTexture(this.webglContext));
-        // 初始化时，创建颜色和纹理Program
-        GLProgramCache.instance.set('color', GLProgram.createDefaultColorProgram(this.webglContext));
-        GLProgramCache.instance.set('texture', GLProgram.createDefaultTextureProgram(this.webglContext));
         // 初始化时，创建颜色GLMeshBuilder对象
-        this.builder = new GLMeshBuilder(this.webglContext, GLAttributeHelper.POSITION.BIT | GLAttributeHelper.COLOR.BIT, GLProgramCache.instance.getMust('color'));
+        this.builder = new GLMeshBuilder(this.webglContext, GLAttributeHelper.POSITION.BIT | GLAttributeHelper.COLOR.BIT);
     }
     
+    
     /**
-     * 获取顶点属性。
-     * @param webglContext
+     * 运行。
+     * @return {Promise<void>}
      */
-    public static getMaxVertexAttributes(webglContext: WebGLRenderingContext): number {
-        return webglContext.getParameter(webglContext.MAX_VERTEX_ATTRIBS) as number;
+    public override async runAsync(): Promise<void> {
+        await this.initAsync();
+        await super.runAsync();
     }
     
     /**
@@ -137,6 +145,47 @@ export class WebGLApplication extends BaseApplication {
         if (this.webglContext) {
             this.webglContext.clear(this.webglContext.COLOR_BUFFER_BIT | this.webglContext.DEPTH_BUFFER_BIT);
         }
+    }
+    
+    /**
+     * 初始化
+     * @return {Promise<void>}
+     * @private
+     */
+    private async initAsync(): Promise<void> {
+        if (!this.webglContext) throw new Error('this.webglContext is not defined');
+        // 加载颜色顶点着色器代码
+        let colorVertShader = await this.loadShaderSourceAsync(EGLShaderType.VS_SHADER, 'color.vert');
+        // 加载颜色片元着色器代码
+        let colorFragShader = await this.loadShaderSourceAsync(EGLShaderType.FS_SHADER, 'color.frag');
+        let defaultColorProgram = GLProgram.createDefaultProgram(this.webglContext, colorVertShader, colorFragShader);
+        // 创建颜色Program
+        GLProgramCache.instance.set('color', defaultColorProgram);
+        // 加载纹理顶点着色器代码
+        let textureVertShader = await this.loadShaderSourceAsync(EGLShaderType.VS_SHADER, 'texture.vert');
+        // 加载纹理片元着色器代码
+        let textureFragShader = await this.loadShaderSourceAsync(EGLShaderType.FS_SHADER, 'texture.frag');
+        let defaultTextureProgram = GLProgram.createDefaultProgram(this.webglContext, textureVertShader, textureFragShader, false);
+        // 创建纹理Program
+        GLProgramCache.instance.set('texture', defaultTextureProgram);
+        // 设置颜色GLMeshBuilder对象
+        this.builder.program = defaultColorProgram;
+    }
+    
+    /**
+     * 创建WebGL着色器。
+     * @param {EGLShaderType} type
+     * @param {string} name
+     * @return {Promise<WebGLShader | undefined>}
+     * @private
+     */
+    private async loadShaderSourceAsync(type: EGLShaderType, name: string): Promise<string | null> {
+        if (!this.webglContext) return null;
+        let shadeUrl = this._shaderUrls.get(name);
+        if (!shadeUrl) return null;
+        let shaderSource = await HttpHelper.loadTextFileAsync(shadeUrl);
+        if (!shaderSource) return null;
+        return await HttpHelper.loadTextFileAsync(shadeUrl);
     }
     
     /**
