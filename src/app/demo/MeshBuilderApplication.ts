@@ -131,7 +131,7 @@ export class MeshBuilderApplication extends WebGLApplication {
     }
     
     /**
-     * 使用纹理着色器渲染
+     * 使用纹理着色器进行绘制。
      * @private
      */
     private drawByMultiViewportsWithTextureShader(): void {
@@ -222,6 +222,10 @@ export class MeshBuilderApplication extends WebGLApplication {
         }
     }
     
+    /**
+     * 使用颜色着色器进行绘制。
+     * @private
+     */
     private drawByMatrixWithColorShader(): void {
         if (!this.webglContext) return;
         // 很重要，由于我们后续使用多视口渲染，因此必须要调用camera的setViewport方法
