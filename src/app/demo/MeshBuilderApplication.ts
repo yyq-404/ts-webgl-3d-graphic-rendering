@@ -53,7 +53,8 @@ export class MeshBuilderApplication extends WebGLApplication {
      * @param {HTMLCanvasElement} canvas
      */
     public constructor(canvas: HTMLCanvasElement) {
-        super(canvas);
+        // 调用基类构造函数
+        super(canvas, {preserveDrawingBuffer: false}, true);
         if (!this.webglContext) throw new Error('this.webglContext is undefined.');
         // 使用default纹理和着色器
         this._texture = GLTextureCache.instance.getMust('default');
@@ -74,7 +75,6 @@ export class MeshBuilderApplication extends WebGLApplication {
         // BUG
         // this.currentDrawMethod = this.drawByMultiViewportsWithTextureShader;
     }
-    
     
     /**
      * 运行
@@ -118,6 +118,8 @@ export class MeshBuilderApplication extends WebGLApplication {
         this._angle += 1;
         // 调用基类方法，这样就能让摄像机进行更新
         super.update(elapsedMsec, intervalSec);
+        if (!this.context2d) return;
+        this.context2d.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
     
     /**
@@ -137,11 +139,12 @@ export class MeshBuilderApplication extends WebGLApplication {
         // 第一步，设置viewport
         this.setViewport(this._coords[0]);
         // 第二步，设置viewport的背景色（可选，如果你不想使用default深灰色的背景色）
-        this.webglContext.clearColor(0.0, 0, 0, 1);
+        // this.webglContext.clearColor(0.0, 0, 0, 1);
         // 第三步，将viewport设置为第二步设置的背景色（可选，如果你不想使用default深灰色的背景色）
         this.webglContext.clear(this.webglContext.COLOR_BUFFER_BIT | this.webglContext.DEPTH_BUFFER_BIT);
-        this.matStack.pushMatrix();
+        // 在viewport0中绘制绕z轴旋转的三角形
         {
+            this.matStack.pushMatrix();
             this.matStack.rotate(this._angle, Vector3.forward);
             Matrix4.product(this.camera.viewProjectionMatrix, this.matStack.modelViewMatrix, Matrix4Adapter.m0);
             this._texBuilder0.begin(this.webglContext.TRIANGLES);
@@ -150,11 +153,13 @@ export class MeshBuilderApplication extends WebGLApplication {
             this._texBuilder0.texCoordinate(0.5, 0.5).vertex(0, 1, 0);
             this._texBuilder0.end(Matrix4Adapter.m0);
             this.matStack.popMatrix();
-            GLCoordinateSystemHelper.drawAxis(this._colorBuilder0, Matrix4Adapter.m0, EAxisType.NONE, 1.5);
+            this.drawCoordinateAxis(this._colorBuilder0, 1.5);
         }
-        this.setViewport(this._coords[1]);
-        this.matStack.pushMatrix();
+        
+        // 在viewport1中绘制绕z轴旋转的正方形
         {
+            this.setViewport(this._coords[1]);
+            this.matStack.pushMatrix();
             this._texBuilder1.begin(this.webglContext.TRIANGLE_FAN);
             this.matStack.rotate(-this._angle, Vector3.forward);
             Matrix4.product(this.camera.viewProjectionMatrix, this.matStack.modelViewMatrix, Matrix4Adapter.m0);
@@ -164,54 +169,56 @@ export class MeshBuilderApplication extends WebGLApplication {
             this._texBuilder1.texCoordinate(0, 1).vertex(-1, 0.5, 0);
             this._texBuilder1.end(Matrix4Adapter.m0);
             this.matStack.popMatrix();
-            GLCoordinateSystemHelper.drawAxis(this._colorBuilder0, Matrix4Adapter.m0, EAxisType.NONE, 1.5);
+            this.drawCoordinateAxis(this._colorBuilder0, 1.5);
         }
-
+        
         // 在viewport2中绘制绕y轴旋转、使用cubeTexCoords的立方体
-        this.setViewport(this._coords[2]);
-        this.matStack.pushMatrix();
         {
+            this.setViewport(this._coords[2]);
+            this.matStack.pushMatrix();
             this.matStack.rotate(this._angle, Vector3.up);
             Matrix4.product(this.camera.viewProjectionMatrix, this.matStack.modelViewMatrix, Matrix4Adapter.m0);
             DrawHelper.drawTextureCubeBox(this._texBuilder0, Matrix4Adapter.m0, 0.5, this.cubeTexCoords);
             this.matStack.popMatrix();
-            GLCoordinateSystemHelper.drawAxis(this._colorBuilder0, Matrix4Adapter.m0, EAxisType.NONE, 1.5);
+            this.drawCoordinateAxis(this._colorBuilder0, 1.5);
         }
-
+        
         // 在viewport3中绘制绕x轴旋转、使用cubeTexCoords的立方体
-        this.setViewport(this._coords[3]);
-        this.webglContext.clearColor(1.0, 1, 1, 1);
-        this.webglContext.clear(this.webglContext.COLOR_BUFFER_BIT | this.webglContext.DEPTH_BUFFER_BIT);
-        this.matStack.pushMatrix();
         {
+            this.setViewport(this._coords[3]);
+            // this.webglContext.clearColor(1.0, 1, 1, 1);
+            // this.webglContext.clear(this.webglContext.COLOR_BUFFER_BIT | this.webglContext.DEPTH_BUFFER_BIT);
+            this.matStack.pushMatrix();
             this.matStack.rotate(this._angle, Vector3.right);
             Matrix4.product(this.camera.viewProjectionMatrix, this.matStack.modelViewMatrix, Matrix4Adapter.m0);
             DrawHelper.drawTextureCubeBox(this._texBuilder1, Matrix4Adapter.m0, 0.5, this.cubeTexCoords);
             this.matStack.popMatrix();
-            GLCoordinateSystemHelper.drawAxis(this._colorBuilder0, Matrix4Adapter.m0, EAxisType.NONE, 1.5);
+            this.drawCoordinateAxis(this._colorBuilder0, 1.5);
         }
-
+        
         // 在viewport4中绘制绕z轴旋转、使用cubeTexCoords的立方体
-        this.setViewport(this._coords[4]);
-        this.webglContext.clearColor(0.0, 0, 0, 1);
-        this.webglContext.clear(this.webglContext.COLOR_BUFFER_BIT | this.webglContext.DEPTH_BUFFER_BIT);
-        this.matStack.pushMatrix();
         {
+            this.setViewport(this._coords[4]);
+            // this.webglContext.clearColor(0.0, 0, 0, 1);
+            // this.webglContext.clear(this.webglContext.COLOR_BUFFER_BIT | this.webglContext.DEPTH_BUFFER_BIT);
+            this.matStack.pushMatrix();
             this.matStack.rotate(this._angle, Vector3.forward);
             Matrix4.product(this.camera.viewProjectionMatrix, this.matStack.modelViewMatrix, Matrix4Adapter.m0);
             DrawHelper.drawTextureCubeBox(this._texBuilder0, Matrix4Adapter.m0, 0.5, this.cubeTexCoords);
             this.matStack.popMatrix();
             GLCoordinateSystemHelper.drawAxis(this._colorBuilder0, Matrix4Adapter.m0, EAxisType.NONE, 1.5);
+            this.drawCoordinateAxis(this._colorBuilder0, 1.5);
         }
         // 在viewport5中绘制绕[1, 1, 1]轴旋转、使用默认贴图坐标的立方体
-        this.setViewport(this._coords[5]);
-        this.matStack.pushMatrix();
         {
+            this.setViewport(this._coords[5]);
+            this.matStack.pushMatrix();
             this.matStack.rotate(this._angle, new Vector3([1, 1, 1]).normalize());
             Matrix4.product(this.camera.viewProjectionMatrix, this.matStack.modelViewMatrix, Matrix4Adapter.m0);
-            DrawHelper.drawTextureCubeBox(this._texBuilder0, Matrix4Adapter.m0, 0.8);
+            DrawHelper.drawTextureCubeBox(this._texBuilder0, Matrix4Adapter.m0, 0.5);
             this.matStack.popMatrix();
             GLCoordinateSystemHelper.drawAxis(this._colorBuilder0, Matrix4Adapter.m0, EAxisType.NONE, 1.5);
+            this.drawCoordinateAxis(this._colorBuilder0, 1.5);
         }
     }
     
@@ -245,12 +252,13 @@ export class MeshBuilderApplication extends WebGLApplication {
         this._colorBuilder0.end(Matrix4Adapter.m0);
         // 矩阵出堆栈
         this.matStack.popMatrix();
-        GLCoordinateSystemHelper.drawAxis(this._colorBuilder0, Matrix4Adapter.m0, EAxisType.NONE, 0.8);
+        this.drawCoordinateAxis(this._colorBuilder0, 0.8);
         
         // EGLVertexLayoutType.SEQUENCED 顶点存储格式绘制绘制绕y轴旋转的四边形
         // 矩阵堆栈进栈
         this.matStack.pushMatrix();
-        this.matStack.rotate(this._angle, Vector3.up); // 在窗口中心绘制，因此不需要平移，只需要旋转
+        // 在窗口中心绘制，因此不需要平移，只需要旋转
+        this.matStack.rotate(this._angle, Vector3.up);
         // 合成model-view-projection矩阵，存储到Matrix4的静态变量中，减少内存的重新分配
         Matrix4.product(this.camera.viewProjectionMatrix, this.matStack.modelViewMatrix, Matrix4Adapter.m0);
         // 注意这里我们使用TRIANGLE_FAN图元而不是TRIANGLES图元绘制
@@ -267,7 +275,7 @@ export class MeshBuilderApplication extends WebGLApplication {
         this._colorBuilder1.end(Matrix4Adapter.m0);
         // 矩阵出堆栈
         this.matStack.popMatrix();
-        GLCoordinateSystemHelper.drawAxis(this._colorBuilder1, Matrix4Adapter.m0, EAxisType.NONE, 0.8);
+        this.drawCoordinateAxis(this._colorBuilder1, 0.8);
         
         // EGLVertexLayoutType.SEPARATED 顶点存储格式绘制绘制绕[1, 1, 1]轴转转的立方体
         // 矩阵堆栈进栈
@@ -282,7 +290,7 @@ export class MeshBuilderApplication extends WebGLApplication {
         DrawHelper.drawWireFrameCubeBox(this._colorBuilder2, Matrix4Adapter.m0, 0.2);
         // 矩阵出堆栈
         this.matStack.popMatrix();
-        GLCoordinateSystemHelper.drawAxis(this._colorBuilder2, Matrix4Adapter.m0, EAxisType.NONE, 0.8);
+        this.drawCoordinateAxis(this._colorBuilder2, 0.8);
         // 恢复三角形背面剔除功能
         this.webglContext.enable(this.webglContext.CULL_FACE);
     }
@@ -300,5 +308,17 @@ export class MeshBuilderApplication extends WebGLApplication {
         // 因此可以进行视口大小的裁剪操作了，超出视口部分的内容都被裁剪掉了!!
         this.camera.setViewport(glCoordinateSystem.viewport[0], glCoordinateSystem.viewport[1], glCoordinateSystem.viewport[2], glCoordinateSystem.viewport[3]
         );
+    }
+    
+    /**
+     * 绘制坐标轴
+     * @private
+     * @param builder
+     * @param length
+     */
+    private drawCoordinateAxis(builder: GLMeshBuilder, length: number = 1.0): void {
+        GLCoordinateSystemHelper.drawAxis(builder, Matrix4Adapter.m0, EAxisType.NONE, length);
+        if (!this.context2d) return;
+        GLCoordinateSystemHelper.drawText(this.context2d, Matrix4Adapter.m0, this.camera.getViewport(), this.canvas.height, false, length);
     }
 }

@@ -119,17 +119,18 @@ export class GLCoordinateSystemHelper {
      * @param {Int32Array} viewport
      * @param {number} canvasHeight
      * @param {boolean} inverse
+     * @param {number} length
      * @param {boolean} isLeftHardness
      * @private
      */
-    public static drawText(context: CanvasRenderingContext2D, mvp: Matrix4, viewport: Int32Array, canvasHeight: number, inverse: boolean = false, isLeftHardness: boolean = false): void {
-        GLCoordinateSystemHelper.drawAxisText(context, Vector3.right, EAxisType.X_AXIS, mvp, viewport, canvasHeight);
-        GLCoordinateSystemHelper.drawAxisText(context, Vector3.up, EAxisType.Y_AXIS, mvp, viewport, canvasHeight);
-        GLCoordinateSystemHelper.drawAxisText(context, isLeftHardness ? Vector3.forward.negate(new Vector3()) : Vector3.forward, EAxisType.Z_AXIS, mvp, viewport, canvasHeight);
+    public static drawText(context: CanvasRenderingContext2D, mvp: Matrix4, viewport: Int32Array, canvasHeight: number, inverse: boolean = false, length: number = 1.0, isLeftHardness: boolean = false): void {
+        GLCoordinateSystemHelper.drawAxisText(context, Vector3.right.copy(new Vector3()).scale(length), EAxisType.X_AXIS, mvp, viewport, canvasHeight);
+        GLCoordinateSystemHelper.drawAxisText(context, Vector3.up.copy(new Vector3()).scale(length), EAxisType.Y_AXIS, mvp, viewport, canvasHeight);
+        GLCoordinateSystemHelper.drawAxisText(context, isLeftHardness ? Vector3.forward.negate(new Vector3()).scale(length) : Vector3.forward.copy(new Vector3()).scale(length), EAxisType.Z_AXIS, mvp, viewport, canvasHeight);
         if (!inverse) return;
-        GLCoordinateSystemHelper.drawAxisText(context, Vector3.right.negate(new Vector3()), EAxisType.X_AXIS, mvp, viewport, canvasHeight, true);
-        GLCoordinateSystemHelper.drawAxisText(context, Vector3.up.negate(new Vector3()), EAxisType.Y_AXIS, mvp, viewport, canvasHeight, true);
-        GLCoordinateSystemHelper.drawAxisText(context, isLeftHardness ? Vector3.forward : Vector3.forward.negate(new Vector3()), EAxisType.Z_AXIS, mvp, viewport, canvasHeight, true);
+        GLCoordinateSystemHelper.drawAxisText(context, Vector3.right.negate(new Vector3()).scale(length), EAxisType.X_AXIS, mvp, viewport, canvasHeight, true);
+        GLCoordinateSystemHelper.drawAxisText(context, Vector3.up.negate(new Vector3()).scale(length), EAxisType.Y_AXIS, mvp, viewport, canvasHeight, true);
+        GLCoordinateSystemHelper.drawAxisText(context, isLeftHardness ? Vector3.forward.copy(new Vector3()).scale(length) : Vector3.forward.negate(new Vector3()).scale(length), EAxisType.Z_AXIS, mvp, viewport, canvasHeight, true);
     }
     
     /**
