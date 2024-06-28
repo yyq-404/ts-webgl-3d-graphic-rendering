@@ -38,39 +38,30 @@ export class DrawHelper {
      * ```
      */
     public static drawBoundBox(builder: GLMeshBuilder, mvp: Matrix4, min: Vector3, max: Vector3, color: Vector4 = Vector4Adapter.red): void {
+        let vertexes = [
+            new Vector3([min.x, min.y, max.z]), // 0   - - +
+            new Vector3([min.x, max.y, max.z]), // 1   - + +
+            new Vector3([min.x, min.y, min.z]), // 2   - - -
+            new Vector3([min.x, max.y, min.z]), // 3   - + -
+            new Vector3([max.x, min.y, max.z]), // 4   + - +
+            new Vector3([max.x, max.y, max.z]), // 5   + + +
+            new Vector3([max.x, min.y, min.z]), // 6   + - -
+            new Vector3([max.x, max.y, min.z]) // 7   + + -
+        ];
         // 使用LINE_LOOP绘制底面，注意顶点顺序，逆时针方向，根据右手螺旋定则可知，法线朝外
         // 使用的是LINE_LOOP图元绘制模式
         builder.begin(builder.webglContext.LINE_LOOP);
-        {
-            builder.color(color.r, color.g, color.b).vertex(min.x, min.y, min.z); // 2   - - -
-            builder.color(color.r, color.g, color.b).vertex(min.x, min.y, max.z); // 0   - - +
-            builder.color(color.r, color.g, color.b).vertex(max.x, min.y, max.z); // 4   + - +
-            builder.color(color.r, color.g, color.b).vertex(max.x, min.y, min.z); // 6   + - -
-        }
+        [vertexes[2], vertexes[0], vertexes[4], vertexes[6]].forEach((pos) => builder.color(color.r, color.g, color.b).vertex(pos.x, pos.y, pos.z));
         builder.end(mvp);
         // 使用LINE_LOOP绘制顶面，注意顶点顺序，逆时针方向，根据右手螺旋定则可知，法线朝外
         // 使用的是LINE_LOOP图元绘制模式
         builder.begin(builder.webglContext.LINE_LOOP);
-        {
-            builder.color(color.r, color.g, color.b).vertex(min.x, max.y, min.z); // 3   - + -
-            builder.color(color.r, color.g, color.b).vertex(max.x, max.y, min.z); // 7   + + -
-            builder.color(color.r, color.g, color.b).vertex(max.x, max.y, max.z); // 5   + + +
-            builder.color(color.r, color.g, color.b).vertex(min.x, max.y, max.z); // 1   - + +
-        }
+        [vertexes[3], vertexes[7], vertexes[5], vertexes[1]].forEach((pos) => builder.color(color.r, color.g, color.b).vertex(pos.x, pos.y, pos.z));
         builder.end(mvp);
         // 使用LINES绘制
         // 使用的是LINES图元绘制模式
         builder.begin(builder.webglContext.LINES);
-        {
-            builder.color(color.r, color.g, color.b).vertex(min.x, min.y, min.z); // 2   - - -
-            builder.color(color.r, color.g, color.b).vertex(min.x, max.y, min.z); // 3   - + -
-            builder.color(color.r, color.g, color.b).vertex(min.x, min.y, max.z); // 0   - - +
-            builder.color(color.r, color.g, color.b).vertex(min.x, max.y, max.z); // 1   - + +
-            builder.color(color.r, color.g, color.b).vertex(max.x, min.y, max.z); // 4   + - +
-            builder.color(color.r, color.g, color.b).vertex(max.x, max.y, max.z); // 5   + + +
-            builder.color(color.r, color.g, color.b).vertex(max.x, min.y, min.z); // 6   + - -
-            builder.color(color.r, color.g, color.b).vertex(max.x, max.y, min.z); // 7   + + -
-        }
+        [vertexes[2], vertexes[3], vertexes[0], vertexes[1], vertexes[4], vertexes[5], vertexes[6], vertexes[7]].forEach((pos) => builder.color(color.r, color.g, color.b).vertex(pos.x, pos.y, pos.z));
         builder.end(mvp);
     }
     
@@ -101,47 +92,32 @@ export class DrawHelper {
                                          ...[0, 0, 1, 0, 1, 1, 0, 1] // 下面
                                      ]
     ): void {
-        // 前面
-        builder.begin(builder.webglContext.TRIANGLE_FAN);
-        builder.texCoordinate(textureCoordinate[0], textureCoordinate[1]).vertex(-halfLen, -halfLen, halfLen); // 0   - - +
-        builder.texCoordinate(textureCoordinate[2], textureCoordinate[3]).vertex(halfLen, -halfLen, halfLen); // 4   + - +
-        builder.texCoordinate(textureCoordinate[4], textureCoordinate[5]).vertex(halfLen, halfLen, halfLen); // 5   + + +
-        builder.texCoordinate(textureCoordinate[6], textureCoordinate[7]).vertex(-halfLen, halfLen, halfLen); // 1   - + +
-        builder.end(mvp);
-        // 右面
-        builder.begin(builder.webglContext.TRIANGLE_FAN);
-        builder.texCoordinate(textureCoordinate[8], textureCoordinate[9]).vertex(halfLen, -halfLen, halfLen); // 4   + - +
-        builder.texCoordinate(textureCoordinate[10], textureCoordinate[11]).vertex(halfLen, -halfLen, -halfLen); // 6   + - -
-        builder.texCoordinate(textureCoordinate[12], textureCoordinate[13]).vertex(halfLen, halfLen, -halfLen); // 7   + + -
-        builder.texCoordinate(textureCoordinate[14], textureCoordinate[15]).vertex(halfLen, halfLen, halfLen); // 5   + + +
-        builder.end(mvp);
-        // 后面
-        builder.begin(builder.webglContext.TRIANGLE_FAN);
-        builder.texCoordinate(textureCoordinate[16], textureCoordinate[17]).vertex(halfLen, -halfLen, -halfLen); // 6   + - -
-        builder.texCoordinate(textureCoordinate[18], textureCoordinate[19]).vertex(-halfLen, -halfLen, -halfLen); // 2   - - -
-        builder.texCoordinate(textureCoordinate[20], textureCoordinate[21]).vertex(-halfLen, halfLen, -halfLen); // 3   - + -
-        builder.texCoordinate(textureCoordinate[22], textureCoordinate[23]).vertex(halfLen, halfLen, -halfLen); // 7   + + -
-        builder.end(mvp);
-        // 左面
-        builder.begin(builder.webglContext.TRIANGLE_FAN);
-        builder.texCoordinate(textureCoordinate[24], textureCoordinate[25]).vertex(-halfLen, -halfLen, -halfLen); // 2   - - -
-        builder.texCoordinate(textureCoordinate[26], textureCoordinate[27]).vertex(-halfLen, -halfLen, halfLen); // 0   - - +
-        builder.texCoordinate(textureCoordinate[28], textureCoordinate[29]).vertex(-halfLen, halfLen, halfLen); // 1   - + +
-        builder.texCoordinate(textureCoordinate[30], textureCoordinate[31]).vertex(-halfLen, halfLen, -halfLen); // 3   - + -
-        builder.end(mvp);
-        // 上面
-        builder.begin(builder.webglContext.TRIANGLE_FAN);
-        builder.texCoordinate(textureCoordinate[32], textureCoordinate[33]).vertex(-halfLen, halfLen, halfLen); // 1   - + +
-        builder.texCoordinate(textureCoordinate[34], textureCoordinate[35]).vertex(halfLen, halfLen, halfLen); // 5   + + +
-        builder.texCoordinate(textureCoordinate[36], textureCoordinate[37]).vertex(halfLen, halfLen, -halfLen); // 7   + + -
-        builder.texCoordinate(textureCoordinate[38], textureCoordinate[39]).vertex(-halfLen, halfLen, -halfLen); // 3   - + -
-        builder.end(mvp);
-        // 下面
-        builder.begin(builder.webglContext.TRIANGLE_FAN);
-        builder.texCoordinate(textureCoordinate[40], textureCoordinate[41]).vertex(-halfLen, -halfLen, halfLen); // 0   - - +
-        builder.texCoordinate(textureCoordinate[42], textureCoordinate[43]).vertex(-halfLen, -halfLen, -halfLen); // 2   - - -
-        builder.texCoordinate(textureCoordinate[44], textureCoordinate[45]).vertex(halfLen, -halfLen, -halfLen); // 6   + - -
-        builder.texCoordinate(textureCoordinate[46], textureCoordinate[47]).vertex(halfLen, -halfLen, halfLen); // 4   + - +
-        builder.end(mvp);
+        let vertexes = [
+            new Vector3([-halfLen, -halfLen, halfLen]), // 0   - - +
+            new Vector3([-halfLen, halfLen, halfLen]), // 1   - + +
+            new Vector3([-halfLen, -halfLen, -halfLen]), // 2   - - -
+            new Vector3([-halfLen, halfLen, -halfLen]), // 3   - + -
+            new Vector3([halfLen, -halfLen, halfLen]), // 4   + - +
+            new Vector3([halfLen, halfLen, halfLen]), // 5   + + +
+            new Vector3([halfLen, -halfLen, -halfLen]), // 6   + - -
+            new Vector3([halfLen, halfLen, -halfLen]) // 7   + + -
+        ];
+        let surfaces = [
+            [vertexes[0], vertexes[4], vertexes[5], vertexes[1]], // 前面
+            [vertexes[4], vertexes[6], vertexes[7], vertexes[5]], // 右面
+            [vertexes[6], vertexes[2], vertexes[3], vertexes[7]], // 后面
+            [vertexes[2], vertexes[0], vertexes[1], vertexes[3]], // 左面
+            [vertexes[1], vertexes[5], vertexes[7], vertexes[3]], // 上面
+            [vertexes[0], vertexes[2], vertexes[6], vertexes[4]] // 下面
+        ];
+        surfaces.forEach((vertexes: Vector3[], surfaceIndex: number) => {
+            builder.begin(builder.webglContext.TRIANGLE_FAN);
+            vertexes.forEach((vertex: Vector3, vertexIndex: number) => {
+                let uIndex = vertexIndex * 2 + surfaceIndex * 8;
+                let vIndex = uIndex + 1;
+                builder.texCoordinate(textureCoordinate[uIndex], textureCoordinate[vIndex]).vertex(vertex.x, vertex.y, vertex.z);
+            });
+            builder.end(mvp);
+        });
     }
 }
