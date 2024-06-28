@@ -127,7 +127,6 @@ export class WebGLApplication extends BaseApplication {
      */
     public override dispose(): void {
         this.matStack.clear();
-        // GLRenderHelper.triggerContextLostEvent(this.gl);
         this.camera.setViewport(0, 0, this.canvas.width, this.canvas.height);
         this.clearBuffer();
         GLProgramCache.instance.clear();
@@ -153,7 +152,7 @@ export class WebGLApplication extends BaseApplication {
      * @return {Promise<void>}
      * @private
      */
-    private async initAsync(): Promise<void> {
+    protected async initAsync(): Promise<void> {
         if (!this.webglContext) throw new Error('this.webglContext is not defined');
         // 加载颜色顶点着色器代码
         let colorVertShader = await this.loadShaderSourceAsync(EGLShaderType.VS_SHADER, 'color.vert');

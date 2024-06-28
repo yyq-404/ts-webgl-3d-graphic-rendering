@@ -21,9 +21,9 @@ export class BaseApplication implements EventListenerObject, IBaseApplication, I
     /** 是否支持鼠标移动 */
     protected isSupportMouseMove: boolean = false;
     /** 标记当前鼠标是否按下, 目的是提供 `mousedrag` 事件 */
-    protected _isMouseDown: boolean = false;
+    protected isMouseDown: boolean = false;
     /** 标记当前鼠标右键是否按下, 目的是提供 `mousedrag` 事件 */
-    protected _isRightMouseDown: boolean = false;
+    protected isRightMouseDown: boolean = false;
     /** 标记当前 `Application` 是否进入不间断的循环状态 */
     protected _start: boolean = false;
     /** `window.requestAnimationFrame()` 返回的大于0的id号,可以使用 `cancelAnimationFrame(this ._requestId)` 来取消动画循环 */
@@ -39,7 +39,7 @@ export class BaseApplication implements EventListenerObject, IBaseApplication, I
      */
     public constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas;
-        this._isMouseDown = false;
+        this.isMouseDown = false;
         this.isSupportMouseMove = false;
         this.frameCallback = null;
         document.oncontextmenu = () => false;
@@ -259,16 +259,16 @@ export class BaseApplication implements EventListenerObject, IBaseApplication, I
         if (event.type === 'mousedown') {
             type = ECanvasInputEventType.MOUSE_DOWN;
             if (event.button == 2) {
-                this._isRightMouseDown = true;
+                this.isRightMouseDown = true;
             }
         } else if (event.type === 'mouseup') {
             type = ECanvasInputEventType.MOUSE_UP;
             if (event.button == 2) {
-                this._isRightMouseDown = false;
+                this.isRightMouseDown = false;
             }
         }
         if (event.type === 'mousemove') {
-            if (this._isMouseDown && this._isRightMouseDown) {
+            if (this.isMouseDown && this.isRightMouseDown) {
                 button = 2;
                 type = ECanvasInputEventType.MOUSE_DRAG;
             }
@@ -286,7 +286,7 @@ export class BaseApplication implements EventListenerObject, IBaseApplication, I
         let mouseEvent: CanvasMouseEvent = this.toCanvasMouseEvent(event);
         switch (event.type) {
             case 'mousedown':
-                this._isMouseDown = true;
+                this.isMouseDown = true;
                 this.onMouseDown(mouseEvent);
                 break;
             case 'mouseup':
@@ -296,7 +296,7 @@ export class BaseApplication implements EventListenerObject, IBaseApplication, I
                 if (this.isSupportMouseMove) {
                     this.onMouseMove(mouseEvent);
                 }
-                if (this._isMouseDown) {
+                if (this.isMouseDown) {
                     this.onMouseDrag(mouseEvent);
                 }
                 break;

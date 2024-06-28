@@ -390,7 +390,7 @@ export class GLMeshBuilder extends GLMeshBase {
         if (!has) return;
         let list = this._lists[attribute.NAME];
         this.webglContext.bufferSubData(this.webglContext.ARRAY_BUFFER, offsets[attribute.NAME], list.subArray());
-        
+        list.clear();
     }
     
     
@@ -406,6 +406,7 @@ export class GLMeshBuilder extends GLMeshBase {
         let list: TypedArrayList<Float32Array> = this._lists[attribute.NAME];
         this.webglContext.bindBuffer(this.webglContext.ARRAY_BUFFER, buffer);
         this.webglContext.bufferData(this.webglContext.ARRAY_BUFFER, list.subArray(), this.webglContext.DYNAMIC_DRAW);
+        list.clear();
     }
     
     /**
@@ -547,7 +548,7 @@ export class GLMeshBuilder extends GLMeshBase {
         if (!indexBuffer) throw new Error('WebGLBuffer创建不成功!');
         this._buffers[attribute.NAME] = indexBuffer;
         this.webglContext.bindBuffer(this.webglContext.ARRAY_BUFFER, indexBuffer);
-        this.webglContext.vertexAttribPointer(attribute.BIT, size, this.webglContext.FLOAT, false, 0, 0);
-        this.webglContext.enableVertexAttribArray(attribute.BIT);
+        this.webglContext.vertexAttribPointer(attribute.LOCATION, size, this.webglContext.FLOAT, false, 0, 0);
+        this.webglContext.enableVertexAttribArray(attribute.LOCATION);
     }
 }

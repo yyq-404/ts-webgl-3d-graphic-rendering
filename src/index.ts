@@ -2,6 +2,7 @@ import {BaseApplication} from './app/base/BaseApplication';
 import {RotatingCubeApplication} from './app/demo/RotationCubeApplication';
 import {BasicWebGLApplication} from './app/demo/BasicWebGLApplication';
 import {CoordinateSystemApplication} from './app/demo/CoordinateSystemApplication';
+import {MeshBuilderApplication} from './app/demo/MeshBuilderApplication';
 
 /** 获取用于获得webgl上下文对象的HTMLCanvasElement元素 */
 let canvas: HTMLCanvasElement | null = document.getElementById('webgl') as HTMLCanvasElement;
@@ -10,7 +11,8 @@ let canvas: HTMLCanvasElement | null = document.getElementById('webgl') as HTMLC
 const apps = {
     '1: RotatingCube': RotatingCubeApplication,
     '2: BasicWebGL': BasicWebGLApplication,
-    '3: CoordinateSystem': CoordinateSystemApplication
+    '3: CoordinateSystem': CoordinateSystemApplication,
+    '4: MeshBuilder': MeshBuilderApplication
 };
 
 /** 当前正在运行的App */
