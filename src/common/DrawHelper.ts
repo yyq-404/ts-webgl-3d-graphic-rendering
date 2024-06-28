@@ -8,6 +8,15 @@ import {Vector4Adapter} from './math/MathAdapter';
  *绘制助手
  */
 export class DrawHelper {
+    /**  默认盒子纹理坐标 */
+    private static readonly _defaultTextureCoordinates: number[] = [
+        ...[0, 0, 1, 0, 1, 1, 0, 1], // 前面
+        ...[0, 0, 1, 0, 1, 1, 0, 1], // 右面
+        ...[0, 0, 1, 0, 1, 1, 0, 1], // 后面
+        ...[0, 0, 1, 0, 1, 1, 0, 1], // 左面
+        ...[0, 0, 1, 0, 1, 1, 0, 1], // 上面
+        ...[0, 0, 1, 0, 1, 1, 0, 1] // 下面
+    ];
     
     /**
      * 绘制立方体
@@ -83,15 +92,7 @@ export class DrawHelper {
      * @param textureCoordinate 纹理坐标数组，该数组保存48个number类型，共6组纹理坐标，
      * 每组8个纹理坐标值，可以映射到立方体的某个面上，其顺序是前、右、后、左、上、下。
      */
-    public static drawTextureCubeBox(builder: GLMeshBuilder, mvp: Matrix4, halfLen: number = 0.2, textureCoordinate: number[] = [
-                                         ...[0, 0, 1, 0, 1, 1, 0, 1], // 前面
-                                         ...[0, 0, 1, 0, 1, 1, 0, 1], // 右面
-                                         ...[0, 0, 1, 0, 1, 1, 0, 1], // 后面
-                                         ...[0, 0, 1, 0, 1, 1, 0, 1], // 左面
-                                         ...[0, 0, 1, 0, 1, 1, 0, 1], // 上面
-                                         ...[0, 0, 1, 0, 1, 1, 0, 1] // 下面
-                                     ]
-    ): void {
+    public static drawTextureCubeBox(builder: GLMeshBuilder, mvp: Matrix4, halfLen: number = 0.2, textureCoordinate: number[] = DrawHelper._defaultTextureCoordinates): void {
         let vertexes = [
             new Vector3([-halfLen, -halfLen, halfLen]), // 0   - - +
             new Vector3([-halfLen, halfLen, halfLen]), // 1   - + +
