@@ -51,17 +51,17 @@ export class DrawHelper {
         // 使用LINE_LOOP绘制底面，注意顶点顺序，逆时针方向，根据右手螺旋定则可知，法线朝外
         // 使用的是LINE_LOOP图元绘制模式
         builder.begin(builder.webglContext.LINE_LOOP);
-        [vertexes[2], vertexes[0], vertexes[4], vertexes[6]].forEach((pos) => builder.color(color.r, color.g, color.b).vertex(pos.x, pos.y, pos.z));
+        [vertexes[2], vertexes[0], vertexes[4], vertexes[6]].forEach((vertex: Vector3) => builder.color(color.r, color.g, color.b).vertex(vertex.x, vertex.y, vertex.z));
         builder.end(mvp);
         // 使用LINE_LOOP绘制顶面，注意顶点顺序，逆时针方向，根据右手螺旋定则可知，法线朝外
         // 使用的是LINE_LOOP图元绘制模式
         builder.begin(builder.webglContext.LINE_LOOP);
-        [vertexes[3], vertexes[7], vertexes[5], vertexes[1]].forEach((pos) => builder.color(color.r, color.g, color.b).vertex(pos.x, pos.y, pos.z));
+        [vertexes[3], vertexes[7], vertexes[5], vertexes[1]].forEach((vertex: Vector3) => builder.color(color.r, color.g, color.b).vertex(vertex.x, vertex.y, vertex.z));
         builder.end(mvp);
         // 使用LINES绘制
         // 使用的是LINES图元绘制模式
         builder.begin(builder.webglContext.LINES);
-        [vertexes[2], vertexes[3], vertexes[0], vertexes[1], vertexes[4], vertexes[5], vertexes[6], vertexes[7]].forEach((pos) => builder.color(color.r, color.g, color.b).vertex(pos.x, pos.y, pos.z));
+        [vertexes[2], vertexes[3], vertexes[0], vertexes[1], vertexes[4], vertexes[5], vertexes[6], vertexes[7]].forEach((vertex: Vector3) => builder.color(color.r, color.g, color.b).vertex(vertex.x, vertex.y, vertex.z));
         builder.end(mvp);
     }
     
@@ -110,14 +110,16 @@ export class DrawHelper {
             [vertexes[1], vertexes[5], vertexes[7], vertexes[3]], // 上面
             [vertexes[0], vertexes[2], vertexes[6], vertexes[4]] // 下面
         ];
-        surfaces.forEach((vertexes: Vector3[], surfaceIndex: number) => {
+        for (let i = 0; i < surfaces.length; i++) {
+            let vertexes: Vector3[] = surfaces[i];
             builder.begin(builder.webglContext.TRIANGLE_FAN);
-            vertexes.forEach((vertex: Vector3, vertexIndex: number) => {
-                let uIndex = vertexIndex * 2 + surfaceIndex * 8;
+            for (let j = 0; j < vertexes.length; j++) {
+                let vertex = vertexes[j];
+                let uIndex = j * 2 + i * 8;
                 let vIndex = uIndex + 1;
                 builder.texCoordinate(textureCoordinate[uIndex], textureCoordinate[vIndex]).vertex(vertex.x, vertex.y, vertex.z);
-            });
+            }
             builder.end(mvp);
-        });
+        }
     }
 }
