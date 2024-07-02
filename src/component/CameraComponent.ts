@@ -376,7 +376,7 @@ export class CameraComponent {
         // 使用mat4的perspective静态方法计算投影矩阵
         this._projectionMatrix = Matrix4Adapter.perspective(this.fovY, this.aspectRatio, this.near, this.far);
         // 计算视图矩阵
-        this.calcViewMatrix();
+        this.computeViewMatrix();
         // 使用 _projectionMatrix * _viewMatrix顺序合成_viewProjectionMatrix，注意矩阵相乘的顺序
         this._viewProjectionMatrix = Matrix4.product(this._projectionMatrix, this._viewMatrix);
         // 然后再计算出_viewProjMatrix的逆矩阵
@@ -386,11 +386,11 @@ export class CameraComponent {
     /**
      * 计算视口矩阵
      */
-    public calcViewMatrix(): void {
+    public computeViewMatrix(): void {
         this.zAxis.normalize();
-        Vector3.cross(this.zAxis, this.xAxis, this.yAxis);
+        this.yAxis = Vector3.cross(this.zAxis, this.xAxis);
         this.yAxis.normalize();
-        Vector3.cross(this.yAxis, this.zAxis, this.xAxis);
+        this.xAxis = Vector3.cross(this.yAxis, this.zAxis);
         this.xAxis.normalize();
         let x: number = -Vector3.dot(this.xAxis, this.position);
         let y: number = -Vector3.dot(this.yAxis, this.position);
