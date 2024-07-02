@@ -150,7 +150,7 @@ export class Vector2 {
     }
     
     /**
-     * 组合
+     * 线性混合
      * @param {Vector2} vector
      * @param {Vector2} vector2
      * @param {number} time

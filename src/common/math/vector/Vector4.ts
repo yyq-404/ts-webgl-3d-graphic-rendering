@@ -265,7 +265,7 @@ export class Vector4 {
     }
     
     /**
-     * 组合
+     * 线性混合
      * @param {Vector4} vector
      * @param {Vector4} vector2
      * @param {number} time
