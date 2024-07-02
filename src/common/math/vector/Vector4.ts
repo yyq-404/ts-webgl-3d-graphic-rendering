@@ -1,6 +1,6 @@
 import {Matrix4} from '../matrix/Matrix4';
 
-import {epsilon} from '../Constants';
+import {EPSILON} from '../Constants';
 
 /**
  * 四维向量
@@ -10,6 +10,14 @@ export class Vector4 {
     public static readonly zero = new Vector4([0, 0, 0, 1]);
     /** 单位向量 */
     public static readonly one = new Vector4([1, 1, 1, 1]);
+    /** 红色 */
+    public static red: Vector4 = new Vector4([1.0, 0.0, 0.0, 1.0]);
+    /** 绿色 */
+    public static green: Vector4 = new Vector4([0.0, 1.0, 0.0, 1.0]);
+    /** 蓝色 */
+    public static blue: Vector4 = new Vector4([0.0, 0.0, 1.0, 1.0]);
+    /** 黑色 */
+    public static black: Vector4 = new Vector4([0, 0, 0, 0]);
     /** 值*/
     private _values = new Float32Array(4);
     
@@ -399,7 +407,7 @@ export class Vector4 {
      * @param {number} threshold
      * @return {boolean}
      */
-    public equals(vector: Vector4, threshold: number = epsilon): boolean {
+    public equals(vector: Vector4, threshold: number = EPSILON): boolean {
         return (Math.abs(this.x - vector.x) <= threshold)
             && (Math.abs(this.y - vector.y) <= threshold)
             && (Math.abs(this.z - vector.z) <= threshold)

@@ -1,7 +1,6 @@
-import {Matrix4} from "../../common/math/matrix/Matrix4";
-import {MathHelper} from "../../common/math/MathHelper";
-import {Matrix4Adapter} from "../../common/math/MathAdapter";
-import {Vector3} from "../../common/math/vector/Vector3";
+import {Matrix4} from '../../common/math/matrix/Matrix4';
+import {MathHelper} from '../../common/math/MathHelper';
+import {Vector3} from '../../common/math/vector/Vector3';
 import {EGLMatrixType} from '../enum/EGLMatrixType';
 
 /**
@@ -16,21 +15,18 @@ export class GLMatrixStack {
     private readonly _projStack: Matrix4[];
     /** 纹理矩阵栈 */
     private readonly _texStack: Matrix4[];
-
+    
     /**
      * 构造
      */
     public constructor() {
         //初始化时每个矩阵栈都先添加一个正交归一化后的矩阵
-        this._mvStack = [];
-        this._mvStack.push(new Matrix4().setIdentity());
-        this._projStack = [];
-        this._projStack.push(new Matrix4().setIdentity());
-        this._texStack = [];
-        this._texStack.push(new Matrix4().setIdentity());
+        this._mvStack = [new Matrix4().setIdentity()];
+        this._projStack = [new Matrix4().setIdentity()];
+        this._texStack = [new Matrix4().setIdentity()];
         this.matrixType = EGLMatrixType.MODEL_VIEW;
     }
-
+    
     /**
      * 获取模型矩阵
      */
@@ -40,7 +36,7 @@ export class GLMatrixStack {
         }
         return this._mvStack[this._mvStack.length - 1];
     }
-
+    
     /**
      * 获取投影矩阵。
      */
@@ -50,7 +46,7 @@ export class GLMatrixStack {
         }
         return this._projStack[this._projStack.length - 1];
     }
-
+    
     /**
      * 获取模型视图投影矩阵
      */
@@ -60,7 +56,7 @@ export class GLMatrixStack {
         ret.multiply(this.modelViewMatrix);
         return ret;
     }
-
+    
     /**
      * 获取法线矩阵
      */
@@ -72,7 +68,7 @@ export class GLMatrixStack {
         ret.transpose();
         return ret;
     }
-
+    
     /**
      * 获取纹理矩阵
      */
@@ -82,7 +78,7 @@ export class GLMatrixStack {
         }
         return this._texStack[this._texStack.length - 1];
     }
-
+    
     /**
      * 压入矩阵。
      */
@@ -106,7 +102,7 @@ export class GLMatrixStack {
         }
         return this;
     }
-
+    
     /**
      * 弹出矩阵
      */
@@ -124,7 +120,7 @@ export class GLMatrixStack {
         }
         return this;
     }
-
+    
     /**
      * 将栈顶的矩阵重置为单位矩阵
      */
@@ -142,7 +138,7 @@ export class GLMatrixStack {
         }
         return this;
     }
-
+    
     /**
      * 将参数矩阵mat的值复制到栈顶矩阵
      * @param mat
@@ -161,9 +157,9 @@ export class GLMatrixStack {
         }
         return this;
     }
-
+    
     /**
-     * 计算透视矩阵
+     * 创建透视投影矩阵
      * @param fov
      * @param aspect
      * @param near
@@ -175,14 +171,14 @@ export class GLMatrixStack {
         if (!isRadians) {
             fov = MathHelper.toRadian(fov);
         }
-        const mat: Matrix4 = Matrix4Adapter.perspective(fov, aspect, near, far);
+        const mat: Matrix4 = Matrix4.perspective(fov, aspect, near, far);
         this.loadMatrix(mat);
         this.matrixType = EGLMatrixType.MODEL_VIEW;
         // 是否要调用loadIdentity方法???
         this.loadIdentity();
         return this;
     }
-
+    
     /**
      * 计算视锥矩阵
      * @param left
@@ -201,7 +197,7 @@ export class GLMatrixStack {
         this.loadIdentity();
         return this;
     }
-
+    
     /**
      * 计算正交矩阵
      * @param left
@@ -220,7 +216,7 @@ export class GLMatrixStack {
         this.loadIdentity();
         return this;
     }
-
+    
     /**
      * 计算朝向
      * @param pos
@@ -233,7 +229,7 @@ export class GLMatrixStack {
         this.loadMatrix(mat);
         return this;
     }
-
+    
     /**
      * 构建视图
      * @param pos
@@ -243,31 +239,26 @@ export class GLMatrixStack {
      */
     public makeView(pos: Vector3, xAxis: Vector3, yAxis: Vector3, zAxis: Vector3): GLMatrixStack {
         zAxis.normalize();
-
         //forward cross right = up
         Vector3.cross(zAxis, xAxis, yAxis);
         yAxis.normalize();
-
         //up cross forward = right
         Vector3.cross(yAxis, zAxis, xAxis);
         xAxis.normalize();
-
         const x: number = -Vector3.dot(xAxis, pos);
         const y: number = -Vector3.dot(yAxis, pos);
         const z: number = -Vector3.dot(zAxis, pos);
-
         const mat: Matrix4 = this._mvStack[this._mvStack.length - 1];
-
         mat.init([
             ...[xAxis.x, yAxis.x, zAxis.x, 0.0],
             ...[xAxis.y, yAxis.y, zAxis.y, 0.0],
             ...[xAxis.z, yAxis.z, zAxis.z, 0.0],
-            ...[x, y, z, 1.0],
+            ...[x, y, z, 1.0]
         ]);
-
+        
         return this;
     }
-
+    
     /**
      * 矩阵乘法
      * @param mat
@@ -283,10 +274,12 @@ export class GLMatrixStack {
             case EGLMatrixType.TEXTURE:
                 this.textureMatrix.multiply(mat);
                 break;
+            default:
+                break;
         }
         return this;
     }
-
+    
     /**
      * 矩阵平移
      * @param pos
@@ -302,10 +295,12 @@ export class GLMatrixStack {
             case EGLMatrixType.TEXTURE:
                 this.textureMatrix.translate(pos);
                 break;
+            default:
+                break;
         }
         return this;
     }
-
+    
     /**
      * 矩阵旋转
      * @param angle
@@ -326,10 +321,12 @@ export class GLMatrixStack {
             case EGLMatrixType.TEXTURE:
                 this.textureMatrix.rotate(angle, axis);
                 break;
+            default:
+                break;
         }
         return this;
     }
-
+    
     /**
      * 矩阵缩放
      * @param s
@@ -344,6 +341,8 @@ export class GLMatrixStack {
                 break;
             case EGLMatrixType.TEXTURE:
                 this.textureMatrix.scale(s);
+                break;
+            default:
                 break;
         }
         return this;

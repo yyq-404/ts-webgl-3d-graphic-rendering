@@ -21,7 +21,7 @@ export class WebGLApplication extends BaseApplication {
     /* 可以直接操作WebGL相关内容 */
     protected webglContext: WebGLRenderingContext | null;
     /** 模拟 `OpenGL1.1` 中的矩阵堆栈, 封装在 `GLWorldMatrixStack` 类中 */
-    protected matStack: GLWorldMatrixStack;
+    protected worldMatrixStack: GLWorldMatrixStack;
     /** 模拟OpenGL1.1中的立即绘制模式, 封装在GLMeshBuilder类中 */
     protected builder: GLMeshBuilder;
     /** 为了在3D环境中同时支持Canvas2D绘制，特别是为了实现文字绘制 */
@@ -54,7 +54,7 @@ export class WebGLApplication extends BaseApplication {
             this.create2dCanvas();
         }
         this.camera = new CameraComponent(this.webglContext, canvas.width, canvas.height, 45, 1);
-        this.matStack = new GLWorldMatrixStack();
+        this.worldMatrixStack = new GLWorldMatrixStack();
         // 初始化渲染状态
         GLRenderHelper.setDefaultState(this.webglContext);
         // 由于Canvas是左手系，而webGL是右手系，需要FlipYCoordinate
@@ -126,7 +126,7 @@ export class WebGLApplication extends BaseApplication {
      * 释放
      */
     public override dispose(): void {
-        this.matStack.clear();
+        this.worldMatrixStack.clear();
         this.camera.setViewport(0, 0, this.canvas.width, this.canvas.height);
         this.clearBuffer();
         GLProgramCache.instance.clear();

@@ -1,5 +1,5 @@
 import {Vector2} from '../vector/Vector2';
-import {epsilon} from '../Constants';
+import {EPSILON} from '../Constants';
 
 /**
  * 二维矩阵
@@ -112,7 +112,7 @@ export class Matrix2 {
      * @param matrix
      * @param threshold
      */
-    public equals(matrix: Matrix2, threshold = epsilon): boolean {
+    public equals(matrix: Matrix2, threshold = EPSILON): boolean {
         for (let i = 0; i < 4; i++) {
             if (Math.abs(this._values[i] - matrix.at(i)) > threshold) {
                 return false;

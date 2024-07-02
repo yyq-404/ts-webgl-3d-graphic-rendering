@@ -1,4 +1,4 @@
-import {epsilon} from '../Constants';
+import {EPSILON} from '../Constants';
 import {Matrix3} from '../matrix/Matrix3';
 import {Quaternion} from '../Quaternion';
 
@@ -324,7 +324,7 @@ export class Vector3 {
      * @param {number} threshold
      * @return {boolean}
      */
-    public equals(vector: Vector3, threshold: number = epsilon): boolean {
+    public equals(vector: Vector3, threshold: number = EPSILON): boolean {
         if (Math.abs(this.x - vector.x) > threshold) {
             return false;
         }

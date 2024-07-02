@@ -1,7 +1,7 @@
 import {Vector3} from '../math/vector/Vector3';
 import {Vector4} from '../math/vector/Vector4';
-import {MathAdapter} from '../math/MathAdapter';
 import {Matrix4} from '../math/matrix/Matrix4';
+import {EPSILON} from '../math/Constants';
 
 /**
  * 点与平面之间的关系
@@ -107,10 +107,10 @@ export class GeometryHelper {
     public static planeTestPoint(plane: Vector4, point: Vector3): EPlaneLoc {
         // 三维空间中任意一个点与平面的有向距离
         const num: number = GeometryHelper.planeDistanceFromPoint(plane, point);
-        if (num > MathAdapter.EPSILON) {
+        if (num > EPSILON) {
             // 大于正容差数（+0.0001），点在平面的正面
             return EPlaneLoc.FRONT;
-        } else if (num < -MathAdapter.EPSILON) {
+        } else if (num < -EPSILON) {
             // 小于负容差数（-0.0001），点在平面的背面
             return EPlaneLoc.BACK;
         } else {

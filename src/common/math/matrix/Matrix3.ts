@@ -3,7 +3,7 @@ import {Quaternion} from '../Quaternion';
 import {Vector2} from '../vector/Vector2';
 import {Vector3} from '../vector/Vector3';
 
-import {epsilon} from '../Constants';
+import {EPSILON} from '../Constants';
 
 /**
  * 三维矩阵
@@ -130,7 +130,7 @@ export class Matrix3 {
      * @param matrix
      * @param threshold
      */
-    public equals(matrix: Matrix3, threshold = epsilon): boolean {
+    public equals(matrix: Matrix3, threshold = EPSILON): boolean {
         for (let i = 0; i < 9; i++) {
             if (Math.abs(this._values[i] - matrix.at(i)) > threshold) {
                 return false;

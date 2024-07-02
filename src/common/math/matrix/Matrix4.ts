@@ -1,4 +1,4 @@
-import {epsilon} from '../Constants';
+import {EPSILON} from '../Constants';
 import {Vector4} from '../vector/Vector4';
 import {Vector3} from '../vector/Vector3';
 import {Matrix3} from './Matrix3';
@@ -7,6 +7,8 @@ import {Matrix3} from './Matrix3';
  * 四维矩阵
  */
 export class Matrix4 {
+    public static m0 = new Matrix4().setIdentity();
+    public static m1 = new Matrix4().setIdentity();
     /** 单位向量 */
     public static readonly identity = new Matrix4().setIdentity();
     
@@ -237,7 +239,7 @@ export class Matrix4 {
      * @param matrix
      * @param threshold
      */
-    public equals(matrix: Matrix4, threshold = epsilon): boolean {
+    public equals(matrix: Matrix4, threshold = EPSILON): boolean {
         for (let i = 0; i < 16; i++) {
             if (Math.abs(this._values[i] - matrix.at(i)) > threshold) {
                 return false;

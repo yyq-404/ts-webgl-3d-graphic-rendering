@@ -2,7 +2,6 @@ import {ECameraType} from '../enum/ECameraType';
 import {Vector3} from '../common/math/vector/Vector3';
 import {Matrix4} from '../common/math/matrix/Matrix4';
 import {MathHelper} from '../common/math/MathHelper';
-import {Matrix4Adapter} from '../common/math/MathAdapter';
 
 /**
  * 摄像机。
@@ -28,7 +27,7 @@ export class CameraComponent {
     public constructor(gl: WebGLRenderingContext | null, width: number, height: number, fovY: number = 45.0, zNear: number = 1, zFar: number = 1000) {
         this.gl = gl;
         this._aspectRatio = width / height;
-        this._fovY = MathHelper.toRadian(fovY);
+        this._fovY = fovY;
         this._near = zNear;
         this._far = zFar;
         this._viewMatrix = new Matrix4();
@@ -326,11 +325,11 @@ export class CameraComponent {
      * @param degree
      */
     public pitch(degree: number): void {
-        Matrix4Adapter.m0.setIdentity();
+        Matrix4.m0.setIdentity();
         let radian = MathHelper.toRadian(degree);
-        Matrix4Adapter.m0.rotate(radian, this.xAxis);
-        this.yAxis = Matrix4Adapter.m0.multiplyVector3(this.yAxis);
-        this.zAxis = Matrix4Adapter.m0.multiplyVector3(this.zAxis);
+        Matrix4.m0.rotate(radian, this.xAxis);
+        this.yAxis = Matrix4.m0.multiplyVector3(this.yAxis);
+        this.zAxis = Matrix4.m0.multiplyVector3(this.zAxis);
     }
     
     /**
@@ -338,15 +337,15 @@ export class CameraComponent {
      * @param degree
      */
     public yaw(degree: number): void {
-        Matrix4Adapter.m0.setIdentity();
+        Matrix4.m0.setIdentity();
         let radian = MathHelper.toRadian(degree);
         if (this.type === ECameraType.FPS_CAMERA) {
-            Matrix4Adapter.m0.rotate(radian, Vector3.up);
+            Matrix4.m0.rotate(radian, Vector3.up);
         } else if (this.type === ECameraType.FLY_CAMERA) {
-            Matrix4Adapter.m0.rotate(radian, this.yAxis);
+            Matrix4.m0.rotate(radian, this.yAxis);
         }
-        this.xAxis = Matrix4Adapter.m0.multiplyVector3(this.xAxis);
-        this.zAxis = Matrix4Adapter.m0.multiplyVector3(this.zAxis);
+        this.xAxis = Matrix4.m0.multiplyVector3(this.xAxis);
+        this.zAxis = Matrix4.m0.multiplyVector3(this.zAxis);
     }
     
     /**
@@ -355,11 +354,11 @@ export class CameraComponent {
      */
     public roll(degree: number): void {
         if (this.type == ECameraType.FLY_CAMERA) {
-            Matrix4Adapter.m0.setIdentity();
+            Matrix4.m0.setIdentity();
             let radian = MathHelper.toRadian(degree);
-            Matrix4Adapter.m0.rotate(radian, this.zAxis);
-            this.xAxis = Matrix4Adapter.m0.multiplyVector3(this.xAxis);
-            this.yAxis = Matrix4Adapter.m0.multiplyVector3(this.yAxis);
+            Matrix4.m0.rotate(radian, this.zAxis);
+            this.xAxis = Matrix4.m0.multiplyVector3(this.xAxis);
+            this.yAxis = Matrix4.m0.multiplyVector3(this.yAxis);
         }
     }
     
@@ -374,7 +373,7 @@ export class CameraComponent {
      */
     public update(intervalSec: number): void {
         // 使用mat4的perspective静态方法计算投影矩阵
-        this._projectionMatrix = Matrix4Adapter.perspective(this.fovY, this.aspectRatio, this.near, this.far);
+        this._projectionMatrix = Matrix4.perspective(this.fovY, this.aspectRatio, this.near, this.far);
         // 计算视图矩阵
         this.computeViewMatrix();
         // 使用 _projectionMatrix * _viewMatrix顺序合成_viewProjectionMatrix，注意矩阵相乘的顺序

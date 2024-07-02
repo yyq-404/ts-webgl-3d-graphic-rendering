@@ -1,7 +1,7 @@
 import {Vector3} from './vector/Vector3';
 import {Quaternion} from './Quaternion';
 import {Matrix4} from './matrix/Matrix4';
-import {MathAdapter} from './MathAdapter';
+import {EPSILON} from './Constants';
 
 /**
  * 数学工具类。
@@ -52,7 +52,7 @@ export class MathHelper {
      * @param right
      */
     public static numberEquals(left: number, right: number): boolean {
-        return Math.abs(left - right) <= MathAdapter.EPSILON;
+        return Math.abs(left - right) <= EPSILON;
     }
     
     /**

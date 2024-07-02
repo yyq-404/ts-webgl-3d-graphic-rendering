@@ -202,11 +202,11 @@ export class RotatingCubeApplication extends WebGLApplication {
         textureProgram.loadSampler();
         // 第一个渲染堆栈操作
         // 矩阵进栈
-        this.matStack.pushMatrix();
+        this.worldMatrixStack.pushMatrix();
         // 以角度(非弧度)为单位，每帧旋转
-        this.matStack.rotate(this._cubeAngle, Vector3.up, false);
+        this.worldMatrixStack.rotate(this._cubeAngle, Vector3.up, false);
         // 合成modelViewProjection矩阵
-        this._cubeMatrix = Matrix4.product(this.camera.viewProjectionMatrix, this.matStack.modelViewMatrix);
+        this._cubeMatrix = Matrix4.product(this.camera.viewProjectionMatrix, this.worldMatrixStack.modelViewMatrix);
         // 将合成的矩阵给GLProgram对象
         textureProgram.setMatrix4(GLShaderConstants.MVPMatrix, this._cubeMatrix);
         // 使用当前绑定的texture和program绘制cubeVao对象
@@ -217,7 +217,7 @@ export class RotatingCubeApplication extends WebGLApplication {
             GLCoordinateSystemHelper.drawText(this.context2d, this._cubeMatrix, this.camera.getViewport(), this.canvas.height, false);
         }
         // 矩阵出栈
-        this.matStack.popMatrix();
+        this.worldMatrixStack.popMatrix();
         // 解除绑定的texture和program
         textureProgram.unbind();
         if (texture) {
@@ -237,12 +237,12 @@ export class RotatingCubeApplication extends WebGLApplication {
         // 由于三角形使用颜色+位置信息进行绘制，因此要绑定当前的GPU Program为colorProgram
         colorProgram.bind();
         // 新产生一个矩阵
-        this.matStack.pushMatrix();
+        this.worldMatrixStack.pushMatrix();
         // 立方体绘制在Canvas的中心
         // 而三角形则绘制在向左（负号）平移2个单位处的位置
-        this.matStack.translate(new Vector3([-2, 0, 0]));
+        this.worldMatrixStack.translate(new Vector3([-2, 0, 0]));
         // 使用弧度，绕Z轴进行Roll旋转
-        this.matStack.rotate(this._triangleAngle, Vector3.forward, true);
+        this.worldMatrixStack.rotate(this._triangleAngle, Vector3.forward, true);
         // 使用类似OpenGL1.1的立即绘制模式
         // 开始绘制，default使用gl.TRIANGLES方式绘制
         this.builder.begin();
@@ -253,11 +253,11 @@ export class RotatingCubeApplication extends WebGLApplication {
         // 三角形第三个点的颜色与坐标
         this.builder.color(0, 0, 1).vertex(0, 0.5, 0);
         // 合成model-view-projection matrix
-        this._triangleMatrix = Matrix4.product(this.camera.viewProjectionMatrix, this.matStack.modelViewMatrix);
+        this._triangleMatrix = Matrix4.product(this.camera.viewProjectionMatrix, this.worldMatrixStack.modelViewMatrix);
         // 将mvpMatrix传递给GLMeshBuilder的end方法，该方法会正确的显示图形
         this.builder.end(this._triangleMatrix);
         // 删除一个矩阵
-        this.matStack.popMatrix();
+        this.worldMatrixStack.popMatrix();
         colorProgram.unbind();
         // 恢复背面剔除功能
         this.webglContext.enable(this.webglContext.CULL_FACE);

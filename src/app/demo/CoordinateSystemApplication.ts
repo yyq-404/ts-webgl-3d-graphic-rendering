@@ -4,7 +4,6 @@ import {Vector3} from '../../common/math/vector/Vector3';
 import {CanvasKeyboardEvent} from '../../event/CanvasKeyboardEvent';
 import {EAxisType} from '../../enum/EAxisType';
 import {DrawHelper} from '../../common/DrawHelper';
-import {Vector4Adapter} from '../../common/math/MathAdapter';
 import {Vector4} from '../../common/math/vector/Vector4';
 import {WebGLApplication} from '../base/WebGLApplication';
 import {GLCoordinateSystemHelper} from "../../webgl/GLCoordinateSystemHelper";
@@ -155,12 +154,12 @@ export class CoordinateSystemApplication extends WebGLApplication {
      */
     private drawCoordinateSystem(glCoordinateSystem: GLCoordinateSystem): void {
         // 矩阵进栈
-        this.matStack.pushMatrix();
+        this.worldMatrixStack.pushMatrix();
         // 计算模型视图投影矩阵。
         this.calcModelViewProjectionMatrix(glCoordinateSystem);
         // 调用DrawHelper.drawCoordinateSystem的方法绘制X / Y / Z坐标系
         GLCoordinateSystemHelper.drawAxis(this.builder, this._mvp, EAxisType.NONE, 1, glCoordinateSystem.isDrawAxis ? glCoordinateSystem.axis : null, glCoordinateSystem.isLeftHardness);
-        this.matStack.popMatrix();
+        this.worldMatrixStack.popMatrix();
         // 绘制坐标系的标示文字，调用drawText方法
         this.drawCoordinateSystemText();
     }
@@ -172,13 +171,13 @@ export class CoordinateSystemApplication extends WebGLApplication {
      */
     private drawFullCoordinateSystem(glCoordinateSystem: GLCoordinateSystem): void {
         // 矩阵进栈
-        this.matStack.pushMatrix();
+        this.worldMatrixStack.pushMatrix();
         // 计算模型视图投影矩阵
         this.calcModelViewProjectionMatrix(glCoordinateSystem);
         // 使用mvp矩阵绘制六轴坐标系，调用的是DrawHelper.drawFullCoordinateSystem的静态辅助方法
         GLCoordinateSystemHelper.drawAxis(this.builder, this._mvp, EAxisType.NONE, 1, glCoordinateSystem.isDrawAxis ? glCoordinateSystem.axis : null, true, glCoordinateSystem.isLeftHardness);
         // 矩阵出栈
-        this.matStack.popMatrix();
+        this.worldMatrixStack.popMatrix();
         // 绘制坐标系的标示文字,调用的是本类的drawText方法
         this.drawCoordinateSystemText(true);
     }
@@ -190,7 +189,7 @@ export class CoordinateSystemApplication extends WebGLApplication {
      */
     private drawFullCoordinateSystemWithRotatedCube(glCoordinateSystem: GLCoordinateSystem): void {
         // 矩阵进栈
-        this.matStack.pushMatrix();
+        this.worldMatrixStack.pushMatrix();
         //计算模型视图投影矩阵
         this.calcModelViewProjectionMatrix(glCoordinateSystem);
         // 绘制坐标系
@@ -204,7 +203,7 @@ export class CoordinateSystemApplication extends WebGLApplication {
         // 第五步：绘制绕坐标系旋转轴（s.axis）旋转的线框立方体
         this.drawFixedAxisRotatedCube(glCoordinateSystem);
         // 矩阵出栈
-        this.matStack.popMatrix();
+        this.worldMatrixStack.popMatrix();
         // 第六步：绘制坐标系的标示文字
         this.drawCoordinateSystemText(true);
     }
@@ -215,13 +214,13 @@ export class CoordinateSystemApplication extends WebGLApplication {
      * @private
      */
     private drawXAxisRotatedCube(glCoordinateSystem: GLCoordinateSystem): void {
-        this.matStack.pushMatrix();
-        this.matStack.rotate(glCoordinateSystem.angle, Vector3.right, false);
-        this.matStack.translate(new Vector3([0.8, 0.4, 0]));
-        this.matStack.rotate(glCoordinateSystem.angle * 2, Vector3.right, false);
-        this._cubeMVP = Matrix4.product(this.camera.viewProjectionMatrix, this.matStack.modelViewMatrix);
+        this.worldMatrixStack.pushMatrix();
+        this.worldMatrixStack.rotate(glCoordinateSystem.angle, Vector3.right, false);
+        this.worldMatrixStack.translate(new Vector3([0.8, 0.4, 0]));
+        this.worldMatrixStack.rotate(glCoordinateSystem.angle * 2, Vector3.right, false);
+        this._cubeMVP = Matrix4.product(this.camera.viewProjectionMatrix, this.worldMatrixStack.modelViewMatrix);
         DrawHelper.drawWireFrameCubeBox(this.builder, this._cubeMVP, 0.1);
-        this.matStack.popMatrix();
+        this.worldMatrixStack.popMatrix();
     }
 
     /**
@@ -230,13 +229,13 @@ export class CoordinateSystemApplication extends WebGLApplication {
      * @private
      */
     private drawYAxisRotatedCube(glCoordinateSystem: GLCoordinateSystem): void {
-        this.matStack.pushMatrix();
-        this.matStack.rotate(glCoordinateSystem.angle, Vector3.up, false);
-        this.matStack.translate(new Vector3([0.2, 0.8, 0]));
-        this.matStack.rotate(glCoordinateSystem.angle * 2, Vector3.up, false);
-        this._cubeMVP = Matrix4.product(this.camera.viewProjectionMatrix, this.matStack.modelViewMatrix);
-        DrawHelper.drawWireFrameCubeBox(this.builder, this._cubeMVP, 0.1, Vector4Adapter.green);
-        this.matStack.popMatrix();
+        this.worldMatrixStack.pushMatrix();
+        this.worldMatrixStack.rotate(glCoordinateSystem.angle, Vector3.up, false);
+        this.worldMatrixStack.translate(new Vector3([0.2, 0.8, 0]));
+        this.worldMatrixStack.rotate(glCoordinateSystem.angle * 2, Vector3.up, false);
+        this._cubeMVP = Matrix4.product(this.camera.viewProjectionMatrix, this.worldMatrixStack.modelViewMatrix);
+        DrawHelper.drawWireFrameCubeBox(this.builder, this._cubeMVP, 0.1, Vector4.green);
+        this.worldMatrixStack.popMatrix();
     }
 
     /**
@@ -245,12 +244,12 @@ export class CoordinateSystemApplication extends WebGLApplication {
      * @private
      */
     private drawZAxisRotatedCube(glCoordinateSystem: GLCoordinateSystem): void {
-        this.matStack.pushMatrix();
-        this.matStack.translate(new Vector3([0.0, 0.0, 0.8]));
-        this.matStack.rotate(glCoordinateSystem.angle * 2, Vector3.forward, false);
-        this._cubeMVP = Matrix4.product(this.camera.viewProjectionMatrix, this.matStack.modelViewMatrix);
-        DrawHelper.drawWireFrameCubeBox(this.builder, this._cubeMVP, 0.1, Vector4Adapter.blue);
-        this.matStack.popMatrix();
+        this.worldMatrixStack.pushMatrix();
+        this.worldMatrixStack.translate(new Vector3([0.0, 0.0, 0.8]));
+        this.worldMatrixStack.rotate(glCoordinateSystem.angle * 2, Vector3.forward, false);
+        this._cubeMVP = Matrix4.product(this.camera.viewProjectionMatrix, this.worldMatrixStack.modelViewMatrix);
+        DrawHelper.drawWireFrameCubeBox(this.builder, this._cubeMVP, 0.1, Vector4.blue);
+        this.worldMatrixStack.popMatrix();
     }
 
     /**
@@ -259,14 +258,14 @@ export class CoordinateSystemApplication extends WebGLApplication {
      * @private
      */
     private drawFixedAxisRotatedCube(glCoordinateSystem: GLCoordinateSystem): void {
-        this.matStack.pushMatrix();
+        this.worldMatrixStack.pushMatrix();
         const len: Vector3 = new Vector3();
-        this.matStack.translate(glCoordinateSystem.axis.scale(0.8, len));
-        this.matStack.translate(new Vector3([0, 0.3, 0]));
-        this.matStack.rotate(glCoordinateSystem.angle, glCoordinateSystem.axis, false);
-        this._cubeMVP = Matrix4.product(this.camera.viewProjectionMatrix, this.matStack.modelViewMatrix);
+        this.worldMatrixStack.translate(glCoordinateSystem.axis.scale(0.8, len));
+        this.worldMatrixStack.translate(new Vector3([0, 0.3, 0]));
+        this.worldMatrixStack.rotate(glCoordinateSystem.angle, glCoordinateSystem.axis, false);
+        this._cubeMVP = Matrix4.product(this.camera.viewProjectionMatrix, this.worldMatrixStack.modelViewMatrix);
         DrawHelper.drawWireFrameCubeBox(this.builder, this._cubeMVP, 0.1, new Vector4());
-        this.matStack.popMatrix();
+        this.worldMatrixStack.popMatrix();
     }
 
     /**
@@ -278,11 +277,11 @@ export class CoordinateSystemApplication extends WebGLApplication {
         // 设置当前的视口
         this.camera.setViewport(glCoordinateSystem.viewport[0], glCoordinateSystem.viewport[1], glCoordinateSystem.viewport[2], glCoordinateSystem.viewport[3]);
         // 将坐标系平移到s.pos位置
-        this.matStack.translate(glCoordinateSystem.position);
+        this.worldMatrixStack.translate(glCoordinateSystem.position);
         // 坐标系绕着s.axis轴旋转s.angle度
-        this.matStack.rotate(glCoordinateSystem.angle, glCoordinateSystem.axis, false);
+        this.worldMatrixStack.rotate(glCoordinateSystem.angle, glCoordinateSystem.axis, false);
         // 合成model-view-project矩阵
-        this._mvp = Matrix4.product(this.camera.viewProjectionMatrix, this.matStack.modelViewMatrix);
+        this._mvp = Matrix4.product(this.camera.viewProjectionMatrix, this.worldMatrixStack.modelViewMatrix);
     }
 
     /**
