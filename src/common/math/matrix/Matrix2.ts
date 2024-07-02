@@ -140,7 +140,7 @@ export class Matrix2 {
     }
     
     /**
-     * 调换矩阵
+     * 转置矩阵，行列互换
      */
     public transpose(): Matrix2 {
         const temp = this._values[1];

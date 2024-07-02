@@ -175,7 +175,8 @@ export class Matrix3 {
     }
     
     /**
-     * 转置矩阵。
+     *
+     * 转置矩阵，行列互换
      */
     public transpose(): Matrix3 {
         const temp01 = this._values[1];

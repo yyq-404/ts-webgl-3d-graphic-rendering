@@ -305,7 +305,7 @@ export class Matrix4 {
     }
     
     /**
-     * 转置矩阵。
+     * 转置矩阵，行列互换。
      */
     public transpose(): Matrix4 {
         const temp01 = this._values[1];
