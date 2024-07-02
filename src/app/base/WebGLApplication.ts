@@ -11,6 +11,7 @@ import {CameraComponent} from '../../component/CameraComponent';
 import {CanvasKeyboardEvent} from '../../event/CanvasKeyboardEvent';
 import {EGLShaderType} from '../../webgl/enum/EGLShaderType';
 import {HttpHelper} from '../../net/HttpHelper';
+import {Vector3} from '../../common/math/vector/Vector3';
 
 /**
  * WebGL应用。

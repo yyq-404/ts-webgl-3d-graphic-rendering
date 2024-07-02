@@ -35,6 +35,8 @@ export class CameraComponent {
         this._viewProjectionMatrix = new Matrix4();
         this._invViewProjectionMatrix = new Matrix4();
         this.setViewport(0, 0, width, height);
+        // 摄影机默认位置。
+        this.position.z = 5;
     }
     
     /** 投影矩阵*摄像机矩阵及其逆矩阵 */

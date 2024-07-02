@@ -79,8 +79,6 @@ export class RotatingCubeApplication extends WebGLApplication {
         // 初始化时，世界矩阵都为归一化矩阵
         this._cubeMatrix = new Matrix4().setIdentity();
         this._triangleMatrix = new Matrix4().setIdentity();
-        // 调整摄像机的位置
-        this.camera.z = 8;
     }
     
     /**

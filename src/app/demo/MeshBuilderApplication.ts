@@ -67,8 +67,6 @@ export class MeshBuilderApplication extends WebGLApplication {
         this._texBuilder2 = new GLMeshBuilder(this.webglContext, GLAttributeHelper.POSITION.BIT | GLAttributeHelper.TEX_COORDINATE_0.BIT, null, this._texture.texture, EGLVertexLayoutType.SEPARATED);
         // 可以随便该行列数量，用于多视口渲染使用
         this._coords = GLCoordinateSystem.makeViewportCoordinateSystems(this.canvas.width, this.canvas.height, 2, 3);
-        // 调整摄像机位置
-        this.camera.z = 4;
         // 初始化时指向页面1的绘图函数
         this._currentDrawMethod = this.drawByMatrixWithColorShader;
         // BUG

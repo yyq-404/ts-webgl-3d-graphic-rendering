@@ -40,8 +40,6 @@ export class CoordinateSystemApplication extends WebGLApplication {
         this.clearBuffer();
         this.makeFourGLCoordinateSystems();
         this._currentDrawMethod = this.drawCoordinateSystem;
-        // 调整摄影机位置
-        this.camera.z = 5;
         this._drawMethods = new Map<string, (glCoordinateSystem: GLCoordinateSystem) => void>([
             ['1', this.drawCoordinateSystem],
             ['2', this.drawFullCoordinateSystem],
