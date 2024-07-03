@@ -228,11 +228,11 @@ export class RotatingCubeApplication extends WebGLApplication {
      */
     private renderTriangle(): void {
         if (!this.webglContext) throw new Error('this.gl is not defined');
-        let colorProgram = GLProgramCache.instance.getMust('texture');
+        let textureProgram = GLProgramCache.instance.getMust('color');
         // 禁止渲染三角形时启用背面剔除功能
         this.webglContext.disable(this.webglContext.CULL_FACE);
         // 由于三角形使用颜色+位置信息进行绘制，因此要绑定当前的GPU Program为colorProgram
-        colorProgram.bind();
+        textureProgram.bind();
         // 新产生一个矩阵
         this.worldMatrixStack.pushMatrix();
         // 立方体绘制在Canvas的中心
@@ -255,7 +255,7 @@ export class RotatingCubeApplication extends WebGLApplication {
         this.builder.end(this._triangleMatrix);
         // 删除一个矩阵
         this.worldMatrixStack.popMatrix();
-        colorProgram.unbind();
+        textureProgram.unbind();
         // 恢复背面剔除功能
         this.webglContext.enable(this.webglContext.CULL_FACE);
     }

@@ -13,6 +13,7 @@ export class WebGL2Application extends BaseApplication {
     protected webglContext: WebGL2RenderingContext;
     /** 模拟 `OpenGL1.1` 中的矩阵堆栈, 封装在 `GLWorldMatrixStack` 类中 */
     protected worldMatrixStack: GLMatrixStack2;
+    protected program: WebGLProgram;
     /** shader路径集合 */
     private readonly _shaderUrls: Map<string, string> = new Map<string, string>([
         ['bns.vert', `${AppConstants.webgl2ShaderRoot}/bns.vert`],
@@ -63,13 +64,12 @@ export class WebGL2Application extends BaseApplication {
      * @private
      */
     protected async initAsync(): Promise<void> {
-        if (!this.webglContext) throw new Error('this.webglContext is not defined');
         // 加载颜色顶点着色器代码
-        let bnsVertShader = await this.loadShaderSourceAsync(this._shaderUrls, 'bns.vert');
+        let vertexShaderSource = await this.loadShaderSourceAsync(this._shaderUrls, 'bns.vert');
         // 加载颜色片元着色器代码
-        let bnsFragShader = await this.loadShaderSourceAsync(this._shaderUrls, 'bns.frag');
-        let defaultColorProgram = GLProgram.createDefaultProgram(this.webglContext, bnsVertShader, bnsFragShader);
-        // 创建颜色Program
-        GLProgramCache.instance.set('color', defaultColorProgram);
+        let fragShaderSource = await this.loadShaderSourceAsync(this._shaderUrls, 'bns.frag');
+        let program = GLProgram.createDefaultProgram(this.webglContext, vertexShaderSource, fragShaderSource);
+        //创建颜色Program
+        GLProgramCache.instance.set('color', program);
     }
 }

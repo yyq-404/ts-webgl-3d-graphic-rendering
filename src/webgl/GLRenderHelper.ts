@@ -112,23 +112,24 @@ export class GLRenderHelper {
      * 链接着色器
      * @param webgl
      * @param program 链接器对象
-     * @param vsShader 要链接的顶点着色器
-     * @param fsShader 要链接的片元着色器
+     * @param vertexShader 要链接的顶点着色器
+     * @param fragShader 要链接的片元着色器
      * @param beforeProgramLink 链接前置处理
      * @param afterProgramLink 链接后置处理
      */
-    public static linkProgram(webgl: WebGLRenderingContextBase, program: WebGLProgram, vsShader: WebGLShader, fsShader: WebGLShader, beforeProgramLink?: GLProgramLinkHook, afterProgramLink?: GLProgramLinkHook): boolean {
+    public static linkProgram(webgl: WebGLRenderingContextBase, program: WebGLProgram, vertexShader: WebGLShader, fragShader: WebGLShader, beforeProgramLink?: GLProgramLinkHook, afterProgramLink?: GLProgramLinkHook): boolean {
         // 1．使用attachShader方法将顶点和片段着色器与当前的链接器相关联
-        webgl.attachShader(program, vsShader);
-        webgl.attachShader(program, fsShader);
+        webgl.attachShader(program, vertexShader);
+        webgl.attachShader(program, fragShader);
         // 2．在调用linkProgram方法之前，按需触发beforeProgramLink回调函数
         beforeProgramLink && beforeProgramLink(webgl, program);
         // 3．调用linkProgram进行链接操作
         webgl.linkProgram(program);
         // 4．使用带webgl.LINK_STATUS参数的getProgramParameter方法，进行链接状态检查
-        if (!webgl.getProgramParameter(program, webgl.LINK_STATUS)) {
+        let linkStatus = webgl.getProgramParameter(program, webgl.LINK_STATUS);
+        if (!linkStatus) {
             // 4.1 删除掉相关资源，防止内存泄漏
-            GLRenderHelper.deleteLink(webgl, program, vsShader, fsShader);
+            GLRenderHelper.deleteLink(webgl, program, vertexShader, fragShader);
             // 4.2 返回链接失败状态
             return false;
         }
@@ -137,7 +138,7 @@ export class GLRenderHelper {
         // 6．使用带webgl.VALIDATE_STATUS参数的getProgramParameter方法，进行验证状态检查
         if (!webgl.getProgramParameter(program, webgl.VALIDATE_STATUS)) {
             // 6.1 删除相关资源，防止内存泄漏
-            GLRenderHelper.deleteLink(webgl, program, vsShader, fsShader);
+            GLRenderHelper.deleteLink(webgl, program, vertexShader, fragShader);
             // 6.2 返回链接失败状态
             return false;
         }
@@ -228,7 +229,6 @@ export class GLRenderHelper {
         if (webgl) {
             webgl.clear(webgl.COLOR_BUFFER_BIT | webgl.DEPTH_BUFFER_BIT);
         }
-        
     }
     
     /**
@@ -273,6 +273,7 @@ export class GLRenderHelper {
      */
     private static deleteLink(webgl: WebGLRenderingContextBase, program: WebGLProgram, vsShader: WebGLShader, fsShader: WebGLShader): void {
         // 调用getProgramInfoLog方法将错误信息以弹框方式通知调用者
+        console.error(webgl.getProgramInfoLog(program));
         alert(webgl.getProgramInfoLog(program));
         webgl.deleteShader(vsShader);
         webgl.deleteShader(fsShader);

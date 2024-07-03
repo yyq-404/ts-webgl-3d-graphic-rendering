@@ -201,7 +201,6 @@ export class GLMeshBuilder extends GLMeshBase {
         this.drawMode = drawMode;
         // 清空顶点数为0
         this._vertexCount = 0;
-        // let list: TypedArrayList<Float32Array> = new TypedArrayList<Float32Array>(Float32Array);
         if (this._layout !== EGLVertexLayoutType.INTERLEAVED) {
             // 使用自己实现的动态类型数组，重用
             let list: TypedArrayList<Float32Array> = this._lists[GLAttributeHelper.POSITION.NAME];

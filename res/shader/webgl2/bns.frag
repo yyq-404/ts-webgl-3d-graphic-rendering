@@ -1,14 +1,8 @@
 #version 300 es
 precision mediump float;
-//接收从顶点着色器过来的参数
-in vec2 vTextureCoord;
-//纹理内容数据
-uniform sampler2D sTexture;
-//输出到的片元颜色
-out vec4 fragColor;
-
+in vec4 vColor; //接收从顶点着色器过来的参数
+out vec4 fragColor;//输出到的片元颜色
 void main()
 {
-    //给此片元从纹理中采样出颜色值
-    fragColor=texture(sTexture, vTextureCoord);
+    fragColor = vColor;//给此片元颜色值
 }

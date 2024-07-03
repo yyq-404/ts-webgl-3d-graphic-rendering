@@ -45,19 +45,19 @@ export class BasicWebGLApplication extends BaseApplication {
     /** 可以直接操作WebGL相关内容 */
     private readonly _webglContext: WebGLRenderingContext;
     /** 着色器链接程序 */
-    private readonly program: WebGLProgram;
+    private readonly _program: WebGLProgram;
     /** 投影矩阵 */
     private readonly _projectMatrix: Matrix4;
     /** 视图矩阵 */
     private readonly _viewMatrix: Matrix4;
     /**  视图矩阵*投影矩阵*/
-    private readonly _viewProjectMatrix: Matrix4;                         // 投影矩阵 * 视矩阵
+    private readonly _viewProjectMatrix: Matrix4;
     /** 顶点数据 */
-    private readonly _verts: TypedArrayList<Float32Array>;
+    private readonly _vertexes: TypedArrayList<Float32Array>;
     /** 顶点缓冲数据 */
-    private readonly _ivbo: WebGLBuffer;
+    private readonly _vertexBuffer: WebGLBuffer;
     /** `gl.ELEMENT_ARRAY_BUFFER`类型的顶点Buffer对象， e表示gl.ELEMENT_ARRAY_BUFFER */
-    private readonly _evbo: WebGLBuffer;
+    private readonly _elementVertexBuffer: WebGLBuffer;
     /** 索引缓存的数据 */
     private _indices: TypedArrayList<Uint16Array>;
     /** 9视图坐标系 */
@@ -108,14 +108,14 @@ export class BasicWebGLApplication extends BaseApplication {
         // 打印WebGL信息
         GLRenderHelper.printWebGLInfo(this._webglContext);
         // 创建着色器链接程序
-        this.program = GLRenderHelper.createProgram(this._webglContext);
+        this._program = GLRenderHelper.createProgram(this._webglContext);
         // 创建顶点数据
-        this._verts = new TypedArrayList<Float32Array>(Float32Array, 6 * 7);
+        this._vertexes = new TypedArrayList<Float32Array>(Float32Array, 6 * 7);
         // 创建顶点缓存冲对象
-        this._ivbo = GLRenderHelper.createBuffer(this._webglContext);
+        this._vertexBuffer = GLRenderHelper.createBuffer(this._webglContext);
         // 初始化evbo
         this._indices = new TypedArrayList(Uint16Array, 6);
-        this._evbo = GLRenderHelper.createBuffer(this._webglContext);
+        this._elementVertexBuffer = GLRenderHelper.createBuffer(this._webglContext);
         this._webglContext.frontFace(this._webglContext.CCW);
         this._webglContext.enable(this._webglContext.CULL_FACE);
         // this.gl.cullFace(this.gl.BACK);
@@ -168,7 +168,7 @@ export class BasicWebGLApplication extends BaseApplication {
         // 设置视口
         GLRenderHelper.setViewport(this._webglContext, glCoordinateSystem.viewport);
         // 重用动态数组，因此调用clear方法，将当前索引reset到0位置
-        this._verts.clear();
+        this._vertexes.clear();
         // 声明interleaved存储的顶点数组。
         let data: number[];
         if (mode === this._webglContext.TRIANGLES) {
@@ -197,7 +197,7 @@ export class BasicWebGLApplication extends BaseApplication {
                 ...[-0.5, 0.5, 0, 0, 1, 0, 1] // 左上 3
             ];
         }
-        this._verts.pushArray(data);
+        this._vertexes.pushArray(data);
         this.bindVertexBufferObject();
         // 默认情况下，是关闭vertexAttribArray对象的，因此需要开启
         // 一旦开启后，当我们调用draw开头的WebGL方法时，WebGL驱动会自动将VBO中的顶点数据上传到对应的Vertex Shader中
@@ -225,10 +225,10 @@ export class BasicWebGLApplication extends BaseApplication {
         // 设置视口
         GLRenderHelper.setViewport(this._webglContext, glCoordinateSystem.viewport);
         // 重用动态数组，因此调用clear方法，将当前索引reset到0位置
-        this._verts.clear();
+        this._vertexes.clear();
         // 声明interleaved存储的顶点数组。
         // 逆时针顺序声明不重复的顶点属性相关数据
-        this._verts.pushArray([
+        this._vertexes.pushArray([
             ...[-0.5, -0.5, 0, 1, 0, 0, 1], // 左下 0
             ...[0.5, -0.5, 0, 0, 1, 0, 1], // 右下 1
             ...[0.5, 0.5, 0, 0, 0, 1, 0], // 右上 2
@@ -250,7 +250,7 @@ export class BasicWebGLApplication extends BaseApplication {
         // 绑定VBO
         this.bindVertexBufferObject();
         // 绑定EBO
-        this._webglContext.bindBuffer(this._webglContext.ELEMENT_ARRAY_BUFFER, this._evbo);
+        this._webglContext.bindBuffer(this._webglContext.ELEMENT_ARRAY_BUFFER, this._elementVertexBuffer);
         this._webglContext.bufferData(this._webglContext.ELEMENT_ARRAY_BUFFER, this._indices.subArray(), this._webglContext.DYNAMIC_DRAW);
         this.setProgram();
         // 调用drawElements方法
@@ -270,9 +270,9 @@ export class BasicWebGLApplication extends BaseApplication {
         // 创建片元着色器
         let fsShader = await this.createShaderAsync(EGLShaderType.FS_SHADER);
         if (!fsShader) throw new Error('Fragment shader create failed.');
-        GLRenderHelper.linkProgram(this._webglContext, this.program, vsShader, fsShader, GLRenderHelper.printProgramActiveInfos, GLRenderHelper.printProgramActiveInfos);
-        this._attributeMap = GLRenderHelper.getProgramActiveAttributes(this._webglContext, this.program);
-        this._uniformMap = GLRenderHelper.getProgramActiveUniforms(this._webglContext, this.program);
+        GLRenderHelper.linkProgram(this._webglContext, this._program, vsShader, fsShader, GLRenderHelper.printProgramActiveInfos, GLRenderHelper.printProgramActiveInfos);
+        this._attributeMap = GLRenderHelper.getProgramActiveAttributes(this._webglContext, this._program);
+        this._uniformMap = GLRenderHelper.getProgramActiveUniforms(this._webglContext, this._program);
         await super.runAsync();
     }
     
@@ -366,7 +366,7 @@ export class BasicWebGLApplication extends BaseApplication {
      * @private
      */
     private setProgram() {
-        this._webglContext.useProgram(this.program);
+        this._webglContext.useProgram(this._program);
         let mat: Matrix4 = new Matrix4().setIdentity().scale(new Vector3([2, 2, 2]));
         mat = Matrix4.product(this._viewProjectMatrix, mat);
         this._webglContext.uniformMatrix4fv(this._uniformMap['uMVPMatrix'].location, false, mat.all());
@@ -388,10 +388,10 @@ export class BasicWebGLApplication extends BaseApplication {
      * @private
      */
     private bindVertexBufferObject(): void {
-        this._webglContext.bindBuffer(this._webglContext.ARRAY_BUFFER, this._ivbo);
+        this._webglContext.bindBuffer(this._webglContext.ARRAY_BUFFER, this._vertexBuffer);
         // 使用我们自己实现的动态类型数组的subArray方法，该方法不会重新创建Float32Array对象
         // 而是返回一个子数组的引用，这样效率比较高
-        this._webglContext.bufferData(this._webglContext.ARRAY_BUFFER, this._verts.subArray(), this._webglContext.DYNAMIC_DRAW);
+        this._webglContext.bufferData(this._webglContext.ARRAY_BUFFER, this._vertexes.subArray(), this._webglContext.DYNAMIC_DRAW);
         // vertexAttribPointer方法参数说明：
         // 1、使用VertexShader中的attribute变量名aPosition,在attribMap中查找到我们自己封装的GLAttribInfo对象,该对象中存储了顶点属性寄存器的索引号
         // 2、aPosition的类型为vec3,而vec3由3个float类型组成，因此第二个参数为3,第三个参数为gl.FLOAT常量值

@@ -7,10 +7,14 @@ import {Matrix3} from './Matrix3';
  * 四维矩阵
  */
 export class Matrix4 {
+    /** 矩阵0 */
     public static m0 = new Matrix4().setIdentity();
+    /** 矩阵1 */
     public static m1 = new Matrix4().setIdentity();
     /** 单位向量 */
     public static readonly identity = new Matrix4().setIdentity();
+    /** 值 */
+    private _values = new Float32Array(16);
     
     /**
      * 构造
@@ -21,9 +25,6 @@ export class Matrix4 {
             this.init(values);
         }
     }
-    
-    /** 值 */
-    private _values = new Float32Array(16);
     
     /**
      * 获取值集合
