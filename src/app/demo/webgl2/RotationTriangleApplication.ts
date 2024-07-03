@@ -50,9 +50,9 @@ export class RotationTriangleApplication extends WebGL2Application {
      */
     public override update(elapsedMsec: number, intervalSec: number): void {
         this._currentAngle += this._incAngle * intervalSec;
-        // if (this._currentAngle > 360) {
-        //     this._currentAngle %= 360;
-        // }
+        if (this._currentAngle > 360) {
+            this._currentAngle %= 360;
+        }
         super.update(elapsedMsec, intervalSec);
     }
 

@@ -18,7 +18,7 @@
             /*相对左上角*/
             left: 0;
             top: 0;
-            background-color: rgba(0, 0, 0, 0.7);
+            background-color: rgba(0, 0, 0,1.0);
             color: white;
             font-family: "Arial", serif;
             font-size: 14px;
@@ -30,7 +30,7 @@
 <body>
 <label for='select'>Select Demo <select id='select'> </select></label>
 <div id="webgl-canvas" class="container">
-    <div id="overlay">
+    <div id="overlay" style="z-index: 1000">
         <div>FPS: <span id="fps"></span></div>
         <div>Tris: <span id="tris"></span></div>
         <div>Verts: <span id="verts"></span></div>
