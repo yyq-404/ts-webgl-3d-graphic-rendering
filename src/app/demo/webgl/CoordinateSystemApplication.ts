@@ -1,13 +1,13 @@
-import {GLCoordinateSystem} from '../../webgl/common/GLCoordinateSystem';
-import {Matrix4} from '../../common/math/matrix/Matrix4';
-import {Vector3} from '../../common/math/vector/Vector3';
-import {CanvasKeyboardEvent} from '../../event/CanvasKeyboardEvent';
-import {EAxisType} from '../../enum/EAxisType';
-import {DrawHelper} from '../../common/DrawHelper';
-import {Vector4} from '../../common/math/vector/Vector4';
-import {WebGLApplication} from '../base/WebGLApplication';
-import {GLCoordinateSystemHelper} from '../../webgl/GLCoordinateSystemHelper';
-import {GLRenderHelper} from '../../webgl/GLRenderHelper';
+import {GLCoordinateSystem} from '../../../webgl/common/GLCoordinateSystem';
+import {Matrix4} from '../../../common/math/matrix/Matrix4';
+import {Vector3} from '../../../common/math/vector/Vector3';
+import {CanvasKeyboardEvent} from '../../../event/CanvasKeyboardEvent';
+import {EAxisType} from '../../../enum/EAxisType';
+import {DrawHelper} from '../../../common/DrawHelper';
+import {Vector4} from '../../../common/math/vector/Vector4';
+import {WebGLApplication} from '../../base/WebGLApplication';
+import {GLCoordinateSystemHelper} from '../../../webgl/GLCoordinateSystemHelper';
+import {GLRenderHelper} from '../../../webgl/GLRenderHelper';
 
 /**
  * 坐标系统应用。

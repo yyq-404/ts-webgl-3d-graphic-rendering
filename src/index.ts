@@ -1,9 +1,9 @@
 import {BaseApplication} from './app/base/BaseApplication';
-import {RotatingCubeApplication} from './app/demo/RotationCubeApplication';
-import {BasicWebGLApplication} from './app/demo/BasicWebGLApplication';
-import {CoordinateSystemApplication} from './app/demo/CoordinateSystemApplication';
-import {MeshBuilderApplication} from './app/demo/MeshBuilderApplication';
-import {RotationTriangleApplication} from './app/demo/RotationTriangleApplication';
+import {RotatingCubeApplication} from './app/demo/webgl/RotationCubeApplication';
+import {BasicWebGLApplication} from './app/demo/webgl/BasicWebGLApplication';
+import {CoordinateSystemApplication} from './app/demo/webgl/CoordinateSystemApplication';
+import {MeshBuilderApplication} from './app/demo/webgl/MeshBuilderApplication';
+import {RotationTriangleApplication} from './app/demo/webgl2/RotationTriangleApplication';
 
 /** 应用集合 */
 const apps = {

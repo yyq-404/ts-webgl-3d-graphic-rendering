@@ -1,4 +1,4 @@
-import {WebGL2Application} from '../base/WebGL2Application';
+import {WebGL2Application} from '../../base/WebGL2Application';
 
 /**
  * 立方体旋转应用

@@ -1,3 +1,6 @@
+/**
+ * App常量定义。
+ */
 export class AppConstants {
     /** 画布宽度 */
     public static canvasWidth: number = 800;

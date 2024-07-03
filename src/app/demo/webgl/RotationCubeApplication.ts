@@ -1,19 +1,19 @@
-import {GLTexture} from '../../webgl/texture/GLTexture';
-import {Cube} from '../../common/geometry/solid/Cube';
-import {GLStaticMesh} from '../../webgl/mesh/GLStaticMesh';
-import {Matrix4} from '../../common/math/matrix/Matrix4';
-import {GLProgramCache} from '../../webgl/program/GLProgramCache';
-import {Geometry} from '../../common/geometry/Geometry';
-import {GLTextureCache} from '../../webgl/texture/GLTextureCache';
-import {Vector3} from '../../common/math/vector/Vector3';
-import {HttpHelper} from '../../net/HttpHelper';
-import {CanvasKeyboardEvent} from '../../event/CanvasKeyboardEvent';
-import {GLShaderConstants} from '../../webgl/GLShaderConstants';
-import {EAxisType} from '../../enum/EAxisType';
-import {WebGLApplication} from '../base/WebGLApplication';
-import {GLCoordinateSystemHelper} from '../../webgl/GLCoordinateSystemHelper';
-import {GLMeshHelper} from '../../webgl/GLMeshHelper';
-import {GLRenderHelper} from '../../webgl/GLRenderHelper';
+import {GLTexture} from '../../../webgl/texture/GLTexture';
+import {Cube} from '../../../common/geometry/solid/Cube';
+import {GLStaticMesh} from '../../../webgl/mesh/GLStaticMesh';
+import {Matrix4} from '../../../common/math/matrix/Matrix4';
+import {GLProgramCache} from '../../../webgl/program/GLProgramCache';
+import {Geometry} from '../../../common/geometry/Geometry';
+import {GLTextureCache} from '../../../webgl/texture/GLTextureCache';
+import {Vector3} from '../../../common/math/vector/Vector3';
+import {HttpHelper} from '../../../net/HttpHelper';
+import {CanvasKeyboardEvent} from '../../../event/CanvasKeyboardEvent';
+import {GLShaderConstants} from '../../../webgl/GLShaderConstants';
+import {EAxisType} from '../../../enum/EAxisType';
+import {WebGLApplication} from '../../base/WebGLApplication';
+import {GLCoordinateSystemHelper} from '../../../webgl/GLCoordinateSystemHelper';
+import {GLMeshHelper} from '../../../webgl/GLMeshHelper';
+import {GLRenderHelper} from '../../../webgl/GLRenderHelper';
 
 /**
  * 立方体旋转应用
