@@ -1,6 +1,6 @@
 import {Matrix4} from '../matrix/Matrix4';
 
-import {EPSILON} from '../Constants';
+import {EPSILON} from '../MathConstants';
 
 /**
  * 四维向量

@@ -1,4 +1,4 @@
-import {EPSILON} from '../Constants';
+import {EPSILON} from '../MathConstants';
 import {Vector3} from './Vector3';
 import {Matrix2} from '../matrix/Matrix2';
 import {Matrix3} from '../matrix/Matrix3';

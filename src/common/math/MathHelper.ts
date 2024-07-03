@@ -1,7 +1,7 @@
 import {Vector3} from './vector/Vector3';
 import {Quaternion} from './Quaternion';
 import {Matrix4} from './matrix/Matrix4';
-import {EPSILON} from './Constants';
+import {EPSILON} from './MathConstants';
 
 /**
  * 数学工具类。

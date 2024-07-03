@@ -1,7 +1,7 @@
 import {Vector3} from '../math/vector/Vector3';
 import {Vector4} from '../math/vector/Vector4';
 import {Matrix4} from '../math/matrix/Matrix4';
-import {EPSILON} from '../math/Constants';
+import {EPSILON} from '../math/MathConstants';
 
 /**
  * 点与平面之间的关系

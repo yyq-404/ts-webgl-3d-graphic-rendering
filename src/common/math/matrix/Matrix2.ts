@@ -1,5 +1,5 @@
 import {Vector2} from '../vector/Vector2';
-import {EPSILON} from '../Constants';
+import {EPSILON} from '../MathConstants';
 
 /**
  * 二维矩阵
