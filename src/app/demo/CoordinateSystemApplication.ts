@@ -6,7 +6,7 @@ import {EAxisType} from '../../enum/EAxisType';
 import {DrawHelper} from '../../common/DrawHelper';
 import {Vector4} from '../../common/math/vector/Vector4';
 import {WebGLApplication} from '../base/WebGLApplication';
-import {GLCoordinateSystemHelper} from "../../webgl/GLCoordinateSystemHelper";
+import {GLCoordinateSystemHelper} from '../../webgl/GLCoordinateSystemHelper';
 
 /**
  * 坐标系统应用。
@@ -29,14 +29,13 @@ export class CoordinateSystemApplication extends WebGLApplication {
     private _mvp: Matrix4 = new Matrix4();
     /** 坐标系统绘制方法 */
     private _drawMethods: Map<string, (glCoordinateSystem: GLCoordinateSystem) => void>;
-
+    
     /**
      * 构造。
-     * @param {HTMLCanvasElement} canvas
      */
-    public constructor(canvas: HTMLCanvasElement) {
+    public constructor() {
         // 调用基类构造函数
-        super(canvas, {preserveDrawingBuffer: false}, true);
+        super({preserveDrawingBuffer: false}, true);
         this.clearBuffer();
         this.makeFourGLCoordinateSystems();
         this._currentDrawMethod = this.drawCoordinateSystem;
@@ -46,7 +45,7 @@ export class CoordinateSystemApplication extends WebGLApplication {
             ['3', this.drawFullCoordinateSystemWithRotatedCube]
         ]);
     }
-
+    
     /**
      * 按键按下。
      * @param {CanvasKeyboardEvent} evt
@@ -68,7 +67,7 @@ export class CoordinateSystemApplication extends WebGLApplication {
                 break;
         }
     }
-
+    
     /**
      * 更新。
      * @param {number} elapsedMsec
@@ -83,7 +82,7 @@ export class CoordinateSystemApplication extends WebGLApplication {
         // 否则你将什么都看不到，切记!
         super.update(elapsedMsec, intervalSec);
     }
-
+    
     /**
      * 渲染
      */
@@ -98,7 +97,7 @@ export class CoordinateSystemApplication extends WebGLApplication {
         // 使用当前的坐标系及视口数据作为参数，调用currentDrawMethod回调函数
         this._coordinateSystems.forEach((glCoordinateSystem) => this._currentDrawMethod(glCoordinateSystem));
     }
-
+    
     /**
      * 切换展示视图。
      * @private
@@ -113,7 +112,7 @@ export class CoordinateSystemApplication extends WebGLApplication {
             this.makeFourGLCoordinateSystems();
         }
     }
-
+    
     /**
      * 产生一个坐标系统
      * @private
@@ -124,7 +123,7 @@ export class CoordinateSystemApplication extends WebGLApplication {
         // 如果只有一个坐标系的话，其视口和裁剪区与canvas元素尺寸一致， 右下
         this._coordinateSystems.push(new GLCoordinateSystem([0, 0, this.canvas.width, this.canvas.height], Vector3.zero, new Vector3([1, 1, 0]).normalize(), 45, true, this._isD3dMode));
     }
-
+    
     /**
      * 产生四个坐标轴系统。
      */
@@ -144,7 +143,7 @@ export class CoordinateSystemApplication extends WebGLApplication {
         // 右下，旋转轴为[ 1 , 1 , 1 ]
         this._coordinateSystems.push(new GLCoordinateSystem([hw, 0, hw, hh], Vector3.zero, dir, 0, true, this._isD3dMode));
     }
-
+    
     /**
      * 绘制带文字指示的三轴坐标系
      * @param {GLCoordinateSystem} glCoordinateSystem
@@ -161,7 +160,7 @@ export class CoordinateSystemApplication extends WebGLApplication {
         // 绘制坐标系的标示文字，调用drawText方法
         this.drawCoordinateSystemText();
     }
-
+    
     /**
      绘制带文字指示的六轴坐标系
      * @param {GLCoordinateSystem} glCoordinateSystem
@@ -179,7 +178,7 @@ export class CoordinateSystemApplication extends WebGLApplication {
         // 绘制坐标系的标示文字,调用的是本类的drawText方法
         this.drawCoordinateSystemText(true);
     }
-
+    
     /**
      * 使用旋转立方体绘制坐标系
      * @param {GLCoordinateSystem} glCoordinateSystem
@@ -205,7 +204,7 @@ export class CoordinateSystemApplication extends WebGLApplication {
         // 第六步：绘制坐标系的标示文字
         this.drawCoordinateSystemText(true);
     }
-
+    
     /**
      * 绘制X轴旋转立方体。
      * @param {GLCoordinateSystem} glCoordinateSystem
@@ -220,7 +219,7 @@ export class CoordinateSystemApplication extends WebGLApplication {
         DrawHelper.drawWireFrameCubeBox(this.builder, this._cubeMVP, 0.1);
         this.worldMatrixStack.popMatrix();
     }
-
+    
     /**
      * 绘制Y轴旋转立方体。
      * @param {GLCoordinateSystem} glCoordinateSystem
@@ -235,7 +234,7 @@ export class CoordinateSystemApplication extends WebGLApplication {
         DrawHelper.drawWireFrameCubeBox(this.builder, this._cubeMVP, 0.1, Vector4.green);
         this.worldMatrixStack.popMatrix();
     }
-
+    
     /**
      * 绘制Z轴旋转立方体。
      * @param {GLCoordinateSystem} glCoordinateSystem
@@ -249,7 +248,7 @@ export class CoordinateSystemApplication extends WebGLApplication {
         DrawHelper.drawWireFrameCubeBox(this.builder, this._cubeMVP, 0.1, Vector4.blue);
         this.worldMatrixStack.popMatrix();
     }
-
+    
     /**
      * 绘制绕坐标系旋转轴（glCoordinateSystem.axis）旋转的线框立方体
      * @param {GLCoordinateSystem} glCoordinateSystem
@@ -265,7 +264,7 @@ export class CoordinateSystemApplication extends WebGLApplication {
         DrawHelper.drawWireFrameCubeBox(this.builder, this._cubeMVP, 0.1, new Vector4());
         this.worldMatrixStack.popMatrix();
     }
-
+    
     /**
      * 坐标系的model-view-project矩阵
      * @param {GLCoordinateSystem} glCoordinateSystem
@@ -281,7 +280,7 @@ export class CoordinateSystemApplication extends WebGLApplication {
         // 合成model-view-project矩阵
         this._mvp = Matrix4.product(this.camera.viewProjectionMatrix, this.worldMatrixStack.modelViewMatrix);
     }
-
+    
     /**
      * 绘制坐标轴文字
      * @param {boolean} inverse

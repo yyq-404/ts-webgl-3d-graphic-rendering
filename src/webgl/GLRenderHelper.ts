@@ -9,7 +9,7 @@ export class GLRenderHelper {
      * 打印渲染状态
      * @param gl
      */
-    public static printStates(gl: WebGLRenderingContext | null): void {
+    public static printStates(gl: WebGLRenderingContextBase | null): void {
         if (!gl) return;
         // 所有的boolean状态变量，共9个
         console.log(`1. isBlendEnable =  ${gl.isEnabled(gl.BLEND)}`);
@@ -21,15 +21,16 @@ export class GLRenderHelper {
         console.log(`7. isSampleCoverageEnable = ${gl.isEnabled(gl.SAMPLE_COVERAGE)}`);
         console.log(`8. isScissorTestEnable = ${gl.isEnabled(gl.SCISSOR_TEST)}`);
         console.log(`9. isStencilTestEnable  = ${gl.isEnabled(gl.STENCIL_TEST)}`);
+        console.log(`10. version = ${gl.getParameter(gl.VERSION)}`);
     }
     
     /**
      * 模拟触发 `WebGLRenderingContext` 上下文渲染对象丢失
      * @param gl
      */
-    public static triggerContextLostEvent(gl: WebGLRenderingContext | null): void {
+    public static triggerContextLostEvent(gl: WebGLRenderingContextBase): void {
         if (!gl) return;
-        const glExt: WEBGL_lose_context | null = gl.getExtension('WEBGL_lose_context');
+        const glExt: WEBGL_lose_context = gl.getExtension('WEBGL_lose_context');
         if (glExt) glExt.loseContext();
     }
     
@@ -49,8 +50,8 @@ export class GLRenderHelper {
      * @param gl
      * @param type
      */
-    public static createShader(gl: WebGLRenderingContext, type: EGLShaderType): WebGLShader {
-        let shader: WebGLShader | null;
+    public static createShader(gl: WebGLRenderingContextBase, type: EGLShaderType): WebGLShader {
+        let shader: WebGLShader;
         if (type === EGLShaderType.VS_SHADER) {
             shader = gl.createShader(gl.VERTEX_SHADER);
         } else {
@@ -65,14 +66,14 @@ export class GLRenderHelper {
      * @param gl
      * @param v
      */
-    public static setViewport(gl: WebGLRenderingContext, v: number[]): void {
+    public static setViewport(gl: WebGLRenderingContextBase | WebGL2RenderingContext, v: number[]): void {
         gl.viewport(v[0], v[1], v[2], v[3]);
     }
     
     /**
      * 编译着色器
      */
-    public static compileShader(gl: WebGLRenderingContext, code: string, shader: WebGLShader): boolean {
+    public static compileShader(gl: WebGLRenderingContextBase, code: string, shader: WebGLShader): boolean {
         gl.shaderSource(shader, code); // 载入shader源码
         gl.compileShader(shader); // 编译shader源码
         // 检查编译错误
@@ -92,7 +93,7 @@ export class GLRenderHelper {
      * 创建链接器程序
      * @param gl
      */
-    public static createProgram(gl: WebGLRenderingContext): WebGLProgram {
+    public static createProgram(gl: WebGLRenderingContextBase): WebGLProgram {
         const program: WebGLProgram | null = gl.createProgram();
         if (!program) throw new Error('WebGLProgram创建失败!');
         return program;
@@ -107,7 +108,7 @@ export class GLRenderHelper {
      * @param beforeProgramLink 链接前置处理
      * @param afterProgramLink 链接后置处理
      */
-    public static linkProgram(gl: WebGLRenderingContext, program: WebGLProgram, vsShader: WebGLShader, fsShader: WebGLShader, beforeProgramLink?: GLProgramLinkHook, afterProgramLink?: GLProgramLinkHook): boolean {
+    public static linkProgram(gl: WebGLRenderingContextBase, program: WebGLProgram, vsShader: WebGLShader, fsShader: WebGLShader, beforeProgramLink?: GLProgramLinkHook, afterProgramLink?: GLProgramLinkHook): boolean {
         // 1．使用attachShader方法将顶点和片段着色器与当前的链接器相关联
         gl.attachShader(program, vsShader);
         gl.attachShader(program, fsShader);
@@ -144,7 +145,7 @@ export class GLRenderHelper {
      * @param program
      * @private
      */
-    public static printProgramActiveInfos(gl: WebGLRenderingContext, program: WebGLProgram): void {
+    public static printProgramActiveInfos(gl: WebGLRenderingContextBase, program: WebGLProgram): void {
         // 获取当前active状态的attribute和uniform的数量
         // 很重要的一点，active_attributes/uniforms必须在link后才能获得
         const attributeMap: GLAttributeMap = GLRenderHelper.getProgramActiveAttributes(gl, program);
@@ -159,7 +160,7 @@ export class GLRenderHelper {
      * @param program
      * @return GLAttributeMap
      */
-    public static getProgramActiveAttributes(gl: WebGLRenderingContext, program: WebGLProgram): GLAttributeMap {
+    public static getProgramActiveAttributes(gl: WebGLRenderingContextBase, program: WebGLProgram): GLAttributeMap {
         let attributeMap: GLAttributeMap = {};
         //获取当前active状态的attribute和uniform的数量
         //很重要的一点，active_attributes/uniforms必须在link后才能获得
@@ -183,7 +184,7 @@ export class GLRenderHelper {
      * @param program
      * @return GLUniformMap
      */
-    public static getProgramActiveUniforms(gl: WebGLRenderingContext, program: WebGLProgram): GLUniformMap {
+    public static getProgramActiveUniforms(gl: WebGLRenderingContextBase, program: WebGLProgram): GLUniformMap {
         let uniformMap: GLUniformMap = {};
         const uniformsCount: number = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
         //很重要的一点，所谓active是指uniform已经被使用的，否则不属于uniform.uniform在shader中必须是读取，不能赋值
@@ -204,8 +205,8 @@ export class GLRenderHelper {
      * 创建渲染用数据缓冲区
      * @param gl
      */
-    public static createBuffer(gl: WebGLRenderingContext): WebGLBuffer {
-        const buffer: WebGLBuffer | null = gl.createBuffer();
+    public static createBuffer(gl: WebGLRenderingContextBase): WebGLBuffer {
+        const buffer: WebGLBuffer = gl.createBuffer();
         if (!buffer) throw new Error('WebGLBuffer创建失败!');
         return buffer;
     }
@@ -214,7 +215,7 @@ export class GLRenderHelper {
      * 设置默认渲染状态
      * @param gl
      */
-    public static setDefaultState(gl: WebGLRenderingContext): void {
+    public static setDefaultState(gl: WebGLRenderingContextBase): void {
         // default [r=0, g=0, b=0, a=0]
         // 每次清屏时，将颜色缓冲区设置为全透明黑色
         gl.clearColor(0.0, 0.0, 0.0, 0.0);
@@ -232,7 +233,7 @@ export class GLRenderHelper {
      * 检查错误
      * @param gl
      */
-    public static checkGLError(gl: WebGLRenderingContext): boolean {
+    public static checkGLError(gl: WebGLRenderingContextBase): boolean {
         const err: number = gl.getError();
         if (err === 0) {
             return false;
@@ -250,7 +251,7 @@ export class GLRenderHelper {
      * @param {WebGLShader} fsShader
      * @private
      */
-    private static deleteLink(gl: WebGLRenderingContext, program: WebGLProgram, vsShader: WebGLShader, fsShader: WebGLShader): void {
+    private static deleteLink(gl: WebGLRenderingContextBase, program: WebGLProgram, vsShader: WebGLShader, fsShader: WebGLShader): void {
         // 调用getProgramInfoLog方法将错误信息以弹框方式通知调用者
         alert(gl.getProgramInfoLog(program));
         gl.deleteShader(vsShader);

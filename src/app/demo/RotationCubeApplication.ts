@@ -51,12 +51,11 @@ export class RotatingCubeApplication extends WebGLApplication {
     
     /**
      * 构造
-     * @param canvas
      */
-    public constructor(canvas: HTMLCanvasElement) {
+    public constructor() {
         // 调用基类构造函数，最后一个参数为true，意味着我们要创建一个Canvas2D上下文渲染对象
         // 这样我们才能使用该上下文对象进行2D文字渲染
-        super(canvas, {premultipliedAlpha: false}, true);
+        super({premultipliedAlpha: false}, true);
         if (!this.webglContext) throw new Error('this.gl is not defined');
         this.clearBuffer();
         // 初始化角位移和角速度

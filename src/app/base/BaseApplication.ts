@@ -35,10 +35,9 @@ export class BaseApplication implements EventListenerObject, IBaseApplication, I
     
     /**
      * 构造
-     * @param canvas
      */
-    public constructor(canvas: HTMLCanvasElement) {
-        this.canvas = canvas;
+    public constructor() {
+        this.canvas = this.createWebGLCanvas();
         this.isMouseDown = false;
         this.isSupportMouseMove = false;
         this.frameCallback = null;
@@ -196,6 +195,10 @@ export class BaseApplication implements EventListenerObject, IBaseApplication, I
         this.frameCallback = null;
         this.unregisterMouseEvents();
         this.unregisterKeyBoardEvents();
+        if (this.canvas && this.canvas.parentElement) {
+            this.canvas.parentElement.removeChild(this.canvas);
+            this.canvas = null;
+        }
     }
     
     /**
@@ -382,5 +385,23 @@ export class BaseApplication implements EventListenerObject, IBaseApplication, I
             type = ECanvasInputEventType.KEY_PRESS;
         }
         return new CanvasKeyboardEvent(type, event.key, event.code, event.repeat, event.altKey, event.ctrlKey, event.shiftKey);
+    }
+    
+    /**
+     * 创建画布。
+     * @private
+     */
+    private createWebGLCanvas(): HTMLCanvasElement {
+        const webglCanvas: HTMLCanvasElement = document.createElement('canvas');
+        webglCanvas.width = 800;
+        webglCanvas.height = 600;
+        webglCanvas.style.backgroundColor = 'lightgray';
+        webglCanvas.style.position = 'absolute';
+        webglCanvas.style.left = '0px';
+        webglCanvas.style.top = '0px';
+        const parent: HTMLElement | null = document.getElementById('webgl-canvas');
+        if (!parent) throw new Error('canvas元素必须要有父亲!!');
+        parent.appendChild(webglCanvas);
+        return webglCanvas;
     }
 }

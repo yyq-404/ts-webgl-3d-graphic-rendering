@@ -7,7 +7,7 @@ import {MathHelper} from '../common/math/MathHelper';
  * 摄像机。
  */
 export class CameraComponent {
-    public gl: WebGLRenderingContext | null = null;
+    public gl: WebGLRenderingContextBase;
     /** 视图矩阵 */
     private _viewMatrix: Matrix4;
     /** 投影矩阵 */
@@ -24,7 +24,7 @@ export class CameraComponent {
      * @param zNear
      * @param zFar
      */
-    public constructor(gl: WebGLRenderingContext | null, width: number, height: number, fovY: number = 45.0, zNear: number = 1, zFar: number = 1000) {
+    public constructor(gl: WebGLRenderingContextBase, width: number, height: number, fovY: number = 45.0, zNear: number = 1, zFar: number = 1000) {
         this.gl = gl;
         this._aspectRatio = width / height;
         this._fovY = fovY;

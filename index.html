@@ -3,10 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta http-equiv="X-UA-Compatible">
     <style>
         .container {
             position: relative;
+        }
+
+        #webgl {
+            background: lightgray;
         }
 
         #overlay {
@@ -25,8 +29,7 @@
 </head>
 <body>
 <label for='select'>Select Demo <select id='select'> </select></label>
-<div class="container">
-    <canvas id="webgl" width="800" height="600" style="background:lightgray"></canvas>
+<div id="webgl-canvas" class="container">
     <div id="overlay">
         <div>FPS: <span id="fps"></span></div>
         <div>Tris: <span id="tris"></span></div>

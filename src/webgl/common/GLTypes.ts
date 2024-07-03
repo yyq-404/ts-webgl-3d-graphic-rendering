@@ -57,4 +57,4 @@ export type GLAttributeOffsetMap = { [key: string]: number };
 export type GLUniformMap = { [key: string]: GLUniformInfo };
 export type GLAttributeMap = { [key: string]: GLAttributeInfo };
 export type GLAttributeBits = number;
-export type GLProgramLinkHook = (gl: WebGLRenderingContext, program: WebGLProgram) => void;
+export type GLProgramLinkHook = (gl: WebGLRenderingContextBase, program: WebGLProgram) => void;

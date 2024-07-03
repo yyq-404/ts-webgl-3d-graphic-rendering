@@ -73,12 +73,11 @@ export class BasicWebGLApplication extends BaseApplication {
     
     /**
      * 构造
-     * @param {HTMLCanvasElement} canvas
      */
-    public constructor(canvas: HTMLCanvasElement) {
+    public constructor() {
         // 创建WebGLRenderingContext上下文渲染对象
         // 调用基类构造函数
-        super(canvas);
+        super();
         let contextAttribs: WebGLContextAttributes = this.getContextAttributes();
         let ctx: WebGLRenderingContext | null = this.canvas.getContext('webgl', contextAttribs);
         if (ctx === null) {
@@ -87,7 +86,7 @@ export class BasicWebGLApplication extends BaseApplication {
         }
         // 从canvas元素中获得webgl上下文渲染对象，WebGL API都通过该上下文渲染对象进行调用
         this._webglContext = ctx;
-        canvas.addEventListener('webglcontextlost', function (e) {
+        this.canvas.addEventListener('webglcontextlost', function (e) {
             // 当触发WebGLContextLost事件时，将该事件相关信息打印到控制台
             console.log(JSON.stringify(e));
         }, false);

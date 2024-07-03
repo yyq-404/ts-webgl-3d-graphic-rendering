@@ -3,16 +3,15 @@ import {RotatingCubeApplication} from './app/demo/RotationCubeApplication';
 import {BasicWebGLApplication} from './app/demo/BasicWebGLApplication';
 import {CoordinateSystemApplication} from './app/demo/CoordinateSystemApplication';
 import {MeshBuilderApplication} from './app/demo/MeshBuilderApplication';
-
-/** 获取用于获得webgl上下文对象的HTMLCanvasElement元素 */
-let canvas: HTMLCanvasElement | null = document.getElementById('webgl') as HTMLCanvasElement;
+import {RotationTriangleApplication} from './app/demo/RotationTriangleApplication';
 
 /** 应用集合 */
 const apps = {
-    '1: RotatingCube': RotatingCubeApplication,
+    '1: RotationCube': RotatingCubeApplication,
     '2: BasicWebGL': BasicWebGLApplication,
     '3: CoordinateSystem': CoordinateSystemApplication,
-    '4: MeshBuilder': MeshBuilderApplication
+    '4: MeshBuilder': MeshBuilderApplication,
+    '5: RotationTriangle': RotationTriangleApplication
 };
 
 /** 当前正在运行的App */
@@ -28,7 +27,7 @@ select.onchange = () => {
         currentApp.stop();
         currentApp.dispose();
     }
-    const app: BaseApplication = new apps[appName](canvas);
+    const app: BaseApplication = new apps[appName]();
     runAppAsync(app).then().catch((reason) => console.log(reason));
 };
 
@@ -66,9 +65,9 @@ function frameCallback(app: BaseApplication): void {
  * 异步执行。
  * @param app
  */
-async function runAppAsync(app: BaseApplication | (new (canvas: HTMLCanvasElement | null) => BaseApplication)) {
+async function runAppAsync(app: BaseApplication | (new () => BaseApplication)) {
     if (typeof app === 'function') {
-        app = new app(canvas);
+        app = new app();
     }
     currentApp = app;
     app.frameCallback = frameCallback;
@@ -79,5 +78,5 @@ async function runAppAsync(app: BaseApplication | (new (canvas: HTMLCanvasElemen
  * 默认运行RotatingCubeApplication
  */
 (async (): Promise<void> => {
-    await runAppAsync(new RotatingCubeApplication(canvas));
+    await runAppAsync(new RotatingCubeApplication());
 })();

@@ -51,9 +51,9 @@ export class MeshBuilderApplication extends WebGLApplication {
      * 构造
      * @param {HTMLCanvasElement} canvas
      */
-    public constructor(canvas: HTMLCanvasElement) {
+    public constructor() {
         // 调用基类构造函数
-        super(canvas, {preserveDrawingBuffer: false}, true);
+        super({preserveDrawingBuffer: false}, true);
         if (!this.webglContext) throw new Error('this.webglContext is undefined.');
         // 使用default纹理和着色器
         this._texture = GLTextureCache.instance.getMust('default');
