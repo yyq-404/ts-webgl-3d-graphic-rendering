@@ -58,7 +58,6 @@ export class RotatingCubeApplication extends WebGLApplication {
         // 这样我们才能使用该上下文对象进行2D文字渲染
         super({premultipliedAlpha: false}, true);
         if (!this.webglContext) throw new Error('this.gl is not defined');
-        this.clearBuffer();
         // 初始化角位移和角速度
         this._cubeAngle = 0;
         this._triangleAngle = 0;
@@ -144,7 +143,7 @@ export class RotatingCubeApplication extends WebGLApplication {
             this.context2d.clearRect(0, 0, this.canvas.width, this.canvas.height);
         }
         // FIXME: 切记，一定要先清屏（清除掉颜色缓冲区和深度缓冲区）(书上有，随书源码中无？？？)
-        this.clearBuffer();
+        GLRenderHelper.clearBuffer(this.webglContext);
         this.renderCube();
         this.renderTriangle();
         this.renderText('First WebGL Demo');

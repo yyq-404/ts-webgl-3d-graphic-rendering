@@ -7,8 +7,6 @@ import {GLAttributeHelper} from '../../webgl/GLAttributeHelper';
 import {GLProgram} from '../../webgl/program/GLProgram';
 import {GLTexture} from '../../webgl/texture/GLTexture';
 import {GLWorldMatrixStack} from '../../webgl/matrix/GLWorldMatrixStack';
-import {CanvasKeyboardEvent} from '../../event/CanvasKeyboardEvent';
-import {HttpHelper} from '../../net/HttpHelper';
 import {AppConstants} from '../AppConstants';
 
 /**
@@ -52,8 +50,6 @@ export class WebGLApplication extends BaseApplication {
         this.worldMatrixStack = new GLWorldMatrixStack();
         // 初始化渲染状态
         GLRenderHelper.setDefaultState(this.webglContext);
-        // 由于Canvas是左手系，而webGL是右手系，需要FlipYCoordinate
-        this.isFlipYCoordinate = true;
         // 初始化时，创建default纹理
         GLTextureCache.instance.set('default', GLTexture.createDefaultTexture(this.webglContext));
         // 初始化时，创建颜色GLMeshBuilder对象
@@ -70,62 +66,12 @@ export class WebGLApplication extends BaseApplication {
         await super.runAsync();
     }
     
-    /**
-     * 按键按下。
-     * @param event
-     */
-    public override onKeyPress(event: CanvasKeyboardEvent): void {
-        switch (event.key) {
-            case 'w':
-                this.camera.moveForward(-1);
-                break;
-            case 's':
-                this.camera.moveForward(1);
-                break;
-            case 'a':
-                this.camera.moveRightward(-1);
-                break;
-            case 'd':
-                this.camera.moveRightward(1);
-                break;
-            case 'z':
-                this.camera.moveUpward(1);
-                break;
-            case 'x':
-                this.camera.moveUpward(-1);
-                break;
-            case 'y':
-                this.camera.yaw(1);
-                break;
-            case 'r':
-                this.camera.roll(1);
-                break;
-            case 'p':
-                this.camera.pitch(1);
-                break;
-            default:
-                break;
-        }
-    }
-    
-    /**
-     * 更新。
-     * @param elapsedMsec
-     * @param intervalSec
-     */
-    public override update(elapsedMsec: number, intervalSec: number): void {
-        this.camera.update(intervalSec);
-    }
     
     /**
      * 释放
      */
     public override dispose(): void {
         this.worldMatrixStack.clear();
-        this.clearBuffer();
-        if (this.webglContext) {
-            this.webglContext = null;
-        }
         GLProgramCache.instance.clear();
         GLTextureCache.instance.clear();
         if (this.canvas2d && this.canvas2d.parentElement) {
@@ -135,17 +81,11 @@ export class WebGLApplication extends BaseApplication {
         if (this.context2d) {
             this.context2d = null;
         }
-        super.dispose();
-    }
-    
-    /**
-     * 清理缓冲数据。
-     * @protected
-     */
-    protected clearBuffer(): void {
+        GLRenderHelper.clearBuffer(this.webglContext);
         if (this.webglContext) {
-            this.webglContext.clear(this.webglContext.COLOR_BUFFER_BIT | this.webglContext.DEPTH_BUFFER_BIT);
+            this.webglContext = null;
         }
+        super.dispose();
     }
     
     /**
@@ -156,16 +96,16 @@ export class WebGLApplication extends BaseApplication {
     protected async initAsync(): Promise<void> {
         if (!this.webglContext) throw new Error('this.webglContext is not defined');
         // 加载颜色顶点着色器代码
-        let colorVertShader = await this.loadShaderSourceAsync('color.vert');
+        let colorVertShader = await this.loadShaderSourceAsync(this._shaderUrls, 'color.vert');
         // 加载颜色片元着色器代码
-        let colorFragShader = await this.loadShaderSourceAsync('color.frag');
+        let colorFragShader = await this.loadShaderSourceAsync(this._shaderUrls, 'color.frag');
         let defaultColorProgram = GLProgram.createDefaultProgram(this.webglContext, colorVertShader, colorFragShader);
         // 创建颜色Program
         GLProgramCache.instance.set('color', defaultColorProgram);
         // 加载纹理顶点着色器代码
-        let textureVertShader = await this.loadShaderSourceAsync('texture.vert');
+        let textureVertShader = await this.loadShaderSourceAsync(this._shaderUrls, 'texture.vert');
         // 加载纹理片元着色器代码
-        let textureFragShader = await this.loadShaderSourceAsync('texture.frag');
+        let textureFragShader = await this.loadShaderSourceAsync(this._shaderUrls, 'texture.frag');
         let defaultTextureProgram = GLProgram.createDefaultProgram(this.webglContext, textureVertShader, textureFragShader, false);
         // 创建纹理Program
         GLProgramCache.instance.set('texture', defaultTextureProgram);
@@ -190,20 +130,5 @@ export class WebGLApplication extends BaseApplication {
         this.context2d = canvas2d.getContext('2d');
         parent.appendChild(canvas2d);
         this.canvas2d = canvas2d;
-    }
-    
-    /**
-     * 创建WebGL着色器。
-     * @param {string} name
-     * @return {Promise<WebGLShader | undefined>}
-     * @private
-     */
-    private async loadShaderSourceAsync(name: string): Promise<string | null> {
-        if (!this.webglContext) return null;
-        let shadeUrl = this._shaderUrls.get(name);
-        if (!shadeUrl) return null;
-        let shaderSource = await HttpHelper.loadTextFileAsync(shadeUrl);
-        if (!shaderSource) return null;
-        return await HttpHelper.loadTextFileAsync(shadeUrl);
     }
 }

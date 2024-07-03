@@ -7,6 +7,7 @@ import {ICanvasInputEventListener} from '../../interface/ICanvasInputEventListen
 import {IBaseApplication} from '../../interface/IBaseApplication';
 import {CameraComponent} from '../../component/CameraComponent';
 import {AppConstants} from '../AppConstants';
+import {HttpHelper} from '../../net/HttpHelper';
 
 /**
  * 基础应用
@@ -28,14 +29,14 @@ export class BaseApplication implements EventListenerObject, IBaseApplication, I
     protected isMouseDown: boolean = false;
     /** 标记当前鼠标右键是否按下, 目的是提供 `mousedrag` 事件 */
     protected isRightMouseDown: boolean = false;
-    /** 标记当前 `Application` 是否进入不间断的循环状态 */
-    protected _start: boolean = false;
     /** `window.requestAnimationFrame()` 返回的大于0的id号,可以使用 `cancelAnimationFrame(this ._requestId)` 来取消动画循环 */
     protected requestId: number = -1;
     /** 用于计算当前更新与上一次更新之间的时间差, 用于基于时间的物理更新 */
     protected lastTime: number = 0;
     /** 用于计算当前更新与上一次更新之间的时间差, 用于基于时间的物理更新 */
     protected startTime: number = 0;
+    /** 标记当前 `Application` 是否进入不间断的循环状态 */
+    private _running: boolean = false;
     /** 帧率 */
     private _fps: number = 0;
     
@@ -47,6 +48,8 @@ export class BaseApplication implements EventListenerObject, IBaseApplication, I
         this.camera = new CameraComponent(this.canvas.width, this.canvas.height, 45, 1);
         this.isMouseDown = false;
         this.isSupportMouseMove = false;
+        // 由于Canvas是左手系，而webGL是右手系，需要FlipYCoordinate
+        this.isFlipYCoordinate = true;
         this.frameCallback = null;
         document.oncontextmenu = () => false;
         this.registerMouseEvents();
@@ -80,8 +83,8 @@ export class BaseApplication implements EventListenerObject, IBaseApplication, I
      * 启动
      */
     public start(): void {
-        if (!this._start) {
-            this._start = true;
+        if (!this.isRunning()) {
+            this._running = true;
             this.lastTime = this.startTime = -1;
             this.requestId = requestAnimationFrame(this.step.bind(this));
         }
@@ -91,18 +94,18 @@ export class BaseApplication implements EventListenerObject, IBaseApplication, I
      * 是否运行。
      */
     public isRunning(): boolean {
-        return this._start;
+        return this._running;
     }
     
     /**
      * 停止
      */
     public stop(): void {
-        if (this._start) {
+        if (this.isRunning()) {
             cancelAnimationFrame(this.requestId);
             this.requestId = -1;
             this.lastTime = this.startTime = -1;
-            this._start = false;
+            this._running = false;
         }
     }
     
@@ -168,20 +171,50 @@ export class BaseApplication implements EventListenerObject, IBaseApplication, I
     }
     
     /**
-     * 按键长按
+     * 按键按下。
      * @param event
      */
     public onKeyPress(event: CanvasKeyboardEvent): void {
-        console.log(`onKeyPress: ${event.key}`);
+        switch (event.key) {
+            case 'w':
+                this.camera.moveForward(-1);
+                break;
+            case 's':
+                this.camera.moveForward(1);
+                break;
+            case 'a':
+                this.camera.moveRightward(-1);
+                break;
+            case 'd':
+                this.camera.moveRightward(1);
+                break;
+            case 'z':
+                this.camera.moveUpward(1);
+                break;
+            case 'x':
+                this.camera.moveUpward(-1);
+                break;
+            case 'y':
+                this.camera.yaw(1);
+                break;
+            case 'r':
+                this.camera.roll(1);
+                break;
+            case 'p':
+                this.camera.pitch(1);
+                break;
+            default:
+                break;
+        }
     }
     
     /**
-     * 更新
+     * 更新。
      * @param elapsedMsec
      * @param intervalSec
      */
     public update(elapsedMsec: number, intervalSec: number): void {
-        throw new Error('Method not implemented, please override it in sub class.');
+        this.camera.update(intervalSec);
     }
     
     /**
@@ -211,7 +244,7 @@ export class BaseApplication implements EventListenerObject, IBaseApplication, I
      * @protected
      */
     protected step(timeStamp: number): void {
-        if (!this._start) return;
+        if (!this._running) return;
         if (this.startTime === -1) {
             this.startTime = timeStamp;
         }
@@ -407,5 +440,20 @@ export class BaseApplication implements EventListenerObject, IBaseApplication, I
         if (!parent) throw new Error('canvas元素必须要有父亲!!');
         parent.appendChild(webglCanvas);
         return webglCanvas;
+    }
+    
+    /**
+     * 创建WebGL着色器。
+     * @param {string} name
+     * @param {Map} shaderUrls
+     * @return {Promise<WebGLShader}
+     * @private
+     */
+    protected async loadShaderSourceAsync(shaderUrls: Map<string, string>, name: string): Promise<string> {
+        let shadeUrl = shaderUrls.get(name);
+        if (!shadeUrl) return null;
+        let shaderSource = await HttpHelper.loadTextFileAsync(shadeUrl);
+        if (!shaderSource) return null;
+        return await HttpHelper.loadTextFileAsync(shadeUrl);
     }
 }

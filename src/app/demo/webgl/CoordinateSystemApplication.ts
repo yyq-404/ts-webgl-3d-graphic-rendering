@@ -37,7 +37,6 @@ export class CoordinateSystemApplication extends WebGLApplication {
     public constructor() {
         // 调用基类构造函数
         super({preserveDrawingBuffer: false}, true);
-        this.clearBuffer();
         this.makeFourGLCoordinateSystems();
         this._currentDrawMethod = this.drawCoordinateSystem;
         this._drawMethods = new Map<string, (glCoordinateSystem: GLCoordinateSystem) => void>([
@@ -91,7 +90,7 @@ export class CoordinateSystemApplication extends WebGLApplication {
         // 由于要使用Canvas2D绘制文字，所以必须要有ctx2D对象
         if (!this.context2d) return;
         // 使用了 preserveDrawingBuffer: false 创建WebGLRenderingContext，因此可以不用每帧调用clear方法清屏
-        this.clearBuffer();
+        GLRenderHelper.clearBuffer(this.webglContext);
         // 对Canvas2D上下文渲染对象进行清屏操作
         this.context2d.clearRect(0, 0, this.canvas.width, this.canvas.height);
         // 遍历整个坐标系视口数组
