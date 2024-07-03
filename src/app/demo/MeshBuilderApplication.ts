@@ -12,6 +12,7 @@ import {EAxisType} from '../../enum/EAxisType';
 import {DrawHelper} from '../../common/DrawHelper';
 import {CanvasKeyboardEvent} from '../../event/CanvasKeyboardEvent';
 import {Matrix4} from '../../common/math/matrix/Matrix4';
+import {GLRenderHelper} from '../../webgl/GLRenderHelper';
 
 /**
  * 网格构建器应用
@@ -226,7 +227,12 @@ export class MeshBuilderApplication extends WebGLApplication {
     private drawByMatrixWithColorShader(): void {
         if (!this.webglContext) return;
         // 很重要，由于我们后续使用多视口渲染，因此必须要调用camera的setViewport方法
-        this.camera.setViewport(0, 0, this.canvas.width, this.canvas.height);
+        GLRenderHelper.setViewport(this.webglContext, {
+            x: 0,
+            y: 0,
+            width: this.canvas.width,
+            height: this.canvas.height
+        });
         // 使用clearColor方法设置当前颜色缓冲区背景色是什么颜色
         this.webglContext.clearColor(0.8, 0.8, 0.8, 1);
         // 调用clear清屏操作
@@ -307,8 +313,7 @@ export class MeshBuilderApplication extends WebGLApplication {
         // 2、gl.scissor (x, y, width, height)方法
         // 而在WebGLApplication的构造函数调用的GLHelper.setDefaultState方法已经开启了SCISSOR_TEST
         // 因此可以进行视口大小的裁剪操作了，超出视口部分的内容都被裁剪掉了!!
-        this.camera.setViewport(glCoordinateSystem.viewport[0], glCoordinateSystem.viewport[1], glCoordinateSystem.viewport[2], glCoordinateSystem.viewport[3]
-        );
+        GLRenderHelper.setViewport(this.webglContext, glCoordinateSystem.viewport);
     }
     
     /**
@@ -320,6 +325,6 @@ export class MeshBuilderApplication extends WebGLApplication {
     private drawCoordinateAxis(builder: GLMeshBuilder, length: number = 1.0): void {
         GLCoordinateSystemHelper.drawAxis(builder, Matrix4.m0, EAxisType.NONE, length);
         if (!this.context2d) return;
-        GLCoordinateSystemHelper.drawText(this.context2d, Matrix4.m0, this.camera.getViewport(), this.canvas.height, false, length);
+        GLCoordinateSystemHelper.drawText(this.context2d, Matrix4.m0, GLRenderHelper.getViewport(this.webglContext), this.canvas.height, false, length);
     }
 }

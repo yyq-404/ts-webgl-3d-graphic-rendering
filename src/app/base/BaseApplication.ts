@@ -5,11 +5,14 @@ import {Vector2} from '../../common/math/vector/Vector2';
 import {TimerManager} from '../../timer/TimerManager';
 import {ICanvasInputEventListener} from '../../interface/ICanvasInputEventListener';
 import {IBaseApplication} from '../../interface/IBaseApplication';
+import {CameraComponent} from '../../component/CameraComponent';
 
 /**
  * 基础应用
  */
 export class BaseApplication implements EventListenerObject, IBaseApplication, ICanvasInputEventListener {
+    /** 摄像机 */
+    protected camera: CameraComponent;
     /** 每帧间回调函数, 下一次重绘之前更新动画帧所调用的函数 */
     public frameCallback: ((app: BaseApplication) => void) | null = null;
     /** 定时器管理器 */
@@ -32,12 +35,14 @@ export class BaseApplication implements EventListenerObject, IBaseApplication, I
     protected lastTime: number = 0;
     /** 用于计算当前更新与上一次更新之间的时间差, 用于基于时间的物理更新 */
     protected startTime: number = 0;
-    
+    /** 帧率 */
+    private _fps: number = 0;
     /**
      * 构造
      */
     public constructor() {
         this.canvas = this.createWebGLCanvas();
+        this.camera = new CameraComponent(this.canvas.width, this.canvas.height, 45, 1);
         this.isMouseDown = false;
         this.isSupportMouseMove = false;
         this.frameCallback = null;
@@ -45,9 +50,6 @@ export class BaseApplication implements EventListenerObject, IBaseApplication, I
         this.registerMouseEvents();
         this.registerKeyBoardEvents();
     }
-    
-    /** 帧率 */
-    private _fps: number = 0;
     
     /**
      * 获取fps

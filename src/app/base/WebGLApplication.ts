@@ -15,18 +15,16 @@ import {HttpHelper} from '../../net/HttpHelper';
  * WebGL应用。
  */
 export class WebGLApplication extends BaseApplication {
-    /** 摄像机 */
-    protected camera: CameraComponent;
     /* 可以直接操作WebGL相关内容 */
-    protected webglContext: WebGLRenderingContext | null;
+    protected webglContext: WebGLRenderingContext;
     /** 模拟 `OpenGL1.1` 中的矩阵堆栈, 封装在 `GLWorldMatrixStack` 类中 */
     protected worldMatrixStack: GLWorldMatrixStack;
     /** 模拟OpenGL1.1中的立即绘制模式, 封装在GLMeshBuilder类中 */
     protected builder: GLMeshBuilder;
     /** 为了在3D环境中同时支持Canvas2D绘制，特别是为了实现文字绘制 */
-    protected canvas2d: HTMLCanvasElement | null = null;
+    protected canvas2d: HTMLCanvasElement;
     /** 2D渲染环境 */
-    protected context2d: CanvasRenderingContext2D | null = null;
+    protected context2d: CanvasRenderingContext2D;
     /** shader路径集合 */
     private readonly _shaderUrls: Map<string, string> = new Map<string, string>([
         ['color.vert', 'res/shader/common/color/color.vert'],
@@ -51,7 +49,6 @@ export class WebGLApplication extends BaseApplication {
         if (option2d) {
             this.create2dCanvas();
         }
-        this.camera = new CameraComponent(this.webglContext, this.canvas.width, this.canvas.height, 45, 1);
         this.worldMatrixStack = new GLWorldMatrixStack();
         // 初始化渲染状态
         GLRenderHelper.setDefaultState(this.webglContext);
@@ -125,13 +122,18 @@ export class WebGLApplication extends BaseApplication {
      */
     public override dispose(): void {
         this.worldMatrixStack.clear();
-        this.camera.setViewport(0, 0, this.canvas.width, this.canvas.height);
         this.clearBuffer();
+        if (this.webglContext) {
+            this.webglContext = null;
+        }
         GLProgramCache.instance.clear();
         GLTextureCache.instance.clear();
         if (this.canvas2d && this.canvas2d.parentElement) {
             this.canvas2d.parentElement.removeChild(this.canvas2d);
             this.canvas2d = null;
+        }
+        if (this.context2d) {
+            this.context2d = null;
         }
         super.dispose();
     }

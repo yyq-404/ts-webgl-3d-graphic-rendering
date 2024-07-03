@@ -1,11 +1,25 @@
-import {Vector3} from "../../common/math/vector/Vector3";
+import {Vector3} from '../../common/math/vector/Vector3';
+
+/**
+ * 坐标系视口
+ */
+export type GLCoordinateSystemViewport = {
+    /** x轴坐标 */
+    x: number,
+    /** y轴坐标 */
+    y: number,
+    /** 宽度 */
+    width: number,
+    /** 长度 */
+    height: number,
+}
 
 /**
  *  `GLCoordinateSystem` 类用来描述和显示WebGL的坐标系结构，支持多视口的绘制
  */
 export class GLCoordinateSystem {
     /** 当前坐标系被绘制在哪个视口中 */
-    public viewport: number[] = [];
+    public viewport: GLCoordinateSystemViewport;
     /** 当前坐标系的位置，如果是多视口渲染的话，就为 `[0,0,0]` */
     public position: Vector3 = Vector3.zero;
     /** 当前坐标系绕哪个轴旋转 */
@@ -16,7 +30,7 @@ export class GLCoordinateSystem {
     public isDrawAxis: boolean = false;
     /** 是否绘制为 `Direct3D` 左手系 */
     public isLeftHardness: boolean = false;
-
+    
     /**
      * 构造
      * @param viewport
@@ -26,7 +40,7 @@ export class GLCoordinateSystem {
      * @param isDrawAxis
      * @param isLeftHardness
      */
-    public constructor(viewport: number[], position: Vector3 = Vector3.zero, axis: Vector3 = Vector3.up, angle: number = 0, isDrawAxis: boolean = false, isLeftHardness: boolean = false) {
+    public constructor(viewport: GLCoordinateSystemViewport, position: Vector3 = Vector3.zero, axis: Vector3 = Vector3.up, angle: number = 0, isDrawAxis: boolean = false, isLeftHardness: boolean = false) {
         this.viewport = viewport;
         this.position = position;
         this.axis = axis;
@@ -34,7 +48,7 @@ export class GLCoordinateSystem {
         this.isDrawAxis = isDrawAxis;
         this.isLeftHardness = isLeftHardness;
     }
-
+    
     /**
      * 构建视图坐标系统。
      * @param width
@@ -52,7 +66,7 @@ export class GLCoordinateSystem {
         for (let i: number = 0; i < colum; i++) {
             for (let j: number = 0; j < row; j++) {
                 // viewport是[ x , y , width , height ]格式
-                coords.push(new GLCoordinateSystem([i * w, j * h, w, h]));
+                coords.push(new GLCoordinateSystem({x: i * w, y: i * h, width: w, height: h}));
             }
         }
         // 将生成的GLCoordinateSystem数组返回

@@ -7,6 +7,7 @@ import {DrawHelper} from '../../common/DrawHelper';
 import {Vector4} from '../../common/math/vector/Vector4';
 import {WebGLApplication} from '../base/WebGLApplication';
 import {GLCoordinateSystemHelper} from '../../webgl/GLCoordinateSystemHelper';
+import {GLRenderHelper} from '../../webgl/GLRenderHelper';
 
 /**
  * 坐标系统应用。
@@ -121,7 +122,12 @@ export class CoordinateSystemApplication extends WebGLApplication {
         // 清空坐标系数组内容，用于按需重新生成
         this._coordinateSystems = [];
         // 如果只有一个坐标系的话，其视口和裁剪区与canvas元素尺寸一致， 右下
-        this._coordinateSystems.push(new GLCoordinateSystem([0, 0, this.canvas.width, this.canvas.height], Vector3.zero, new Vector3([1, 1, 0]).normalize(), 45, true, this._isD3dMode));
+        this._coordinateSystems.push(new GLCoordinateSystem({
+            x: 0,
+            y: 0,
+            width: this.canvas.width,
+            height: this.canvas.height
+        }, Vector3.zero, new Vector3([1, 1, 0]).normalize(), 45, true, this._isD3dMode));
     }
     
     /**
@@ -135,13 +141,33 @@ export class CoordinateSystemApplication extends WebGLApplication {
         const dir: Vector3 = new Vector3([1, 1, 1]).normalize();
         // 对于四视口渲染来说，将整个窗口平分成2*2四个视口表示
         // 左上，旋转轴为y轴
-        this._coordinateSystems.push(new GLCoordinateSystem([0, hh, hw, hh], Vector3.zero, Vector3.up, 0));
+        this._coordinateSystems.push(new GLCoordinateSystem({
+            x: 0,
+            y: hh,
+            width: hw,
+            height: hh
+        }, Vector3.zero, Vector3.up, 0));
         // 右上，旋转轴为x轴
-        this._coordinateSystems.push(new GLCoordinateSystem([hw, hh, hw, hh], Vector3.zero, Vector3.right, 0));
+        this._coordinateSystems.push(new GLCoordinateSystem({
+            x: hw,
+            y: hh,
+            width: hw,
+            height: hh
+        }, Vector3.zero, Vector3.right, 0));
         // 左下，旋转轴为z轴
-        this._coordinateSystems.push(new GLCoordinateSystem([0, 0, hw, hh], Vector3.zero, Vector3.forward, 0));
+        this._coordinateSystems.push(new GLCoordinateSystem({
+            x: 0,
+            y: 0,
+            width: hw,
+            height: hh
+        }, Vector3.zero, Vector3.forward, 0));
         // 右下，旋转轴为[ 1 , 1 , 1 ]
-        this._coordinateSystems.push(new GLCoordinateSystem([hw, 0, hw, hh], Vector3.zero, dir, 0, true, this._isD3dMode));
+        this._coordinateSystems.push(new GLCoordinateSystem({
+            x: hw,
+            y: 0,
+            width: hw,
+            height: hh
+        }, Vector3.zero, dir, 0, true, this._isD3dMode));
     }
     
     /**
@@ -272,7 +298,7 @@ export class CoordinateSystemApplication extends WebGLApplication {
      */
     private calcModelViewProjectionMatrix(glCoordinateSystem: GLCoordinateSystem): void {
         // 设置当前的视口
-        this.camera.setViewport(glCoordinateSystem.viewport[0], glCoordinateSystem.viewport[1], glCoordinateSystem.viewport[2], glCoordinateSystem.viewport[3]);
+        GLRenderHelper.setViewport(this.webglContext, glCoordinateSystem.viewport);
         // 将坐标系平移到s.pos位置
         this.worldMatrixStack.translate(glCoordinateSystem.position);
         // 坐标系绕着s.axis轴旋转s.angle度
@@ -288,6 +314,6 @@ export class CoordinateSystemApplication extends WebGLApplication {
      */
     private drawCoordinateSystemText(inverse: boolean = false): void {
         if (!this.context2d) return;
-        GLCoordinateSystemHelper.drawText(this.context2d, this._mvp, this.camera.getViewport(), this.canvas.height, inverse);
+        GLCoordinateSystemHelper.drawText(this.context2d, this._mvp, GLRenderHelper.getViewport(this.webglContext), this.canvas.height, inverse);
     }
 }

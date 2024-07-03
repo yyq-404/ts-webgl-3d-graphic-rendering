@@ -7,25 +7,42 @@ import {MathHelper} from '../common/math/MathHelper';
  * 摄像机。
  */
 export class CameraComponent {
-    public gl: WebGLRenderingContextBase;
     /** 视图矩阵 */
     private _viewMatrix: Matrix4;
     /** 投影矩阵 */
     private _projectionMatrix: Matrix4;
+    /** 投影矩阵*摄像机矩阵及其逆矩阵 */
+    private _viewProjectionMatrix: Matrix4;
     /** view_matrix矩阵及其逆矩阵 */
     private _invViewProjectionMatrix: Matrix4;
+    /** 摄像机类型 */
+    private _type: ECameraType = ECameraType.FLY_CAMERA;
+    /** 位置 */
+    private _position: Vector3 = new Vector3();
+    /** 摄像机世界坐标系x轴 */
+    private _xAxis: Vector3 = Vector3.right.copy(new Vector3());
+    /** 摄像机世界坐标系y轴 */
+    private _yAxis: Vector3 = Vector3.up.copy(new Vector3());
+    /** 世界坐标系z轴 */
+    private _zAxis: Vector3 = Vector3.forward.copy(new Vector3());
+    /** 远平面距离 */
+    private _far: number;
+    /** 近平面距离 */
+    private _near: number;
+    /** 上下场视角的大小，内部由弧度表示，输入由角度表示 */
+    private _fovY: number;
+    /** 纵横比 */
+    private _aspectRatio: number;
     
     /**
      * 构造
-     * @param gl
      * @param width
      * @param height
      * @param fovY
      * @param zNear
      * @param zFar
      */
-    public constructor(gl: WebGLRenderingContextBase, width: number, height: number, fovY: number = 45.0, zNear: number = 1, zFar: number = 1000) {
-        this.gl = gl;
+    public constructor(width: number, height: number, fovY: number = 45.0, zNear: number = 1, zFar: number = 1000) {
         this._aspectRatio = width / height;
         this._fovY = fovY;
         this._near = zNear;
@@ -34,13 +51,9 @@ export class CameraComponent {
         this._projectionMatrix = new Matrix4();
         this._viewProjectionMatrix = new Matrix4();
         this._invViewProjectionMatrix = new Matrix4();
-        this.setViewport(0, 0, width, height);
         // 摄影机默认位置。
         this.position.z = 5;
     }
-    
-    /** 投影矩阵*摄像机矩阵及其逆矩阵 */
-    private _viewProjectionMatrix: Matrix4;
     
     /**
      * 设置投影矩阵*摄像机矩阵及其逆矩阵
@@ -57,9 +70,6 @@ export class CameraComponent {
         this._viewProjectionMatrix = value;
     }
     
-    /** 摄像机类型 */
-    private _type: ECameraType = ECameraType.FLY_CAMERA;
-    
     /**
      * 获取摄像机类型
      */
@@ -74,9 +84,6 @@ export class CameraComponent {
     public set type(value: ECameraType) {
         this._type = value;
     }
-    
-    /** 位置 */
-    private _position: Vector3 = new Vector3();
     
     /**
      * 获取位置
@@ -93,9 +100,6 @@ export class CameraComponent {
         this._position = value;
     }
     
-    /** 摄像机世界坐标系x轴 */
-    private _xAxis: Vector3 = new Vector3([1, 0, 0]);
-    
     /**
      * 获取X轴坐标
      */
@@ -110,9 +114,6 @@ export class CameraComponent {
     public set xAxis(value: Vector3) {
         this._xAxis = value;
     }
-    
-    /** 摄像机世界坐标系y轴 */
-    private _yAxis: Vector3 = new Vector3([0, 1, 0]);
     
     /**
      * 获取Y轴坐标
@@ -129,9 +130,6 @@ export class CameraComponent {
         this._yAxis = value;
     }
     
-    /** 世界坐标系z轴 */
-    private _zAxis: Vector3 = new Vector3([0, 0, 1]);
-    
     /**
      * 获取Z轴坐标
      */
@@ -146,9 +144,6 @@ export class CameraComponent {
     public set zAxis(value: Vector3) {
         this._zAxis = value;
     }
-    
-    /** 近平面距离 */
-    private _near: number;
     
     /**
      * 获取摄像机近距
@@ -165,9 +160,6 @@ export class CameraComponent {
         this._near = value;
     }
     
-    /** 远平面距离 */
-    private _far: number;
-    
     /**
      * 获取摄像机远距
      */
@@ -183,9 +175,6 @@ export class CameraComponent {
         this._far = value;
     }
     
-    /** 上下场视角的大小，内部由弧度表示，输入由角度表示 */
-    private _fovY: number;
-    
     /**
      * 获取Y视场角
      */
@@ -200,9 +189,6 @@ export class CameraComponent {
     public set fovY(value: number) {
         this._fovY = value;
     }
-    
-    /** 纵横比 */
-    private _aspectRatio: number;
     
     /**
      * 获取纵横比
@@ -262,25 +248,6 @@ export class CameraComponent {
      */
     public set z(value: number) {
         this._position.z = value;
-    }
-    
-    /**
-     * 设置视口
-     * 调用`WebGLRenderingContext.viewport()` 方法，用来设置视口，即指定从标准设备到窗口坐标的 x、y 仿射变换
-     * @param x 用来设定视口的左下角水平坐标。默认值：`0`
-     * @param y 用来设定视口的左下角垂直坐标。默认值：`0`
-     * @param width 非负数，用来设定视口的宽度。默认值：`canvas` 的宽度
-     * @param height 非负数，用来设定视口的高度。默认值：`canvas` 的高度
-     */
-    public setViewport(x: GLint, y: GLint, width: GLsizei, height: GLsizei): void {
-        this.gl?.viewport(x, y, width, height);
-    }
-    
-    /**
-     * 获取视口
-     */
-    public getViewport(): Int32Array {
-        return this.gl?.getParameter(this.gl?.VIEWPORT);
     }
     
     /**

@@ -9,9 +9,7 @@ export class GLMatrixStack2 {
     private _viewMatrix: Matrix4;
     /** 矩阵栈 */
     private _stack: Stack<Matrix4>;
-    /** 基本变换矩阵 */
-    private readonly _currentMatrix: Matrix4;
-    
+
     /**
      * 构造
      */
@@ -21,6 +19,9 @@ export class GLMatrixStack2 {
         this._currentMatrix = new Matrix4().setIdentity();
         this._stack = new Stack<Matrix4>();
     }
+    
+    /** 基本变换矩阵 */
+    private _currentMatrix: Matrix4;
     
     /**
      * 获取基本变换矩阵。
@@ -125,5 +126,15 @@ export class GLMatrixStack2 {
      */
     public mvp(): Matrix4 {
         return Matrix4.product(this._projectionMatrix, Matrix4.product(this._viewMatrix, this._currentMatrix));
+    }
+    
+    /**
+     * 清空
+     */
+    public clear(): void {
+        this._stack.clear();
+        this._viewMatrix = null;
+        this._projectionMatrix = null;
+        this._currentMatrix = null;
     }
 }

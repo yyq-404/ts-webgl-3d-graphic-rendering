@@ -13,10 +13,8 @@ import {GLMatrixStack2} from '../../webgl/matrix/GLMatrixStack2';
  * WebGL应用。
  */
 export class WebGL2Application extends BaseApplication {
-    /** 摄像机 */
-    protected camera: CameraComponent;
-    /* 可以直接操作WebGL相关内容 */
-    protected webglContext: WebGL2RenderingContext | null;
+    /* 可以直接操作WebGL2相关内容 */
+    protected webglContext: WebGL2RenderingContext;
     /** 模拟 `OpenGL1.1` 中的矩阵堆栈, 封装在 `GLWorldMatrixStack` 类中 */
     protected worldMatrixStack: GLMatrixStack2;
     /** shader路径集合 */
@@ -38,7 +36,7 @@ export class WebGL2Application extends BaseApplication {
             alert(' 无法创建WebGL2RenderingContext上下文对象 ');
             throw new Error(' 无法创建WebGL2RenderingContext上下文对象 ');
         }
-        this.camera = new CameraComponent(this.webglContext, this.canvas.width, this.canvas.height, 45, 1);
+        this.camera = new CameraComponent(this.canvas.width, this.canvas.height, 45, 1);
         this.worldMatrixStack = new GLMatrixStack2();
         // 初始化渲染状态
         GLRenderHelper.setDefaultState(this.webglContext);
@@ -49,7 +47,6 @@ export class WebGL2Application extends BaseApplication {
         // 初始化时，创建颜色GLMeshBuilder对象
         // this.builder = new GLMeshBuilder(this.webglContext, GLAttributeHelper.POSITION.BIT | GLAttributeHelper.COLOR.BIT);
     }
-    
     /**
      * 运行。
      * @return {Promise<void>}
@@ -110,15 +107,17 @@ export class WebGL2Application extends BaseApplication {
      * 释放
      */
     public override dispose(): void {
-        // this.worldMatrixStack.clear();
-        if (this.webglContext) {
-            GLRenderHelper.setViewport(this.webglContext, [0, 0, this.canvas.width, this.canvas.height]);
-        }
+        this.worldMatrixStack.clear();
         this.clearBuffer();
+        if (this.webglContext) {
+            this.webglContext = null;
+        }
         GLProgramCache.instance.clear();
         GLTextureCache.instance.clear();
         super.dispose();
     }
+    
+
     
     /**
      * 清理缓冲数据。

@@ -13,6 +13,7 @@ import {EAxisType} from '../../enum/EAxisType';
 import {WebGLApplication} from '../base/WebGLApplication';
 import {GLCoordinateSystemHelper} from '../../webgl/GLCoordinateSystemHelper';
 import {GLMeshHelper} from '../../webgl/GLMeshHelper';
+import {GLRenderHelper} from '../../webgl/GLRenderHelper';
 
 /**
  * 立方体旋转应用
@@ -211,7 +212,7 @@ export class RotatingCubeApplication extends WebGLApplication {
         // 使用辅助方法绘制坐标系
         GLCoordinateSystemHelper.drawAxis(this.builder, this._cubeMatrix, this._hitAxis, 1);
         if (this.context2d) {
-            GLCoordinateSystemHelper.drawText(this.context2d, this._cubeMatrix, this.camera.getViewport(), this.canvas.height, false);
+            GLCoordinateSystemHelper.drawText(this.context2d, this._cubeMatrix, GLRenderHelper.getViewport(this.webglContext), this.canvas.height, false);
         }
         // 矩阵出栈
         this.worldMatrixStack.popMatrix();

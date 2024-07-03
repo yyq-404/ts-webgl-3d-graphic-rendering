@@ -1,5 +1,6 @@
 import {GLAttributeInfo, GLAttributeMap, GLProgramLinkHook, GLUniformInfo, GLUniformMap} from './common/GLTypes';
 import {EGLShaderType} from './enum/EGLShaderType';
+import {GLCoordinateSystemViewport} from './common/GLCoordinateSystem';
 
 /**
  * GL渲染工具类。
@@ -62,12 +63,22 @@ export class GLRenderHelper {
     }
     
     /**
-     * 设置视图
-     * @param gl
-     * @param v
+     * 设置视口
+     * 调用`WebGLRenderingContext.viewport()` 方法，用来设置视口，即指定从标准设备到窗口坐标的 x、y 仿射变换
+     * @param gl 渲染上下文
+     * @param viewport 摄影机视口。
      */
-    public static setViewport(gl: WebGLRenderingContextBase | WebGL2RenderingContext, v: number[]): void {
-        gl.viewport(v[0], v[1], v[2], v[3]);
+    public static setViewport(gl: WebGLRenderingContextBase, viewport: GLCoordinateSystemViewport): void {
+        gl.viewport(viewport.x, viewport.y, viewport.width, viewport.height);
+    }
+    
+    /**
+     * 获取视口
+     * @param {WebGLRenderingContextBase} gl
+     * @return {Int32Array}
+     */
+    public static getViewport(gl: WebGLRenderingContextBase): Int32Array {
+        return gl.getParameter(gl.VIEWPORT);
     }
     
     /**
