@@ -3,7 +3,7 @@
  */
 export class TypedArrayList<T extends Uint16Array | Float32Array | Uint8Array> {
     /** 重新分配内存回调 */
-    public capacityChangedCallback: ((arrayList: TypedArrayList<T>) => void) | null = null;
+    public capacityChangedCallback: ((arrayList: TypedArrayList<T>) => void) = null;
     /** 内部类型数组 */
     private _array: T;
     /** 类型数组构造函数签名。 */

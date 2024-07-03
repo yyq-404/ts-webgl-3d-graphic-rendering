@@ -56,7 +56,7 @@ export abstract class ListAdapter<T> implements IListAdapter<T> {
     /**
      * 移除。
      */
-    public remove(): T | undefined {
+    public remove(): T {
         return undefined;
     }
 }

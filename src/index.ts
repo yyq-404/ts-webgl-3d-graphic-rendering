@@ -15,7 +15,7 @@ const apps = {
 };
 
 /** 当前正在运行的App */
-let currentApp: BaseApplication | null = null;
+let currentApp: BaseApplication = null;
 /** 选择器控件 */
 let select: HTMLSelectElement = document.getElementById('select') as HTMLSelectElement;
 /** 构建选择项 */

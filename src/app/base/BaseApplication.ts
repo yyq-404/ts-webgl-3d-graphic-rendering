@@ -16,7 +16,7 @@ export class BaseApplication implements EventListenerObject, IBaseApplication, I
     /** 摄像机 */
     protected camera: CameraComponent;
     /** 每帧间回调函数, 下一次重绘之前更新动画帧所调用的函数 */
-    public frameCallback: ((app: BaseApplication) => void) | null = null;
+    public frameCallback: ((app: BaseApplication) => void) = null;
     /** 定时器管理器 */
     protected timerManager: TimerManager = new TimerManager();
     /** 指示如何计算Y轴的坐标 */
@@ -436,7 +436,7 @@ export class BaseApplication implements EventListenerObject, IBaseApplication, I
         webglCanvas.style.position = 'absolute';
         webglCanvas.style.left = '0px';
         webglCanvas.style.top = '0px';
-        const parent: HTMLElement | null = document.getElementById('webgl-canvas');
+        const parent: HTMLElement = document.getElementById('webgl-canvas');
         if (!parent) throw new Error('canvas元素必须要有父亲!!');
         parent.appendChild(webglCanvas);
         return webglCanvas;

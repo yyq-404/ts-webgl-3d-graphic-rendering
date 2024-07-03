@@ -25,9 +25,9 @@ export class GLProgram {
     /** fragment shader编译器 */
     public fsShader: WebGLShader;
     /** 当调用gl.useProgram(this.program)后触发bindCallback回调 */
-    public bindCallback: ((program: GLProgram) => void) | null;
+    public bindCallback: ((program: GLProgram) => void);
     /** 当调用gl.useProgram(null)前触发unbindCallback回调函数 */
-    public unbindCallback: ((program: GLProgram) => void) | null;
+    public unbindCallback: ((program: GLProgram) => void);
     /** 当前的Program使用的顶点属性bits值 */
     private readonly _attributeBits: GLAttributeBits;
     
@@ -38,7 +38,7 @@ export class GLProgram {
      * @param vertShader
      * @param fragShader
      */
-    public constructor(context: WebGLRenderingContext | WebGL2RenderingContext, attributesState: GLAttributeBits, vertShader: string | null = null, fragShader: string | null = null) {
+    public constructor(context: WebGLRenderingContext | WebGL2RenderingContext, attributesState: GLAttributeBits, vertShader: string = null, fragShader: string = null) {
         this.webglContext = context;
         this._attributeBits = attributesState;
         // 最好能从shader源码中抽取，目前暂时使用参数传递方式
@@ -156,7 +156,7 @@ export class GLProgram {
      * @param f
      */
     public setFloat(name: string, f: number): boolean {
-        const location: WebGLUniformLocation | null = this.getUniformLocation(name);
+        const location: WebGLUniformLocation = this.getUniformLocation(name);
         if (location) {
             this.webglContext.uniform1f(location, f);
             return true;

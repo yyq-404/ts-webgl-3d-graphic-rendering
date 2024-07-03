@@ -3,7 +3,7 @@
  */
 export interface INodeIterator<T> {
     /** 当前节点 */
-    readonly current: T | undefined;
+    readonly current: T;
 
     /**
      * 重置

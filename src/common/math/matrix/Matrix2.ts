@@ -152,7 +152,7 @@ export class Matrix2 {
     /**
      * 计算逆矩阵
      */
-    public inverse(): Matrix2 | null {
+    public inverse(): Matrix2 {
         let det = this.determinant();
         if (!det) return null;
         det = 1.0 / det;

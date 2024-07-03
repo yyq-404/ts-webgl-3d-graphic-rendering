@@ -23,13 +23,13 @@ export class NodeT2BIterator<T, IdxFunc extends TreeIndexer, Adapter extends ILi
     }
 
     /** 节点 */
-    private readonly _node: TreeNode<T> | undefined;
+    private readonly _node: TreeNode<T>;
     /** 适配器 */
     private _adapter!: IListAdapter<TreeNode<T>>;
     /** 索引器 */
     private readonly _indexer!: IdxFunc;
     /** 当前节点 */
-    private _currNode!: TreeNode<T> | undefined;
+    private _currNode!: TreeNode<T>;
 
     /**
      * 构造
@@ -37,7 +37,7 @@ export class NodeT2BIterator<T, IdxFunc extends TreeIndexer, Adapter extends ILi
      * @param func
      * @param adapter
      */
-    public constructor(node: TreeNode<T> | undefined, func: IdxFunc, adapter: new () => Adapter) {
+    public constructor(node: TreeNode<T>, func: IdxFunc, adapter: new () => Adapter) {
         if (node === undefined) {
             return
         }
@@ -50,7 +50,7 @@ export class NodeT2BIterator<T, IdxFunc extends TreeIndexer, Adapter extends ILi
     /**
      * 获取当前节点。
      */
-    public get current(): TreeNode<T> | undefined {
+    public get current(): TreeNode<T> {
         return this._currNode;
     }
 
@@ -68,7 +68,7 @@ export class NodeT2BIterator<T, IdxFunc extends TreeIndexer, Adapter extends ILi
         let count = this._currNode.childCount;
         for (let i = 0; i < count; i++) {
             let index = this._indexer(count, i);
-            let child: TreeNode<T> | undefined = this._currNode.getChildAt(index);
+            let child: TreeNode<T> = this._currNode.getChildAt(index);
             if (child !== undefined) {
                 this._adapter.add(child);
             }

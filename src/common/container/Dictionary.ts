@@ -83,7 +83,7 @@ export class Dictionary<T> {
      * 查找
      * @param key
      */
-    public find(key: string): T | undefined {
+    public find(key: string): T {
         if (this._items instanceof Map) {
             return this._items.get(key);
         } else {
@@ -110,7 +110,7 @@ export class Dictionary<T> {
      * @param key
      */
     public remove(key: string): boolean {
-        let ret: T | undefined = this.find(key);
+        let ret: T = this.find(key);
         if (ret == undefined) {
             return false;
         }

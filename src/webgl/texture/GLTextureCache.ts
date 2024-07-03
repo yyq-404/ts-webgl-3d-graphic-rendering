@@ -32,7 +32,7 @@ export class GLTextureCache {
      * @param key
      * @protected
      */
-    public getMaybe(key: string): GLTexture | undefined {
+    public getMaybe(key: string): GLTexture {
         return this._dict.find(key);
     }
     
@@ -41,7 +41,7 @@ export class GLTextureCache {
      * @param key
      */
     public getMust(key: string): GLTexture {
-        const ret: GLTexture | undefined = this._dict.find(key);
+        const ret: GLTexture = this._dict.find(key);
         if (ret === undefined) {
             throw new Error(key + '对应的Program不存在!!!');
         }

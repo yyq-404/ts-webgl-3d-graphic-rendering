@@ -49,7 +49,7 @@ export class GLCoordinateSystemHelper {
      * @param viewport
      * @param viewportPt
      */
-    public static local2GLViewportSpace(localPt: Vector3, mvp: Matrix4, viewport: Int32Array | Float32Array, viewportPt?: Vector3): Vector3 | null {
+    public static local2GLViewportSpace(localPt: Vector3, mvp: Matrix4, viewport: Int32Array | Float32Array, viewportPt?: Vector3): Vector3 {
         const v: Vector4 = new Vector4([localPt.x, localPt.y, localPt.z, 1.0]);
         // 将顶点从local坐标系变换到投影坐标系，或裁剪坐标系
         mvp.multiplyVector4(v, v);
@@ -83,7 +83,7 @@ export class GLCoordinateSystemHelper {
      * @param inverse
      * @param isLeftHardness
      */
-    public static drawAxis(builder: GLMeshBuilder, mvp: Matrix4, hitAxis: EAxisType, length: number = 1, rotateAxis: Vector3 | null = null, inverse: boolean = false, isLeftHardness: boolean = false): void {
+    public static drawAxis(builder: GLMeshBuilder, mvp: Matrix4, hitAxis: EAxisType, length: number = 1, rotateAxis: Vector3 = null, inverse: boolean = false, isLeftHardness: boolean = false): void {
         // 用5个像素大小的直径绘制线段，但目前仅Safari浏览器实现
         builder.webglContext.lineWidth(5);
         // 关闭帧缓存深度测试
@@ -163,7 +163,7 @@ export class GLCoordinateSystemHelper {
      */
     private static drawAxisText(context: CanvasRenderingContext2D, direction: Vector3, axis: EAxisType, mvp: Matrix4, viewport: Int32Array, canvasHeight: number, inverse: boolean = false): void {
         // 调用 MathHelper.obj2ScreenSpace这个核心函数，将局部坐标系标示的一个点变换到屏幕坐标系上
-        let pos: Vector3 | null = GLCoordinateSystemHelper.local2GLViewportSpace(direction, mvp, viewport);
+        let pos: Vector3 = GLCoordinateSystemHelper.local2GLViewportSpace(direction, mvp, viewport);
         if (!pos) return;
         // 变换到屏幕坐标系，左手系，原点在左上角，x向右，y向下
         pos.y = canvasHeight - pos.y;

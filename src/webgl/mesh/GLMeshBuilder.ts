@@ -45,7 +45,7 @@ export class GLMeshBuilder extends GLMeshBase {
     /** 要渲染的顶点数量  */
     private _vertexCount: number = 0;
     /** 渲染buffer数据 */
-    private _ibo: WebGLBuffer | null = null;
+    private _ibo: WebGLBuffer = null;
     /** 索引数量 */
     private _indexCount: number = -1;
     
@@ -57,7 +57,7 @@ export class GLMeshBuilder extends GLMeshBase {
      * @param texture
      * @param layout
      */
-    public constructor(webglContext: WebGLRenderingContext, state: GLAttributeBits, program: GLProgram | null = null, texture: WebGLTexture | null = null, layout: EGLVertexLayoutType = EGLVertexLayoutType.INTERLEAVED) {
+    public constructor(webglContext: WebGLRenderingContext, state: GLAttributeBits, program: GLProgram = null, texture: WebGLTexture = null, layout: EGLVertexLayoutType = EGLVertexLayoutType.INTERLEAVED) {
         // 调用基类的构造方法
         super(webglContext, state);
         // 根据attribBits，测试是否使用了下面几种类型的顶点属性格式
@@ -78,13 +78,13 @@ export class GLMeshBuilder extends GLMeshBase {
     }
     
     /** 如果使用了纹理坐标，那么需要设置当前使用的纹理对象，否则将`texture`变量设置为`null` */
-    private _texture: WebGLTexture | null;
+    private _texture: WebGLTexture;
     
     /**
      * 获取纹理
      * @return {GLTexture}
      */
-    public get texture(): WebGLTexture | null {
+    public get texture(): WebGLTexture {
         return this._texture;
     }
     
@@ -97,13 +97,13 @@ export class GLMeshBuilder extends GLMeshBase {
     }
     
     /** 当前使用的`GLProgram`对象 */
-    private _program: GLProgram | null;
+    private _program: GLProgram;
     
     /**
      * 获取链接器程序
      * @return {GLProgram}
      */
-    public get program(): GLProgram | null {
+    public get program(): GLProgram {
         return this._program;
     }
     
@@ -449,7 +449,7 @@ export class GLMeshBuilder extends GLMeshBase {
      * @private
      */
     private initLayoutAttribute(): void {
-        let indexBuffer: WebGLBuffer | null = this.webglContext.createBuffer();
+        let indexBuffer: WebGLBuffer = this.webglContext.createBuffer();
         if (!indexBuffer) throw new Error('WebGLBuffer创建不成功!');
         switch (this._layout) {
             case EGLVertexLayoutType.INTERLEAVED:
@@ -540,7 +540,7 @@ export class GLMeshBuilder extends GLMeshBase {
      * @param optionCreateBuffer
      * @private
      */
-    private initVertexAttribute(attribute: IGLAttribute, indexBuffer: WebGLBuffer | null, size: number, has: boolean = true, optionCreateBuffer: boolean = false): void {
+    private initVertexAttribute(attribute: IGLAttribute, indexBuffer: WebGLBuffer, size: number, has: boolean = true, optionCreateBuffer: boolean = false): void {
         if (!has) return;
         this._lists[attribute.NAME] = new TypedArrayList<Float32Array>(Float32Array);
         if (optionCreateBuffer) indexBuffer = this.webglContext.createBuffer();

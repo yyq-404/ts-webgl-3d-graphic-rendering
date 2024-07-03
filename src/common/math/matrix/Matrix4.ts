@@ -335,7 +335,7 @@ export class Matrix4 {
     /**
      * 计算并返回矩阵的逆矩阵（如果存在）。
      */
-    public inverse(): Matrix4 | null {
+    public inverse(): Matrix4 {
         const a00 = this._values[0];
         const a01 = this._values[1];
         const a02 = this._values[2];
@@ -495,7 +495,7 @@ export class Matrix4 {
     /**
      * 计算并返回矩阵左上角 3x3 部分的逆矩阵（如果存在）。
      */
-    public toInverseMatrix3(): Matrix3 | null {
+    public toInverseMatrix3(): Matrix3 {
         const a00 = this._values[0];
         const a01 = this._values[1];
         const a02 = this._values[2];

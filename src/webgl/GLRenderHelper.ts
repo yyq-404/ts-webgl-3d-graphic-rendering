@@ -10,7 +10,7 @@ export class GLRenderHelper {
      * 打印渲染状态
      * @param webgl
      */
-    public static printStates(webgl: WebGLRenderingContextBase | null): void {
+    public static printStates(webgl: WebGLRenderingContextBase): void {
         // 所有的boolean状态变量，共9个
         console.log(`1. isBlendEnable =  ${webgl.isEnabled(webgl.BLEND)}`);
         console.log(`2. isCullFaceEnable = ${webgl.isEnabled(webgl.CULL_FACE)}`);
@@ -178,7 +178,7 @@ export class GLRenderHelper {
         //很重要的一点，attribute在shader中只能读取，不能赋值。如果没有被使用的话，也是不算入activeAttrib中的
         for (let i = 0; i < attributesCount; i++) {
             // 获取WebGLActiveInfo对象
-            const info: WebGLActiveInfo | null = webgl.getActiveAttrib(program, i);
+            const info: WebGLActiveInfo = webgl.getActiveAttrib(program, i);
             if (info) {
                 // 将WebGLActiveInfo对象转换为GLAttribInfo对象，并存储在GLAttribMap中
                 // 内部调用了getAttribLocation方法获取索引号
@@ -200,11 +200,11 @@ export class GLRenderHelper {
         //很重要的一点，所谓active是指uniform已经被使用的，否则不属于uniform.uniform在shader中必须是读取，不能赋值
         for (let i = 0; i < uniformsCount; i++) {
             // 获取WebGLActiveInfo对象
-            const info: WebGLActiveInfo | null = webgl.getActiveUniform(program, i);
+            const info: WebGLActiveInfo = webgl.getActiveUniform(program, i);
             if (info) {
                 // 将WebGLActiveInfo对象转换为GLUniformInfo对象，并存储在GLUniformMap 中
                 // 内部调用了getUniformLocation方法获取WebGLUniformLocation对象
-                const loc: WebGLUniformLocation | null = webgl.getUniformLocation(program, info.name);
+                const loc: WebGLUniformLocation = webgl.getUniformLocation(program, info.name);
                 if (loc) uniformMap[info.name] = new GLUniformInfo(info.size, info.type, loc);
             }
         }

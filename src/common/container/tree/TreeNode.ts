@@ -3,13 +3,13 @@
  */
 export class TreeNode<T> {
     /** 父节点 */
-    private _parent: TreeNode<T> | undefined;
+    private _parent: TreeNode<T>;
     /** 子节点集合 */
-    private _children: TreeNode<T>[] | undefined;
+    private _children: TreeNode<T>[];
     /** 名称 */
     public name: string;
     /** 数据 */
-    public data: T | undefined;
+    public data: T;
 
     /**
      * 构造
@@ -17,7 +17,7 @@ export class TreeNode<T> {
      * @param parent
      * @param name
      */
-    public constructor(data: T | undefined, parent: TreeNode<T> | undefined = undefined, name: string = '') {
+    public constructor(data: T, parent: TreeNode<T> = undefined, name: string = '') {
         this._parent = parent;
         this.data = data;
         this.name = name;
@@ -29,8 +29,8 @@ export class TreeNode<T> {
     /**
      * 获取跟节点。
      */
-    public get root(): TreeNode<T> | undefined {
-        let current: TreeNode<T> | undefined = this;
+    public get root(): TreeNode<T> {
+        let current: TreeNode<T> = this;
         while (current !== undefined && current.parent !== undefined) {
             current = current.parent;
         }
@@ -40,7 +40,7 @@ export class TreeNode<T> {
     /**
      * 获取父节点
      */
-    public get parent(): TreeNode<T> | undefined {
+    public get parent(): TreeNode<T> {
         return this._parent;
     }
 
@@ -58,9 +58,9 @@ export class TreeNode<T> {
      * 是否后代节点。
      * @param ancestor
      */
-    public isDescendantOf(ancestor: TreeNode<T> | undefined): boolean {
+    public isDescendantOf(ancestor: TreeNode<T>): boolean {
         if (ancestor === undefined) return false;
-        for (let node: TreeNode<T> | undefined = this._parent; node !== undefined; node = node._parent) {
+        for (let node: TreeNode<T> = this._parent; node !== undefined; node = node._parent) {
             if (ancestor === node) {
                 return true;
             }
@@ -72,11 +72,11 @@ export class TreeNode<T> {
      * 根据索引删除子节点。
      * @param index
      */
-    public removeChildAt(index: number): TreeNode<T> | undefined {
+    public removeChildAt(index: number): TreeNode<T> {
         if (this._children === undefined) {
             return undefined;
         }
-        let child: TreeNode<T> | undefined = this.getChildAt(index);
+        let child: TreeNode<T> = this.getChildAt(index);
         if (child === undefined) {
             return undefined;
         }
@@ -89,7 +89,7 @@ export class TreeNode<T> {
      * 删除子节点
      * @param child
      */
-    public removeChild(child: TreeNode<T> | undefined): TreeNode<T> | undefined {
+    public removeChild(child: TreeNode<T>): TreeNode<T> {
         if (child === undefined) {
             return undefined;
         }
@@ -112,7 +112,7 @@ export class TreeNode<T> {
     /**
      * 删除自己。
      */
-    public remove(): TreeNode<T> | undefined {
+    public remove(): TreeNode<T> {
         if (this._parent !== undefined) {
             return this._parent.removeChild(this);
         }
@@ -124,7 +124,7 @@ export class TreeNode<T> {
      * @param child
      * @param index
      */
-    public addChildAt(child: TreeNode<T> | undefined, index: number): TreeNode<T> | undefined {
+    public addChildAt(child: TreeNode<T>, index: number): TreeNode<T> {
         if (this.isDescendantOf(child)) {
             return undefined;
         }
@@ -146,7 +146,7 @@ export class TreeNode<T> {
      * 添加子节点
      * @param child
      */
-    public addChild(child: TreeNode<T> | undefined): TreeNode<T> | undefined {
+    public addChild(child: TreeNode<T>): TreeNode<T> {
         if (this._children === undefined) {
             this._children = [];
         }
@@ -157,7 +157,7 @@ export class TreeNode<T> {
      * 根据索引添加子节点
      * @param index
      */
-    public getChildAt(index: number): TreeNode<T> | undefined {
+    public getChildAt(index: number): TreeNode<T> {
         if (this._children === undefined) {
             return undefined;
         }
@@ -179,7 +179,7 @@ export class TreeNode<T> {
      */
     public depth(): number {
         let depth = 0;
-        let current: TreeNode<T> | undefined = this;
+        let current: TreeNode<T> = this;
         while (current !== undefined && current.parent !== undefined) {
             current = current.parent;
             depth++;

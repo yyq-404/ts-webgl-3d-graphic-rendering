@@ -20,7 +20,7 @@ export class GLStaticMesh extends GLMeshBase {
     protected _vertexCount: number = 0;
     // GLStaticMesh内置了一个可选的索引缓冲区
     /** 索引缓冲区 */
-    protected _ibo: WebGLBuffer | null = null;
+    protected _ibo: WebGLBuffer = null;
     /** 索引的数量 */
     protected _indexCount: number = 0;
     
@@ -33,7 +33,7 @@ export class GLStaticMesh extends GLMeshBase {
      * @param ibo Index Buffer Object
      * @param drawMode 图元绘制模式
      */
-    public constructor(gl: WebGLRenderingContext, attribState: GLAttributeBits, vbo: Float32Array | ArrayBuffer, ibo: Uint16Array | null = null, drawMode: number = gl.TRIANGLES) {
+    public constructor(gl: WebGLRenderingContext, attribState: GLAttributeBits, vbo: Float32Array | ArrayBuffer, ibo: Uint16Array = null, drawMode: number = gl.TRIANGLES) {
         // 调用基类的构造函数
         super(gl, attribState, drawMode);
         // 关键的操作：
@@ -41,7 +41,7 @@ export class GLStaticMesh extends GLMeshBase {
         // 先绑定VAO后，那么后续创建的VBO和EBO对象都归属VAO管辖!!!
         this.bind();
         // 在创建并绑定vbo
-        const vb: WebGLBuffer | null = gl.createBuffer();
+        const vb: WebGLBuffer = gl.createBuffer();
         if (!vb) throw new Error('vbo creation fail');
         this._vbo = vb;
         this.webglContext.bindBuffer(this.webglContext.ARRAY_BUFFER, this._vbo); // 绑定VBO
@@ -103,7 +103,7 @@ export class GLStaticMesh extends GLMeshBase {
      * 创建`IBO`
      * @param ibo `IBO`表示 `Index Buffer Object`
      */
-    protected setIBO(ibo: Uint16Array | null): void {
+    protected setIBO(ibo: Uint16Array): void {
         if (!ibo) return; // 按需创建IBO
         // 创建IBO
         this._ibo = this.webglContext.createBuffer();

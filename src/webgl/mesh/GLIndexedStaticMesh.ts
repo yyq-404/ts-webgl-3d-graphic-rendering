@@ -45,7 +45,7 @@ export class GLIndexedStaticMesh extends GLStaticMesh {
      * @param ibo
      * @protected
      */
-    protected setIBO(ibo: Uint16Array | null): void {
+    protected setIBO(ibo: Uint16Array): void {
         this._ibo = this.webglContext.createBuffer();
         if (this._ibo === null) {
             throw new Error('IBO creation fail');

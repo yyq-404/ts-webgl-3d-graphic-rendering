@@ -32,7 +32,7 @@ export class GLProgramCache {
      * 获取缓存对象， 可能返回undefined类型
      * @param key
      */
-    public getMaybe(key: string): GLProgram | undefined {
+    public getMaybe(key: string): GLProgram {
         return this._dict.find(key);
     }
     
@@ -41,7 +41,7 @@ export class GLProgramCache {
      * @param key
      */
     public getMust(key: string): GLProgram {
-        const ret: GLProgram | undefined = this._dict.find(key);
+        const ret: GLProgram = this._dict.find(key);
         if (ret === undefined) {
             throw new Error(key + '对应的Program不存在!! ! ');
         }

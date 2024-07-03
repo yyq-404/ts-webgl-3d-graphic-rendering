@@ -10,7 +10,7 @@ export interface IListAdapter<T> {
     /**
      * 移除
      */
-    remove(): T | undefined;
+    remove(): T;
 
     /**
      * 清空

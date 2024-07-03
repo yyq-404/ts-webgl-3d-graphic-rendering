@@ -48,7 +48,7 @@ export class GeometryHelper {
      * @param c
      * @param result
      */
-    public static computeNormal(a: Vector3, b: Vector3, c: Vector3, result: Vector3 | null): Vector3 {
+    public static computeNormal(a: Vector3, b: Vector3, c: Vector3, result: Vector3): Vector3 {
         if (!result) result = new Vector3();
         const l0: Vector3 = new Vector3();
         const l1: Vector3 = new Vector3();
@@ -168,7 +168,7 @@ export class GeometryHelper {
      * @param max
      * @param out
      */
-    public static boundBoxGetCenter(min: Vector3, max: Vector3, out: Vector3 | null = null): Vector3 {
+    public static boundBoxGetCenter(min: Vector3, max: Vector3, out: Vector3 = null): Vector3 {
         if (!out) out = new Vector3();
         // (max + min) ＊ 0.5
         Vector3.sum(min, max, out);

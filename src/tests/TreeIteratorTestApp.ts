@@ -32,7 +32,7 @@ export class TreeIteratorTestApp {
     public static process(): void {
         let root = TreeIteratorTestApp.createNumberTree();
         let iter: INodeIterator<TreeNode<number>>;
-        let current: TreeNode<number> | undefined = undefined;
+        let current: TreeNode<number> = undefined;
         console.log('1. depthFirst_left2right_top2bottom_enumerator');
         iter = NodeIteratorFactory.create_df_l2r_t2b_iter(root);
         while (iter.moveNext()) {

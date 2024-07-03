@@ -1,4 +1,4 @@
-export type TimerCallback = ((id: number, data: any) => void) | null;
+export type TimerCallback = ((id: number, data: any) => void);
 
 /**
  * 定时器

@@ -80,7 +80,7 @@ export class BasicWebGLApplication extends BaseApplication {
         // 调用基类构造函数
         super();
         let contextAttribs: WebGLContextAttributes = this.getContextAttributes();
-        let ctx: WebGLRenderingContext | null = this.canvas.getContext('webgl', contextAttribs);
+        let ctx: WebGLRenderingContext = this.canvas.getContext('webgl', contextAttribs);
         if (ctx === null) {
             alert(' 无法创建WebGLRenderingContext上下文对象 ');
             throw new Error(' 无法创建WebGLRenderingContext上下文对象 ');
@@ -322,7 +322,7 @@ export class BasicWebGLApplication extends BaseApplication {
     
     /**
      * 获取渲染上下文环境属性
-     * @return {WebGLContextAttributes | null}
+     * @return {WebGLContextAttributes}
      * @protected
      */
     protected getContextAttributes(): WebGLContextAttributes {
@@ -347,10 +347,10 @@ export class BasicWebGLApplication extends BaseApplication {
     /**
      * 创建WebGL着色器。
      * @param {EGLShaderType} type
-     * @return {Promise<WebGLShader | undefined>}
+     * @return {Promise<WebGLShader>}
      * @private
      */
-    private async createShaderAsync(type: EGLShaderType): Promise<WebGLShader | undefined> {
+    private async createShaderAsync(type: EGLShaderType): Promise<WebGLShader> {
         let shadeUrl = this._shaderUrls.get(type);
         if (!shadeUrl) return undefined;
         let shaderSource = await HttpHelper.loadTextFileAsync(shadeUrl);

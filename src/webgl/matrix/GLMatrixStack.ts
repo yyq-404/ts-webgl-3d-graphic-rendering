@@ -8,7 +8,7 @@ import {EGLMatrixType} from '../enum/EGLMatrixType';
  */
 export class GLMatrixStack {
     /** 矩阵模式 */
-    private matrixType: EGLMatrixType;
+    private type: EGLMatrixType;
     /** 模型矩阵栈 */
     private readonly _mvStack: Matrix4[];
     /** 投影矩阵栈 */
@@ -24,7 +24,7 @@ export class GLMatrixStack {
         this._mvStack = [new Matrix4().setIdentity()];
         this._projStack = [new Matrix4().setIdentity()];
         this._texStack = [new Matrix4().setIdentity()];
-        this.matrixType = EGLMatrixType.MODEL_VIEW;
+        this.type = EGLMatrixType.MODEL_VIEW;
     }
     
     /**
@@ -74,7 +74,7 @@ export class GLMatrixStack {
      */
     get textureMatrix(): Matrix4 {
         if (this._texStack.length <= 0) {
-            throw new Error('projection matrix stack为空!');
+            throw new Error('texture matrix stack为空!');
         }
         return this._texStack[this._texStack.length - 1];
     }
@@ -86,7 +86,7 @@ export class GLMatrixStack {
         const mv: Matrix4 = new Matrix4().setIdentity();
         const proj = new Matrix4().setIdentity();
         const tex: Matrix4 = new Matrix4().setIdentity();
-        switch (this.matrixType) {
+        switch (this.type) {
             case EGLMatrixType.MODEL_VIEW:
                 this.modelViewMatrix.copy(mv);
                 this._mvStack.push(mv);
@@ -107,7 +107,7 @@ export class GLMatrixStack {
      * 弹出矩阵
      */
     public popMatrix(): GLMatrixStack {
-        switch (this.matrixType) {
+        switch (this.type) {
             case EGLMatrixType.MODEL_VIEW:
                 this._mvStack.pop();
                 break;
@@ -125,7 +125,7 @@ export class GLMatrixStack {
      * 将栈顶的矩阵重置为单位矩阵
      */
     public loadIdentity(): GLMatrixStack {
-        switch (this.matrixType) {
+        switch (this.type) {
             case EGLMatrixType.MODEL_VIEW:
                 this.modelViewMatrix.setIdentity();
                 break;
@@ -144,7 +144,7 @@ export class GLMatrixStack {
      * @param mat
      */
     public loadMatrix(mat: Matrix4): GLMatrixStack {
-        switch (this.matrixType) {
+        switch (this.type) {
             case EGLMatrixType.MODEL_VIEW:
                 mat.copy(this.modelViewMatrix);
                 break;
@@ -167,13 +167,13 @@ export class GLMatrixStack {
      * @param isRadians
      */
     public perspective(fov: number, aspect: number, near: number, far: number, isRadians: boolean = false): GLMatrixStack {
-        this.matrixType = EGLMatrixType.PROJECTION;
+        this.type = EGLMatrixType.PROJECTION;
         if (!isRadians) {
             fov = MathHelper.toRadian(fov);
         }
         const mat: Matrix4 = Matrix4.perspective(fov, aspect, near, far);
         this.loadMatrix(mat);
-        this.matrixType = EGLMatrixType.MODEL_VIEW;
+        this.type = EGLMatrixType.MODEL_VIEW;
         // 是否要调用loadIdentity方法???
         this.loadIdentity();
         return this;
@@ -189,10 +189,10 @@ export class GLMatrixStack {
      * @param far
      */
     public frustum(left: number, right: number, bottom: number, top: number, near: number, far: number): GLMatrixStack {
-        this.matrixType = EGLMatrixType.PROJECTION;
+        this.type = EGLMatrixType.PROJECTION;
         const mat: Matrix4 = Matrix4.frustum(left, right, bottom, top, near, far);
         this.loadMatrix(mat);
-        this.matrixType = EGLMatrixType.MODEL_VIEW;
+        this.type = EGLMatrixType.MODEL_VIEW;
         // 是否要调用loadIdentity方法???
         this.loadIdentity();
         return this;
@@ -208,10 +208,10 @@ export class GLMatrixStack {
      * @param far
      */
     public orthographic(left: number, right: number, bottom: number, top: number, near: number, far: number): GLMatrixStack {
-        this.matrixType = EGLMatrixType.PROJECTION;
+        this.type = EGLMatrixType.PROJECTION;
         const mat: Matrix4 = Matrix4.orthographic(left, right, bottom, top, near, far);
         this.loadMatrix(mat);
-        this.matrixType = EGLMatrixType.MODEL_VIEW;
+        this.type = EGLMatrixType.MODEL_VIEW;
         // 是否要调用loadIdentity方法???
         this.loadIdentity();
         return this;
@@ -224,7 +224,7 @@ export class GLMatrixStack {
      * @param up
      */
     public lookAt(pos: Vector3, target: Vector3, up: Vector3 = Vector3.up): GLMatrixStack {
-        this.matrixType = EGLMatrixType.MODEL_VIEW;
+        this.type = EGLMatrixType.MODEL_VIEW;
         const mat: Matrix4 = Matrix4.lookAt(pos, target, up);
         this.loadMatrix(mat);
         return this;
@@ -264,7 +264,7 @@ export class GLMatrixStack {
      * @param mat
      */
     public multiplyMatrix(mat: Matrix4): GLMatrixStack {
-        switch (this.matrixType) {
+        switch (this.type) {
             case EGLMatrixType.MODEL_VIEW:
                 this.modelViewMatrix.multiply(mat);
                 break;
@@ -285,7 +285,7 @@ export class GLMatrixStack {
      * @param pos
      */
     public translate(pos: Vector3): GLMatrixStack {
-        switch (this.matrixType) {
+        switch (this.type) {
             case EGLMatrixType.MODEL_VIEW:
                 this.modelViewMatrix.translate(pos);
                 break;
@@ -311,7 +311,7 @@ export class GLMatrixStack {
         if (!isRadians) {
             angle = MathHelper.toRadian(angle);
         }
-        switch (this.matrixType) {
+        switch (this.type) {
             case EGLMatrixType.MODEL_VIEW:
                 this.modelViewMatrix.rotate(angle, axis);
                 break;
@@ -332,7 +332,7 @@ export class GLMatrixStack {
      * @param s
      */
     public scale(s: Vector3): GLMatrixStack {
-        switch (this.matrixType) {
+        switch (this.type) {
             case EGLMatrixType.MODEL_VIEW:
                 this.modelViewMatrix.scale(s);
                 break;

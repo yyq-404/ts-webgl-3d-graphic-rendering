@@ -55,7 +55,7 @@ export class LinkedList<T> {
      * @param data
      */
     public contains(data: T): boolean {
-        for (let link: ListNode<T> | null = this._headNode.next; link != null && link != this._headNode; link = link?.next) {
+        for (let link: ListNode<T> = this._headNode.next; link != null && link != this._headNode; link = link?.next) {
             if (link != null && link.data !== undefined && link.data === data) {
                 return true;
             }
@@ -68,7 +68,7 @@ export class LinkedList<T> {
      * @param cb
      */
     public forNext(cb: (data: T) => void): void {
-        for (let link: ListNode<T> | null = this._headNode.next; link != null && link != this._headNode; link = link.next) {
+        for (let link: ListNode<T> = this._headNode.next; link != null && link != this._headNode; link = link.next) {
             if (link != null && link.data !== undefined && cb) {
                 cb(link.data)
             }
@@ -80,7 +80,7 @@ export class LinkedList<T> {
      * @param cb
      */
     public forPrev(cb: (data: T) => void): void {
-        for (let link: ListNode<T> | null = this._headNode.prev; link != null && link != this._headNode; link = link.prev) {
+        for (let link: ListNode<T> = this._headNode.prev; link != null && link != this._headNode; link = link.prev) {
             if (link != null && link.data !== undefined && cb) {
                 cb(link.data)
             }
@@ -109,8 +109,8 @@ export class LinkedList<T> {
      * @param node
      */
     public remove(node: ListNode<T>): void {
-        let next: ListNode<T> | null = node.next;
-        let prev: ListNode<T> | null = node.prev;
+        let next: ListNode<T> = node.next;
+        let prev: ListNode<T> = node.prev;
         if (prev !== null) {
             prev.next = next;
         }
@@ -131,12 +131,12 @@ export class LinkedList<T> {
     /**
      * 弹出。
      */
-    public pop(): T | undefined {
-        let prev: ListNode<T> | null = this.end().prev;
+    public pop(): T {
+        let prev: ListNode<T> = this.end().prev;
         if (prev === null) {
             return undefined;
         }
-        let ret: T | undefined = prev.data;
+        let ret: T = prev.data;
         this.remove(prev);
         return ret;
     }
@@ -152,8 +152,8 @@ export class LinkedList<T> {
     /**
      * 弹出开始节点。
      */
-    public popFront(): T | undefined {
-        let ret: T | undefined = this.begin().data;
+    public popFront(): T {
+        let ret: T = this.begin().data;
         this.remove(this.begin());
         return ret;
     }

@@ -8,7 +8,7 @@ export class NodeB2TIterator<T> implements INodeIterator<TreeNode<T>> {
     /** 枚举迭代器 */
     private _iter: INodeIterator<TreeNode<T>>;
     /** 节点数组 */
-    private _arr!: Array<TreeNode<T> | undefined>;
+    private _arr!: Array<TreeNode<T>>;
     /** 节点索引 */
     private _arrIdx!: number;
 
@@ -25,7 +25,7 @@ export class NodeB2TIterator<T> implements INodeIterator<TreeNode<T>> {
     /**
      * 获取当前节点
      */
-    public get current(): TreeNode<T> | undefined {
+    public get current(): TreeNode<T> {
         return this._arrIdx < this._arr.length ? this._arr[this._arrIdx] : undefined;
     }
 

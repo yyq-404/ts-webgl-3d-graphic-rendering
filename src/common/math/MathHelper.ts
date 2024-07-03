@@ -71,7 +71,7 @@ export class MathHelper {
      * @param q
      * @param dest
      */
-    public static matrixFrom(pos: Vector3, q: Quaternion, dest: Matrix4 | null = null): Matrix4 {
+    public static matrixFrom(pos: Vector3, q: Quaternion, dest: Matrix4 = null): Matrix4 {
         if (!dest) dest = new Matrix4().setIdentity();
         q.toMatrix4(dest);
         // 调用quaternion的toMatrix4方法，再放入平移部分数据

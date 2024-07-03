@@ -1,16 +1,16 @@
 export class ListNode<T> {
     /** 后驱 */
-    public next: ListNode<T> | null;
+    public next: ListNode<T>;
     /** 前驱 */
-    public prev: ListNode<T> | null;
+    public prev: ListNode<T>;
     /** 数据 */
-    public data: T | undefined;
+    public data: T;
 
     /**
      * 构造
      * @param data
      */
-    public constructor(data: T | undefined = undefined) {
+    public constructor(data: T = undefined) {
         this.next = this.prev = null;
         this.data = data;
     }

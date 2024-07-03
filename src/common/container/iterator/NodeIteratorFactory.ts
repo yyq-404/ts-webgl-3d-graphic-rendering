@@ -14,7 +14,7 @@ export class NodeIteratorFactory {
      * 创建深度优先、从左到右、从上到下的枚举器。
      * @param node
      */
-    public static create_df_l2r_t2b_iter<T>(node: TreeNode<T> | undefined): INodeIterator<TreeNode<T>> {
+    public static create_df_l2r_t2b_iter<T>(node: TreeNode<T>): INodeIterator<TreeNode<T>> {
         return new NodeT2BIterator(node, IndexerR2L, Stack);
     }
 
@@ -22,7 +22,7 @@ export class NodeIteratorFactory {
      * 创建深度优先、从右到左、从上到下的枚举器。
      * @param node
      */
-    public static create_df_r2l_t2b_iter<T>(node: TreeNode<T> | undefined): INodeIterator<TreeNode<T>> {
+    public static create_df_r2l_t2b_iter<T>(node: TreeNode<T>): INodeIterator<TreeNode<T>> {
         return new NodeT2BIterator(node, IndexerL2R, Stack);
     }
 
@@ -30,7 +30,7 @@ export class NodeIteratorFactory {
      * 创建深度优先、从左到右、从下到上的枚举器。
      * @param node
      */
-    public static create_df_l2r_b2t_iter<T>(node: TreeNode<T> | undefined): INodeIterator<TreeNode<T>> {
+    public static create_df_l2r_b2t_iter<T>(node: TreeNode<T>): INodeIterator<TreeNode<T>> {
         return new NodeB2TIterator(NodeIteratorFactory.create_df_l2r_t2b_iter(node));
     }
 
@@ -38,7 +38,7 @@ export class NodeIteratorFactory {
      * 创建深度游侠、从右到左、从下到上的枚举器。
      * @param node
      */
-    public static create_df_r2l_b2t_iter<T>(node: TreeNode<T> | undefined): INodeIterator<TreeNode<T>> {
+    public static create_df_r2l_b2t_iter<T>(node: TreeNode<T>): INodeIterator<TreeNode<T>> {
         return new NodeB2TIterator(NodeIteratorFactory.create_df_r2l_t2b_iter(node));
     }
 
@@ -46,7 +46,7 @@ export class NodeIteratorFactory {
      * 创建广度优先、从左到右、从上到下的枚举器。
      * @param node
      */
-    public static create_bf_l2r_t2b_iter<T>(node: TreeNode<T> | undefined): INodeIterator<TreeNode<T>> {
+    public static create_bf_l2r_t2b_iter<T>(node: TreeNode<T>): INodeIterator<TreeNode<T>> {
         return new NodeT2BIterator(node, IndexerR2L, Queue);
     }
 
@@ -54,7 +54,7 @@ export class NodeIteratorFactory {
      * 创建广度优先、从右到左、从上到下的枚举器。
      * @param node
      */
-    public static create_bf_r2l_t2b_iter<T>(node: TreeNode<T> | undefined): INodeIterator<TreeNode<T>> {
+    public static create_bf_r2l_t2b_iter<T>(node: TreeNode<T>): INodeIterator<TreeNode<T>> {
         return new NodeT2BIterator(node, IndexerL2R, Queue);
     }
 
@@ -62,7 +62,7 @@ export class NodeIteratorFactory {
      * 创建广度优先、从左到右、从下到上的枚举器。
      * @param node
      */
-    public static create_bf_l2r_b2t_iter<T>(node: TreeNode<T> | undefined): INodeIterator<TreeNode<T>> {
+    public static create_bf_l2r_b2t_iter<T>(node: TreeNode<T>): INodeIterator<TreeNode<T>> {
         return new NodeB2TIterator(NodeIteratorFactory.create_bf_l2r_t2b_iter(node));
     }
 
@@ -70,7 +70,7 @@ export class NodeIteratorFactory {
      * 创建广度优先、从右到左、从下到上的枚举器。
      * @param node
      */
-    public static create_bf_r2l_b2t_iter<T>(node: TreeNode<T> | undefined): INodeIterator<TreeNode<T>> {
+    public static create_bf_r2l_b2t_iter<T>(node: TreeNode<T>): INodeIterator<TreeNode<T>> {
         return new NodeB2TIterator(NodeIteratorFactory.create_bf_r2l_t2b_iter(node));
     }
 }

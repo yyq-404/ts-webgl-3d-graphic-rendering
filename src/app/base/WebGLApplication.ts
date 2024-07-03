@@ -125,7 +125,7 @@ export class WebGLApplication extends BaseApplication {
         canvas2d.style.position = 'absolute';
         canvas2d.style.left = '0px';
         canvas2d.style.top = '0px';
-        const parent: HTMLElement | null = this.canvas.parentElement;
+        const parent: HTMLElement = this.canvas.parentElement;
         if (!parent) throw new Error('canvas元素必须要有父亲!!');
         this.context2d = canvas2d.getContext('2d');
         parent.appendChild(canvas2d);

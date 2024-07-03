@@ -40,7 +40,7 @@ export class GLMatrixStack2 {
     /**
      * 保护变换矩阵，当前矩阵入栈
      *
-     * @return {Matrix4 | undefined}
+     * @return {Matrix4}
      */
     public popMatrix(): Matrix4 {
         if (this._stack.length <= 0) {
@@ -62,7 +62,7 @@ export class GLMatrixStack2 {
      * 执行旋转变换
      * @param {number} angle
      * @param {Vector3} axis
-     * @return {Matrix4 | null}
+     * @return {Matrix4}
      */
     public rotate(angle: number, axis: Vector3): Matrix4 {
         return this._currentMatrix.rotate(angle, axis);

@@ -194,7 +194,7 @@ export class Matrix3 {
     /**
      * 逆矩阵
      */
-    public inverse(): Matrix3 | null {
+    public inverse(): Matrix3 {
         const a00 = this._values[0];
         const a01 = this._values[1];
         const a02 = this._values[2];
@@ -374,7 +374,7 @@ export class Matrix3 {
      * @param angle
      * @param axis
      */
-    public rotate(angle: number, axis: Vector3): Matrix3 | null {
+    public rotate(angle: number, axis: Vector3): Matrix3 {
         let x = axis.x;
         let y = axis.y;
         let z = axis.z;

@@ -36,11 +36,11 @@ export abstract class GLMeshBase {
         this.webglContext = webGLRenderingContext;
         // 获取VAO的步骤
         // 1．使用gl.getExtension( "OES_vertex_array_object" )方式获取 VAO 扩展
-        const vaoExtension: OES_vertex_array_object | null = this.webglContext.getExtension('OES_vertex_array_object');
+        const vaoExtension: OES_vertex_array_object = this.webglContext.getExtension('OES_vertex_array_object');
         if (!vaoExtension) throw new Error('Not Support OES_vertex_array_object');
         this._vaoExtension = vaoExtension;
         // 2．调用createVertexArrayOES获取 `WebGLVertexArrayObject` 对象
-        const vao: WebGLVertexArrayObjectOES | null = this._vaoExtension.createVertexArrayOES();
+        const vao: WebGLVertexArrayObjectOES = this._vaoExtension.createVertexArrayOES();
         if (!vao) throw new Error('Not Support WebGLVertexArrayObjectOES');
         this._vao = vao;
         // 顶点属性格式，和绘制当前网格时使用的GLProgram具有一致的attribBits

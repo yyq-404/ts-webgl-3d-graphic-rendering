@@ -83,7 +83,7 @@ export class GLTexture {
         this.width = this.height = 0;
         this.format = gl.RGBA;
         this.type = gl.UNSIGNED_BYTE;
-        const tex: WebGLTexture | null = gl.createTexture();
+        const tex: WebGLTexture = gl.createTexture();
         if (!tex) throw new Error('WebGLTexture创建不成功!');
         this.texture = tex;
         this.target = gl.TEXTURE_2D;
@@ -106,7 +106,7 @@ export class GLTexture {
         const canvas: HTMLCanvasElement = document.createElement('canvas');
         canvas.width = MathHelper.getNextPowerOfTwo(srcImage.width);
         canvas.height = MathHelper.getNextPowerOfTwo(srcImage.height as number);
-        const ctx: CanvasRenderingContext2D | null = canvas.getContext('2d');
+        const ctx: CanvasRenderingContext2D = canvas.getContext('2d');
         if (ctx === null) {
             throw new Error('未能成功创建CanvasRenderingContext2D对象');
         }
@@ -123,7 +123,7 @@ export class GLTexture {
         const canvas: HTMLCanvasElement = document.createElement('canvas') as HTMLCanvasElement;
         canvas.width = 32 * step;
         canvas.height = 32 * step;
-        const context: CanvasRenderingContext2D | null = canvas.getContext('2d');
+        const context: CanvasRenderingContext2D = canvas.getContext('2d');
         if (context === null) {
             alert('离屏Canvas获取渲染上下文失败!');
             throw new Error('离屏Canvas获取渲染上下文失败!');

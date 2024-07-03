@@ -8,7 +8,7 @@ export class Queue<T> extends ListAdapter<T> {
     /**
      * 移除。
      */
-    public override remove(): T | undefined {
+    public override remove(): T {
         if (this.length <= 0) {
             return undefined;
         }
