@@ -8,6 +8,7 @@ import {GLCoordinateSystem} from '../../webgl/common/GLCoordinateSystem';
 import {GLAttributeMap, GLUniformMap} from '../../webgl/common/GLTypes';
 import {CanvasKeyboardEvent} from '../../event/CanvasKeyboardEvent';
 import {HttpHelper} from '../../net/HttpHelper';
+import {AppConstants} from '../AppConstants';
 
 /**
  * 9视图参数类型
@@ -67,8 +68,8 @@ export class BasicWebGLApplication extends BaseApplication {
     private _isFourViewport: boolean = false;
     /** shader路径集合 */
     private readonly _shaderUrls: Map<EGLShaderType, string> = new Map<EGLShaderType, string>([
-        [EGLShaderType.VS_SHADER, 'res/shader/basic/color.vert'],
-        [EGLShaderType.FS_SHADER, 'res/shader/basic/color.frag']
+        [EGLShaderType.VS_SHADER, `${AppConstants.webglShaderRoot}/basic/color.vert`],
+        [EGLShaderType.FS_SHADER, `${AppConstants.webglShaderRoot}/basic/color.frag`]
     ]);
     
     /**
@@ -303,7 +304,7 @@ export class BasicWebGLApplication extends BaseApplication {
      * 渲染处理。
      */
     public override render(): void {
-        this.clearBuffer();
+        // this.clearBuffer();
         if (this._isFourViewport) {
             this.render4Viewports();
         } else {

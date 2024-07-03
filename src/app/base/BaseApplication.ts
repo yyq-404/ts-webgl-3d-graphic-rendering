@@ -6,6 +6,7 @@ import {TimerManager} from '../../timer/TimerManager';
 import {ICanvasInputEventListener} from '../../interface/ICanvasInputEventListener';
 import {IBaseApplication} from '../../interface/IBaseApplication';
 import {CameraComponent} from '../../component/CameraComponent';
+import {AppConstants} from '../AppConstants';
 
 /**
  * 基础应用
@@ -37,6 +38,7 @@ export class BaseApplication implements EventListenerObject, IBaseApplication, I
     protected startTime: number = 0;
     /** 帧率 */
     private _fps: number = 0;
+    
     /**
      * 构造
      */
@@ -395,8 +397,8 @@ export class BaseApplication implements EventListenerObject, IBaseApplication, I
      */
     private createWebGLCanvas(): HTMLCanvasElement {
         const webglCanvas: HTMLCanvasElement = document.createElement('canvas');
-        webglCanvas.width = 800;
-        webglCanvas.height = 600;
+        webglCanvas.width = AppConstants.canvasWidth;
+        webglCanvas.height = AppConstants.canvasHeight;
         webglCanvas.style.backgroundColor = 'lightgray';
         webglCanvas.style.position = 'absolute';
         webglCanvas.style.left = '0px';

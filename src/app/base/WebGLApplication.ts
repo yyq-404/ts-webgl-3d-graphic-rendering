@@ -7,9 +7,9 @@ import {GLAttributeHelper} from '../../webgl/GLAttributeHelper';
 import {GLProgram} from '../../webgl/program/GLProgram';
 import {GLTexture} from '../../webgl/texture/GLTexture';
 import {GLWorldMatrixStack} from '../../webgl/matrix/GLWorldMatrixStack';
-import {CameraComponent} from '../../component/CameraComponent';
 import {CanvasKeyboardEvent} from '../../event/CanvasKeyboardEvent';
 import {HttpHelper} from '../../net/HttpHelper';
+import {AppConstants} from '../AppConstants';
 
 /**
  * WebGL应用。
@@ -27,10 +27,10 @@ export class WebGLApplication extends BaseApplication {
     protected context2d: CanvasRenderingContext2D;
     /** shader路径集合 */
     private readonly _shaderUrls: Map<string, string> = new Map<string, string>([
-        ['color.vert', 'res/shader/common/color/color.vert'],
-        ['color.frag', 'res/shader/common/color/color.frag'],
-        ['texture.vert', 'res/shader/common/texture/texture.vert'],
-        ['texture.frag', 'res/shader/common/texture/texture.frag']
+        ['color.vert', `${AppConstants.webglShaderRoot}/common/color/color.vert`],
+        ['color.frag', `${AppConstants.webglShaderRoot}/common/color/color.frag`],
+        ['texture.vert', `${AppConstants.webglShaderRoot}/common/texture/texture.vert`],
+        ['texture.frag', `${AppConstants.webglShaderRoot}/common/texture/texture.frag`]
     ]);
     
     /**

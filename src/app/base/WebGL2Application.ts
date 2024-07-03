@@ -3,7 +3,6 @@ import {GLRenderHelper} from '../../webgl/GLRenderHelper';
 import {GLTextureCache} from '../../webgl/texture/GLTextureCache';
 import {GLProgramCache} from '../../webgl/program/GLProgramCache';
 import {GLTexture} from '../../webgl/texture/GLTexture';
-import {CameraComponent} from '../../component/CameraComponent';
 import {CanvasKeyboardEvent} from '../../event/CanvasKeyboardEvent';
 import {EGLShaderType} from '../../webgl/enum/EGLShaderType';
 import {HttpHelper} from '../../net/HttpHelper';
@@ -36,7 +35,6 @@ export class WebGL2Application extends BaseApplication {
             alert(' 无法创建WebGL2RenderingContext上下文对象 ');
             throw new Error(' 无法创建WebGL2RenderingContext上下文对象 ');
         }
-        this.camera = new CameraComponent(this.canvas.width, this.canvas.height, 45, 1);
         this.worldMatrixStack = new GLMatrixStack2();
         // 初始化渲染状态
         GLRenderHelper.setDefaultState(this.webglContext);

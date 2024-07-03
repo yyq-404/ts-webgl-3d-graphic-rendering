@@ -56,17 +56,22 @@ export class GLCoordinateSystem {
      * @param row
      * @param colum
      */
-    public static makeViewportCoordinateSystems(width: number, height: number, row: number = 2, colum: number = 2): GLCoordinateSystem[] {
+    public static makeViewportCoordinateSystems(width: number, height: number, row: number = 1, colum: number = 1): GLCoordinateSystem[] {
         const coords: GLCoordinateSystem[] = [];
-        // 一行有多少个
-        const w: number = width / colum;
-        // 一列有多少个
-        const h: number = height / row;
+        // 视口宽度
+        const viewWidth: number = width / colum;
+        // 视口高度
+        const viewHeight: number = height / row;
         // 循环生成GLCoordinateSystem对象，每个GLCoordinateSystem内置了表示viewport的数组
         for (let i: number = 0; i < colum; i++) {
             for (let j: number = 0; j < row; j++) {
                 // viewport是[ x , y , width , height ]格式
-                coords.push(new GLCoordinateSystem({x: i * w, y: i * h, width: w, height: h}));
+                coords.push(new GLCoordinateSystem({
+                    x: i * viewWidth,
+                    y: j * viewHeight,
+                    width: viewWidth,
+                    height: viewHeight
+                }));
             }
         }
         // 将生成的GLCoordinateSystem数组返回
