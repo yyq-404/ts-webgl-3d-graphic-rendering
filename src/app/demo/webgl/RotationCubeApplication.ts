@@ -227,7 +227,6 @@ export class RotatingCubeApplication extends WebGLApplication {
      * @private
      */
     private renderTriangle(): void {
-        if (!this.webglContext) throw new Error('this.gl is not defined');
         let textureProgram = GLProgramCache.instance.getMust('color');
         // 禁止渲染三角形时启用背面剔除功能
         this.webglContext.disable(this.webglContext.CULL_FACE);

@@ -9,6 +9,8 @@ export class GLMatrixStack2 {
     private _viewMatrix: Matrix4;
     /** 矩阵栈 */
     private _stack: Stack<Matrix4>;
+    /** 基本变换矩阵 */
+    private _currentMatrix: Matrix4;
 
     /**
      * 构造
@@ -19,10 +21,7 @@ export class GLMatrixStack2 {
         this._currentMatrix = new Matrix4().setIdentity();
         this._stack = new Stack<Matrix4>();
     }
-    
-    /** 基本变换矩阵 */
-    private _currentMatrix: Matrix4;
-    
+
     /**
      * 获取基本变换矩阵。
      * @return {Matrix4}
@@ -43,7 +42,7 @@ export class GLMatrixStack2 {
      *
      * @return {Matrix4 | undefined}
      */
-    public popMatrix(): Matrix4 | undefined {
+    public popMatrix(): Matrix4 {
         if (this._stack.length <= 0) {
             throw new Error('matrix stack为空!');
         }
@@ -65,7 +64,7 @@ export class GLMatrixStack2 {
      * @param {Vector3} axis
      * @return {Matrix4 | null}
      */
-    public rotate(angle: number, axis: Vector3): Matrix4 | null {
+    public rotate(angle: number, axis: Vector3): Matrix4 {
         return this._currentMatrix.rotate(angle, axis);
     }
     

@@ -18,12 +18,12 @@ export class RotationTriangleApplication extends WebGL2Application {
         0.0, 0.0, 1.0, 1.0,
         0.0, 1.0, 0.0, 1.0
     ];
-    
+
     /** 旋转角度 */
     private _currentAngle = 0;
     /** 旋转角度步进值 */
     private _incAngle = 100;
-    
+
     /**
      * 构造
      */
@@ -34,7 +34,7 @@ export class RotationTriangleApplication extends WebGL2Application {
         this.camera.z = 8;
         this.camera.viewProjectionMatrix = Matrix4.frustum(-1.5, 1.5, -1, 1, 1, 100);
     }
-    
+
     /**
      * 运行。
      * @return {Promise<void>}
@@ -43,7 +43,7 @@ export class RotationTriangleApplication extends WebGL2Application {
         await this.initAsync();
         this.start();
     }
-    
+
     /** 更新。
      * @param elapsedMsec
      * @param intervalSec
@@ -51,11 +51,11 @@ export class RotationTriangleApplication extends WebGL2Application {
     public override update(elapsedMsec: number, intervalSec: number): void {
         this._currentAngle += this._incAngle * intervalSec;
         // if (this._currentAngle > 360) {
-        //     this._currentAngle -= 360;
+        //     this._currentAngle %= 360;
         // }
         super.update(elapsedMsec, intervalSec);
     }
-    
+
     /**
      * 渲染
      */
@@ -63,16 +63,17 @@ export class RotationTriangleApplication extends WebGL2Application {
         GLRenderHelper.clearBuffer(this.webglContext);
         this.draw();
     }
-    
+
     private draw(): void {
         let program = GLProgramCache.instance.getMust('color');
         program.bind();
+        program.loadSampler();
         this.worldMatrixStack.pushMatrix();
         this.worldMatrixStack.rotate(this._currentAngle, Vector3.up);
         // this.webglContext.useProgram(program);//指定使用某套着色器程序
         //获取总变换矩阵引用id
         // let uMVPMatrixHandle = this.webglContext.getUniformLocation(program.program, 'uMVPMatrix');
-        let mvp = Matrix4.product(this.camera.viewProjectionMatrix, this.worldMatrixStack.currentMatrix);
+        let mvp = Matrix4.product(this.camera.viewProjectionMatrix, this.worldMatrixStack.modelViewMatrix);
         //将总变换矩阵送入渲染管线
         program.setMatrix4(GLShaderConstants.MVPMatrix, mvp);
         // this.webglContext.uniformMatrix4fv(uMVPMatrixHandle, false, new Float32Array(mvp.values));
@@ -90,7 +91,7 @@ export class RotationTriangleApplication extends WebGL2Application {
         this.worldMatrixStack.popMatrix();
         program.unbind();
     }
-    
+
     /**
      * 绑定buffer
      * @private

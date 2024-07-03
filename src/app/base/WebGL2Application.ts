@@ -4,6 +4,7 @@ import {GLProgramCache} from '../../webgl/program/GLProgramCache';
 import {GLMatrixStack2} from '../../webgl/matrix/GLMatrixStack2';
 import {AppConstants} from '../AppConstants';
 import {GLProgram} from '../../webgl/program/GLProgram';
+import {GLMatrixStack} from "../../webgl/matrix/GLMatrixStack";
 
 /**
  * WebGL应用。
@@ -12,7 +13,7 @@ export class WebGL2Application extends BaseApplication {
     /* 可以直接操作WebGL2相关内容 */
     protected webglContext: WebGL2RenderingContext;
     /** 模拟 `OpenGL1.1` 中的矩阵堆栈, 封装在 `GLWorldMatrixStack` 类中 */
-    protected worldMatrixStack: GLMatrixStack2;
+    protected worldMatrixStack: GLMatrixStack;
     protected program: WebGLProgram;
     /** shader路径集合 */
     private readonly _shaderUrls: Map<string, string> = new Map<string, string>([
@@ -31,9 +32,9 @@ export class WebGL2Application extends BaseApplication {
             alert(' 无法创建WebGL2RenderingContext上下文对象 ');
             throw new Error(' 无法创建WebGL2RenderingContext上下文对象 ');
         }
-        this.worldMatrixStack = new GLMatrixStack2();
+        this.worldMatrixStack = new GLMatrixStack();
         // 初始化渲染状态
-        GLRenderHelper.setDefaultState(this.webglContext);
+        // GLRenderHelper.setDefaultState(this.webglContext);
     }
     
     /**
@@ -49,7 +50,7 @@ export class WebGL2Application extends BaseApplication {
      * 释放
      */
     public override dispose(): void {
-        this.worldMatrixStack.clear();
+        // this.worldMatrixStack.clear();
         GLProgramCache.instance.clear();
         GLRenderHelper.clearBuffer(this.webglContext);
         if (this.webglContext) {

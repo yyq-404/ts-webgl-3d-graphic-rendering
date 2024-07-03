@@ -15,7 +15,7 @@ export class Matrix4 {
     public static readonly identity = new Matrix4().setIdentity();
     /** 值 */
     private _values = new Float32Array(16);
-    
+
     /**
      * 构造
      * @param values
@@ -25,7 +25,7 @@ export class Matrix4 {
             this.init(values);
         }
     }
-    
+
     /**
      * 获取值集合
      * @return {Float32Array}
@@ -33,7 +33,7 @@ export class Matrix4 {
     public get values(): Float32Array {
         return this._values;
     }
-    
+
     /**
      * 创建一个视锥矩阵，常用于透视投影。
      * @param left
@@ -52,7 +52,7 @@ export class Matrix4 {
             (right + left) / rl, (top + bottom) / tb, -(far + near) / fn, -1,
             0, 0, -(far * near * 2) / fn, 0]);
     }
-    
+
     /**
      * 创建透视投影矩阵。
      * @param fov 角度
@@ -65,7 +65,7 @@ export class Matrix4 {
         const right = top * aspect;
         return Matrix4.frustum(-right, right, -top, top, near, far);
     }
-    
+
     /**
      * 创建正交投影矩阵。
      * @param left
@@ -86,7 +86,7 @@ export class Matrix4 {
             -(left + right) / rl, -(top + bottom) / tb, -(far + near) / fn, 1
         ]);
     }
-    
+
     /**
      * 创建摄影机矩阵。
      * @param position
@@ -107,7 +107,7 @@ export class Matrix4 {
             -Vector3.dot(xAxis, position), -Vector3.dot(yAxis, position), -Vector3.dot(zAxis, position), 1
         ]);
     }
-    
+
     /**
      * 计算两个矩阵的乘积，并将结果存储在第三个矩阵中。
      * @param m1
@@ -167,7 +167,7 @@ export class Matrix4 {
             b30 * a03 + b31 * a13 + b32 * a23 + b33 * a33
         ]);
     }
-    
+
     /**
      * 根据索引获取值
      * @param index
@@ -175,7 +175,7 @@ export class Matrix4 {
     public at(index: number): number {
         return this._values[index];
     }
-    
+
     /**
      * 初始化
      * @param values
@@ -186,7 +186,7 @@ export class Matrix4 {
         }
         return this;
     }
-    
+
     /**
      * 将矩阵的值重置为零。
      */
@@ -195,7 +195,7 @@ export class Matrix4 {
             this._values[i] = 0;
         }
     }
-    
+
     /**
      * 将矩阵的值复制到另一个矩阵。
      * @param dest
@@ -207,7 +207,7 @@ export class Matrix4 {
         }
         return dest;
     }
-    
+
     /**
      * 返回矩阵的所有值作为一个数组。
      */
@@ -218,7 +218,7 @@ export class Matrix4 {
         }
         return data;
     }
-    
+
     /**
      * 返回矩阵中指定行的值作为一个数组。
      * @param index
@@ -226,7 +226,7 @@ export class Matrix4 {
     public row(index: number): number[] {
         return [this._values[index * 4], this._values[index * 4 + 1], this._values[index * 4 + 2], this._values[index * 4 + 3]];
     }
-    
+
     /**
      * 返回矩阵中指定列的值作为一个数组。
      * @param index
@@ -234,7 +234,7 @@ export class Matrix4 {
     public col(index: number): number[] {
         return [this._values[index], this._values[index + 4], this._values[index + 8], this._values[index + 12]];
     }
-    
+
     /**
      * 在指定的阈值范围内比较两个矩阵是否相等。
      * @param matrix
@@ -248,7 +248,7 @@ export class Matrix4 {
         }
         return true;
     }
-    
+
     /**
      *  计算并返回矩阵的行列式。
      */
@@ -283,7 +283,7 @@ export class Matrix4 {
         const det11 = a22 * a33 - a23 * a32;
         return (det00 * det11 - det01 * det10 + det02 * det09 + det03 * det08 - det04 * det07 + det05 * det06);
     }
-    
+
     /**
      * 将矩阵重置为单位矩阵。
      */
@@ -306,7 +306,7 @@ export class Matrix4 {
         this._values[15] = 1;
         return this;
     }
-    
+
     /**
      * 转置矩阵，行列互换。
      */
@@ -331,7 +331,7 @@ export class Matrix4 {
         this._values[14] = temp23;
         return this;
     }
-    
+
     /**
      * 计算并返回矩阵的逆矩阵（如果存在）。
      */
@@ -385,7 +385,7 @@ export class Matrix4 {
         this._values[15] = (a20 * det03 - a21 * det01 + a22 * det00) * det;
         return this;
     }
-    
+
     /**
      * 自身与目标向量相乘。
      * @param matrix
@@ -441,7 +441,7 @@ export class Matrix4 {
         this._values[15] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
         return this;
     }
-    
+
     /**
      * 将矩阵与一个三维向量相乘。
      * @param vector
@@ -456,7 +456,7 @@ export class Matrix4 {
             this._values[2] * x + this._values[6] * y + this._values[10] * z + this._values[14]
         ]);
     }
-    
+
     /**
      * 将矩阵与一个四维向量相乘，并可选择将结果存储在另一个向量中。
      * @param vector
@@ -474,7 +474,7 @@ export class Matrix4 {
         dest.w = this._values[3] * x + this._values[7] * y + this._values[11] * z + this._values[15] * w;
         return dest;
     }
-    
+
     /**
      * 通过提取左上角的 3x3 部分将 4x4 矩阵转换为 3x3 矩阵。
      */
@@ -491,7 +491,7 @@ export class Matrix4 {
             this._values[10]
         ]);
     }
-    
+
     /**
      * 计算并返回矩阵左上角 3x3 部分的逆矩阵（如果存在）。
      */
@@ -523,7 +523,7 @@ export class Matrix4 {
             (a11 * a00 - a01 * a10) * det
         ]);
     }
-    
+
     /**
      * 按给定的向量平移矩阵。
      * @param vector
@@ -538,7 +538,7 @@ export class Matrix4 {
         this._values[15] += this._values[3] * x + this._values[7] * y + this._values[11] * z;
         return this;
     }
-    
+
     /**
      * 按给定的向量缩放矩阵。
      * @param vector
@@ -561,13 +561,13 @@ export class Matrix4 {
         this._values[11] *= z;
         return this;
     }
-    
+
     /**
      * 围绕指定的轴按给定的角度旋转矩阵。
      * @param angle
      * @param axis
      */
-    public rotate(angle: number, axis: Vector3): Matrix4 | null {
+    public rotate(angle: number, axis: Vector3): Matrix4 {
         let x = axis.x;
         let y = axis.y;
         let z = axis.z;
