@@ -94,7 +94,7 @@ export class LinkedList<T> {
      */
     public insert(targetNode: ListNode<T>, data: T): ListNode<T> {
         let node: ListNode<T> = new ListNode<T>(data);
-        node.link(targetNode, false)
+        node.link(targetNode);
         this._length++;
         return node;
     }

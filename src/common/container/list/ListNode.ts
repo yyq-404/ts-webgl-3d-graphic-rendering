@@ -18,7 +18,6 @@ export class ListNode<T> {
         this._data = data;
     }
 
-
     /**
      * 设置后驱。
      * @param value
@@ -68,7 +67,7 @@ export class ListNode<T> {
      * @param targetNode
      * @param append
      */
-    public link(targetNode: ListNode<T>, append: boolean = true): void {
+    public link(targetNode: ListNode<T>, append: boolean = false): void {
         // 后面
         if (append) {
             targetNode._next = this;
