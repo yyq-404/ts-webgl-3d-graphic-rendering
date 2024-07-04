@@ -3,17 +3,16 @@ import {Cube} from '../../../common/geometry/solid/Cube';
 import {GLStaticMesh} from '../../../webgl/mesh/GLStaticMesh';
 import {Matrix4} from '../../../common/math/matrix/Matrix4';
 import {GLProgramCache} from '../../../webgl/program/GLProgramCache';
-import {Geometry} from '../../../common/geometry/Geometry';
 import {GLTextureCache} from '../../../webgl/texture/GLTextureCache';
 import {Vector3} from '../../../common/math/vector/Vector3';
 import {HttpHelper} from '../../../net/HttpHelper';
-import {CanvasKeyboardEvent} from '../../../event/CanvasKeyboardEvent';
 import {GLShaderConstants} from '../../../webgl/GLShaderConstants';
 import {EAxisType} from '../../../enum/EAxisType';
 import {WebGLApplication} from '../../base/WebGLApplication';
 import {GLCoordinateSystemHelper} from '../../../webgl/GLCoordinateSystemHelper';
 import {GLMeshHelper} from '../../../webgl/GLMeshHelper';
 import {GLRenderHelper} from '../../../webgl/GLRenderHelper';
+import {ECanvasKeyboardEventType} from '../../../enum/ECanvasKeyboardEventType';
 
 /**
  * 立方体旋转应用
@@ -71,13 +70,17 @@ export class RotatingCubeApplication extends WebGLApplication {
         // 创建cube的渲染数据
         // 对于三角形的渲染数据，我们使用GLMeshBuilder中立即模式绘制方式
         this._cube = new Cube(0.5, 0.5, 0.5);
-        const data: Geometry = this._cube.makeGeometry();
-        this._cubeVAO = GLMeshHelper.makeStaticMesh(this.webglContext, data);
+        this._cubeVAO = GLMeshHelper.makeStaticMesh(this.webglContext, this._cube.geometry);
         // 初始化时没选中任何一条坐标轴
         this._hitAxis = EAxisType.NONE;
         // 初始化时，世界矩阵都为归一化矩阵
         this._cubeMatrix = new Matrix4().setIdentity();
         this._triangleMatrix = new Matrix4().setIdentity();
+        this.keyboardEventManager.registers([
+                {type: ECanvasKeyboardEventType.KEY_DOWN, key: 'q', callback: this.startRotateTriangle.bind(this)},
+                {type: ECanvasKeyboardEventType.KEY_DOWN, key: 'e', callback: this.stopRotateTriangle.bind(this)}
+            ]
+        );
     }
     
     /**
@@ -97,29 +100,6 @@ export class RotatingCubeApplication extends WebGLApplication {
     }
     
     /**
-     * 按键按下
-     * @param evt
-     */
-    public override onKeyDown(evt: CanvasKeyboardEvent): void {
-        switch (evt.key) {
-            case 'q':
-                if (this._triangleTimerId === -1) {
-                    this._triangleTimerId = this.timerManager.add(this.triangleTimeCallback.bind(this), 0.25, false);
-                }
-                break;
-            case 'e':
-                if (this._triangleTimerId !== -1) {
-                    if (this.timerManager.remove(this._triangleTimerId)) {
-                        this._triangleTimerId = -1;
-                    }
-                }
-                break;
-            default:
-                break;
-        }
-    }
-    
-    /**
      * 更新
      * @param elapsedMsec
      * @param intervalSec
@@ -127,7 +107,7 @@ export class RotatingCubeApplication extends WebGLApplication {
     public override update(elapsedMsec: number, intervalSec: number): void {
         // s = vt，根据两帧间隔更新角速度和角位移
         this._cubeAngle += this._cubeSpeed * intervalSec;
-        if (this._cubeAngle > 360) {
+        if (this._cubeAngle >= 360) {
             this._cubeAngle %= 360;
         }
         // 我们在 CameraApplication 中也覆写（override）的update方法
@@ -286,5 +266,25 @@ export class RotatingCubeApplication extends WebGLApplication {
         this.context2d.fillText(text, x, y);
         // 恢复原来的渲染状态
         this.context2d.restore();
+    }
+    
+    /**
+     * 开始旋转三角形
+     * @private
+     */
+    private startRotateTriangle(): void {
+        if (this._triangleTimerId === -1) {
+            this._triangleTimerId = this.timerManager.add(this.triangleTimeCallback.bind(this), 0.25, false);
+        }
+    }
+    
+    /**
+     * 停止旋转三角形
+     * @private
+     */
+    private stopRotateTriangle(): void {
+        if (this.timerManager.remove(this._triangleTimerId)) {
+            this._triangleTimerId = -1;
+        }
     }
 }

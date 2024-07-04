@@ -1,5 +1,4 @@
 import {CanvasMouseEvent} from "../event/CanvasMouseEvent";
-import {CanvasKeyboardEvent} from "../event/CanvasKeyboardEvent";
 
 /**
  * 画布事件监听接口
@@ -28,22 +27,4 @@ export interface ICanvasInputEventListener {
      * @param event
      */
     onMouseDrag(event: CanvasMouseEvent): void;
-
-    /**
-     * 按键按下
-     * @param event
-     */
-    onKeyDown(event: CanvasKeyboardEvent): void;
-
-    /**
-     * 按键抬起
-     * @param event
-     */
-    onKeyUp(event: CanvasKeyboardEvent): void;
-
-    /**
-     * 按键长按
-     * @param event
-     */
-    onKeyPress(event: CanvasKeyboardEvent): void;
 }

@@ -276,21 +276,21 @@ export class BasicWebGLApplication extends BaseApplication {
         await super.runAsync();
     }
     
-    /**
-     * 按键按下。
-     * @param {CanvasKeyboardEvent} evt
-     */
-    public override onKeyPress(evt: CanvasKeyboardEvent): void {
-        // 调用基类方法，这样摄像机键盘事件全部有效了
-        super.onKeyPress(evt);
-        switch (evt.key) {
-            case 'c':
-                this._isFourViewport = !this._isFourViewport;
-                break;
-            default:
-                break;
-        }
-    }
+    // /**
+    //  * 按键按下。
+    //  * @param {CanvasKeyboardEvent} evt
+    //  */
+    // public override onKeyPress(evt: CanvasKeyboardEvent): void {
+    //     // 调用基类方法，这样摄像机键盘事件全部有效了
+    //     super.onKeyPress(evt);
+    //     switch (evt.key) {
+    //         case 'c':
+    //             this._isFourViewport = !this._isFourViewport;
+    //             break;
+    //         default:
+    //             break;
+    //     }
+    // }
     
     /**
      * 更新

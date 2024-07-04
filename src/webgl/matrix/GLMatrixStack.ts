@@ -4,47 +4,70 @@ import {Vector3} from '../../common/math/vector/Vector3';
 import {EGLMatrixType} from '../enum/EGLMatrixType';
 
 /**
- * 实现 `OpenGL 1.x` 中矩阵堆栈的相关功能
+ * 实现 `OpenGL` 中矩阵堆栈的相关功能
+ * 该类用于将**局部坐标系**表示的顶点变换到**世界坐标系**, 以`Matrix4`矩阵为栈中的元素
  */
 export class GLMatrixStack {
     /** 矩阵模式 */
     private type: EGLMatrixType;
-    /** 模型矩阵栈 */
-    private readonly _mvStack: Matrix4[];
-    /** 投影矩阵栈 */
-    private readonly _projStack: Matrix4[];
-    /** 纹理矩阵栈 */
-    private readonly _texStack: Matrix4[];
+    /** 矩阵栈集合 */
+    private _matrixStacks: Map<string, Matrix4[]>;
     
     /**
      * 构造
      */
     public constructor() {
         //初始化时每个矩阵栈都先添加一个正交归一化后的矩阵
-        this._mvStack = [new Matrix4().setIdentity()];
-        this._projStack = [new Matrix4().setIdentity()];
-        this._texStack = [new Matrix4().setIdentity()];
         this.type = EGLMatrixType.MODEL_VIEW;
+        this._matrixStacks = new Map<string, Matrix4[]>;
+        for (const type of Object.values(EGLMatrixType)) {
+            this._matrixStacks.set(type, [new Matrix4().setIdentity()]);
+        }
+    }
+    
+    /**
+     * 世界矩阵。
+     * @return {Matrix4}
+     */
+    public worldMatrix(): Matrix4 {
+        const worldStack = this._matrixStacks.get(this.type);
+        if (!worldStack || worldStack.length <= 0) {
+            throw new Error('World matrix stack为空!');
+        }
+        return worldStack[worldStack.length - 1];
     }
     
     /**
      * 获取模型矩阵
      */
-    get modelViewMatrix(): Matrix4 {
-        if (this._mvStack.length <= 0) {
-            throw new Error('model view matrix stack为空!');
+    public get modelViewMatrix(): Matrix4 {
+        const modelViewStack = this._matrixStacks.get(EGLMatrixType.MODEL_VIEW);
+        if (!modelViewStack || modelViewStack.length <= 0) {
+            throw new Error('Model view matrix stack is null!');
         }
-        return this._mvStack[this._mvStack.length - 1];
+        return modelViewStack[modelViewStack.length - 1];
     }
     
     /**
      * 获取投影矩阵。
      */
-    get projectionMatrix(): Matrix4 {
-        if (this._projStack.length <= 0) {
-            throw new Error('projection matrix stack为空!');
+    public get projectionMatrix(): Matrix4 {
+        const projectionStack = this._matrixStacks.get(EGLMatrixType.PROJECTION);
+        if (!projectionStack || projectionStack.length <= 0) {
+            throw new Error('Projection matrix stack is null!');
         }
-        return this._projStack[this._projStack.length - 1];
+        return projectionStack[projectionStack.length - 1];
+    }
+    
+    /**
+     * 获取纹理矩阵
+     */
+    public get textureMatrix(): Matrix4 {
+        const textureStack = this._matrixStacks.get(EGLMatrixType.TEXTURE);
+        if (!textureStack || textureStack.length <= 0) {
+            throw new Error('Texture matrix stack is null!');
+        }
+        return textureStack[textureStack.length - 1];
     }
     
     /**
@@ -70,36 +93,13 @@ export class GLMatrixStack {
     }
     
     /**
-     * 获取纹理矩阵
-     */
-    get textureMatrix(): Matrix4 {
-        if (this._texStack.length <= 0) {
-            throw new Error('texture matrix stack为空!');
-        }
-        return this._texStack[this._texStack.length - 1];
-    }
-    
-    /**
      * 压入矩阵。
      */
     public pushMatrix(): GLMatrixStack {
+        const matrixStack = this._matrixStacks.get(this.type);
         const mv: Matrix4 = new Matrix4().setIdentity();
-        const proj = new Matrix4().setIdentity();
-        const tex: Matrix4 = new Matrix4().setIdentity();
-        switch (this.type) {
-            case EGLMatrixType.MODEL_VIEW:
-                this.modelViewMatrix.copy(mv);
-                this._mvStack.push(mv);
-                break;
-            case EGLMatrixType.PROJECTION:
-                this.projectionMatrix.copy(proj);
-                this._projStack.push(proj);
-                break;
-            case EGLMatrixType.TEXTURE:
-                this.textureMatrix.copy(tex);
-                this._texStack.push(tex);
-                break;
-        }
+        this.worldMatrix().copy(mv);
+        matrixStack.push(mv);
         return this;
     }
     
@@ -107,17 +107,8 @@ export class GLMatrixStack {
      * 弹出矩阵
      */
     public popMatrix(): GLMatrixStack {
-        switch (this.type) {
-            case EGLMatrixType.MODEL_VIEW:
-                this._mvStack.pop();
-                break;
-            case EGLMatrixType.PROJECTION:
-                this._projStack.pop();
-                break;
-            case EGLMatrixType.TEXTURE:
-                this._texStack.pop();
-                break;
-        }
+        const matrixStack = this._matrixStacks.get(this.type);
+        matrixStack.pop();
         return this;
     }
     
@@ -125,17 +116,7 @@ export class GLMatrixStack {
      * 将栈顶的矩阵重置为单位矩阵
      */
     public loadIdentity(): GLMatrixStack {
-        switch (this.type) {
-            case EGLMatrixType.MODEL_VIEW:
-                this.modelViewMatrix.setIdentity();
-                break;
-            case EGLMatrixType.PROJECTION:
-                this.projectionMatrix.setIdentity();
-                break;
-            case EGLMatrixType.TEXTURE:
-                this.textureMatrix.setIdentity();
-                break;
-        }
+        this.worldMatrix().setIdentity();
         return this;
     }
     
@@ -144,17 +125,7 @@ export class GLMatrixStack {
      * @param mat
      */
     public loadMatrix(mat: Matrix4): GLMatrixStack {
-        switch (this.type) {
-            case EGLMatrixType.MODEL_VIEW:
-                mat.copy(this.modelViewMatrix);
-                break;
-            case EGLMatrixType.PROJECTION:
-                mat.copy(this.projectionMatrix);
-                break;
-            case EGLMatrixType.TEXTURE:
-                mat.copy(this.textureMatrix);
-                break;
-        }
+        mat.copy(this.worldMatrix());
         return this;
     }
     
@@ -248,14 +219,12 @@ export class GLMatrixStack {
         const x: number = -Vector3.dot(xAxis, pos);
         const y: number = -Vector3.dot(yAxis, pos);
         const z: number = -Vector3.dot(zAxis, pos);
-        const mat: Matrix4 = this._mvStack[this._mvStack.length - 1];
-        mat.init([
+        this.modelViewMatrix.init([
             ...[xAxis.x, yAxis.x, zAxis.x, 0.0],
             ...[xAxis.y, yAxis.y, zAxis.y, 0.0],
             ...[xAxis.z, yAxis.z, zAxis.z, 0.0],
             ...[x, y, z, 1.0]
         ]);
-        
         return this;
     }
     
@@ -264,19 +233,7 @@ export class GLMatrixStack {
      * @param mat
      */
     public multiplyMatrix(mat: Matrix4): GLMatrixStack {
-        switch (this.type) {
-            case EGLMatrixType.MODEL_VIEW:
-                this.modelViewMatrix.multiply(mat);
-                break;
-            case EGLMatrixType.PROJECTION:
-                this.projectionMatrix.multiply(mat);
-                break;
-            case EGLMatrixType.TEXTURE:
-                this.textureMatrix.multiply(mat);
-                break;
-            default:
-                break;
-        }
+        this.worldMatrix().multiply(mat);
         return this;
     }
     
@@ -285,19 +242,7 @@ export class GLMatrixStack {
      * @param pos
      */
     public translate(pos: Vector3): GLMatrixStack {
-        switch (this.type) {
-            case EGLMatrixType.MODEL_VIEW:
-                this.modelViewMatrix.translate(pos);
-                break;
-            case EGLMatrixType.PROJECTION:
-                this.projectionMatrix.translate(pos);
-                break;
-            case EGLMatrixType.TEXTURE:
-                this.textureMatrix.translate(pos);
-                break;
-            default:
-                break;
-        }
+        this.worldMatrix().translate(pos);
         return this;
     }
     
@@ -308,22 +253,8 @@ export class GLMatrixStack {
      * @param isRadians
      */
     public rotate(angle: number, axis: Vector3, isRadians: boolean = false): GLMatrixStack {
-        if (!isRadians) {
-            angle = MathHelper.toRadian(angle);
-        }
-        switch (this.type) {
-            case EGLMatrixType.MODEL_VIEW:
-                this.modelViewMatrix.rotate(angle, axis);
-                break;
-            case EGLMatrixType.PROJECTION:
-                this.projectionMatrix.rotate(angle, axis);
-                break;
-            case EGLMatrixType.TEXTURE:
-                this.textureMatrix.rotate(angle, axis);
-                break;
-            default:
-                break;
-        }
+        if (!isRadians) angle = MathHelper.toRadian(angle);
+        this.worldMatrix().rotate(angle, axis);
         return this;
     }
     
@@ -332,19 +263,14 @@ export class GLMatrixStack {
      * @param s
      */
     public scale(s: Vector3): GLMatrixStack {
-        switch (this.type) {
-            case EGLMatrixType.MODEL_VIEW:
-                this.modelViewMatrix.scale(s);
-                break;
-            case EGLMatrixType.PROJECTION:
-                this.projectionMatrix.scale(s);
-                break;
-            case EGLMatrixType.TEXTURE:
-                this.textureMatrix.scale(s);
-                break;
-            default:
-                break;
-        }
+        this.worldMatrix().scale(s);
         return this;
+    }
+    
+    /**
+     * 清空。
+     */
+    public clear(): void {
+        this._matrixStacks.clear();
     }
 }

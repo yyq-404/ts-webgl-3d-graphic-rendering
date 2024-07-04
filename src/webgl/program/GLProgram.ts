@@ -137,17 +137,36 @@ export class GLProgram {
     }
     
     /**
+     * 设置顶属性
+     * @param {string} name
+     * @param {WebGLBuffer} buffer
+     * @param {number} size
+     * @param {number} target
+     * @param {number} type
+     * @param {boolean} normalized
+     * @param {number} stride
+     * @param {number} offset
+     */
+    public setVertexAttribute(name: string, buffer: WebGLBuffer, size: number, target: number = this.webglContext.ARRAY_BUFFER, type: number = this.webglContext.FLOAT, normalized: boolean = false, stride: number = 0, offset: number = 0): void {
+        let location = this.getAttributeLocation(name);
+        //启用顶点数据数组
+        this.webglContext.enableVertexAttribArray(location);
+        //绑定顶点数据缓冲
+        this.webglContext.bindBuffer(target, buffer);
+        //给管线指定顶点数据
+        this.webglContext.vertexAttribPointer(location, size, type, normalized, stride, offset);
+    }
+    
+    /**
      * 设置整数
      * @param name
      * @param i
      */
-    public setInt(name: string, i: number): boolean {
+    public setInt(name: string, i: number): void {
         const location: WebGLUniformLocation = this.getUniformLocation(name);
         if (location) {
             this.webglContext.uniform1i(location, i);
-            return true;
         }
-        return false;
     }
     
     /**
@@ -155,13 +174,11 @@ export class GLProgram {
      * @param name
      * @param f
      */
-    public setFloat(name: string, f: number): boolean {
+    public setFloat(name: string, f: number): void {
         const location: WebGLUniformLocation = this.getUniformLocation(name);
         if (location) {
             this.webglContext.uniform1f(location, f);
-            return true;
         }
-        return false;
     }
     
     /**
@@ -169,13 +186,11 @@ export class GLProgram {
      * @param name
      * @param vec2
      */
-    public setVector2(name: string, vec2: Vector2): boolean {
+    public setVector2(name: string, vec2: Vector2): void {
         const location: WebGLUniformLocation = this.getUniformLocation(name);
         if (location) {
             this.webglContext.uniform2fv(location, vec2.xy);
-            return true;
         }
-        return false;
     }
     
     /**
@@ -183,13 +198,11 @@ export class GLProgram {
      * @param name
      * @param vec3
      */
-    public setVector3(name: string, vec3: Vector3): boolean {
+    public setVector3(name: string, vec3: Vector3): void {
         const location: WebGLUniformLocation = this.getUniformLocation(name);
         if (location) {
             this.webglContext.uniform3fv(location, vec3.xyz);
-            return true;
         }
-        return false;
     }
     
     /**
@@ -197,13 +210,11 @@ export class GLProgram {
      * @param name
      * @param vec4
      */
-    public setVector4(name: string, vec4: Vector4): boolean {
+    public setVector4(name: string, vec4: Vector4): void {
         const location: WebGLUniformLocation = this.getUniformLocation(name);
         if (location) {
             this.webglContext.uniform4fv(location, vec4.xyzw);
-            return true;
         }
-        return false;
     }
     
     /**
@@ -211,13 +222,11 @@ export class GLProgram {
      * @param name
      * @param quaternion
      */
-    public setQuaternion(name: string, quaternion: Quaternion): boolean {
+    public setQuaternion(name: string, quaternion: Quaternion): void {
         const location: WebGLUniformLocation = this.getUniformLocation(name);
         if (location) {
             this.webglContext.uniform4fv(location, quaternion.xyzw);
-            return true;
         }
-        return false;
     }
     
     /**
@@ -225,13 +234,11 @@ export class GLProgram {
      * @param name
      * @param mat
      */
-    public setMatrix3(name: string, mat: Matrix4): boolean {
+    public setMatrix3(name: string, mat: Matrix4): void {
         const location: WebGLUniformLocation = this.getUniformLocation(name);
         if (location) {
             this.webglContext.uniformMatrix3fv(location, false, mat.all());
-            return true;
         }
-        return false;
     }
     
     /**
@@ -239,13 +246,11 @@ export class GLProgram {
      * @param name
      * @param mat
      */
-    public setMatrix4(name: string, mat: Matrix4): boolean {
+    public setMatrix4(name: string, mat: Matrix4): void {
         const location: WebGLUniformLocation = this.getUniformLocation(name);
         if (location) {
             this.webglContext.uniformMatrix4fv(location, false, mat.all());
-            return true;
         }
-        return false;
     }
     
     /**
@@ -253,29 +258,27 @@ export class GLProgram {
      * @param name
      * @param sampler
      */
-    public setSampler(name: string, sampler: number): boolean {
+    public setSampler(name: string, sampler: number): void {
         const location: WebGLUniformLocation = this.getUniformLocation(name);
         if (location) {
             this.webglContext.uniform1i(location, sampler);
-            return true;
         }
-        return false;
     }
     
     /**
      * 加载取样器
      * @param unit
      */
-    public loadSampler(unit: number = 0): boolean {
-        return this.setSampler(GLShaderConstants.Sampler, unit);
+    public loadSampler(unit: number = 0): void {
+        this.setSampler(GLShaderConstants.Sampler, unit);
     }
     
     /**
      * 加载模型视图矩阵
      * @param mat
      */
-    public loadModelViewMatrix(mat: Matrix4): boolean {
-        return this.setMatrix4(GLShaderConstants.MVMatrix, mat);
+    public loadModelViewMatrix(mat: Matrix4): void {
+        this.setMatrix4(GLShaderConstants.MVMatrix, mat);
     }
     
     /**
@@ -289,12 +292,11 @@ export class GLProgram {
         // 1.attrib名字和shader中的命名必须要一致
         // 2．数量必须要和mesh中一致
         // 3.mesh中的数组的component必须固定
-        this.bindAttribLocation(gl, program, GLAttributeHelper.POSITION);
-        this.bindAttribLocation(gl, program, GLAttributeHelper.NORMAL);
-        this.bindAttribLocation(gl, program, GLAttributeHelper.TEX_COORDINATE_0);
-        this.bindAttribLocation(gl, program, GLAttributeHelper.TEX_COORDINATE_1);
-        this.bindAttribLocation(gl, program, GLAttributeHelper.COLOR);
-        this.bindAttribLocation(gl, program, GLAttributeHelper.TANGENT);
+        let attributes: IGLAttribute[] = [
+            GLAttributeHelper.POSITION, GLAttributeHelper.NORMAL, GLAttributeHelper.TEX_COORDINATE_0,
+            GLAttributeHelper.TEX_COORDINATE_1, GLAttributeHelper.COLOR, GLAttributeHelper.TANGENT
+        ];
+        attributes.forEach(attribute => this.bindAttribLocation(gl, program, attribute));
     }
     
     /**

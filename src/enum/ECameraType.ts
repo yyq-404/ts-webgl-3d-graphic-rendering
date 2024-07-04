@@ -3,7 +3,7 @@
  */
 export enum ECameraType {
     /** 第一人称相机 */
-    FPS_CAMERA,
+    FPS,
     /** 自由运动相机 */
-    FLY_CAMERA
+    FLY
 }

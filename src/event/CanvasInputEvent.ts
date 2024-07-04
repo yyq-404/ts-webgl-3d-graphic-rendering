@@ -1,11 +1,9 @@
-import {ECanvasInputEventType} from "../enum/ECanvasInputEventType";
+import {ECanvasMouseEventType} from "../enum/ECanvasMouseEventType";
 
 /**
  * 画布输入事件
  */
 export class CanvasInputEvent {
-    /** 事件类型 */
-    public type: ECanvasInputEventType
     /** alt按下 */
     public altKey: boolean;
     /** ctrl按下 */
@@ -18,10 +16,8 @@ export class CanvasInputEvent {
      * @param altKey
      * @param ctrlKey
      * @param shiftKey
-     * @param type
      */
-    public constructor(type: ECanvasInputEventType = ECanvasInputEventType.MOUSE_EVENT, altKey: boolean = false, ctrlKey: boolean = false, shiftKey: boolean = false,) {
-        this.type = type;
+    public constructor(altKey: boolean = false, ctrlKey: boolean = false, shiftKey: boolean = false,) {
         this.altKey = altKey;
         this.ctrlKey = ctrlKey;
         this.shiftKey = shiftKey;

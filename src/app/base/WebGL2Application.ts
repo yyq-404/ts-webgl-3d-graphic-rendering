@@ -1,10 +1,9 @@
 import {BaseApplication} from './BaseApplication';
 import {GLRenderHelper} from '../../webgl/GLRenderHelper';
 import {GLProgramCache} from '../../webgl/program/GLProgramCache';
-import {GLMatrixStack2} from '../../webgl/matrix/GLMatrixStack2';
 import {AppConstants} from '../AppConstants';
 import {GLProgram} from '../../webgl/program/GLProgram';
-import {GLMatrixStack} from "../../webgl/matrix/GLMatrixStack";
+import {GLMatrixStack} from '../../webgl/matrix/GLMatrixStack';
 
 /**
  * WebGL应用。
@@ -14,7 +13,6 @@ export class WebGL2Application extends BaseApplication {
     protected webglContext: WebGL2RenderingContext;
     /** 模拟 `OpenGL1.1` 中的矩阵堆栈, 封装在 `GLWorldMatrixStack` 类中 */
     protected worldMatrixStack: GLMatrixStack;
-    protected program: WebGLProgram;
     /** shader路径集合 */
     private readonly _shaderUrls: Map<string, string> = new Map<string, string>([
         ['bns.vert', `${AppConstants.webgl2ShaderRoot}/bns.vert`],
@@ -33,24 +31,13 @@ export class WebGL2Application extends BaseApplication {
             throw new Error(' 无法创建WebGL2RenderingContext上下文对象 ');
         }
         this.worldMatrixStack = new GLMatrixStack();
-        // 初始化渲染状态
-        // GLRenderHelper.setDefaultState(this.webglContext);
-    }
-    
-    /**
-     * 运行。
-     * @return {Promise<void>}
-     */
-    public override async runAsync(): Promise<void> {
-        await this.initAsync();
-        await super.runAsync();
     }
     
     /**
      * 释放
      */
     public override dispose(): void {
-        // this.worldMatrixStack.clear();
+        this.worldMatrixStack.clear();
         GLProgramCache.instance.clear();
         GLRenderHelper.clearBuffer(this.webglContext);
         if (this.webglContext) {
