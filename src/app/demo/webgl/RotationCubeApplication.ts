@@ -127,6 +127,9 @@ export class RotatingCubeApplication extends WebGLApplication {
     public override update(elapsedMsec: number, intervalSec: number): void {
         // s = vt，根据两帧间隔更新角速度和角位移
         this._cubeAngle += this._cubeSpeed * intervalSec;
+        if (this._cubeAngle >= 360) {
+            this._cubeAngle %= 360;
+        }
         // 我们在 CameraApplication 中也覆写（override）的update方法
         // CameraApplication的update方法用来计算摄像机的投影矩阵以及视图矩阵
         // 所以我们必须要调用基类方法，用于控制摄像机更新

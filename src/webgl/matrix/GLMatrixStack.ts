@@ -347,4 +347,13 @@ export class GLMatrixStack {
         }
         return this;
     }
+    
+    /**
+     * 清空。
+     */
+    public clear(): void {
+        this._mvStack.length = 0;
+        this._projStack.length = 0;
+        this._texStack.length = 0;
+    }
 }
