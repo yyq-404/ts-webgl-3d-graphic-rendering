@@ -48,7 +48,7 @@ export class Cube {
     /**
      * 产生几何数据。
      */
-    public makeGeometry(): Geometry {
+    public get geometry(): Geometry {
         const geometry: Geometry = new Geometry();
         // 0
         geometry.positions.push(new Vector3([-this.halfWidth, -this.halfHeight, this.halfDepth]));

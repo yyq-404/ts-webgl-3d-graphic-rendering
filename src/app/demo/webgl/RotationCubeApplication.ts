@@ -71,8 +71,7 @@ export class RotatingCubeApplication extends WebGLApplication {
         // 创建cube的渲染数据
         // 对于三角形的渲染数据，我们使用GLMeshBuilder中立即模式绘制方式
         this._cube = new Cube(0.5, 0.5, 0.5);
-        const data: Geometry = this._cube.makeGeometry();
-        this._cubeVAO = GLMeshHelper.makeStaticMesh(this.webglContext, data);
+        this._cubeVAO = GLMeshHelper.makeStaticMesh(this.webglContext, this._cube.geometry);
         // 初始化时没选中任何一条坐标轴
         this._hitAxis = EAxisType.NONE;
         // 初始化时，世界矩阵都为归一化矩阵
