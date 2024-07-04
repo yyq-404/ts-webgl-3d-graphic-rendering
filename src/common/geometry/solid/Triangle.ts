@@ -1,6 +1,4 @@
 import {Vector3} from '../../math/vector/Vector3';
-import {Geometry} from '../Geometry';
-import {Vector2} from '../../math/vector/Vector2';
 
 /**
  * 三角形定义。
@@ -39,15 +37,5 @@ export class Triangle {
      */
     public vertexData(): number[] {
         return [...this.p1.xyz, ...this.p2.xyz, ...this.p3.xyz];
-    }
-    
-    /**
-     * 产生几何数据。
-     */
-    public makeGeometry(): Geometry {
-        const geometry: Geometry = new Geometry();
-        // 0
-        geometry.positions = [this.p1, this.p2, this.p3];
-        return geometry;
     }
 }
