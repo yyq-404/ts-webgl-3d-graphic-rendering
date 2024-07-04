@@ -1,16 +1,18 @@
-import {CanvasInputEvent} from "./CanvasInputEvent";
-import {ECanvasInputEventType} from "../enum/ECanvasInputEventType";
-import {Vector2} from "../common/math/vector/Vector2";
+import {CanvasInputEvent} from './CanvasInputEvent';
+import {ECanvasMouseEventType} from '../enum/ECanvasMouseEventType';
+import {Vector2} from '../common/math/vector/Vector2';
 
 /**
  * 鼠标事件。
  */
 export class CanvasMouseEvent extends CanvasInputEvent {
+    /** 类型 */
+    public type: ECanvasMouseEventType;
     /** 鼠标按键 */
     public button: number;
     /** 鼠标位置 */
     public mousePosition: Vector2;
-
+    
     /**
      * 结构
      * @param type
@@ -20,9 +22,10 @@ export class CanvasMouseEvent extends CanvasInputEvent {
      * @param ctrlKey
      * @param shiftKey
      */
-    public constructor(type: ECanvasInputEventType = ECanvasInputEventType.MOUSE_EVENT, mousePosition: Vector2, button: number, altKey: boolean = false, ctrlKey: boolean = false, shiftKey: boolean = false) {
-        super(type, altKey, ctrlKey, shiftKey);
-        this.mousePosition = mousePosition;
+    public constructor(type: ECanvasMouseEventType = ECanvasMouseEventType.MOUSE_EVENT, mousePosition: Vector2, button: number, altKey: boolean = false, ctrlKey: boolean = false, shiftKey: boolean = false) {
+        super(altKey, ctrlKey, shiftKey);
+        this.type = type;
         this.button = button;
+        this.mousePosition = mousePosition;
     }
 }
