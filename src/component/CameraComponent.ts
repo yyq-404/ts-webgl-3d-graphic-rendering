@@ -16,7 +16,7 @@ export class CameraComponent {
     /** view_matrix矩阵及其逆矩阵 */
     private _invViewProjectionMatrix: Matrix4;
     /** 摄像机类型 */
-    private _type: ECameraType = ECameraType.FLY_CAMERA;
+    private _type: ECameraType = ECameraType.FLY;
     /** 位置 */
     private _position: Vector3 = new Vector3();
     /** 摄像机世界坐标系x轴 */
@@ -257,7 +257,7 @@ export class CameraComponent {
     public moveForward(speed: number): void {
         this.position.x += this.zAxis.x * speed;
         // 对于第一人称摄像机来说，你双脚不能离地，因此运动时不能变动y轴上的数据
-        if (this.type == ECameraType.FLY_CAMERA) {
+        if (this.type == ECameraType.FLY) {
             this.position.y += this.zAxis.y * speed;
         }
         this.position.z += this.zAxis.z * speed;
@@ -270,7 +270,7 @@ export class CameraComponent {
     public moveRightward(speed: number): void {
         this.position.x += this.xAxis.x * speed;
         // 对于第一人称摄像机来说，你双脚不能离地，因此运动时不能变动y轴上的数据
-        if (this.type == ECameraType.FLY_CAMERA) {
+        if (this.type == ECameraType.FLY) {
             this.position.y += this.xAxis.y * speed;
         }
         this.position.z += this.xAxis.z * speed;
@@ -283,7 +283,7 @@ export class CameraComponent {
     public moveUpward(speed: number): void {
         // 对于第一人称摄像机来说，只调整上下的高度，目的是模拟眼睛的高度
         this.position.y += this.yAxis.y * speed;
-        if (this.type == ECameraType.FLY_CAMERA) {
+        if (this.type == ECameraType.FLY) {
             this.position.x += this.yAxis.x * speed;
             this.position.z += this.yAxis.z * speed;
         }
@@ -308,9 +308,9 @@ export class CameraComponent {
     public yaw(degree: number): void {
         Matrix4.m0.setIdentity();
         let radian = MathHelper.toRadian(degree);
-        if (this.type === ECameraType.FPS_CAMERA) {
+        if (this.type === ECameraType.FPS) {
             Matrix4.m0.rotate(radian, Vector3.up);
-        } else if (this.type === ECameraType.FLY_CAMERA) {
+        } else if (this.type === ECameraType.FLY) {
             Matrix4.m0.rotate(radian, this.yAxis);
         }
         this.xAxis = Matrix4.m0.multiplyVector3(this.xAxis);
@@ -322,7 +322,7 @@ export class CameraComponent {
      * @param degree
      */
     public roll(degree: number): void {
-        if (this.type == ECameraType.FLY_CAMERA) {
+        if (this.type == ECameraType.FLY) {
             Matrix4.m0.setIdentity();
             let radian = MathHelper.toRadian(degree);
             Matrix4.m0.rotate(radian, this.zAxis);

@@ -1,13 +1,13 @@
 import {GLCoordinateSystem} from '../../../webgl/common/GLCoordinateSystem';
 import {Matrix4} from '../../../common/math/matrix/Matrix4';
 import {Vector3} from '../../../common/math/vector/Vector3';
-import {CanvasKeyboardEvent} from '../../../event/CanvasKeyboardEvent';
 import {EAxisType} from '../../../enum/EAxisType';
 import {DrawHelper} from '../../../common/DrawHelper';
 import {Vector4} from '../../../common/math/vector/Vector4';
 import {WebGLApplication} from '../../base/WebGLApplication';
 import {GLCoordinateSystemHelper} from '../../../webgl/GLCoordinateSystemHelper';
 import {GLRenderHelper} from '../../../webgl/GLRenderHelper';
+import {ECanvasKeyboardEventType} from '../../../enum/ECanvasKeyboardEventType';
 
 /**
  * 坐标系统应用。
@@ -28,8 +28,6 @@ export class CoordinateSystemApplication extends WebGLApplication {
     private _coordinateSystems: GLCoordinateSystem[] = [];
     /** 当前要绘制的坐标系的model-view-project矩阵 */
     private _mvp: Matrix4 = new Matrix4();
-    /** 坐标系统绘制方法 */
-    private _drawMethods: Map<string, (glCoordinateSystem: GLCoordinateSystem) => void>;
     
     /**
      * 构造。
@@ -39,33 +37,12 @@ export class CoordinateSystemApplication extends WebGLApplication {
         super({preserveDrawingBuffer: false}, true);
         this.makeFourGLCoordinateSystems();
         this._currentDrawMethod = this.drawCoordinateSystem;
-        this._drawMethods = new Map<string, (glCoordinateSystem: GLCoordinateSystem) => void>([
-            ['1', this.drawCoordinateSystem],
-            ['2', this.drawFullCoordinateSystem],
-            ['3', this.drawFullCoordinateSystemWithRotatedCube]
+        this.keyboardEventManager.registers([
+            {type: ECanvasKeyboardEventType.KEY_PRESS, key: '1', callback: () => this._currentDrawMethod = this.drawCoordinateSystem},
+            {type: ECanvasKeyboardEventType.KEY_PRESS, key: '2', callback: () => this._currentDrawMethod = this.drawFullCoordinateSystem},
+            {type: ECanvasKeyboardEventType.KEY_PRESS, key: '3', callback: () => this._currentDrawMethod = this.drawFullCoordinateSystemWithRotatedCube},
+            {type: ECanvasKeyboardEventType.KEY_PRESS, key: 'c', callback: this.changeGLCoordinateSystemView.bind(this)}
         ]);
-    }
-    
-    /**
-     * 按键按下。
-     * @param {CanvasKeyboardEvent} evt
-     */
-    public override onKeyPress(evt: CanvasKeyboardEvent): void {
-        // 调用基类方法，这样摄像机键盘事件全部有效了
-        super.onKeyPress(evt);
-        switch (evt.key) {
-            case '1':
-            case '2':
-            case '3':
-                let drawMethod = this._drawMethods.get(evt.key);
-                if (drawMethod) this._currentDrawMethod = drawMethod;
-                break;
-            case 'c':
-                this.changeGLCoordinateSystemView();
-                break;
-            default:
-                break;
-        }
     }
     
     /**

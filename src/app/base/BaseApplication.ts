@@ -1,4 +1,4 @@
-import {ECanvasInputEventType} from '../../enum/ECanvasInputEventType';
+import {ECanvasMouseEventType} from '../../enum/ECanvasMouseEventType';
 import {CanvasMouseEvent} from '../../event/CanvasMouseEvent';
 import {CanvasKeyboardEvent} from '../../event/CanvasKeyboardEvent';
 import {Vector2} from '../../common/math/vector/Vector2';
@@ -8,6 +8,9 @@ import {IBaseApplication} from '../../interface/IBaseApplication';
 import {CameraComponent} from '../../component/CameraComponent';
 import {AppConstants} from '../AppConstants';
 import {HttpHelper} from '../../net/HttpHelper';
+import {ECanvasKeyboardEventType} from '../../enum/ECanvasKeyboardEventType';
+import {CanvasKeyboardEventManager} from '../../event/CanvasKeyboardEventManager';
+import {CanvasMouseEventManager} from '../../event/CanvasEventEventManager';
 
 /**
  * 基础应用
@@ -19,6 +22,10 @@ export class BaseApplication implements EventListenerObject, IBaseApplication, I
     public frameCallback: ((app: BaseApplication) => void) = null;
     /** 定时器管理器 */
     protected timerManager: TimerManager = new TimerManager();
+    /** 画布键盘事件管理器 */
+    protected keyboardEventManager: CanvasKeyboardEventManager = new CanvasKeyboardEventManager();
+    /** 画布鼠标事件管理器 */
+    protected mouseEventManager: CanvasMouseEventManager = new CanvasMouseEventManager();
     /** 指示如何计算Y轴的坐标 */
     protected isFlipYCoordinate: boolean = false;
     /** 我们的Application主要是canvas2D和webGL应用， 而canvas2D和webGL context都是从HTMLCanvasElement元素获取的 */
@@ -39,6 +46,21 @@ export class BaseApplication implements EventListenerObject, IBaseApplication, I
     private _running: boolean = false;
     /** 帧率 */
     private _fps: number = 0;
+    private readonly _cameraSpeed: number = 1;
+    private _cameraEvents = [
+        {type: ECanvasKeyboardEventType.KEY_PRESS, key: 'w', callback: () => this.camera.moveForward(this._cameraSpeed)},
+        {type: ECanvasKeyboardEventType.KEY_PRESS, key: 's', callback: () => this.camera.moveForward(-this._cameraSpeed)},
+        {type: ECanvasKeyboardEventType.KEY_PRESS, key: 'a', callback: () => this.camera.moveRightward(this._cameraSpeed)},
+        {type: ECanvasKeyboardEventType.KEY_PRESS, key: 'd', callback: () => this.camera.moveRightward(-this._cameraSpeed)},
+        {type: ECanvasKeyboardEventType.KEY_PRESS, key: 'z', callback: () => this.camera.moveUpward(this._cameraSpeed)},
+        {type: ECanvasKeyboardEventType.KEY_PRESS, key: 'x', callback: () => this.camera.moveUpward(-this._cameraSpeed)},
+        {type: ECanvasKeyboardEventType.KEY_PRESS, key: 'y', callback: () => this.camera.yaw(this._cameraSpeed)},
+        {type: ECanvasKeyboardEventType.KEY_PRESS, key: 'u', callback: () => this.camera.yaw(-this._cameraSpeed)},
+        {type: ECanvasKeyboardEventType.KEY_PRESS, key: 'p', callback: () => this.camera.pitch(this._cameraSpeed)},
+        {type: ECanvasKeyboardEventType.KEY_PRESS, key: 'o', callback: () => this.camera.pitch(-this._cameraSpeed)},
+        {type: ECanvasKeyboardEventType.KEY_PRESS, key: 'r', callback: () => this.camera.roll(this._cameraSpeed)},
+        {type: ECanvasKeyboardEventType.KEY_PRESS, key: 't', callback: () => this.camera.roll(-this._cameraSpeed)}
+    ];
     
     /**
      * 构造
@@ -52,8 +74,9 @@ export class BaseApplication implements EventListenerObject, IBaseApplication, I
         this.isFlipYCoordinate = true;
         this.frameCallback = null;
         document.oncontextmenu = () => false;
-        this.registerMouseEvents();
-        this.registerKeyBoardEvents();
+        this.keyboardEventManager.types.forEach(type => window.addEventListener(type, this, false));
+        this.mouseEventManager.types.forEach(type => this.canvas.addEventListener(type, this, false));
+        this.keyboardEventManager.registers(this._cameraEvents);
     }
     
     /**
@@ -118,7 +141,7 @@ export class BaseApplication implements EventListenerObject, IBaseApplication, I
             this.onMouseEvent(event);
         }
         if (event instanceof KeyboardEvent) {
-            this.onKeyBoardEvent(event);
+            this.keyboardEventManager.onEvent(event);
         }
     }
     
@@ -154,59 +177,6 @@ export class BaseApplication implements EventListenerObject, IBaseApplication, I
         console.log(`onMouseDrag: ${event.button}, pos: [${event.mousePosition.x}, ${event.mousePosition.y}]`);
     }
     
-    /**
-     * 按键按下
-     * @param event
-     */
-    public onKeyDown(event: CanvasKeyboardEvent): void {
-        console.log(`onKeyDown: ${event.key}`);
-    }
-    
-    /**
-     * 案件抬起
-     * @param event
-     */
-    public onKeyUp(event: CanvasKeyboardEvent): void {
-        console.log(`onKeyUp: ${event.key}`);
-    }
-    
-    /**
-     * 按键按下。
-     * @param event
-     */
-    public onKeyPress(event: CanvasKeyboardEvent): void {
-        switch (event.key) {
-            case 'w':
-                this.camera.moveForward(-1);
-                break;
-            case 's':
-                this.camera.moveForward(1);
-                break;
-            case 'a':
-                this.camera.moveRightward(-1);
-                break;
-            case 'd':
-                this.camera.moveRightward(1);
-                break;
-            case 'z':
-                this.camera.moveUpward(1);
-                break;
-            case 'x':
-                this.camera.moveUpward(-1);
-                break;
-            case 'y':
-                this.camera.yaw(1);
-                break;
-            case 'r':
-                this.camera.roll(1);
-                break;
-            case 'p':
-                this.camera.pitch(1);
-                break;
-            default:
-                break;
-        }
-    }
     
     /**
      * 更新。
@@ -230,8 +200,8 @@ export class BaseApplication implements EventListenerObject, IBaseApplication, I
     public dispose(): void {
         this.timerManager.clear();
         this.frameCallback = null;
-        this.unregisterMouseEvents();
-        this.unregisterKeyBoardEvents();
+        this.keyboardEventManager.types.forEach(type => window.removeEventListener(type, this, false));
+        this.mouseEventManager.types.forEach(type => this.canvas.removeEventListener(type, this, false));
         if (this.canvas && this.canvas.parentElement) {
             this.canvas.parentElement.removeChild(this.canvas);
             this.canvas = null;
@@ -294,15 +264,15 @@ export class BaseApplication implements EventListenerObject, IBaseApplication, I
      * @private
      */
     protected toCanvasMouseEvent(event: MouseEvent): CanvasMouseEvent {
-        let type: ECanvasInputEventType = ECanvasInputEventType.MOUSE_MOVE;
+        let type: ECanvasMouseEventType = ECanvasMouseEventType.MOUSE_MOVE;
         let button = event.button;
         if (event.type === 'mousedown') {
-            type = ECanvasInputEventType.MOUSE_DOWN;
+            type = ECanvasMouseEventType.MOUSE_DOWN;
             if (event.button == 2) {
                 this.isRightMouseDown = true;
             }
         } else if (event.type === 'mouseup') {
-            type = ECanvasInputEventType.MOUSE_UP;
+            type = ECanvasMouseEventType.MOUSE_UP;
             if (event.button == 2) {
                 this.isRightMouseDown = false;
             }
@@ -310,7 +280,7 @@ export class BaseApplication implements EventListenerObject, IBaseApplication, I
         if (event.type === 'mousemove') {
             if (this.isMouseDown && this.isRightMouseDown) {
                 button = 2;
-                type = ECanvasInputEventType.MOUSE_DRAG;
+                type = ECanvasMouseEventType.MOUSE_DRAG;
             }
         }
         let mousePosition: Vector2 = this.viewPortToCanvasCoordinate(event);
@@ -323,105 +293,27 @@ export class BaseApplication implements EventListenerObject, IBaseApplication, I
      * @protected
      */
     protected onMouseEvent(event: MouseEvent): void {
-        let mouseEvent: CanvasMouseEvent = this.toCanvasMouseEvent(event);
+        let canvasEvent: CanvasMouseEvent = this.toCanvasMouseEvent(event);
+        console.log(event.type);
         switch (event.type) {
             case 'mousedown':
                 this.isMouseDown = true;
-                this.onMouseDown(mouseEvent);
+                this.onMouseDown(canvasEvent);
                 break;
             case 'mouseup':
-                this.onMouseUp(mouseEvent);
+                this.onMouseUp(canvasEvent);
                 break;
             case 'mousemove':
                 if (this.isSupportMouseMove) {
-                    this.onMouseMove(mouseEvent);
+                    this.onMouseMove(canvasEvent);
                 }
                 if (this.isMouseDown) {
-                    this.onMouseDrag(mouseEvent);
+                    this.onMouseDrag(canvasEvent);
                 }
                 break;
             default:
                 break;
         }
-    }
-    
-    /**
-     * 键盘事件回调
-     * @param event
-     * @protected
-     */
-    protected onKeyBoardEvent(event: KeyboardEvent): void {
-        let keyEvent: CanvasKeyboardEvent = this.toCanvasKeyboardEvent(event);
-        switch (event.type) {
-            case 'keypress':
-                this.onKeyPress(keyEvent);
-                break;
-            case 'keydown':
-                this.onKeyDown(keyEvent);
-                break;
-            case 'keyup':
-                this.onKeyUp(keyEvent);
-                break;
-            default:
-                break;
-        }
-    }
-    
-    /**
-     * 注册鼠标事件。
-     * @private
-     */
-    private registerMouseEvents(): void {
-        this.canvas.addEventListener('mousedown', this, false);
-        this.canvas.addEventListener('mouseup', this, false);
-        this.canvas.addEventListener('mousemove', this, false);
-    }
-    
-    /**
-     * 注销鼠标事件。
-     * @private
-     */
-    private unregisterMouseEvents(): void {
-        this.canvas.removeEventListener('mousedown', this, false);
-        this.canvas.removeEventListener('mouseup', this, false);
-        this.canvas.removeEventListener('mousemove', this, false);
-    }
-    
-    /**
-     * 注册键盘事件。
-     * @private
-     */
-    private registerKeyBoardEvents(): void {
-        window.addEventListener('keydown', this, false);
-        window.addEventListener('keyup', this, false);
-        window.addEventListener('keypress', this, false);
-    }
-    
-    /**
-     * 注销键盘事件。
-     * @private
-     */
-    private unregisterKeyBoardEvents(): void {
-        window.removeEventListener('keydown', this, false);
-        window.removeEventListener('keyup', this, false);
-        window.removeEventListener('keypress', this, false);
-    }
-    
-    /**
-     * 获取画布键盘事件。
-     * @param event
-     * @private
-     */
-    private toCanvasKeyboardEvent(event: KeyboardEvent): CanvasKeyboardEvent {
-        let type = ECanvasInputEventType.KEYBOARD_EVENT;
-        if (event.type === 'keydown') {
-            type = ECanvasInputEventType.KEY_DOWN;
-        } else if (event.type === 'keyup') {
-            type = ECanvasInputEventType.KEY_UP;
-        } else if (event.type === 'keypress') {
-            type = ECanvasInputEventType.KEY_PRESS;
-        }
-        return new CanvasKeyboardEvent(type, event.key, event.code, event.repeat, event.altKey, event.ctrlKey, event.shiftKey);
     }
     
     /**

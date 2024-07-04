@@ -13,6 +13,7 @@ import {DrawHelper} from '../../../common/DrawHelper';
 import {CanvasKeyboardEvent} from '../../../event/CanvasKeyboardEvent';
 import {Matrix4} from '../../../common/math/matrix/Matrix4';
 import {GLRenderHelper} from '../../../webgl/GLRenderHelper';
+import {ECanvasKeyboardEventType} from '../../../enum/ECanvasKeyboardEventType';
 
 /**
  * 网格构建器应用
@@ -72,6 +73,10 @@ export class MeshBuilderApplication extends WebGLApplication {
         this._currentDrawMethod = this.drawByMatrixWithColorShader;
         // BUG
         // this.currentDrawMethod = this.drawByMultiViewportsWithTextureShader;
+        this.keyboardEventManager.registers([
+            {type: ECanvasKeyboardEventType.KEY_PRESS, key: '1', callback: () => this._currentDrawMethod = this.drawByMatrixWithColorShader},
+            {type: ECanvasKeyboardEventType.KEY_PRESS, key: '2', callback: () => this._currentDrawMethod = this.drawByMultiViewportsWithTextureShader},
+        ])
     }
     
     /**
@@ -89,21 +94,6 @@ export class MeshBuilderApplication extends WebGLApplication {
         this._texBuilder1.program = textureShaderProgram;
         this._texBuilder2.program = textureShaderProgram;
         this.start();
-    }
-    
-    /**
-     * 按键按下。
-     * @param {CanvasKeyboardEvent} evt
-     */
-    public override onKeyPress(evt: CanvasKeyboardEvent): void {
-        super.onKeyPress(evt); // 调用基类方法，这样摄像机键盘事件全部有效了
-        if (evt.key === '1') {
-            // 将currentDrawMethod函数指针指向drawByMatrixWithColorShader方法
-            this._currentDrawMethod = this.drawByMatrixWithColorShader;
-        } else if (evt.key === '2') {
-            // 将currentDrawMethod函数指针指向drawByMultiViewportsWithTextureShader方法
-            this._currentDrawMethod = this.drawByMultiViewportsWithTextureShader;
-        }
     }
     
     /**
