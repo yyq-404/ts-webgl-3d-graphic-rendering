@@ -19,7 +19,7 @@ export class GLMatrixStack2 {
         this._projectionMatrix = new Matrix4().setIdentity();
         this._viewMatrix = new Matrix4().setIdentity();
         this._currentMatrix = new Matrix4().setIdentity();
-        this._stack = new Stack<Matrix4>();
+        this._stack = new Stack<Matrix4>(false);
     }
 
     /**
@@ -34,7 +34,7 @@ export class GLMatrixStack2 {
      * 保护变换矩阵，当前矩阵入栈
      */
     public pushMatrix(): void {
-        this._stack.add(this._currentMatrix);
+        this._stack.push(this._currentMatrix);
     }
     
     /**
@@ -46,7 +46,7 @@ export class GLMatrixStack2 {
         if (this._stack.length <= 0) {
             throw new Error('matrix stack为空!');
         }
-        return this._stack.remove();
+        return this._stack.pop();
     }
     
     /**

@@ -2,6 +2,7 @@ import {Matrix4} from '../../common/math/matrix/Matrix4';
 import {MathHelper} from '../../common/math/MathHelper';
 import {Vector3} from '../../common/math/vector/Vector3';
 import {EGLMatrixType} from '../enum/EGLMatrixType';
+import {Stack} from "../../common/container/Stack";
 
 /**
  * 实现 `OpenGL` 中矩阵堆栈的相关功能
@@ -11,65 +12,67 @@ export class GLMatrixStack {
     /** 矩阵模式 */
     private type: EGLMatrixType;
     /** 矩阵栈集合 */
-    private _matrixStacks: Map<string, Matrix4[]>;
-    
+    private _matrixStacks: Map<string, Stack<Matrix4>>;
+
     /**
      * 构造
      */
     public constructor() {
         //初始化时每个矩阵栈都先添加一个正交归一化后的矩阵
         this.type = EGLMatrixType.MODEL_VIEW;
-        this._matrixStacks = new Map<string, Matrix4[]>;
+        this._matrixStacks = new Map<string, Stack<Matrix4>>;
         for (const type of Object.values(EGLMatrixType)) {
-            this._matrixStacks.set(type, [new Matrix4().setIdentity()]);
+            let stack = new Stack<Matrix4>(false);
+            stack.push(new Matrix4().setIdentity())
+            this._matrixStacks.set(type, stack)
         }
     }
-    
+
     /**
      * 世界矩阵。
      * @return {Matrix4}
      */
     public worldMatrix(): Matrix4 {
         const worldStack = this._matrixStacks.get(this.type);
-        if (!worldStack || worldStack.length <= 0) {
-            throw new Error('World matrix stack为空!');
+        if (!worldStack || worldStack.isEmpty) {
+            throw new Error('World matrix stack is null!');
         }
-        return worldStack[worldStack.length - 1];
+        return worldStack.last;
     }
-    
+
     /**
      * 获取模型矩阵
      */
     public get modelViewMatrix(): Matrix4 {
         const modelViewStack = this._matrixStacks.get(EGLMatrixType.MODEL_VIEW);
-        if (!modelViewStack || modelViewStack.length <= 0) {
+        if (!modelViewStack || modelViewStack.isEmpty) {
             throw new Error('Model view matrix stack is null!');
         }
-        return modelViewStack[modelViewStack.length - 1];
+        return modelViewStack.last;
     }
-    
+
     /**
      * 获取投影矩阵。
      */
     public get projectionMatrix(): Matrix4 {
         const projectionStack = this._matrixStacks.get(EGLMatrixType.PROJECTION);
-        if (!projectionStack || projectionStack.length <= 0) {
+        if (!projectionStack || projectionStack.isEmpty) {
             throw new Error('Projection matrix stack is null!');
         }
-        return projectionStack[projectionStack.length - 1];
+        return projectionStack.last;
     }
-    
+
     /**
      * 获取纹理矩阵
      */
     public get textureMatrix(): Matrix4 {
         const textureStack = this._matrixStacks.get(EGLMatrixType.TEXTURE);
-        if (!textureStack || textureStack.length <= 0) {
+        if (!textureStack || textureStack.isEmpty) {
             throw new Error('Texture matrix stack is null!');
         }
-        return textureStack[textureStack.length - 1];
+        return textureStack.last;
     }
-    
+
     /**
      * 获取模型视图投影矩阵
      */
@@ -79,7 +82,7 @@ export class GLMatrixStack {
         ret.multiply(this.modelViewMatrix);
         return ret;
     }
-    
+
     /**
      * 获取法线矩阵
      */
@@ -91,7 +94,7 @@ export class GLMatrixStack {
         ret.transpose();
         return ret;
     }
-    
+
     /**
      * 压入矩阵。
      */
@@ -102,7 +105,7 @@ export class GLMatrixStack {
         matrixStack.push(mv);
         return this;
     }
-    
+
     /**
      * 弹出矩阵
      */
@@ -111,7 +114,7 @@ export class GLMatrixStack {
         matrixStack.pop();
         return this;
     }
-    
+
     /**
      * 将栈顶的矩阵重置为单位矩阵
      */
@@ -119,7 +122,7 @@ export class GLMatrixStack {
         this.worldMatrix().setIdentity();
         return this;
     }
-    
+
     /**
      * 将参数矩阵mat的值复制到栈顶矩阵
      * @param mat
@@ -128,7 +131,7 @@ export class GLMatrixStack {
         mat.copy(this.worldMatrix());
         return this;
     }
-    
+
     /**
      * 创建透视投影矩阵
      * @param fov
@@ -149,7 +152,7 @@ export class GLMatrixStack {
         this.loadIdentity();
         return this;
     }
-    
+
     /**
      * 计算视锥矩阵
      * @param left
@@ -168,7 +171,7 @@ export class GLMatrixStack {
         this.loadIdentity();
         return this;
     }
-    
+
     /**
      * 计算正交矩阵
      * @param left
@@ -187,7 +190,7 @@ export class GLMatrixStack {
         this.loadIdentity();
         return this;
     }
-    
+
     /**
      * 计算朝向
      * @param pos
@@ -200,7 +203,7 @@ export class GLMatrixStack {
         this.loadMatrix(mat);
         return this;
     }
-    
+
     /**
      * 构建视图
      * @param pos
@@ -227,7 +230,7 @@ export class GLMatrixStack {
         ]);
         return this;
     }
-    
+
     /**
      * 矩阵乘法
      * @param mat
@@ -236,7 +239,7 @@ export class GLMatrixStack {
         this.worldMatrix().multiply(mat);
         return this;
     }
-    
+
     /**
      * 矩阵平移
      * @param pos
@@ -245,7 +248,7 @@ export class GLMatrixStack {
         this.worldMatrix().translate(pos);
         return this;
     }
-    
+
     /**
      * 矩阵旋转
      * @param angle
@@ -257,7 +260,7 @@ export class GLMatrixStack {
         this.worldMatrix().rotate(angle, axis);
         return this;
     }
-    
+
     /**
      * 矩阵缩放
      * @param s
@@ -266,7 +269,7 @@ export class GLMatrixStack {
         this.worldMatrix().scale(s);
         return this;
     }
-    
+
     /**
      * 清空。
      */
