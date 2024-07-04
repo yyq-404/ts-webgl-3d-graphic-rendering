@@ -1,5 +1,4 @@
 import {CanvasMouseEvent} from "../event/CanvasMouseEvent";
-import {CanvasKeyboardEvent} from "../event/CanvasKeyboardEvent";
 
 /**
  * 画布事件监听接口
