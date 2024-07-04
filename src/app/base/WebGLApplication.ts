@@ -6,8 +6,8 @@ import {GLProgramCache} from '../../webgl/program/GLProgramCache';
 import {GLAttributeHelper} from '../../webgl/GLAttributeHelper';
 import {GLProgram} from '../../webgl/program/GLProgram';
 import {GLTexture} from '../../webgl/texture/GLTexture';
-import {GLWorldMatrixStack} from '../../webgl/matrix/GLWorldMatrixStack';
 import {AppConstants} from '../AppConstants';
+import {GLMatrixStack} from '../../webgl/matrix/GLMatrixStack';
 
 /**
  * WebGL应用。
@@ -16,7 +16,7 @@ export class WebGLApplication extends BaseApplication {
     /* 可以直接操作WebGL相关内容 */
     protected webglContext: WebGLRenderingContext;
     /** 模拟 `OpenGL1.1` 中的矩阵堆栈, 封装在 `GLWorldMatrixStack` 类中 */
-    protected worldMatrixStack: GLWorldMatrixStack;
+    protected worldMatrixStack: GLMatrixStack;
     /** 模拟OpenGL1.1中的立即绘制模式, 封装在GLMeshBuilder类中 */
     protected builder: GLMeshBuilder;
     /** 为了在3D环境中同时支持Canvas2D绘制，特别是为了实现文字绘制 */
@@ -47,7 +47,7 @@ export class WebGLApplication extends BaseApplication {
         if (option2d) {
             this.create2dCanvas();
         }
-        this.worldMatrixStack = new GLWorldMatrixStack();
+        this.worldMatrixStack = new GLMatrixStack();
         // 初始化渲染状态
         GLRenderHelper.setDefaultState(this.webglContext);
         // 初始化时，创建default纹理

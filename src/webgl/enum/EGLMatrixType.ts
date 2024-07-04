@@ -3,10 +3,10 @@
  */
 export enum EGLMatrixType {
     /** 模型视图矩阵 */
-    MODEL_VIEW,
+    MODEL_VIEW = 'model_view',
     /** 投影矩阵 */
-    PROJECTION,
+    PROJECTION = 'projection',
     /** 纹理矩阵 */
-    TEXTURE,
+    TEXTURE = 'texture'
 }
 

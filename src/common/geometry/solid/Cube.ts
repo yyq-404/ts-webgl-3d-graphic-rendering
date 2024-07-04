@@ -50,37 +50,29 @@ export class Cube {
      */
     public get geometry(): Geometry {
         const geometry: Geometry = new Geometry();
-        // 0
-        geometry.positions.push(new Vector3([-this.halfWidth, -this.halfHeight, this.halfDepth]));
-        geometry.uvs.push(new Vector2([1, 0]));
-        // 1
-        geometry.positions.push(new Vector3([-this.halfWidth, this.halfHeight, this.halfDepth]));
-        geometry.uvs.push(new Vector2([1, 1]));
-        // 2
-        geometry.positions.push(new Vector3([-this.halfWidth, -this.halfHeight, -this.halfDepth]));
-        geometry.uvs.push(new Vector2([0, 0]));
-        // 3
-        geometry.positions.push(new Vector3([-this.halfWidth, this.halfHeight, -this.halfDepth]));
-        geometry.uvs.push(new Vector2([0, 1]));
-        // 4
-        geometry.positions.push(new Vector3([this.halfWidth, -this.halfHeight, this.halfDepth]));
-        geometry.uvs.push(new Vector2([0, 0]));
-        // 5
-        geometry.positions.push(new Vector3([this.halfWidth, this.halfHeight, this.halfDepth]));
-        geometry.uvs.push(new Vector2([0, 1]));
-        // 6
-        geometry.positions.push(new Vector3([this.halfWidth, -this.halfHeight, -this.halfDepth]));
-        geometry.uvs.push(new Vector2([1, 0]));
-        // 7
-        geometry.positions.push(new Vector3([this.halfWidth, this.halfHeight, -this.halfDepth]));
-        geometry.uvs.push(new Vector2([1, 1]));
-        // 法线朝外
-        geometry.indices.push(0, 1, 3, 0, 3, 2); // 左面
-        geometry.indices.push(3, 7, 6, 3, 6, 2); // 后面
-        geometry.indices.push(6, 7, 5, 6, 5, 4); // 右面
-        geometry.indices.push(5, 1, 0, 5, 0, 4); // 前面
-        geometry.indices.push(1, 5, 7, 1, 7, 3); // 上面
-        geometry.indices.push(2, 6, 4, 2, 4, 0); // 下面
+        const items = [
+            {position: new Vector3([-this.halfWidth, -this.halfHeight, this.halfDepth]), uv: new Vector2([1, 0])}, // 0
+            {position: new Vector3([-this.halfWidth, this.halfHeight, this.halfDepth]), uv: new Vector2([1, 1])}, // 1
+            {position: new Vector3([-this.halfWidth, -this.halfHeight, -this.halfDepth]), uv: new Vector2([0, 0])}, // 2
+            {position: new Vector3([-this.halfWidth, this.halfHeight, -this.halfDepth]), uv: new Vector2([0, 1])}, // 3
+            {position: new Vector3([this.halfWidth, -this.halfHeight, this.halfDepth]), uv: new Vector2([0, 0])}, // 4
+            {position: new Vector3([this.halfWidth, this.halfHeight, this.halfDepth]), uv: new Vector2([0, 1])}, // 5
+            {position: new Vector3([this.halfWidth, -this.halfHeight, -this.halfDepth]), uv: new Vector2([1, 0])}, // 6
+            {position: new Vector3([this.halfWidth, this.halfHeight, -this.halfDepth]), uv: new Vector2([1, 1])} // 7
+        ];
+        items.forEach(item => {
+            geometry.positions.push(item.position);
+            geometry.uvs.push(item.uv);
+        });
+        const indices = [
+            [0, 1, 3, 0, 3, 2], // 左面
+            [3, 7, 6, 3, 6, 2], // 后面
+            [6, 7, 5, 6, 5, 4], // 右面
+            [5, 1, 0, 5, 0, 4], // 前面
+            [1, 5, 7, 1, 7, 3], // 上面
+            [2, 6, 4, 2, 4, 0] // 下面
+        ];
+        indices.forEach(points => geometry.indices.push(...points));
         return geometry;
     }
 }
