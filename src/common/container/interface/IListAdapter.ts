@@ -1,24 +1,9 @@
 /**
- * 适配器接口
+ * 列表适配器接口
  */
 export interface IListAdapter<T> {
     /**
-     * 增加
-     */
-    add(t: T): void;
-
-    /**
-     * 移除
-     */
-    remove(): T;
-
-    /**
-     * 清空
-     */
-    clear(): void;
-
-    /**
-     * 长度
+     * 长度。
      */
     get length(): number;
 
@@ -26,5 +11,31 @@ export interface IListAdapter<T> {
      * 是否为空
      */
     get isEmpty(): boolean;
+
+    /**
+     * 获取第一个元素。
+     */
+    get first(): T;
+
+    /**
+     * 获取最后一个元素。
+     */
+    get last(): T;
+
+    /**
+     * 压入元素。
+     */
+    push(t: T): void;
+
+    /**
+     * 弹出元素。
+     */
+    pop(): T;
+
+    /**
+     * 清空元素。
+     */
+    clear(): void;
+
 }
 

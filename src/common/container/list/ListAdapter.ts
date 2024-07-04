@@ -5,8 +5,8 @@ import {IListAdapter} from "../interface/IListAdapter";
  * 链表适配器。
  */
 export abstract class ListAdapter<T> implements IListAdapter<T> {
-    /** 内部类型数组 */
-    protected _array: Array<T> | LinkedList<T>;
+    /** 内部元素集合 */
+    protected _elements: Array<T> | LinkedList<T>;
 
     /**
      * 构造
@@ -14,9 +14,9 @@ export abstract class ListAdapter<T> implements IListAdapter<T> {
      */
     public constructor(useList: boolean = true) {
         if (useList) {
-            this._array = new LinkedList<T>()
+            this._elements = new LinkedList<T>()
         } else {
-            this._array = new Array<T>();
+            this._elements = new Array<T>();
         }
     }
 
@@ -24,39 +24,67 @@ export abstract class ListAdapter<T> implements IListAdapter<T> {
      * 是否为空。
      */
     public get isEmpty(): boolean {
-        return this._array.length <= 0;
+        if (this._elements instanceof LinkedList) {
+            return this._elements.isEmpty();
+        } else {
+            return this._elements.length <= 0;
+        }
     }
 
     /**
      * 长度。
      */
     public get length(): number {
-        return this._array.length;
+        return this._elements.length;
     }
 
     /**
-     * 增加。
+     * 获取第一个元素。
+     */
+    public get first(): T {
+        if (this.isEmpty) return undefined;
+        if (this._elements instanceof LinkedList) {
+            return this._elements.begin().data;
+        } else {
+            return this._elements[0];
+        }
+    }
+
+    /**
+     * 获取最后一个元素
+     */
+    public get last(): T {
+        if (this.isEmpty) return undefined;
+        if (this._elements instanceof LinkedList) {
+            return this._elements.end().data;
+        } else {
+            return this._elements[this._elements.length - 1];
+        }
+    }
+
+    /**
+     * 压入元素。
      * @param t
      */
-    public add(t: T): void {
-        this._array.push(t);
+    public push(t: T): void {
+        this._elements.push(t);
+    }
+
+    /**
+     * 弹出元素。
+     */
+    public pop(): T {
+        return undefined;
     }
 
     /**
      * 清空。
      */
     public clear(): void {
-        if (this._array instanceof LinkedList) {
-            this._array = new LinkedList<T>();
+        if (this._elements instanceof LinkedList) {
+            this._elements = new LinkedList<T>();
         } else {
-            this._array = new Array<T>();
+            this._elements = new Array<T>();
         }
-    }
-
-    /**
-     * 移除。
-     */
-    public remove(): T {
-        return undefined;
     }
 }

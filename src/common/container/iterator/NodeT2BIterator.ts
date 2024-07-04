@@ -61,7 +61,7 @@ export class NodeT2BIterator<T, IdxFunc extends TreeIndexer, Adapter extends ILi
         if (this._adapter.isEmpty) {
             return false;
         }
-        this._currNode = this._adapter.remove();
+        this._currNode = this._adapter.pop();
         if (this._currNode === undefined) {
             return false;
         }
@@ -70,7 +70,7 @@ export class NodeT2BIterator<T, IdxFunc extends TreeIndexer, Adapter extends ILi
             let index = this._indexer(count, i);
             let child: TreeNode<T> = this._currNode.getChildAt(index);
             if (child !== undefined) {
-                this._adapter.add(child);
+                this._adapter.push(child);
             }
         }
         return true;
@@ -85,6 +85,6 @@ export class NodeT2BIterator<T, IdxFunc extends TreeIndexer, Adapter extends ILi
         }
         this._currNode = undefined;
         this._adapter.clear();
-        this._adapter.add(this._node);
+        this._adapter.push(this._node);
     }
 }

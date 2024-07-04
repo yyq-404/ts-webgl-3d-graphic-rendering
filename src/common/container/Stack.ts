@@ -5,9 +5,9 @@ import {ListAdapter} from "./list/ListAdapter";
  */
 export class Stack<T> extends ListAdapter<T> {
     /**
-     * 移除。
+     * 弹出元素。
      */
-    public override remove(): T {
-        return this.length > 0 ? this._array.pop() : undefined;
+    public override pop(): T {
+        return this.length > 0 ? this._elements.pop() : undefined;
     }
 }

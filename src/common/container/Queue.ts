@@ -6,16 +6,14 @@ import {LinkedList} from "./list/LinkedList";
  */
 export class Queue<T> extends ListAdapter<T> {
     /**
-     * 移除。
+     * 弹出元素。。
      */
-    public override remove(): T {
-        if (this.length <= 0) {
-            return undefined;
-        }
-        if (this._array instanceof LinkedList) {
-            return this._array.popFront()
+    public override pop(): T {
+        if (this.isEmpty) return undefined;
+        if (this._elements instanceof LinkedList) {
+            return this._elements.popFront()
         } else {
-            return this._array.shift();
+            return this._elements.shift();
         }
     }
 }

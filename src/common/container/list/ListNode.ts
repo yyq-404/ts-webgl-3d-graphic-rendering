@@ -1,46 +1,95 @@
+/**
+ * 双向链表节点。
+ */
 export class ListNode<T> {
     /** 后驱 */
-    public next: ListNode<T>;
+    private _next: ListNode<T>;
     /** 前驱 */
-    public prev: ListNode<T>;
+    private _prev: ListNode<T>;
     /** 数据 */
-    public data: T;
+    private _data: T;
 
     /**
      * 构造
      * @param data
      */
     public constructor(data: T = undefined) {
-        this.next = this.prev = null;
-        this.data = data;
+        this._next = this._prev = null;
+        this._data = data;
     }
 
-    public link(newLink: ListNode<T>, append: boolean = true): void {
+
+    /**
+     * 设置后驱。
+     * @param value
+     */
+    public set next(value: ListNode<T>) {
+        this._next = value;
+    }
+
+    /**
+     * 获取后驱。
+     */
+    public get next() {
+        return this._next;
+    }
+
+    /**
+     * 设置前驱。
+     * @param value
+     */
+    public set prev(value: ListNode<T>) {
+        this._prev = value;
+    }
+
+    /**
+     * 获取前驱。
+     */
+    public get prev() {
+        return this._prev;
+    }
+
+    /**
+     * 获取数据。
+     */
+    public get data() {
+        return this._data;
+    }
+
+    /**
+     * 连接节点。
+     * @param targetNode
+     * @param append
+     */
+    public link(targetNode: ListNode<T>, append: boolean = false): void {
         // 后面
         if (append) {
-            newLink.next = this;
-            newLink.prev = this.prev;
-            if (this.prev) {
-                this.prev.next = newLink;
+            targetNode._next = this;
+            targetNode._prev = this._prev;
+            if (this._prev) {
+                this._prev._next = targetNode;
             }
-            this.prev = newLink;
+            this._prev = targetNode;
         } else {
             //前面
-            newLink.prev = this;
-            newLink.next = this.next;
-            if (this.next) {
-                this.next.prev = newLink;
+            targetNode._prev = this;
+            targetNode._next = this._next;
+            if (this._next) {
+                this._next._prev = targetNode;
             }
-            this.next = newLink;
+            this._next = targetNode;
         }
     }
 
+    /**
+     * 取消连接。
+     */
     public unlink(): void {
-        if (this.next !== null) {
-            this.next.prev = this.prev;
+        if (this._next) {
+            this._next._prev = this._prev;
         }
-        if (this.prev !== null) {
-            this.prev.next = this.next;
+        if (this._prev) {
+            this._prev._next = this._next;
         }
     }
 }

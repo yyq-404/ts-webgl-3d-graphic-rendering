@@ -22,7 +22,7 @@ export class LinkedList<T> {
     /**
      * 是否为空。
      */
-    public empty(): boolean {
+    public isEmpty(): boolean {
         return this._headNode.next === this._headNode;
     }
 
@@ -30,14 +30,14 @@ export class LinkedList<T> {
      * 获取长度。
      */
     public get length(): number {
-        return this._length
+        return this._length;
     }
 
     /**
      * 开始节点。
      */
     public begin(): ListNode<T> {
-        if (this._headNode.next === null) {
+        if (!this._headNode.next) {
             throw new Error("headNode cannot be null");
         }
         return this._headNode.next;
@@ -55,8 +55,8 @@ export class LinkedList<T> {
      * @param data
      */
     public contains(data: T): boolean {
-        for (let link: ListNode<T> = this._headNode.next; link != null && link != this._headNode; link = link?.next) {
-            if (link != null && link.data !== undefined && link.data === data) {
+        for (let link: ListNode<T> = this._headNode.next; link != null && link != this._headNode; link = link.next) {
+            if (link && link.data && link.data === data) {
                 return true;
             }
         }
@@ -69,7 +69,7 @@ export class LinkedList<T> {
      */
     public forNext(cb: (data: T) => void): void {
         for (let link: ListNode<T> = this._headNode.next; link != null && link != this._headNode; link = link.next) {
-            if (link != null && link.data !== undefined && cb) {
+            if (link && link.data && cb) {
                 cb(link.data)
             }
         }
@@ -81,7 +81,7 @@ export class LinkedList<T> {
      */
     public forPrev(cb: (data: T) => void): void {
         for (let link: ListNode<T> = this._headNode.prev; link != null && link != this._headNode; link = link.prev) {
-            if (link != null && link.data !== undefined && cb) {
+            if (link && link.data && cb) {
                 cb(link.data)
             }
         }
@@ -91,15 +91,11 @@ export class LinkedList<T> {
      * 插入。
      * @param targetNode
      * @param data
+     * @param append
      */
-    public insertBefore(targetNode: ListNode<T>, data: T): ListNode<T> {
+    public insert(targetNode: ListNode<T>, data: T, append: boolean = false): ListNode<T> {
         let node: ListNode<T> = new ListNode<T>(data);
-        node.next = targetNode;
-        node.prev = targetNode.prev;
-        if (targetNode.prev !== null) {
-            targetNode.prev.next = node;
-        }
-        targetNode.prev = node;
+        node.link(targetNode, append)
         this._length++;
         return node;
     }
@@ -109,14 +105,7 @@ export class LinkedList<T> {
      * @param node
      */
     public remove(node: ListNode<T>): void {
-        let next: ListNode<T> = node.next;
-        let prev: ListNode<T> = node.prev;
-        if (prev !== null) {
-            prev.next = next;
-        }
-        if (next !== null) {
-            next.prev = prev;
-        }
+        node.unlink()
         this._length--;
     }
 
@@ -125,7 +114,7 @@ export class LinkedList<T> {
      * @param data
      */
     public push(data: T): void {
-        this.insertBefore(this.end(), data);
+        this.insert(this.end(), data);
     }
 
     /**
@@ -146,7 +135,7 @@ export class LinkedList<T> {
      * @param data
      */
     public pushFront(data: T): void {
-        this.insertBefore(this.begin(), data);
+        this.insert(this.begin(), data);
     }
 
     /**
