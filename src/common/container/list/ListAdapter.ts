@@ -1,5 +1,6 @@
 import {LinkedList} from "./LinkedList";
 import {IListAdapter} from "../interface/IListAdapter";
+import {ListNode} from "./ListNode";
 
 /**
  * 链表适配器。
@@ -56,7 +57,9 @@ export abstract class ListAdapter<T> implements IListAdapter<T> {
     public get last(): T {
         if (this.isEmpty) return undefined;
         if (this._elements instanceof LinkedList) {
-            return this._elements.end().data;
+            let prev: ListNode<T> = this._elements.end().prev;
+            if (!prev) return undefined;
+            return prev.data;
         } else {
             return this._elements[this._elements.length - 1];
         }

@@ -70,7 +70,7 @@ export class LinkedList<T> {
     public forNext(cb: (data: T) => void): void {
         for (let link: ListNode<T> = this._headNode.next; link != null && link != this._headNode; link = link.next) {
             if (link && link.data && cb) {
-                cb(link.data)
+                cb(link.data);
             }
         }
     }
@@ -82,7 +82,7 @@ export class LinkedList<T> {
     public forPrev(cb: (data: T) => void): void {
         for (let link: ListNode<T> = this._headNode.prev; link != null && link != this._headNode; link = link.prev) {
             if (link && link.data && cb) {
-                cb(link.data)
+                cb(link.data);
             }
         }
     }
@@ -94,11 +94,7 @@ export class LinkedList<T> {
      */
     public insert(targetNode: ListNode<T>, data: T): ListNode<T> {
         let node: ListNode<T> = new ListNode<T>(data);
-        if (this.isEmpty()) {
-            this._headNode.data = data;
-        } else {
-            node.link(targetNode, false)
-        }
+        node.link(targetNode, false)
         this._length++;
         return node;
     }
@@ -108,7 +104,7 @@ export class LinkedList<T> {
      * @param node
      */
     public remove(node: ListNode<T>): void {
-        node.unlink()
+        node.unlink();
         this._length--;
     }
 

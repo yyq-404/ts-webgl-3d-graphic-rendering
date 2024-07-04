@@ -72,16 +72,16 @@ export class ListNode<T> {
         // 后面
         if (append) {
             targetNode._next = this;
+            targetNode._prev = this._prev;
             if (this._prev) {
-                targetNode._prev = this._prev;
                 this._prev._next = targetNode;
             }
             this._prev = targetNode;
         } else {
             //前面
             targetNode._prev = this;
+            targetNode._next = this._next;
             if (this._next) {
-                targetNode._next = this._next;
                 this._next._prev = targetNode;
             }
             this._next = targetNode;
