@@ -23,7 +23,7 @@ export class LinkedList<T> {
      * 是否为空。
      */
     public isEmpty(): boolean {
-        return this._headNode.next === this._headNode;
+        return (this._headNode.next === this._headNode) && (this._length <= 0);
     }
 
     /**
@@ -91,11 +91,14 @@ export class LinkedList<T> {
      * 插入。
      * @param targetNode
      * @param data
-     * @param append
      */
-    public insert(targetNode: ListNode<T>, data: T, append: boolean = false): ListNode<T> {
+    public insert(targetNode: ListNode<T>, data: T): ListNode<T> {
         let node: ListNode<T> = new ListNode<T>(data);
-        node.link(targetNode, append)
+        if (this.isEmpty()) {
+            this._headNode.data = data;
+        } else {
+            node.link(targetNode, false)
+        }
         this._length++;
         return node;
     }
@@ -122,9 +125,7 @@ export class LinkedList<T> {
      */
     public pop(): T {
         let prev: ListNode<T> = this.end().prev;
-        if (prev === null) {
-            return undefined;
-        }
+        if (!prev) return undefined;
         let ret: T = prev.data;
         this.remove(prev);
         return ret;

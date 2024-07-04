@@ -30,7 +30,7 @@ export class ListNode<T> {
     /**
      * 获取后驱。
      */
-    public get next() {
+    public get next(): ListNode<T> {
         return this._next;
     }
 
@@ -45,14 +45,21 @@ export class ListNode<T> {
     /**
      * 获取前驱。
      */
-    public get prev() {
+    public get prev(): ListNode<T> {
         return this._prev;
+    }
+
+    /**
+     * 设置数据。
+     */
+    public set data(value: T) {
+        this._data = value;
     }
 
     /**
      * 获取数据。
      */
-    public get data() {
+    public get data(): T {
         return this._data;
     }
 
@@ -61,20 +68,20 @@ export class ListNode<T> {
      * @param targetNode
      * @param append
      */
-    public link(targetNode: ListNode<T>, append: boolean = false): void {
+    public link(targetNode: ListNode<T>, append: boolean = true): void {
         // 后面
         if (append) {
             targetNode._next = this;
-            targetNode._prev = this._prev;
             if (this._prev) {
+                targetNode._prev = this._prev;
                 this._prev._next = targetNode;
             }
             this._prev = targetNode;
         } else {
             //前面
             targetNode._prev = this;
-            targetNode._next = this._next;
             if (this._next) {
+                targetNode._next = this._next;
                 this._next._prev = targetNode;
             }
             this._next = targetNode;
