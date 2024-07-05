@@ -33,8 +33,6 @@ export class RotatingCubeApplication extends WebGLApplication {
     private _cubeAngle: number;
     /** cube的角速度 */
     private readonly _cubeSpeed: number;
-    /** 合成的cube的世界矩阵 */
-    private _cubeMatrix: Matrix4;
     // 三角形
     /** 三角形的角位移 */
     private _triangleAngle: number;
@@ -42,8 +40,6 @@ export class RotatingCubeApplication extends WebGLApplication {
     private readonly _triangleSpeed: number;
     /** 由于三角形使用键盘控制的更新方式，需要添加和删除操作，需要定时器id */
     private _triangleTimerId: number;
-    /** 合成的三角形的世界矩阵 */
-    private _triangleMatrix: Matrix4;
     /** 为了支持鼠标点选，记录选中的坐标轴的enum值 */
     private readonly _hitAxis: EAxisType;
     /** 贴图路径集合 */
@@ -73,9 +69,6 @@ export class RotatingCubeApplication extends WebGLApplication {
         this._cubeVAO = GLMeshHelper.makeStaticMesh(this.webglContext, this._cube.geometry);
         // 初始化时没选中任何一条坐标轴
         this._hitAxis = EAxisType.NONE;
-        // 初始化时，世界矩阵都为归一化矩阵
-        this._cubeMatrix = new Matrix4().setIdentity();
-        this._triangleMatrix = new Matrix4().setIdentity();
         this.keyboardEventManager.registers([
                 {type: ECanvasKeyboardEventType.KEY_DOWN, key: 'q', callback: this.startRotateTriangle.bind(this)},
                 {type: ECanvasKeyboardEventType.KEY_DOWN, key: 'e', callback: this.stopRotateTriangle.bind(this)}
@@ -186,15 +179,15 @@ export class RotatingCubeApplication extends WebGLApplication {
         // 以角度(非弧度)为单位，每帧旋转
         this.worldMatrixStack.rotate(this._cubeAngle, Vector3.up, false);
         // 合成modelViewProjection矩阵
-        this._cubeMatrix = Matrix4.product(this.camera.viewProjectionMatrix, this.worldMatrixStack.modelViewMatrix);
+        const mvp = Matrix4.product(this.camera.viewProjectionMatrix, this.worldMatrixStack.modelViewMatrix);
         // 将合成的矩阵给GLProgram对象
-        textureProgram.setMatrix4(GLShaderConstants.MVPMatrix, this._cubeMatrix);
+        textureProgram.setMatrix4(GLShaderConstants.MVPMatrix, mvp);
         // 使用当前绑定的texture和program绘制cubeVao对象
         this._cubeVAO.draw();
         // 使用辅助方法绘制坐标系
-        GLCoordinateSystemHelper.drawAxis(this.builder, this._cubeMatrix, this._hitAxis, 1);
+        GLCoordinateSystemHelper.drawAxis(this.builder, mvp, this._hitAxis, 1);
         if (this.context2d) {
-            GLCoordinateSystemHelper.drawText(this.context2d, this._cubeMatrix, GLRenderHelper.getViewport(this.webglContext), this.canvas.height, false);
+            GLCoordinateSystemHelper.drawText(this.context2d, mvp, GLRenderHelper.getViewport(this.webglContext), this.canvas.height, false);
         }
         // 矩阵出栈
         this.worldMatrixStack.popMatrix();
@@ -232,9 +225,9 @@ export class RotatingCubeApplication extends WebGLApplication {
         // 三角形第三个点的颜色与坐标
         this.builder.color(0, 0, 1).vertex(0, 0.5, 0);
         // 合成model-view-projection matrix
-        this._triangleMatrix = Matrix4.product(this.camera.viewProjectionMatrix, this.worldMatrixStack.modelViewMatrix);
+        const mvp = Matrix4.product(this.camera.viewProjectionMatrix, this.worldMatrixStack.modelViewMatrix);
         // 将mvpMatrix传递给GLMeshBuilder的end方法，该方法会正确的显示图形
-        this.builder.end(this._triangleMatrix);
+        this.builder.end(mvp);
         // 删除一个矩阵
         this.worldMatrixStack.popMatrix();
         textureProgram.unbind();
