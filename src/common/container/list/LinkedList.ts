@@ -95,16 +95,7 @@ export class LinkedList<T> {
      */
     public insert(targetNode: ListNode<T>, data: T): ListNode<T> {
         let node: ListNode<T> = new ListNode<T>(data);
-        // 设置新节点的后驱指针和前驱指针
-        node.next = targetNode;
-        node.prev = targetNode.prev;
-        // 设置好新节点的前后驱指针后
-        // 我们还要调整参考节点的前后驱指针
-        if (targetNode.prev !== null) {
-            targetNode.prev.next = node;
-        }
-        targetNode.prev = node;
-        // 插入成功后，元素计数器加1
+        targetNode.link(node);
         this._length++;
         return node;
     }
@@ -114,19 +105,20 @@ export class LinkedList<T> {
      * @param node
      */
     public remove(node: ListNode<T>): void {
-        // 获得要删除的node3的后驱指针指向的节点，这里应该是node1
-        let next: ListNode<T> = node.next;
-        // 获得要删除的node3的前驱指针指向的节点，这里应该是node0
-        let prev: ListNode<T> = node.prev;
-        if (prev) {
-            // 设置node0后驱指针next指向node1
-            prev.next = next;
-        }
-        if (next) {
-            // 设置node1的前驱指针prev指向node0
-            next.prev = prev;
-        }
-        // 操作到这里，说明参数node已经被成功删除了，此时需要将List的数量减1
+        node.unlink();
+        // // 获得要删除的node3的后驱指针指向的节点，这里应该是node1
+        // let next: ListNode<T> = node.next;
+        // // 获得要删除的node3的前驱指针指向的节点，这里应该是node0
+        // let prev: ListNode<T> = node.prev;
+        // if (prev) {
+        //     // 设置node0后驱指针next指向node1
+        //     prev.next = next;
+        // }
+        // if (next) {
+        //     // 设置node1的前驱指针prev指向node0
+        //     next.prev = prev;
+        // }
+        // // 操作到这里，说明参数node已经被成功删除了，此时需要将List的数量减1
         this._length--;
     }
     

@@ -8,7 +8,7 @@ export class ListNode<T> {
     private _prev: ListNode<T>;
     /** 数据 */
     private _data: T;
-
+    
     /**
      * 构造
      * @param data
@@ -17,7 +17,7 @@ export class ListNode<T> {
         this._next = this._prev = null;
         this._data = data;
     }
-
+    
     /**
      * 设置后驱。
      * @param value
@@ -25,14 +25,14 @@ export class ListNode<T> {
     public set next(value: ListNode<T>) {
         this._next = value;
     }
-
+    
     /**
      * 获取后驱。
      */
     public get next(): ListNode<T> {
         return this._next;
     }
-
+    
     /**
      * 设置前驱。
      * @param value
@@ -40,36 +40,36 @@ export class ListNode<T> {
     public set prev(value: ListNode<T>) {
         this._prev = value;
     }
-
+    
     /**
      * 获取前驱。
      */
     public get prev(): ListNode<T> {
         return this._prev;
     }
-
+    
     /**
      * 设置数据。
      */
     public set data(value: T) {
         this._data = value;
     }
-
+    
     /**
      * 获取数据。
      */
     public get data(): T {
         return this._data;
     }
-
+    
     /**
      * 连接节点。
      * @param targetNode
-     * @param append
+     * @param insert
      */
-    public link(targetNode: ListNode<T>, append: boolean = false): void {
+    public link(targetNode: ListNode<T>, insert: boolean = true): void {
         // 后面
-        if (append) {
+        if (insert) {
             targetNode._next = this;
             targetNode._prev = this._prev;
             if (this._prev) {
@@ -86,7 +86,7 @@ export class ListNode<T> {
             this._next = targetNode;
         }
     }
-
+    
     /**
      * 取消连接。
      */
