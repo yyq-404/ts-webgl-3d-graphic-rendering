@@ -5,7 +5,7 @@ import {NodeIteratorFactory} from '../common/container/iterator/NodeIteratorFact
 /**
  * 树结构迭代器测试应用
  */
-export class TreeIteratorTestApp {
+export class TreeIteratorTest {
     /**
      * 创建
      */
@@ -30,7 +30,7 @@ export class TreeIteratorTestApp {
      * 测试
      */
     public static process(): void {
-        let root = TreeIteratorTestApp.createNumberTree();
+        let root = TreeIteratorTest.createNumberTree();
         let iter: INodeIterator<TreeNode<number>>;
         let current: TreeNode<number> = undefined;
         console.log('1. depthFirst_left2right_top2bottom_enumerator');

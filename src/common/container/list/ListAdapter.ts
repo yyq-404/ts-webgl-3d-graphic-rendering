@@ -67,10 +67,10 @@ export abstract class ListAdapter<T> implements IListAdapter<T> {
 
     /**
      * 压入元素。
-     * @param t
+     * @param data
      */
-    public push(t: T): void {
-        this._elements.push(t);
+    public push(data: T): void {
+        this._elements.push(data);
     }
 
     /**

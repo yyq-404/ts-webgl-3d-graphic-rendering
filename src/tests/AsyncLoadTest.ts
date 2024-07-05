@@ -3,7 +3,7 @@ import {HttpHelper} from '../net/HttpHelper';
 /**
  * 异步加载测试应用
  */
-export class AsyncLoadTestApp {
+export class AsyncLoadTest {
     /** 需要从服务器加载的图像url列表 */
     private _urls: string[] = ['data/uv.jpg', 'data/test.jpg', 'data/p1.jpg'];
     
@@ -12,7 +12,7 @@ export class AsyncLoadTestApp {
      */
     public static process(): void {
         // 重点关注代码调用顺序与运行后的显示顺序之间的关系
-        let app = new AsyncLoadTestApp();
+        let app = new AsyncLoadTest();
         // 先调用Sequence版加载Image
         app.loadImagesSequenceAsync();
         // 然后调用文本文件加载方法
