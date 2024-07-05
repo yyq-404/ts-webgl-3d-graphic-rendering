@@ -13,7 +13,7 @@ import {IGLAttribute} from '../../../webgl/attribute/IGLAttribute';
  */
 export class RotationTriangleApplication extends WebGL2Application {
     /** 三角形 */
-    private _triangle: Triangle = new Triangle(new Vector3([3.0, 0.0, 0.0]), new Vector3([0.0, 0.0, 0.0]), new Vector3([0.0, 3.0, 0.0]));
+    private _triangle: Triangle = new Triangle([new Vector3([3.0, 0.0, 0.0]), new Vector3([0.0, 0.0, 0.0]), new Vector3([0.0, 3.0, 0.0])]);
     /** 颜色数据 */
     private _colorData: number[] = [
         ...new Vector4([1.0, 1.0, 1.0, 1.0]).rgba,
@@ -40,7 +40,7 @@ export class RotationTriangleApplication extends WebGL2Application {
         this._bufferData.forEach((bufferData: number[], attribute: IGLAttribute) => {
             this.bindBuffer(attribute, bufferData);
         });
-        this.camera.z = 8;
+        this.camera.z = 10;
         this.camera.viewProjectionMatrix = Matrix4.frustum(-1.5, 1.5, -1, 1, 1, 100);
     }
     
@@ -98,8 +98,8 @@ export class RotationTriangleApplication extends WebGL2Application {
      */
     private bindBuffer(attribute: IGLAttribute, bufferData: number[]): void {
         let buffer = this.webglContext.createBuffer();
-        this._buffers.set(attribute, buffer);
         this.webglContext.bindBuffer(this.webglContext.ARRAY_BUFFER, buffer);
         this.webglContext.bufferData(this.webglContext.ARRAY_BUFFER, new Float32Array(bufferData), this.webglContext.STATIC_DRAW);
+        this._buffers.set(attribute, buffer);
     }
 }

@@ -4,6 +4,7 @@ import {BasicWebGLApplication} from './app/demo/webgl/BasicWebGLApplication';
 import {CoordinateSystemApplication} from './app/demo/webgl/CoordinateSystemApplication';
 import {MeshBuilderApplication} from './app/demo/webgl/MeshBuilderApplication';
 import {RotationTriangleApplication} from './app/demo/webgl2/RotationTriangleApplication';
+import {SixPointStarApplication} from './app/demo/webgl2/SixPointedStarApplication';
 
 /** 应用集合 */
 const apps = {
@@ -11,7 +12,8 @@ const apps = {
     '2: BasicWebGL': BasicWebGLApplication,
     '3: CoordinateSystem': CoordinateSystemApplication,
     '4: MeshBuilder': MeshBuilderApplication,
-    '5: RotationTriangle': RotationTriangleApplication
+    '5: RotationTriangle': RotationTriangleApplication,
+    '6: SixPointStar': SixPointStarApplication
 };
 
 /** 当前正在运行的App */
