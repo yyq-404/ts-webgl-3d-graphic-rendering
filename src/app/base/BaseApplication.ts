@@ -1,13 +1,13 @@
 import {ECanvasMouseEventType} from '../../enum/ECanvasMouseEventType';
 import {CanvasMouseEvent} from '../../event/CanvasMouseEvent';
 import {Vector2} from '../../common/math/vector/Vector2';
-import {TimerManager} from '../../timer/TimerManager';
 import {ICanvasInputEventListener} from '../../interface/ICanvasInputEventListener';
 import {IBaseApplication} from '../../interface/IBaseApplication';
 import {CameraComponent} from '../../component/CameraComponent';
 import {AppConstants} from '../AppConstants';
 import {HttpHelper} from '../../net/HttpHelper';
 import {ECanvasKeyboardEventType} from '../../enum/ECanvasKeyboardEventType';
+import {TimerManager} from '../../timer/TimerManager';
 import {CanvasKeyboardEventManager} from '../../event/CanvasKeyboardEventManager';
 import {CanvasMouseEventManager} from '../../event/CanvasEventEventManager';
 
@@ -19,18 +19,14 @@ export class BaseApplication implements EventListenerObject, IBaseApplication, I
     protected camera: CameraComponent;
     /** 每帧间回调函数, 下一次重绘之前更新动画帧所调用的函数 */
     public frameCallback: ((app: BaseApplication) => void) = null;
-    /** 定时器管理器 */
-    protected timerManager: TimerManager = new TimerManager();
-    /** 画布键盘事件管理器 */
-    protected keyboardEventManager: CanvasKeyboardEventManager = new CanvasKeyboardEventManager();
-    /** 画布鼠标事件管理器 */
-    protected mouseEventManager: CanvasMouseEventManager = new CanvasMouseEventManager();
+    // /** 定时器管理器 */
+    // protected timerManager: TimerManager = new TimerManager();
     /** 指示如何计算Y轴的坐标 */
     protected isFlipYCoordinate: boolean = false;
     /** 我们的Application主要是canvas2D和webGL应用， 而canvas2D和webGL context都是从HTMLCanvasElement元素获取的 */
     protected canvas: HTMLCanvasElement;
     /** 是否支持鼠标移动 */
-    protected isSupportMouseMove: boolean = false;
+    protected isSupportMouseMove: boolean = true;
     /** 标记当前鼠标是否按下, 目的是提供 `mousedrag` 事件 */
     protected isMouseDown: boolean = false;
     /** 标记当前鼠标右键是否按下, 目的是提供 `mousedrag` 事件 */
@@ -70,12 +66,12 @@ export class BaseApplication implements EventListenerObject, IBaseApplication, I
         this.isMouseDown = false;
         this.isSupportMouseMove = false;
         // 由于Canvas是左手系，而webGL是右手系，需要FlipYCoordinate
-        this.isFlipYCoordinate = true;
+        this.isFlipYCoordinate = false;
         this.frameCallback = null;
         document.oncontextmenu = () => false;
-        this.keyboardEventManager.types.forEach(type => window.addEventListener(type, this, false));
-        this.mouseEventManager.types.forEach(type => this.canvas.addEventListener(type, this, false));
-        this.keyboardEventManager.registers(this._cameraEvents);
+        CanvasKeyboardEventManager.instance.types.forEach(type => window.addEventListener(type, this, false));
+        CanvasMouseEventManager.instance.types.forEach(type => this.canvas.addEventListener(type, this, false));
+        CanvasKeyboardEventManager.instance.registers(this._cameraEvents);
     }
     
     /**
@@ -140,7 +136,7 @@ export class BaseApplication implements EventListenerObject, IBaseApplication, I
             this.onMouseEvent(event);
         }
         if (event instanceof KeyboardEvent) {
-            this.keyboardEventManager.onEvent(event);
+            CanvasKeyboardEventManager.instance.onEvent(event);
         }
     }
     
@@ -149,7 +145,7 @@ export class BaseApplication implements EventListenerObject, IBaseApplication, I
      * @param event
      */
     public onMouseDown(event: CanvasMouseEvent): void {
-        console.log(`onMouseDown: ${event.button}, pos: [${event.mousePosition.x}, ${event.mousePosition.y}]`);
+        console.log(`onMouseDown: ${event.button}, pos: [${event.position.x}, ${event.position.y}]`);
     }
     
     /**
@@ -157,7 +153,7 @@ export class BaseApplication implements EventListenerObject, IBaseApplication, I
      * @param event
      */
     public onMouseUp(event: CanvasMouseEvent): void {
-        console.log(`onMouseUp: ${event.button}, pos: [${event.mousePosition.x}, ${event.mousePosition.y}]`);
+        console.log(`onMouseUp: ${event.button}, pos: [${event.position.x}, ${event.position.y}]`);
     }
     
     /**
@@ -165,7 +161,7 @@ export class BaseApplication implements EventListenerObject, IBaseApplication, I
      * @param event
      */
     public onMouseMove(event: CanvasMouseEvent): void {
-        console.log(`onMouseMove: ${event.button}, pos: [${event.mousePosition.x}, ${event.mousePosition.y}]`);
+        console.log(`onMouseMove: ${event.button}, pos: [${event.position.x}, ${event.position.y}]`);
     }
     
     /**
@@ -173,9 +169,8 @@ export class BaseApplication implements EventListenerObject, IBaseApplication, I
      * @param event
      */
     public onMouseDrag(event: CanvasMouseEvent): void {
-        console.log(`onMouseDrag: ${event.button}, pos: [${event.mousePosition.x}, ${event.mousePosition.y}]`);
+        console.log(`onMouseDrag: ${event.button}, pos: [${event.position.x}, ${event.position.y}]`);
     }
-    
     
     /**
      * 更新。
@@ -197,10 +192,10 @@ export class BaseApplication implements EventListenerObject, IBaseApplication, I
      * 释放
      */
     public dispose(): void {
-        this.timerManager.clear();
+        TimerManager.instance.clear();
         this.frameCallback = null;
-        this.keyboardEventManager.types.forEach(type => window.removeEventListener(type, this, false));
-        this.mouseEventManager.types.forEach(type => this.canvas.removeEventListener(type, this, false));
+        CanvasKeyboardEventManager.instance.types.forEach(type => window.removeEventListener(type, this, false));
+        CanvasMouseEventManager.instance.types.forEach(type => this.canvas.removeEventListener(type, this, false));
         if (this.canvas && this.canvas.parentElement) {
             this.canvas.parentElement.removeChild(this.canvas);
             this.canvas = null;
@@ -229,7 +224,7 @@ export class BaseApplication implements EventListenerObject, IBaseApplication, I
         }
         intervalSec /= 1000.0;
         this.lastTime = timeStamp;
-        this.timerManager.update(intervalSec);
+        TimerManager.instance.update(intervalSec);
         this.update(elapsedMsec, intervalSec);
         this.render();
         if (this.frameCallback) {
@@ -282,8 +277,8 @@ export class BaseApplication implements EventListenerObject, IBaseApplication, I
                 type = ECanvasMouseEventType.MOUSE_DRAG;
             }
         }
-        let mousePosition: Vector2 = this.viewPortToCanvasCoordinate(event);
-        return new CanvasMouseEvent(type, mousePosition, button, event.altKey, event.ctrlKey, event.shiftKey);
+        let position: Vector2 = this.viewPortToCanvasCoordinate(event);
+        return new CanvasMouseEvent(type, position, button, event.altKey, event.ctrlKey, event.shiftKey);
     }
     
     /**
@@ -303,11 +298,12 @@ export class BaseApplication implements EventListenerObject, IBaseApplication, I
                 this.onMouseUp(canvasEvent);
                 break;
             case 'mousemove':
+                this.onMouseMove(canvasEvent);
                 if (this.isSupportMouseMove) {
-                    this.onMouseMove(canvasEvent);
+                    // this.onMouseMove(canvasEvent);
                 }
                 if (this.isMouseDown) {
-                    this.onMouseDrag(canvasEvent);
+                    // this.onMouseDrag(canvasEvent);
                 }
                 break;
             default:

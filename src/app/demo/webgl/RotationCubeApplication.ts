@@ -13,6 +13,8 @@ import {GLCoordinateSystemHelper} from '../../../webgl/GLCoordinateSystemHelper'
 import {GLMeshHelper} from '../../../webgl/GLMeshHelper';
 import {GLRenderHelper} from '../../../webgl/GLRenderHelper';
 import {ECanvasKeyboardEventType} from '../../../enum/ECanvasKeyboardEventType';
+import {TimerManager} from '../../../timer/TimerManager';
+import {CanvasKeyboardEventManager} from '../../../event/CanvasKeyboardEventManager';
 
 /**
  * 立方体旋转应用
@@ -69,7 +71,7 @@ export class RotatingCubeApplication extends WebGLApplication {
         this._cubeVAO = GLMeshHelper.makeStaticMesh(this.webglContext, this._cube.geometry);
         // 初始化时没选中任何一条坐标轴
         this._hitAxis = EAxisType.NONE;
-        this.keyboardEventManager.registers([
+        CanvasKeyboardEventManager.instance.registers([
                 {type: ECanvasKeyboardEventType.KEY_DOWN, key: 'q', callback: this.startRotateTriangle.bind(this)},
                 {type: ECanvasKeyboardEventType.KEY_DOWN, key: 'e', callback: this.stopRotateTriangle.bind(this)}
             ]
@@ -86,7 +88,7 @@ export class RotatingCubeApplication extends WebGLApplication {
             loadResults.push(this.loadTextureAsync(url));
         });
         await Promise.all(loadResults);
-        this.timerManager.add(this.cubeTimeCallback.bind(this), 2, false);
+        TimerManager.instance.add(this.cubeTimeCallback.bind(this), 2, false);
         console.log('启动Application程序');
         // 调用基类的run方法，基类run方法内部调用了start方法
         await super.runAsync();
@@ -267,7 +269,7 @@ export class RotatingCubeApplication extends WebGLApplication {
      */
     private startRotateTriangle(): void {
         if (this._triangleTimerId === -1) {
-            this._triangleTimerId = this.timerManager.add(this.triangleTimeCallback.bind(this), 0.25, false);
+            this._triangleTimerId = TimerManager.instance.add(this.triangleTimeCallback.bind(this), 0.25, false);
         }
     }
     
@@ -276,7 +278,7 @@ export class RotatingCubeApplication extends WebGLApplication {
      * @private
      */
     private stopRotateTriangle(): void {
-        if (this.timerManager.remove(this._triangleTimerId)) {
+        if (TimerManager.instance.remove(this._triangleTimerId)) {
             this._triangleTimerId = -1;
         }
     }

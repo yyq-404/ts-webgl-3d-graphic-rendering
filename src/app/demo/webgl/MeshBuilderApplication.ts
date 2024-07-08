@@ -10,10 +10,10 @@ import {Vector3} from '../../../common/math/vector/Vector3';
 import {GLCoordinateSystemHelper} from '../../../webgl/GLCoordinateSystemHelper';
 import {EAxisType} from '../../../enum/EAxisType';
 import {DrawHelper} from '../../../common/DrawHelper';
-import {CanvasKeyboardEvent} from '../../../event/CanvasKeyboardEvent';
 import {Matrix4} from '../../../common/math/matrix/Matrix4';
 import {GLRenderHelper} from '../../../webgl/GLRenderHelper';
 import {ECanvasKeyboardEventType} from '../../../enum/ECanvasKeyboardEventType';
+import {CanvasKeyboardEventManager} from '../../../event/CanvasKeyboardEventManager';
 
 /**
  * 网格构建器应用
@@ -73,10 +73,10 @@ export class MeshBuilderApplication extends WebGLApplication {
         this._currentDrawMethod = this.drawByMatrixWithColorShader;
         // BUG
         // this.currentDrawMethod = this.drawByMultiViewportsWithTextureShader;
-        this.keyboardEventManager.registers([
+        CanvasKeyboardEventManager.instance.registers([
             {type: ECanvasKeyboardEventType.KEY_PRESS, key: '1', callback: () => this._currentDrawMethod = this.drawByMatrixWithColorShader},
-            {type: ECanvasKeyboardEventType.KEY_PRESS, key: '2', callback: () => this._currentDrawMethod = this.drawByMultiViewportsWithTextureShader},
-        ])
+            {type: ECanvasKeyboardEventType.KEY_PRESS, key: '2', callback: () => this._currentDrawMethod = this.drawByMultiViewportsWithTextureShader}
+        ]);
     }
     
     /**

@@ -11,21 +11,21 @@ export class CanvasMouseEvent extends CanvasInputEvent {
     /** 鼠标按键 */
     public button: number;
     /** 鼠标位置 */
-    public mousePosition: Vector2;
+    public position: Vector2;
     
     /**
      * 结构
      * @param type
-     * @param mousePosition
+     * @param position
      * @param button
      * @param altKey
      * @param ctrlKey
      * @param shiftKey
      */
-    public constructor(type: ECanvasMouseEventType = ECanvasMouseEventType.MOUSE_EVENT, mousePosition: Vector2, button: number, altKey: boolean = false, ctrlKey: boolean = false, shiftKey: boolean = false) {
+    public constructor(type: ECanvasMouseEventType = ECanvasMouseEventType.MOUSE_EVENT, position: Vector2, button: number, altKey: boolean = false, ctrlKey: boolean = false, shiftKey: boolean = false) {
         super(altKey, ctrlKey, shiftKey);
         this.type = type;
         this.button = button;
-        this.mousePosition = mousePosition;
+        this.position = position;
     }
 }

@@ -8,6 +8,7 @@ import {WebGLApplication} from '../../base/WebGLApplication';
 import {GLCoordinateSystemHelper} from '../../../webgl/GLCoordinateSystemHelper';
 import {GLRenderHelper} from '../../../webgl/GLRenderHelper';
 import {ECanvasKeyboardEventType} from '../../../enum/ECanvasKeyboardEventType';
+import {CanvasKeyboardEventManager} from '../../../event/CanvasKeyboardEventManager';
 
 /**
  * 坐标系统应用。
@@ -37,7 +38,7 @@ export class CoordinateSystemApplication extends WebGLApplication {
         super({preserveDrawingBuffer: false}, true);
         this.makeFourGLCoordinateSystems();
         this._currentDrawMethod = this.drawCoordinateSystem;
-        this.keyboardEventManager.registers([
+        CanvasKeyboardEventManager.instance.registers([
             {type: ECanvasKeyboardEventType.KEY_PRESS, key: '1', callback: () => this._currentDrawMethod = this.drawCoordinateSystem},
             {type: ECanvasKeyboardEventType.KEY_PRESS, key: '2', callback: () => this._currentDrawMethod = this.drawFullCoordinateSystem},
             {type: ECanvasKeyboardEventType.KEY_PRESS, key: '3', callback: () => this._currentDrawMethod = this.drawFullCoordinateSystemWithRotatedCube},
