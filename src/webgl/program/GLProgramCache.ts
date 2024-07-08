@@ -6,7 +6,7 @@ import {GLProgram} from './GLProgram';
  */
 export class GLProgramCache {
     /** 单例模式，只初始化一次，使用的是 static readonly声明方式 */
-    static readonly instance: GLProgramCache = new GLProgramCache();
+    private static _instance: GLProgramCache;
     /** 可编程管线字典 */
     private _dict: Dictionary<GLProgram>;
     
@@ -17,6 +17,17 @@ export class GLProgramCache {
     private constructor() {
         this._dict = new Dictionary<GLProgram>();
         console.log('create new GLProgramCache! ! ');
+    }
+    
+    /**
+     * 获取单例。
+     * @return {GLProgramCache}
+     */
+    public static get instance(): GLProgramCache {
+        if (!GLProgramCache._instance) {
+            GLProgramCache._instance = new GLProgramCache();
+        }
+        return GLProgramCache._instance;
     }
     
     /**

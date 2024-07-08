@@ -6,7 +6,7 @@ import {Dictionary} from '../../common/container/Dictionary';
  */
 export class GLTextureCache {
     /** 单例 */
-    static readonly instance: GLTextureCache = new GLTextureCache();
+    private static _instance: GLTextureCache = new GLTextureCache();
     /** 缓存 */
     private _dict: Dictionary<GLTexture>;
     
@@ -16,6 +16,17 @@ export class GLTextureCache {
      */
     private constructor() {
         this._dict = new Dictionary<GLTexture>();
+    }
+    
+    /**
+     * 获取单例。
+     * @return {GLTextureCache}
+     */
+    public static get instance(): GLTextureCache {
+        if (!GLTextureCache._instance) {
+            GLTextureCache._instance = new GLTextureCache();
+        }
+        return GLTextureCache._instance;
     }
     
     /**
