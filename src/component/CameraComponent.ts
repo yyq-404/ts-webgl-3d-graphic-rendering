@@ -47,12 +47,42 @@ export class CameraComponent {
         this._fovY = fovY;
         this._near = zNear;
         this._far = zFar;
-        this._viewMatrix = new Matrix4();
-        this._projectionMatrix = new Matrix4();
-        this._viewProjectionMatrix = new Matrix4();
-        this._invViewProjectionMatrix = new Matrix4();
+        this._viewMatrix = new Matrix4().setIdentity();
+        this._projectionMatrix = new Matrix4().setIdentity();
+        this._viewProjectionMatrix = new Matrix4().setIdentity();
+        this._invViewProjectionMatrix = new Matrix4().setIdentity();
         // 摄影机默认位置。
         this.position.z = 5;
+    }
+    
+    /**
+     * 获取视图矩阵
+     */
+    public get viewMatrix(): Matrix4 {
+        return this._viewMatrix;
+    }
+    
+    /**
+     * 设置视图矩阵
+     * @param value
+     */
+    public set viewMatrix(value: Matrix4) {
+        this._viewMatrix = value;
+    }
+    
+    /**
+     * 设置投影矩阵
+     */
+    public get projectionMatrix(): Matrix4 {
+        return this._projectionMatrix;
+    }
+    
+    /**
+     * 设置投影矩阵
+     * @param value
+     */
+    public set projectionMatrix(value: Matrix4) {
+        this._projectionMatrix = value;
     }
     
     /**
