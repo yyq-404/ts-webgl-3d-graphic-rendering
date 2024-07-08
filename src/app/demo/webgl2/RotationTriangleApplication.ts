@@ -41,7 +41,6 @@ export class RotationTriangleApplication extends WebGL2Application {
             this.bindBuffer(attribute, bufferData);
         });
         this.camera.z = 10;
-        this.camera.viewProjectionMatrix = Matrix4.frustum(-1.5, 1.5, -1, 1, 1, 100);
     }
     
     /**

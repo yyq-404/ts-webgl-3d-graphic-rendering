@@ -5,7 +5,7 @@ import {Vector3} from '../../common/math/vector/Vector3';
 export class GLMatrixStack2 {
     /** 投影矩阵 */
     private _projectionMatrix: Matrix4;
-    /** 摄影机视口哦矩阵 */
+    /** 摄影机视图矩阵 */
     private _viewMatrix: Matrix4;
     /** 矩阵栈 */
     private _stack: Stack<Matrix4>;
