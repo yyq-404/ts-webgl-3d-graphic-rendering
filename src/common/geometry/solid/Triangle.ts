@@ -33,7 +33,7 @@ export class Triangle {
      */
     public vertexData(): number[] {
         let data: number[] = [];
-        this._points.map(point => data.push(...point.xyz));
+        this._points.forEach(point => data.push(...point.xyz));
         return data;
     }
 }
