@@ -1,6 +1,6 @@
-import {CanvasInputEvent} from './CanvasInputEvent';
-import {ECanvasMouseEventType} from '../enum/ECanvasMouseEventType';
-import {Vector2} from '../common/math/vector/Vector2';
+import {CanvasInputEvent} from '../CanvasInputEvent';
+import {ECanvasMouseEventType} from '../../enum/ECanvasMouseEventType';
+import {Vector2} from '../../common/math/vector/Vector2';
 
 /**
  * 鼠标事件。

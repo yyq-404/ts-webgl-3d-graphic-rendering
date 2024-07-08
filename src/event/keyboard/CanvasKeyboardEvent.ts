@@ -1,5 +1,5 @@
-import {CanvasInputEvent} from './CanvasInputEvent';
-import {ECanvasKeyboardEventType} from '../enum/ECanvasKeyboardEventType';
+import {CanvasInputEvent} from '../CanvasInputEvent';
+import {ECanvasKeyboardEventType} from '../../enum/ECanvasKeyboardEventType';
 
 /**
  * 键盘事件
