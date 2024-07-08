@@ -6,7 +6,7 @@ import {EGLShaderType} from '../../../webgl/enum/EGLShaderType';
 import {TypedArrayList} from '../../../common/container/TypedArrayList';
 import {GLCoordinateSystem} from '../../../webgl/common/GLCoordinateSystem';
 import {GLAttributeMap, GLUniformMap} from '../../../webgl/common/GLTypes';
-import {CanvasKeyboardEvent} from '../../../event/CanvasKeyboardEvent';
+import {CanvasKeyboardEvent} from '../../../event/keyboard/CanvasKeyboardEvent';
 import {HttpHelper} from '../../../net/HttpHelper';
 import {AppConstants} from '../../AppConstants';
 

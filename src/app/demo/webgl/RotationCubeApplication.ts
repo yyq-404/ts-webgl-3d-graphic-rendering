@@ -14,7 +14,7 @@ import {GLMeshHelper} from '../../../webgl/GLMeshHelper';
 import {GLRenderHelper} from '../../../webgl/GLRenderHelper';
 import {ECanvasKeyboardEventType} from '../../../enum/ECanvasKeyboardEventType';
 import {TimerManager} from '../../../timer/TimerManager';
-import {CanvasKeyboardEventManager} from '../../../event/CanvasKeyboardEventManager';
+import {CanvasKeyboardEventManager} from '../../../event/keyboard/CanvasKeyboardEventManager';
 
 /**
  * 立方体旋转应用
@@ -71,9 +71,9 @@ export class RotatingCubeApplication extends WebGLApplication {
         this._cubeVAO = GLMeshHelper.makeStaticMesh(this.webglContext, this._cube.geometry);
         // 初始化时没选中任何一条坐标轴
         this._hitAxis = EAxisType.NONE;
-        CanvasKeyboardEventManager.instance.registers([
-                {type: ECanvasKeyboardEventType.KEY_DOWN, key: 'q', callback: this.startRotateTriangle.bind(this)},
-                {type: ECanvasKeyboardEventType.KEY_DOWN, key: 'e', callback: this.stopRotateTriangle.bind(this)}
+        CanvasKeyboardEventManager.instance.registers(this, [
+                {type: ECanvasKeyboardEventType.KEY_DOWN, key: 'q', callback: this.startRotateTriangle},
+                {type: ECanvasKeyboardEventType.KEY_DOWN, key: 'e', callback: this.stopRotateTriangle}
             ]
         );
     }

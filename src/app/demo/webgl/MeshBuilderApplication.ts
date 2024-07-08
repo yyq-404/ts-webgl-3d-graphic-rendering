@@ -13,7 +13,7 @@ import {DrawHelper} from '../../../common/DrawHelper';
 import {Matrix4} from '../../../common/math/matrix/Matrix4';
 import {GLRenderHelper} from '../../../webgl/GLRenderHelper';
 import {ECanvasKeyboardEventType} from '../../../enum/ECanvasKeyboardEventType';
-import {CanvasKeyboardEventManager} from '../../../event/CanvasKeyboardEventManager';
+import {CanvasKeyboardEventManager} from '../../../event/keyboard/CanvasKeyboardEventManager';
 
 /**
  * 网格构建器应用
@@ -73,7 +73,7 @@ export class MeshBuilderApplication extends WebGLApplication {
         this._currentDrawMethod = this.drawByMatrixWithColorShader;
         // BUG
         // this.currentDrawMethod = this.drawByMultiViewportsWithTextureShader;
-        CanvasKeyboardEventManager.instance.registers([
+        CanvasKeyboardEventManager.instance.registers(this, [
             {type: ECanvasKeyboardEventType.KEY_PRESS, key: '1', callback: () => this._currentDrawMethod = this.drawByMatrixWithColorShader},
             {type: ECanvasKeyboardEventType.KEY_PRESS, key: '2', callback: () => this._currentDrawMethod = this.drawByMultiViewportsWithTextureShader}
         ]);

@@ -43,14 +43,6 @@ export class RotationTriangleApplication extends WebGL2Application {
         this.camera.z = 10;
     }
     
-    /**
-     * 运行。
-     * @return {Promise<void>}
-     */
-    public override async runAsync(): Promise<void> {
-        await this.initAsync();
-        this.start();
-    }
     
     /** 更新。
      * @param elapsedMsec
