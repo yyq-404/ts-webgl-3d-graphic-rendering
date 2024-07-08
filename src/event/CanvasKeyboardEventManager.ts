@@ -5,10 +5,23 @@ import {CanvasKeyboardEvent} from './CanvasKeyboardEvent';
  * 画布键盘事件管理。
  */
 export class CanvasKeyboardEventManager {
+    /** 实例 */
+    private static _instance: CanvasKeyboardEventManager;
     /** 支持的键盘事件类型 */
     private _types = [ECanvasKeyboardEventType.KEY_DOWN, ECanvasKeyboardEventType.KEY_UP, ECanvasKeyboardEventType.KEY_PRESS];
     /** 键盘事件集合 */
     private _typeEvents: Map<ECanvasKeyboardEventType, Map<string, (...args: any[]) => void>> = new Map<ECanvasKeyboardEventType, Map<string, (...args: any[]) => void>>();
+    
+    /**
+     * 获取单例。
+     * @return {CanvasKeyboardEventManager}
+     */
+    public static get instance(): CanvasKeyboardEventManager {
+        if (!CanvasKeyboardEventManager._instance) {
+            CanvasKeyboardEventManager._instance = new CanvasKeyboardEventManager();
+        }
+        return CanvasKeyboardEventManager._instance;
+    }
     
     /**
      * 获取支持的键盘事件类型

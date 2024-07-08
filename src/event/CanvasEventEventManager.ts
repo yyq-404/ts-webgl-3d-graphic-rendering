@@ -5,6 +5,8 @@ import {CanvasMouseEvent} from './CanvasMouseEvent';
  * 画布鼠标事件管理。
  */
 export class CanvasMouseEventManager {
+    /** 实例 */
+    private static _instance: CanvasMouseEventManager;
     /** 支持的鼠标事件类型 */
     private _types = [ECanvasMouseEventType.MOUSE_DOWN, ECanvasMouseEventType.MOUSE_UP, ECanvasMouseEventType.MOUSE_MOVE];
     /** 鼠标事件集合 */
@@ -16,6 +18,17 @@ export class CanvasMouseEventManager {
      */
     public get types(): ECanvasMouseEventType[] {
         return this._types;
+    }
+    
+    /**
+     * 获取单例。
+     * @return {CanvasKeyboardEventManager}
+     */
+    public static get instance(): CanvasMouseEventManager {
+        if (!CanvasMouseEventManager._instance) {
+            CanvasMouseEventManager._instance = new CanvasMouseEventManager();
+        }
+        return CanvasMouseEventManager._instance;
     }
     
     /**

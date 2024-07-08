@@ -4,10 +4,23 @@ import {Timer, TimerCallback} from './Timer';
  * 定时器管理器
  */
 export class TimerManager {
+    /** 实例 */
+    private static _instance: TimerManager;
     /** 定时器集合 */
     private _timers: Timer[] = [];
     /** 定时器编号 */
     private _timeId: number = -1;
+    
+    /**
+     * 获取单例。
+     * @return {TimerManager}
+     */
+    public static get instance(): TimerManager {
+        if (!TimerManager._instance) {
+            TimerManager._instance = new TimerManager();
+        }
+        return TimerManager._instance;
+    }
     
     /**
      * 增加定时器。
