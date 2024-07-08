@@ -101,18 +101,17 @@ export class CanvasMouseEventManager {
         switch (event.type) {
             case ECanvasMouseEventType.MOUSE_DOWN:
                 this.isMouseDown = true;
-                callback.call(this, owner, event, args);
-                // this.onMouseDown(canvasEvent);
+                callback.call(owner, event, args);
                 break;
             case ECanvasMouseEventType.MOUSE_UP:
-                callback.call(this, owner, event, args);
+                callback.call(owner, event, args);
                 break;
             case ECanvasMouseEventType.MOUSE_MOVE:
                 if (this.isSupportMouseMove) {
-                    callback.call(this, owner, event, args);
+                    callback.call(owner, event, args);
                 }
                 if (this.isMouseDown) {
-                    callback.call(this, owner, event, args);
+                    callback.call(owner, event, args);
                 }
                 break;
             default:

@@ -62,15 +62,6 @@ export class SixPointStarApplication extends WebGL2Application {
     }
     
     /**
-     * 运行。
-     * @return {Promise<void>}
-     */
-    public override async runAsync(): Promise<void> {
-        await this.initAsync();
-        this.start();
-    }
-    
-    /**
      * 渲染。
      */
     public override render(): void {
