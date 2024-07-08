@@ -34,7 +34,16 @@ export class WebGL2Application extends BaseApplication {
     }
     
     /**
-     * 释放
+     * 运行。
+     * @return {Promise<void>}
+     */
+    public override async runAsync(): Promise<void> {
+        await this.initAsync();
+        this.start();
+    }
+    
+    /**
+     * 释放d
      */
     public override dispose(): void {
         this.worldMatrixStack.clear();

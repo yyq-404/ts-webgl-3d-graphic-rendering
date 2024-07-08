@@ -1,47 +1,36 @@
-import {ECanvasMouseEventType} from '../../enum/ECanvasMouseEventType';
-import {CanvasMouseEvent} from '../../event/CanvasMouseEvent';
 import {Vector2} from '../../common/math/vector/Vector2';
-import {ICanvasInputEventListener} from '../../interface/ICanvasInputEventListener';
-import {IBaseApplication} from '../../interface/IBaseApplication';
+import {IBaseApplication} from './IBaseApplication';
 import {CameraComponent} from '../../component/CameraComponent';
 import {AppConstants} from '../AppConstants';
 import {HttpHelper} from '../../net/HttpHelper';
 import {ECanvasKeyboardEventType} from '../../enum/ECanvasKeyboardEventType';
 import {TimerManager} from '../../timer/TimerManager';
-import {CanvasKeyboardEventManager} from '../../event/CanvasKeyboardEventManager';
-import {CanvasMouseEventManager} from '../../event/CanvasEventEventManager';
+import {CanvasKeyboardEventManager} from '../../event/keyboard/CanvasKeyboardEventManager';
+import {CanvasMouseEventManager} from '../../event/mouse/CanvasEventEventManager';
 
 /**
  * 基础应用
  */
-export class BaseApplication implements EventListenerObject, IBaseApplication, ICanvasInputEventListener {
-    /** 摄像机 */
-    protected camera: CameraComponent;
+export class BaseApplication implements EventListenerObject, IBaseApplication {
     /** 每帧间回调函数, 下一次重绘之前更新动画帧所调用的函数 */
     public frameCallback: ((app: BaseApplication) => void) = null;
-    // /** 定时器管理器 */
-    // protected timerManager: TimerManager = new TimerManager();
-    /** 指示如何计算Y轴的坐标 */
-    protected isFlipYCoordinate: boolean = false;
+    /** 摄像机 */
+    protected camera: CameraComponent;
     /** 我们的Application主要是canvas2D和webGL应用， 而canvas2D和webGL context都是从HTMLCanvasElement元素获取的 */
     protected canvas: HTMLCanvasElement;
-    /** 是否支持鼠标移动 */
-    protected isSupportMouseMove: boolean = true;
-    /** 标记当前鼠标是否按下, 目的是提供 `mousedrag` 事件 */
-    protected isMouseDown: boolean = false;
-    /** 标记当前鼠标右键是否按下, 目的是提供 `mousedrag` 事件 */
-    protected isRightMouseDown: boolean = false;
     /** `window.requestAnimationFrame()` 返回的大于0的id号,可以使用 `cancelAnimationFrame(this ._requestId)` 来取消动画循环 */
-    protected requestId: number = -1;
+    private _requestId: number = -1;
     /** 用于计算当前更新与上一次更新之间的时间差, 用于基于时间的物理更新 */
-    protected lastTime: number = 0;
+    private _lastTime: number = 0;
     /** 用于计算当前更新与上一次更新之间的时间差, 用于基于时间的物理更新 */
-    protected startTime: number = 0;
+    private _startTime: number = 0;
     /** 标记当前 `Application` 是否进入不间断的循环状态 */
     private _running: boolean = false;
     /** 帧率 */
     private _fps: number = 0;
+    /** 相机移动速度 */
     private readonly _cameraSpeed: number = 1;
+    /** 相机移动事件 */
     private _cameraEvents = [
         {type: ECanvasKeyboardEventType.KEY_PRESS, key: 'w', callback: () => this.camera.moveForward(this._cameraSpeed)},
         {type: ECanvasKeyboardEventType.KEY_PRESS, key: 's', callback: () => this.camera.moveForward(-this._cameraSpeed)},
@@ -63,15 +52,11 @@ export class BaseApplication implements EventListenerObject, IBaseApplication, I
     public constructor() {
         this.canvas = this.createWebGLCanvas();
         this.camera = new CameraComponent(this.canvas.width, this.canvas.height, 45, 1);
-        this.isMouseDown = false;
-        this.isSupportMouseMove = false;
-        // 由于Canvas是左手系，而webGL是右手系，需要FlipYCoordinate
-        this.isFlipYCoordinate = false;
         this.frameCallback = null;
         document.oncontextmenu = () => false;
         CanvasKeyboardEventManager.instance.types.forEach(type => window.addEventListener(type, this, false));
         CanvasMouseEventManager.instance.types.forEach(type => this.canvas.addEventListener(type, this, false));
-        CanvasKeyboardEventManager.instance.registers(this._cameraEvents);
+        CanvasKeyboardEventManager.instance.registers(this, this._cameraEvents);
     }
     
     /**
@@ -103,8 +88,8 @@ export class BaseApplication implements EventListenerObject, IBaseApplication, I
     public start(): void {
         if (!this.isRunning()) {
             this._running = true;
-            this.lastTime = this.startTime = -1;
-            this.requestId = requestAnimationFrame(this.step.bind(this));
+            this._lastTime = this._startTime = -1;
+            this._requestId = requestAnimationFrame(this.step.bind(this));
         }
     }
     
@@ -120,9 +105,9 @@ export class BaseApplication implements EventListenerObject, IBaseApplication, I
      */
     public stop(): void {
         if (this.isRunning()) {
-            cancelAnimationFrame(this.requestId);
-            this.requestId = -1;
-            this.lastTime = this.startTime = -1;
+            cancelAnimationFrame(this._requestId);
+            this._requestId = -1;
+            this._lastTime = this._startTime = -1;
             this._running = false;
         }
     }
@@ -133,43 +118,11 @@ export class BaseApplication implements EventListenerObject, IBaseApplication, I
      */
     public handleEvent(event: Event): void {
         if (event instanceof MouseEvent) {
-            this.onMouseEvent(event);
+            CanvasMouseEventManager.instance.dispatch(this, event, this.viewPortToCanvasCoordinate);
         }
         if (event instanceof KeyboardEvent) {
-            CanvasKeyboardEventManager.instance.onEvent(event);
+            CanvasKeyboardEventManager.instance.dispatch(this, event);
         }
-    }
-    
-    /**
-     * 鼠标按下。
-     * @param event
-     */
-    public onMouseDown(event: CanvasMouseEvent): void {
-        console.log(`onMouseDown: ${event.button}, pos: [${event.position.x}, ${event.position.y}]`);
-    }
-    
-    /**
-     * 鼠标抬起
-     * @param event
-     */
-    public onMouseUp(event: CanvasMouseEvent): void {
-        console.log(`onMouseUp: ${event.button}, pos: [${event.position.x}, ${event.position.y}]`);
-    }
-    
-    /**
-     * 鼠标移动
-     * @param event
-     */
-    public onMouseMove(event: CanvasMouseEvent): void {
-        console.log(`onMouseMove: ${event.button}, pos: [${event.position.x}, ${event.position.y}]`);
-    }
-    
-    /**
-     * 鼠标拖动
-     * @param event
-     */
-    public onMouseDrag(event: CanvasMouseEvent): void {
-        console.log(`onMouseDrag: ${event.button}, pos: [${event.position.x}, ${event.position.y}]`);
     }
     
     /**
@@ -209,21 +162,21 @@ export class BaseApplication implements EventListenerObject, IBaseApplication, I
      */
     protected step(timeStamp: number): void {
         if (!this._running) return;
-        if (this.startTime === -1) {
-            this.startTime = timeStamp;
+        if (this._startTime === -1) {
+            this._startTime = timeStamp;
         }
-        if (this.lastTime === -1) {
-            this.lastTime = timeStamp;
+        if (this._lastTime === -1) {
+            this._lastTime = timeStamp;
         }
         // 计算当前时间和第一次调用step的时间差
-        let elapsedMsec: number = timeStamp - this.startTime;
+        let elapsedMsec: number = timeStamp - this._startTime;
         // 计算当前时间和上次调用step的时间差
-        let intervalSec: number = timeStamp - this.lastTime;
+        let intervalSec: number = timeStamp - this._lastTime;
         if (intervalSec !== 0) {
             this._fps = 1000.0 / intervalSec;
         }
         intervalSec /= 1000.0;
-        this.lastTime = timeStamp;
+        this._lastTime = timeStamp;
         TimerManager.instance.update(intervalSec);
         this.update(elapsedMsec, intervalSec);
         this.render();
@@ -238,77 +191,19 @@ export class BaseApplication implements EventListenerObject, IBaseApplication, I
     /**
      * 视口坐标转换为画布坐标。
      * @param event
+     * @param isFlipYCoordinate
      */
-    protected viewPortToCanvasCoordinate(event: MouseEvent): Vector2 {
+    protected viewPortToCanvasCoordinate(event: MouseEvent, isFlipYCoordinate = false): Vector2 {
         if (!event.target) {
             throw new Error('event.target is null.');
         }
         let rect = this.canvas.getBoundingClientRect();
         let x: number = event.clientX - rect.left;
         let y: number = event.clientY - rect.top;
-        if (this.isFlipYCoordinate) {
+        if (isFlipYCoordinate) {
             y = this.canvas.height - y;
         }
         return new Vector2([x, y]);
-    }
-    
-    /**
-     * 获取画布鼠标事件。
-     * @param event
-     * @private
-     */
-    protected toCanvasMouseEvent(event: MouseEvent): CanvasMouseEvent {
-        let type: ECanvasMouseEventType = ECanvasMouseEventType.MOUSE_MOVE;
-        let button = event.button;
-        if (event.type === 'mousedown') {
-            type = ECanvasMouseEventType.MOUSE_DOWN;
-            if (event.button == 2) {
-                this.isRightMouseDown = true;
-            }
-        } else if (event.type === 'mouseup') {
-            type = ECanvasMouseEventType.MOUSE_UP;
-            if (event.button == 2) {
-                this.isRightMouseDown = false;
-            }
-        }
-        if (event.type === 'mousemove') {
-            if (this.isMouseDown && this.isRightMouseDown) {
-                button = 2;
-                type = ECanvasMouseEventType.MOUSE_DRAG;
-            }
-        }
-        let position: Vector2 = this.viewPortToCanvasCoordinate(event);
-        return new CanvasMouseEvent(type, position, button, event.altKey, event.ctrlKey, event.shiftKey);
-    }
-    
-    /**
-     * 鼠标时间回调。
-     * @param event
-     * @protected
-     */
-    protected onMouseEvent(event: MouseEvent): void {
-        let canvasEvent: CanvasMouseEvent = this.toCanvasMouseEvent(event);
-        console.log(event.type);
-        switch (event.type) {
-            case 'mousedown':
-                this.isMouseDown = true;
-                this.onMouseDown(canvasEvent);
-                break;
-            case 'mouseup':
-                this.onMouseUp(canvasEvent);
-                break;
-            case 'mousemove':
-                this.onMouseMove(canvasEvent);
-                if (this.isSupportMouseMove) {
-                    // this.onMouseMove(canvasEvent);
-                }
-                if (this.isMouseDown) {
-                    // this.onMouseDrag(canvasEvent);
-                }
-                break;
-            default:
-                break;
-        }
     }
     
     /**
