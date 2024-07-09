@@ -16,8 +16,16 @@ export class Vector4 {
     public static green: Vector4 = new Vector4([0.0, 1.0, 0.0, 1.0]);
     /** 蓝色 */
     public static blue: Vector4 = new Vector4([0.0, 0.0, 1.0, 1.0]);
+    /** 黄色 */
+    public static yellow: Vector4 = new Vector4([1.0, 1.0, 0.0, 1.0]);
+    /** 青色 */
+    public static cyan: Vector4 = new Vector4([0.0, 1.0, 1.0, 1.0]);
+    /** 紫色 */
+    public static purple: Vector4 = new Vector4([1.0, 0.0, 1.0, 1.0]);
+    /** 白色 */
+    public static white: Vector4 = new Vector4([1.0, 1.0, 1.0, 1.0]);
     /** 黑色 */
-    public static black: Vector4 = new Vector4([0, 0, 0, 0]);
+    public static black: Vector4 = new Vector4([0.0, 0.0, 0.0, 1.0]);
     /** 值*/
     private _values = new Float32Array(4);
     
