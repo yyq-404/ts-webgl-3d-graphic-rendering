@@ -13,9 +13,9 @@ export class Cube {
     /** 半深 */
     public halfDepth: number;
     /** 点集 */
-    private readonly _points: Vector3[];
+    protected readonly _points: Vector3[];
     /** 表面集合 */
-    private _surfaces: Vector3[][];
+    protected readonly _surfaces: Vector3[][];
     
     /**
      * ```plaintext
@@ -113,27 +113,5 @@ export class Cube {
         ];
         indices.forEach(points => geometry.indices.push(...points));
         return geometry;
-    }
-    
-    /**
-     * 顶点数据。
-     * @return {number[]}
-     */
-    public vertexData(): number[] {
-        let data: number[] = [];
-        this._surfaces.forEach(surface => {
-            surface.forEach(positions => {
-                data.push(...positions.xyz);
-            });
-        });
-        return data;
-    }
-    
-    /**
-     * 顶点数量。
-     * @return {number}
-     */
-    public vertexCount(): number {
-        return this._points.length;
     }
 }
