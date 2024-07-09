@@ -95,10 +95,10 @@ export class DrawHelper {
     public static drawTextureCubeBox(builder: GLMeshBuilder, mvp: Matrix4, halfLen: number = 0.2, textureCoordinate: number[] = DrawHelper._defaultTextureCoordinates): void {
         let cube = new Cube(halfLen, halfLen,halfLen);
         for (let i = 0; i < cube.surfaces.length; i++) {
-            let vertexes: Vector3[] = cube.surfaces[i];
+            let positions: Vector3[] = cube.surfaces[i];
             builder.begin(builder.webglContext.TRIANGLE_FAN);
-            for (let j = 0; j < vertexes.length; j++) {
-                let vertex = vertexes[j];
+            for (let j = 0; j < positions.length; j++) {
+                let vertex = positions[j];
                 let uIndex = j * 2 + i * 8;
                 let vIndex = uIndex + 1;
                 builder.texCoordinate(textureCoordinate[uIndex], textureCoordinate[vIndex]).vertex(vertex.x, vertex.y, vertex.z);
