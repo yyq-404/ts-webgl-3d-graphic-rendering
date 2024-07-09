@@ -13,13 +13,13 @@ export class CanvasMouseEventManager {
     /** 鼠标事件集合 */
     private _events: Map<any, Map<ECanvasMouseEventType, (...args: any[]) => void>> = new Map<any, Map<ECanvasMouseEventType, (...args: any[]) => void>>();
     /** 指示如何计算Y轴的坐标，由于Canvas是左手系，而webGL是右手系，需要FlipYCoordinate */
-    private isFlipYCoordinate: boolean = false;
+    private _isFlipYCoordinate: boolean = false;
     /** 是否支持鼠标移动 */
-    private isSupportMouseMove: boolean = true;
+    private _isSupportMouseMove: boolean = true;
     /** 标记当前鼠标是否按下, 目的是提供 `mousedrag` 事件 */
-    private isMouseDown: boolean = false;
+    private _isMouseDown: boolean = false;
     /** 标记当前鼠标右键是否按下, 目的是提供 `mousedrag` 事件 */
-    private isRightMouseDown: boolean = false;
+    private _isRightMouseDown: boolean = false;
     
     /**
      * 获取支持的鼠标事件类型
@@ -100,17 +100,17 @@ export class CanvasMouseEventManager {
         console.log(event.type);
         switch (event.type) {
             case ECanvasMouseEventType.MOUSE_DOWN:
-                this.isMouseDown = true;
+                this._isMouseDown = true;
                 callback.call(owner, event, args);
                 break;
             case ECanvasMouseEventType.MOUSE_UP:
                 callback.call(owner, event, args);
                 break;
             case ECanvasMouseEventType.MOUSE_MOVE:
-                if (this.isSupportMouseMove) {
+                if (this._isSupportMouseMove) {
                     callback.call(owner, event, args);
                 }
-                if (this.isMouseDown) {
+                if (this._isMouseDown) {
                     callback.call(owner, event, args);
                 }
                 break;
@@ -132,21 +132,21 @@ export class CanvasMouseEventManager {
         if (event.type === 'mousedown') {
             type = ECanvasMouseEventType.MOUSE_DOWN;
             if (event.button == 2) {
-                this.isRightMouseDown = true;
+                this._isRightMouseDown = true;
             }
         } else if (event.type === 'mouseup') {
             type = ECanvasMouseEventType.MOUSE_UP;
             if (event.button == 2) {
-                this.isRightMouseDown = false;
+                this._isRightMouseDown = false;
             }
         }
         if (event.type === 'mousemove') {
-            if (this.isMouseDown && this.isRightMouseDown) {
+            if (this._isMouseDown && this._isRightMouseDown) {
                 button = 2;
                 type = ECanvasMouseEventType.MOUSE_DRAG;
             }
         }
-        let position: Vector2 = computeMousePosition.call(owner, event, this.isFlipYCoordinate);
+        let position: Vector2 = computeMousePosition.call(owner, event, this._isFlipYCoordinate);
         return new CanvasMouseEvent(type, position, button, event.altKey, event.ctrlKey, event.shiftKey);
     }
 }

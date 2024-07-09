@@ -2,6 +2,7 @@ import {GLMeshBuilder} from '../webgl/mesh/GLMeshBuilder';
 import {Matrix4} from './math/matrix/Matrix4';
 import {Vector3} from './math/vector/Vector3';
 import {Vector4} from './math/vector/Vector4';
+import {Cube} from './geometry/solid/Cube';
 
 /**
  *绘制助手
@@ -14,7 +15,7 @@ export class DrawHelper {
         ...[0, 0, 1, 0, 1, 1, 0, 1], // 后面
         ...[0, 0, 1, 0, 1, 1, 0, 1], // 左面
         ...[0, 0, 1, 0, 1, 1, 0, 1], // 上面
-        ...[0, 0, 1, 0, 1, 1, 0, 1] // 下面
+        ...[0, 0, 1, 0, 1, 1, 0, 1]  // 下面
     ];
     
     /**
@@ -54,7 +55,7 @@ export class DrawHelper {
             new Vector3([max.x, min.y, max.z]), // 4   + - +
             new Vector3([max.x, max.y, max.z]), // 5   + + +
             new Vector3([max.x, min.y, min.z]), // 6   + - -
-            new Vector3([max.x, max.y, min.z]) // 7   + + -
+            new Vector3([max.x, max.y, min.z])  // 7   + + -
         ];
         // 使用LINE_LOOP绘制底面，注意顶点顺序，逆时针方向，根据右手螺旋定则可知，法线朝外
         // 使用的是LINE_LOOP图元绘制模式
@@ -92,26 +93,9 @@ export class DrawHelper {
      * 每组8个纹理坐标值，可以映射到立方体的某个面上，其顺序是前、右、后、左、上、下。
      */
     public static drawTextureCubeBox(builder: GLMeshBuilder, mvp: Matrix4, halfLen: number = 0.2, textureCoordinate: number[] = DrawHelper._defaultTextureCoordinates): void {
-        let vertexes = [
-            new Vector3([-halfLen, -halfLen, halfLen]), // 0   - - +
-            new Vector3([-halfLen, halfLen, halfLen]), // 1   - + +
-            new Vector3([-halfLen, -halfLen, -halfLen]), // 2   - - -
-            new Vector3([-halfLen, halfLen, -halfLen]), // 3   - + -
-            new Vector3([halfLen, -halfLen, halfLen]), // 4   + - +
-            new Vector3([halfLen, halfLen, halfLen]), // 5   + + +
-            new Vector3([halfLen, -halfLen, -halfLen]), // 6   + - -
-            new Vector3([halfLen, halfLen, -halfLen]) // 7   + + -
-        ];
-        let surfaces = [
-            [vertexes[0], vertexes[4], vertexes[5], vertexes[1]], // 前面
-            [vertexes[4], vertexes[6], vertexes[7], vertexes[5]], // 右面
-            [vertexes[6], vertexes[2], vertexes[3], vertexes[7]], // 后面
-            [vertexes[2], vertexes[0], vertexes[1], vertexes[3]], // 左面
-            [vertexes[1], vertexes[5], vertexes[7], vertexes[3]], // 上面
-            [vertexes[0], vertexes[2], vertexes[6], vertexes[4]] // 下面
-        ];
-        for (let i = 0; i < surfaces.length; i++) {
-            let vertexes: Vector3[] = surfaces[i];
+        let cube = new Cube(halfLen, halfLen,halfLen);
+        for (let i = 0; i < cube.surfaces.length; i++) {
+            let vertexes: Vector3[] = cube.surfaces[i];
             builder.begin(builder.webglContext.TRIANGLE_FAN);
             for (let j = 0; j < vertexes.length; j++) {
                 let vertex = vertexes[j];
