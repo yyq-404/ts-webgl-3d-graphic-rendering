@@ -48,14 +48,14 @@ export class DrawHelper {
      */
     public static drawBoundBox(builder: GLMeshBuilder, mvp: Matrix4, min: Vector3, max: Vector3, color: Vector4 = Vector4.red): void {
         let vertexes = [
-            new Vector3([min.x, min.y, max.z]), // 0   - - +
-            new Vector3([min.x, max.y, max.z]), // 1   - + +
-            new Vector3([min.x, min.y, min.z]), // 2   - - -
-            new Vector3([min.x, max.y, min.z]), // 3   - + -
-            new Vector3([max.x, min.y, max.z]), // 4   + - +
-            new Vector3([max.x, max.y, max.z]), // 5   + + +
-            new Vector3([max.x, min.y, min.z]), // 6   + - -
-            new Vector3([max.x, max.y, min.z])  // 7   + + -
+            new Vector3([min.x, min.y, max.z]), // 0  - - +
+            new Vector3([min.x, max.y, max.z]), // 1  - + +
+            new Vector3([min.x, min.y, min.z]), // 2  - - -
+            new Vector3([min.x, max.y, min.z]), // 3  - + -
+            new Vector3([max.x, min.y, max.z]), // 4  + - +
+            new Vector3([max.x, max.y, max.z]), // 5  + + +
+            new Vector3([max.x, min.y, min.z]), // 6  + - -
+            new Vector3([max.x, max.y, min.z])  // 7  + + -
         ];
         // 使用LINE_LOOP绘制底面，注意顶点顺序，逆时针方向，根据右手螺旋定则可知，法线朝外
         // 使用的是LINE_LOOP图元绘制模式
