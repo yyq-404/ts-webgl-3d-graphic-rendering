@@ -13,15 +13,18 @@ export class Belt {
     private readonly _stepAngle = (this._endAngle - this._beginAngle) / 6;
     /** 点集 */
     private _points: Vector3[];
-    
+
     /**
      * 构造
      */
-    public constructor() {
+    public constructor(beginAngle: number = -90, endAngle: number = 90, steps: number = 6) {
         this._points = [];
+        this._beginAngle = beginAngle;
+        this._endAngle = endAngle;
+        this._stepAngle = (this._endAngle - this._beginAngle) / steps;
         this.init();
     }
-    
+
     /**
      * 初始化。
      * @private
@@ -33,7 +36,7 @@ export class Belt {
             this._points.push(new Vector3([-0.5 * Math.sin(radian), 0.5 * Math.cos(radian), 0]));
         }
     }
-    
+
     /**
      * 顶点位置数据。
      * @return {number[]}
@@ -43,7 +46,7 @@ export class Belt {
         this._points.forEach(point => data.push(...point.xyz));
         return data;
     }
-    
+
     /**
      * 顶点颜色数据
      * @return {number[]}
@@ -56,7 +59,7 @@ export class Belt {
         }
         return data;
     }
-    
+
     /**
      * 顶点数量
      * @return {number}
