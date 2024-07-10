@@ -36,7 +36,7 @@ export class LineDrawModeApplication extends WebGL2Application {
      */
     public constructor() {
         super();
-        this._mode = this.webglContext.TRIANGLES;
+        this._mode = this.webglContext.LINE_LOOP;
         let vertexBuffer = this.bindBuffer(this._vertexData);
         this._buffers.set(GLAttributeHelper.POSITION, vertexBuffer);
         let colorBuffer = this.bindBuffer(this._colorData);
@@ -67,7 +67,7 @@ export class LineDrawModeApplication extends WebGL2Application {
         this.worldMatrixStack.pushMatrix();
         let mvp = Matrix4.product(this.camera.viewProjectionMatrix, this.worldMatrixStack.modelViewMatrix);
         //将总变换矩阵送入渲染管线
-        program.setMatrix4(GLShaderConstants.MVPMatrix, mvp);
+        program.setMatrix4(GLShaderConstants.MVPMatrix, this.mvpMatrix());
         program.setVertexAttribute('aPosition', this._buffers.get(GLAttributeHelper.POSITION), GLAttributeHelper.POSITION.COMPONENT);
         program.setVertexAttribute('aColor', this._buffers.get(GLAttributeHelper.COLOR), GLAttributeHelper.COLOR.COMPONENT);
         this.webglContext.drawArrays(this._mode, 0, this._vertexData.length / 3);

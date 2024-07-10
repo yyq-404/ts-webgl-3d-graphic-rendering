@@ -7,6 +7,7 @@ import {RotationTriangleApplication} from './app/demo/webgl2/RotationTriangleApp
 import {SixPointStarApplication} from './app/demo/webgl2/SixPointedStarApplication';
 import {TransformCubeApplication} from './app/demo/webgl2/TransformCubeApplication';
 import {LineDrawModeApplication} from './app/demo/webgl2/LineDrawModeApplication';
+import {TriangleDrawModeApplication} from './app/demo/webgl2/TriangleDrawModeApplication';
 
 /** 应用集合 */
 const apps = {
@@ -17,7 +18,8 @@ const apps = {
     '5: RotationTriangle': RotationTriangleApplication,
     '6: SixPointStar': SixPointStarApplication,
     '7: TransformCube': TransformCubeApplication,
-    '7: DrawMode': LineDrawModeApplication
+    '8: LineDrawMode': LineDrawModeApplication,
+    '9: TriangleDrawMode': TriangleDrawModeApplication
 };
 
 /** 当前正在运行的App */
