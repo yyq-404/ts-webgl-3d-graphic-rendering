@@ -92,12 +92,9 @@ export class ColorCube extends Cube {
      */
     private createColor(centerColor: Vector4, pointColor: Vector4): Vector4[] {
         let colors: Vector4[] = [];
+        // 每个表面有四个三角形，12个顶点位置。
         for (let i = 0; i < 12; i++) {
-            if (i % 3 == 0) {
-                colors.push(centerColor);
-            } else {
-                colors.push(pointColor);
-            }
+            colors.push(i % 3 ? pointColor : centerColor);
         }
         return colors;
     }

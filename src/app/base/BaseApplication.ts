@@ -1,8 +1,6 @@
-import {IBaseApplication} from './IBaseApplication';
 import {CameraComponent} from '../../component/CameraComponent';
 import {AppConstants} from '../AppConstants';
 import {HttpHelper} from '../../net/HttpHelper';
-import {ECanvasKeyboardEventType} from '../../enum/ECanvasKeyboardEventType';
 import {TimerManager} from '../../timer/TimerManager';
 import {CanvasKeyboardEventManager} from '../../event/keyboard/CanvasKeyboardEventManager';
 import {CanvasMouseEventManager} from '../../event/mouse/CanvasEventEventManager';
@@ -10,7 +8,7 @@ import {CanvasMouseEventManager} from '../../event/mouse/CanvasEventEventManager
 /**
  * 基础应用
  */
-export class BaseApplication implements EventListenerObject, IBaseApplication {
+export class BaseApplication implements EventListenerObject {
     /** 每帧间回调函数, 下一次重绘之前更新动画帧所调用的函数 */
     public frameCallback: ((app: BaseApplication) => void) = null;
     /** 摄像机 */
@@ -27,23 +25,6 @@ export class BaseApplication implements EventListenerObject, IBaseApplication {
     private _running: boolean = false;
     /** 帧率 */
     private _fps: number = 0;
-    /** 相机移动速度 */
-    private readonly _cameraSpeed: number = 1;
-    /** 相机移动事件 */
-    private _cameraEvents = [
-        {type: ECanvasKeyboardEventType.KEY_PRESS, key: 'w', callback: () => this.camera.moveForward(this._cameraSpeed)},
-        {type: ECanvasKeyboardEventType.KEY_PRESS, key: 's', callback: () => this.camera.moveForward(-this._cameraSpeed)},
-        {type: ECanvasKeyboardEventType.KEY_PRESS, key: 'a', callback: () => this.camera.moveRightward(this._cameraSpeed)},
-        {type: ECanvasKeyboardEventType.KEY_PRESS, key: 'd', callback: () => this.camera.moveRightward(-this._cameraSpeed)},
-        {type: ECanvasKeyboardEventType.KEY_PRESS, key: 'z', callback: () => this.camera.moveUpward(this._cameraSpeed)},
-        {type: ECanvasKeyboardEventType.KEY_PRESS, key: 'x', callback: () => this.camera.moveUpward(-this._cameraSpeed)},
-        {type: ECanvasKeyboardEventType.KEY_PRESS, key: 'y', callback: () => this.camera.yaw(this._cameraSpeed)},
-        {type: ECanvasKeyboardEventType.KEY_PRESS, key: 'u', callback: () => this.camera.yaw(-this._cameraSpeed)},
-        {type: ECanvasKeyboardEventType.KEY_PRESS, key: 'p', callback: () => this.camera.pitch(this._cameraSpeed)},
-        {type: ECanvasKeyboardEventType.KEY_PRESS, key: 'o', callback: () => this.camera.pitch(-this._cameraSpeed)},
-        {type: ECanvasKeyboardEventType.KEY_PRESS, key: 'r', callback: () => this.camera.roll(this._cameraSpeed)},
-        {type: ECanvasKeyboardEventType.KEY_PRESS, key: 't', callback: () => this.camera.roll(-this._cameraSpeed)}
-    ];
     
     /**
      * 构造
@@ -54,7 +35,6 @@ export class BaseApplication implements EventListenerObject, IBaseApplication {
         this.frameCallback = null;
         document.oncontextmenu = () => false;
         CanvasKeyboardEventManager.instance.types.forEach(type => window.addEventListener(type, this, false));
-        CanvasKeyboardEventManager.instance.registers(this, this._cameraEvents);
         CanvasMouseEventManager.instance.types.forEach(type => this.canvas.addEventListener(type, this, false));
         CanvasMouseEventManager.instance.canvas = this.canvas;
     }
@@ -121,6 +101,7 @@ export class BaseApplication implements EventListenerObject, IBaseApplication {
             this.onMouseEvent(event);
         }
         if (event instanceof KeyboardEvent) {
+            CanvasKeyboardEventManager.instance.dispatch(this.camera, event);
             this.onKeyboardEvent(event);
         }
     }

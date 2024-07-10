@@ -19,7 +19,7 @@ export class GLProgram {
     /** 名称 */
     public name: string;
     /** 链接器 */
-    public program: WebGLProgram; // 链接器
+    public program: WebGLProgram;
     /** vertex shader编译器 */
     public vsShader: WebGLShader;
     /** fragment shader编译器 */
@@ -287,7 +287,7 @@ export class GLProgram {
      * @param program
      * @private
      */
-    private programBeforeLink(gl: WebGLRenderingContext, program: WebGLProgram): void {
+    private programBeforeLink(gl: WebGLRenderingContextBase, program: WebGLProgram): void {
         // 链接前才能使用bindAttribLocation函数
         // 1.attrib名字和shader中的命名必须要一致
         // 2．数量必须要和mesh中一致
@@ -306,7 +306,7 @@ export class GLProgram {
      * @param {IGLAttribute} attribute
      * @private
      */
-    private bindAttribLocation(gl: WebGLRenderingContext, program: WebGLProgram, attribute: IGLAttribute): void {
+    private bindAttribLocation(gl: WebGLRenderingContextBase, program: WebGLProgram, attribute: IGLAttribute): void {
         if (GLAttributeHelper.hasAttribute(this._attributeBits, attribute.BIT)) {
             gl.bindAttribLocation(program, attribute.LOCATION, attribute.NAME);
         }
