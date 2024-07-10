@@ -8,6 +8,7 @@ import {Vector4} from '../../../common/math/vector/Vector4';
 import {GLRenderHelper} from '../../../webgl/GLRenderHelper';
 import {Vector3} from '../../../common/math/vector/Vector3';
 import {CanvasMouseMoveEvent} from '../../../event/mouse/CanvasMouseMoveEvent';
+import {CanvasMouseEventManager} from '../../../event/mouse/CanvasEventEventManager';
 
 
 /**
@@ -55,6 +56,15 @@ export class SixPointStarApplication extends WebGL2Application {
     }
     
     /**
+     * 处理鼠标事件。
+     * @param {MouseEvent} event
+     * @protected
+     */
+    protected override onMouseEvent(event: MouseEvent): void {
+        CanvasMouseEventManager.instance.dispatch(this._mouseMoveEvent, event);
+    }
+    
+    /**
      * 渲染六角星列表。
      * @private
      */
@@ -89,12 +99,7 @@ export class SixPointStarApplication extends WebGL2Application {
     private createColorData(star: SixPointedStar): number[] {
         let colorData: number[] = [];
         for (let i = 0; i < star.vertexCount(); i++) {
-            if (i % 3 == 0) {
-                //中心点为白色
-                colorData.push(...new Vector4([1.0, 1.0, 1.0, 1.0]).rgba);
-            } else {
-                colorData.push(...new Vector4([0.45, 0.75, 0.75, 1.0]).rgba);
-            }
+            colorData.push(...(i % 3 ? new Vector4([0.45, 0.75, 0.75, 1.0]).rgba : Vector4.white.rgba));
         }
         return colorData;
     }

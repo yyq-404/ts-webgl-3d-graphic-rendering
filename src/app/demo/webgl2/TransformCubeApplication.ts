@@ -52,6 +52,11 @@ export class TransformCubeApplication extends WebGL2Application {
         this.renderCubes();
     }
     
+    /**
+     * 处理鼠标事件。
+     * @param {MouseEvent} event
+     * @protected
+     */
     protected override onMouseEvent(event: MouseEvent): void {
         CanvasMouseEventManager.instance.dispatch(this._mouseMoveEvent, event);
     }
