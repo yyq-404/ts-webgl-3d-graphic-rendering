@@ -8,6 +8,8 @@ import {Vector2} from '../../common/math/vector/Vector2';
 export class CanvasMouseEventManager {
     /** 实例 */
     private static _instance: CanvasMouseEventManager;
+    /** 画布 */
+    private _canvas: HTMLCanvasElement;
     /** 支持的鼠标事件类型 */
     private _types = [ECanvasMouseEventType.MOUSE_DOWN, ECanvasMouseEventType.MOUSE_UP, ECanvasMouseEventType.MOUSE_MOVE];
     /** 鼠标事件集合 */
@@ -22,14 +24,6 @@ export class CanvasMouseEventManager {
     private _isRightMouseDown: boolean = false;
     
     /**
-     * 获取支持的鼠标事件类型
-     * @return {ECanvasMouseEventType[]}
-     */
-    public get types(): ECanvasMouseEventType[] {
-        return this._types;
-    }
-    
-    /**
      * 获取单例。
      * @return {CanvasKeyboardEventManager}
      */
@@ -38,6 +32,22 @@ export class CanvasMouseEventManager {
             CanvasMouseEventManager._instance = new CanvasMouseEventManager();
         }
         return CanvasMouseEventManager._instance;
+    }
+    
+    /**
+     * 设置画布。
+     * @param {HTMLCanvasElement} canvas
+     */
+    public set canvas(canvas: HTMLCanvasElement) {
+        this._canvas = canvas;
+    }
+    
+    /**
+     * 获取支持的鼠标事件类型
+     * @return {ECanvasMouseEventType[]}
+     */
+    public get types(): ECanvasMouseEventType[] {
+        return this._types;
     }
     
     /**
@@ -76,11 +86,10 @@ export class CanvasMouseEventManager {
      * 分发鼠标事件。
      * @param owner
      * @param evt
-     * @param computeMousePosition
      * @param args
      */
-    public dispatch(owner: any, evt: MouseEvent, computeMousePosition: (event: MouseEvent, isFlipYCoordinate: boolean) => Vector2, ...args: any[]): void {
-        let event = this.toCanvasMouseEvent(owner, evt, computeMousePosition);
+    public dispatch(owner: any, evt: MouseEvent, ...args: any[]): void {
+        let event = this.toCanvasMouseEvent(evt);
         let ownerEvents = this._events.get(owner);
         if (!ownerEvents) return;
         const callback = ownerEvents.get(event.type);
@@ -121,12 +130,10 @@ export class CanvasMouseEventManager {
     
     /**
      * 获取画布鼠标事件。
-     * @param owner
      * @param event
-     * @param computeMousePosition
      * @private
      */
-    private toCanvasMouseEvent(owner: any, event: MouseEvent, computeMousePosition: (event: MouseEvent, isFlipYCoordinate: boolean) => Vector2): CanvasMouseEvent {
+    private toCanvasMouseEvent(event: MouseEvent): CanvasMouseEvent {
         let type: ECanvasMouseEventType = ECanvasMouseEventType.MOUSE_MOVE;
         let button = event.button;
         if (event.type === 'mousedown') {
@@ -146,8 +153,25 @@ export class CanvasMouseEventManager {
                 type = ECanvasMouseEventType.MOUSE_DRAG;
             }
         }
-        let position: Vector2 = computeMousePosition.call(owner, event, this._isFlipYCoordinate);
+        const position = this.viewPortToCanvasCoordinate(event);
         return new CanvasMouseEvent(type, position, button, event.altKey, event.ctrlKey, event.shiftKey);
+    }
+    
+    /**
+     * 视口坐标转换为画布坐标。
+     * @param event
+     */
+    protected viewPortToCanvasCoordinate(event: MouseEvent): Vector2 {
+        if (!event.target) {
+            throw new Error('event.target is null.');
+        }
+        let rect = this._canvas.getBoundingClientRect();
+        let x: number = event.clientX - rect.left;
+        let y: number = event.clientY - rect.top;
+        if (this._isFlipYCoordinate) {
+            y = this.canvas.height - y;
+        }
+        return new Vector2([x, y]);
     }
 }
 
