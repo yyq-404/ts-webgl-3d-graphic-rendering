@@ -9,6 +9,7 @@ import {GLCoordinateSystemHelper} from '../../../webgl/GLCoordinateSystemHelper'
 import {GLRenderHelper} from '../../../webgl/GLRenderHelper';
 import {ECanvasKeyboardEventType} from '../../../enum/ECanvasKeyboardEventType';
 import {CanvasKeyboardEventManager} from '../../../event/keyboard/CanvasKeyboardEventManager';
+import {Color4} from '../../../common/color/Color4';
 
 /**
  * 坐标系统应用。
@@ -234,7 +235,7 @@ export class CoordinateSystemApplication extends WebGLApplication {
         this.worldMatrixStack.translate(new Vector3([0.2, 0.8, 0]));
         this.worldMatrixStack.rotate(glCoordinateSystem.angle * 2, Vector3.up, false);
         this._cubeMVP = Matrix4.product(this.camera.viewProjectionMatrix, this.worldMatrixStack.modelViewMatrix);
-        DrawHelper.drawWireFrameCubeBox(this.builder, this._cubeMVP, 0.1, Vector4.green);
+        DrawHelper.drawWireFrameCubeBox(this.builder, this._cubeMVP, 0.1, Color4.Green);
         this.worldMatrixStack.popMatrix();
     }
     
@@ -248,7 +249,7 @@ export class CoordinateSystemApplication extends WebGLApplication {
         this.worldMatrixStack.translate(new Vector3([0.0, 0.0, 0.8]));
         this.worldMatrixStack.rotate(glCoordinateSystem.angle * 2, Vector3.forward, false);
         this._cubeMVP = Matrix4.product(this.camera.viewProjectionMatrix, this.worldMatrixStack.modelViewMatrix);
-        DrawHelper.drawWireFrameCubeBox(this.builder, this._cubeMVP, 0.1, Vector4.blue);
+        DrawHelper.drawWireFrameCubeBox(this.builder, this._cubeMVP, 0.1, Color4.Blue);
         this.worldMatrixStack.popMatrix();
     }
     
@@ -264,7 +265,7 @@ export class CoordinateSystemApplication extends WebGLApplication {
         this.worldMatrixStack.translate(new Vector3([0, 0.3, 0]));
         this.worldMatrixStack.rotate(glCoordinateSystem.angle, glCoordinateSystem.axis, false);
         this._cubeMVP = Matrix4.product(this.camera.viewProjectionMatrix, this.worldMatrixStack.modelViewMatrix);
-        DrawHelper.drawWireFrameCubeBox(this.builder, this._cubeMVP, 0.1, new Vector4());
+        DrawHelper.drawWireFrameCubeBox(this.builder, this._cubeMVP, 0.1, new Color4());
         this.worldMatrixStack.popMatrix();
     }
     

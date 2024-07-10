@@ -5,8 +5,8 @@ import {Matrix4} from '../../../common/math/matrix/Matrix4';
 import {GLProgramCache} from '../../../webgl/program/GLProgramCache';
 import {GLShaderConstants} from '../../../webgl/GLShaderConstants';
 import {GLAttributeHelper} from '../../../webgl/GLAttributeHelper';
-import {Vector4} from '../../../common/math/vector/Vector4';
 import {IGLAttribute} from '../../../webgl/attribute/IGLAttribute';
+import {Color4} from '../../../common/color/Color4';
 
 /**
  * 立方体旋转应用
@@ -16,9 +16,9 @@ export class RotationTriangleApplication extends WebGL2Application {
     private _triangle: Triangle = new Triangle([new Vector3([3.0, 0.0, 0.0]), new Vector3([0.0, 0.0, 0.0]), new Vector3([0.0, 3.0, 0.0])]);
     /** 颜色数据 */
     private _colorData: number[] = [
-        ...new Vector4([1.0, 1.0, 1.0, 1.0]).rgba,
-        ...new Vector4([0.0, 0.0, 1.0, 1.0]).rgba,
-        ...new Vector4([0.0, 1.0, 0.0, 1.0]).rgba
+        ...new Color4([1.0, 1.0, 1.0, 1.0]).rgba,
+        ...new Color4([0.0, 0.0, 1.0, 1.0]).rgba,
+        ...new Color4([0.0, 1.0, 0.0, 1.0]).rgba
     ];
     /** 顶点缓冲数据 */
     private _bufferData: Map<IGLAttribute, number[]> = new Map<IGLAttribute, number[]>([
@@ -36,7 +36,7 @@ export class RotationTriangleApplication extends WebGL2Application {
      * 构造
      */
     public constructor() {
-        super({antialias: true, premultipliedAlpha: false});
+        super();
         this._bufferData.forEach((bufferData: number[], attribute: IGLAttribute) => {
             this.bindBuffer(attribute, bufferData);
         });

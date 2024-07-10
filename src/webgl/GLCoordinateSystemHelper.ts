@@ -5,6 +5,7 @@ import {Vector3} from '../common/math/vector/Vector3';
 import {Vector4} from '../common/math/vector/Vector4';
 import {Vector2} from '../common/math/vector/Vector2';
 import {MathHelper} from '../common/math/MathHelper';
+import {Color4} from '../common/color/Color4';
 
 
 /**
@@ -12,7 +13,7 @@ import {MathHelper} from '../common/math/MathHelper';
  */
 export class GLCoordinateSystemHelper {
     /** 默认颜色 */
-    public static defaultHitColor: Vector4 = new Vector4([1, 1, 1, 0]);
+    public static defaultHitColor: Color4 = new Color4([1, 1, 1, 0]);
     
     /**
      * 三维向量从ID坐标转换为GL坐标
@@ -90,13 +91,13 @@ export class GLCoordinateSystemHelper {
         builder.webglContext.disable(builder.webglContext.DEPTH_TEST);
         builder.begin(builder.webglContext.LINES);
         // X轴
-        let xAxisColor: Vector4 = hitAxis === EAxisType.X_AXIS ? GLCoordinateSystemHelper.defaultHitColor : new Vector4([1.0, 0.0, 0.0, 1.0]);
+        let xAxisColor: Color4 = hitAxis === EAxisType.X_AXIS ? GLCoordinateSystemHelper.defaultHitColor : new Color4([1.0, 0.0, 0.0, 1.0]);
         this.setAxisColor(builder, xAxisColor, new Vector3([length, 0.0, 0.0]), inverse);
         // Y轴
-        let yAxisColor: Vector4 = hitAxis === EAxisType.Y_AXIS ? GLCoordinateSystemHelper.defaultHitColor : new Vector4([0.0, 1.0, 0.0, 1.0]);
+        let yAxisColor: Color4 = hitAxis === EAxisType.Y_AXIS ? GLCoordinateSystemHelper.defaultHitColor : new Color4([0.0, 1.0, 0.0, 1.0]);
         this.setAxisColor(builder, yAxisColor, new Vector3([0.0, length, 0.0]), inverse);
         // Z轴
-        let zAxisColor: Vector4 = hitAxis === EAxisType.Z_AXIS ? GLCoordinateSystemHelper.defaultHitColor : new Vector4([0.0, 0.0, 1.0, 1.0]);
+        let zAxisColor: Color4 = hitAxis === EAxisType.Z_AXIS ? GLCoordinateSystemHelper.defaultHitColor : new Color4([0.0, 0.0, 1.0, 1.0]);
         this.setAxisColor(builder, zAxisColor, new Vector3([0.0, 0.0, length]), inverse);
         if (rotateAxis) {
             // 如果要绘制旋转轴，则绘制出来
@@ -141,7 +142,7 @@ export class GLCoordinateSystemHelper {
      * @param {boolean} inverse
      * @private
      */
-    private static setAxisColor(builder: GLMeshBuilder, color: Vector4, pos: Vector3, inverse: boolean = false): void {
+    private static setAxisColor(builder: GLMeshBuilder, color: Color4, pos: Vector3, inverse: boolean = false): void {
         builder.color(color.r, color.g, color.b).vertex(Vector3.zero.x, Vector3.zero.y, Vector3.zero.z);
         builder.color(color.r, color.g, color.b).vertex(pos.x, pos.y, pos.z);
         if (!inverse) return;

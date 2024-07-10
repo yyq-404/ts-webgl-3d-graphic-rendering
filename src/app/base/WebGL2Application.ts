@@ -23,7 +23,7 @@ export class WebGL2Application extends BaseApplication {
      * 构造
      * @param contextAttributes
      */
-    public constructor(contextAttributes: WebGLContextAttributes = {premultipliedAlpha: false}) {
+    public constructor(contextAttributes: WebGLContextAttributes = {antialias: true, premultipliedAlpha: false}) {
         super();
         this.webglContext = this.canvas.getContext('webgl2', contextAttributes);
         if (!this.webglContext) {

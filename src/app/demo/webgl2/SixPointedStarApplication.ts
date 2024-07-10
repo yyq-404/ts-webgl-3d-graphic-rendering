@@ -9,6 +9,7 @@ import {GLRenderHelper} from '../../../webgl/GLRenderHelper';
 import {Vector3} from '../../../common/math/vector/Vector3';
 import {CanvasMouseMoveEvent} from '../../../event/mouse/CanvasMouseMoveEvent';
 import {CanvasMouseEventManager} from '../../../event/mouse/CanvasEventEventManager';
+import {Color4} from '../../../common/color/Color4';
 
 
 /**
@@ -99,7 +100,7 @@ export class SixPointStarApplication extends WebGL2Application {
     private createColorData(star: SixPointedStar): number[] {
         let colorData: number[] = [];
         for (let i = 0; i < star.vertexCount(); i++) {
-            colorData.push(...(i % 3 ? new Vector4([0.45, 0.75, 0.75, 1.0]).rgba : Vector4.white.rgba));
+            colorData.push(...(i % 3 ? new Color4([0.45, 0.75, 0.75, 1.0]).rgba : Color4.White.rgba));
         }
         return colorData;
     }

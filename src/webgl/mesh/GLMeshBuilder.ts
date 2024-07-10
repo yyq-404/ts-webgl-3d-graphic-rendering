@@ -11,6 +11,7 @@ import {GLTexture} from '../texture/GLTexture';
 import {EGLVertexLayoutType} from '../enum/EGLVertexLayoutType';
 import {GLShaderConstants} from '../GLShaderConstants';
 import {IGLAttribute} from '../attribute/IGLAttribute';
+import {Color4} from '../../common/color/Color4';
 
 /**
  * GL网格构建器
@@ -26,7 +27,7 @@ export class GLMeshBuilder extends GLMeshBase {
     private readonly _layout: EGLVertexLayoutType;
     // 为了简单起见，只支持顶点的位置坐标、纹理0坐标、颜色和法线这4种顶点属性格式
     /** 当前正在输入的顶点颜色属性 */
-    private _color: Vector4 = new Vector4([0, 0, 0, 0]);
+    private _color: Color4 = new Color4([0, 0, 0, 0]);
     /** 当前正在输入的顶点纹理0坐标属性 */
     private _texCoordinate: Vector2 = new Vector2([0, 0]);
     /** 当前正在输入的顶点法线属性 */
@@ -437,7 +438,7 @@ export class GLMeshBuilder extends GLMeshBase {
      * @param {Vector4} color
      * @private
      */
-    private pushColor(list: TypedArrayList<Float32Array>, color: Vector4): void {
+    private pushColor(list: TypedArrayList<Float32Array>, color: Color4): void {
         list.push(color.r);
         list.push(color.g);
         list.push(color.b);
