@@ -1,11 +1,9 @@
 import {WebGL2Application} from '../../base/WebGL2Application';
-import {Matrix4} from '../../../common/math/matrix/Matrix4';
 import {GLProgramCache} from '../../../webgl/program/GLProgramCache';
 import {GLAttributeHelper} from '../../../webgl/GLAttributeHelper';
 import {GLShaderConstants} from '../../../webgl/GLShaderConstants';
 import {GLRenderHelper} from '../../../webgl/GLRenderHelper';
 import {Vector3} from '../../../common/math/vector/Vector3';
-import {IGLAttribute} from '../../../webgl/attribute/IGLAttribute';
 import {ColorCube} from '../../../common/geometry/solid/ColorCube';
 import {CanvasKeyboardEventManager} from '../../../event/keyboard/CanvasKeyboardEventManager';
 import {ECanvasKeyboardEventType} from '../../../enum/ECanvasKeyboardEventType';
@@ -18,8 +16,6 @@ import {CanvasMouseEventManager} from '../../../event/mouse/CanvasEventEventMana
 export class TransformCubeApplication extends WebGL2Application {
     /** 盒子对象 */
     private _cube: ColorCube = new ColorCube(0.3, 0.3, 0.3);
-    /** 缓冲 */
-    private _buffers: Map<IGLAttribute, WebGLBuffer> = new Map<IGLAttribute, WebGLBuffer>();
     /** 矩阵变换类型 */
     private _transformType: string = 'translation';
     /** 鼠标移动事件 */
@@ -62,19 +58,6 @@ export class TransformCubeApplication extends WebGL2Application {
     }
     
     /**
-     * 绑定缓冲。
-     * @param {number[]} bufferData
-     * @return {WebGLBuffer}
-     * @private
-     */
-    private bindBuffer(bufferData: number[]): WebGLBuffer {
-        let buffer = this.webglContext.createBuffer();
-        this.webglContext.bindBuffer(this.webglContext.ARRAY_BUFFER, buffer);
-        this.webglContext.bufferData(this.webglContext.ARRAY_BUFFER, new Float32Array(bufferData), this.webglContext.STATIC_DRAW);
-        return buffer;
-    }
-    
-    /**
      * 渲染六角星列表。
      * @private
      */
@@ -90,30 +73,41 @@ export class TransformCubeApplication extends WebGL2Application {
      * @private
      */
     private renderTranslationCube(index: number): void {
+        const program = GLProgramCache.instance.getMust('color');
+        program.bind();
+        program.loadSampler();
         this.worldMatrixStack.pushMatrix();
         let pos = index % 2 == 0 ? new Vector3([-0.5 * (index % 2 + 1), 0.0, 0.0]) : new Vector3([0.5 * (index % 2 + 1), 0.0, 0.0]);
         this.worldMatrixStack.translate(pos);
         this.worldMatrixStack.rotate(this._mouseMoveEvent.currentXAngle, Vector3.right);
         this.worldMatrixStack.rotate(this._mouseMoveEvent.currentYAngle, Vector3.up);
         if (index % 2) {
-            if (this._transformType == 'rotation') {
-                this.worldMatrixStack.rotate(45, Vector3.forward);
-            } else if (this._transformType == 'scale') {
-                this.worldMatrixStack.rotate(30, Vector3.forward);
-                this.worldMatrixStack.scale(new Vector3([0.4, 2, 0.6]));
-            }
+            this.onTransform();
         }
-        const program = GLProgramCache.instance.getMust('color');
-        program.bind();
-        program.loadSampler();
-        let mvp = Matrix4.product(this.camera.viewProjectionMatrix, this.worldMatrixStack.modelViewMatrix);
         //将总变换矩阵送入渲染管线
-        program.setMatrix4(GLShaderConstants.MVPMatrix, mvp);
+        program.setMatrix4(GLShaderConstants.MVPMatrix, this.mvpMatrix());
         program.setVertexAttribute('aPosition', this._buffers.get(GLAttributeHelper.POSITION), GLAttributeHelper.POSITION.COMPONENT);
         program.setVertexAttribute('aColor', this._buffers.get(GLAttributeHelper.COLOR), GLAttributeHelper.COLOR.COMPONENT);
         this.webglContext.drawArrays(this.webglContext.TRIANGLES, 0, this._cube.vertexData().length / 3);
         program.unbind();
         this.worldMatrixStack.popMatrix();
     }
-   
+    
+    /**
+     * 执行变换。
+     * @private
+     */
+    private onTransform(): void {
+        switch (this._transformType) {
+            case 'translation':
+                this.worldMatrixStack.rotate(45, Vector3.forward);
+                break;
+            case 'scale':
+                this.worldMatrixStack.rotate(30, Vector3.forward);
+                this.worldMatrixStack.scale(new Vector3([0.4, 2, 0.6]));
+                break;
+            default:
+                break;
+        }
+    }
 }

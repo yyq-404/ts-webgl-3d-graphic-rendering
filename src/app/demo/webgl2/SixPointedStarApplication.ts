@@ -1,10 +1,8 @@
 import {WebGL2Application} from '../../base/WebGL2Application';
 import {SixPointedStar} from '../../../common/geometry/solid/SixPointedStar';
-import {Matrix4} from '../../../common/math/matrix/Matrix4';
 import {GLProgramCache} from '../../../webgl/program/GLProgramCache';
 import {GLAttributeHelper} from '../../../webgl/GLAttributeHelper';
 import {GLShaderConstants} from '../../../webgl/GLShaderConstants';
-import {Vector4} from '../../../common/math/vector/Vector4';
 import {GLRenderHelper} from '../../../webgl/GLRenderHelper';
 import {Vector3} from '../../../common/math/vector/Vector3';
 import {CanvasMouseMoveEvent} from '../../../event/mouse/CanvasMouseMoveEvent';
@@ -106,19 +104,6 @@ export class SixPointStarApplication extends WebGL2Application {
     }
     
     /**
-     * 绑定缓冲。
-     * @param {number[]} bufferData
-     * @return {WebGLBuffer}
-     * @private
-     */
-    private bindBuffer(bufferData: number[]): WebGLBuffer {
-        let buffer = this.webglContext.createBuffer();
-        this.webglContext.bindBuffer(this.webglContext.ARRAY_BUFFER, buffer);
-        this.webglContext.bufferData(this.webglContext.ARRAY_BUFFER, new Float32Array(bufferData), this.webglContext.STATIC_DRAW);
-        return buffer;
-    }
-    
-    /**
      * 渲染六角星
      * @param {SixPointedStarRenderParameters} parameter
      * @private
@@ -128,9 +113,8 @@ export class SixPointStarApplication extends WebGL2Application {
         const program = GLProgramCache.instance.getMust('color');
         program.bind();
         program.loadSampler();
-        let mvp = Matrix4.product(this.camera.viewProjectionMatrix, this.worldMatrixStack.modelViewMatrix);
         //将总变换矩阵送入渲染管线
-        program.setMatrix4(GLShaderConstants.MVPMatrix, mvp);
+        program.setMatrix4(GLShaderConstants.MVPMatrix, this.mvpMatrix());
         program.setVertexAttribute('aPosition', positionBuffer, GLAttributeHelper.POSITION.COMPONENT);
         program.setVertexAttribute('aColor', colorBuffer, GLAttributeHelper.COLOR.COMPONENT);
         this.webglContext.drawArrays(this.webglContext.TRIANGLES, 0, vertexCount);

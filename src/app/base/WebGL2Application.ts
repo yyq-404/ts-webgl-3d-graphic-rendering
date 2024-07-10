@@ -4,6 +4,8 @@ import {GLProgramCache} from '../../webgl/program/GLProgramCache';
 import {AppConstants} from '../AppConstants';
 import {GLProgram} from '../../webgl/program/GLProgram';
 import {GLMatrixStack} from '../../webgl/matrix/GLMatrixStack';
+import {Matrix4} from '../../common/math/matrix/Matrix4';
+import {IGLAttribute} from '../../webgl/attribute/IGLAttribute';
 
 /**
  * WebGL应用。
@@ -13,6 +15,8 @@ export class WebGL2Application extends BaseApplication {
     protected webglContext: WebGL2RenderingContext;
     /** 模拟 `OpenGL1.1` 中的矩阵堆栈, 封装在 `GLWorldMatrixStack` 类中 */
     protected worldMatrixStack: GLMatrixStack;
+    /** 缓冲 */
+    protected _buffers: Map<IGLAttribute, WebGLBuffer> = new Map<IGLAttribute, WebGLBuffer>();
     /** shader路径集合 */
     private readonly _shaderUrls: Map<string, string> = new Map<string, string>([
         ['bns.vert', `${AppConstants.webgl2ShaderRoot}/bns.vert`],
@@ -68,5 +72,27 @@ export class WebGL2Application extends BaseApplication {
         let program = GLProgram.createDefaultProgram(this.webglContext, vertexShaderSource, fragShaderSource);
         //创建颜色Program
         GLProgramCache.instance.set('color', program);
+    }
+    
+    /**
+     * 获取最终变换矩阵。
+     * @return {Matrix4}
+     * @protected
+     */
+    protected mvpMatrix():Matrix4{
+        return  Matrix4.product(this.camera.viewProjectionMatrix, this.worldMatrixStack.modelViewMatrix);
+    }
+    
+    /**
+     * 绑定缓冲。
+     * @param {number[]} bufferData
+     * @return {WebGLBuffer}
+     * @private
+     */
+    protected bindBuffer(bufferData: number[]): WebGLBuffer {
+        let buffer = this.webglContext.createBuffer();
+        this.webglContext.bindBuffer(this.webglContext.ARRAY_BUFFER, buffer);
+        this.webglContext.bufferData(this.webglContext.ARRAY_BUFFER, new Float32Array(bufferData), this.webglContext.STATIC_DRAW);
+        return buffer;
     }
 }

@@ -21,7 +21,7 @@ export class Color4 {
     /** 黑色 */
     public static readonly Black: Color4 = new Color4([0.0, 0.0, 0.0, 1.0]);
     /** 值 */
-    private _value: Vector4;
+    private readonly _value: Vector4;
     
     /**
      * 构造

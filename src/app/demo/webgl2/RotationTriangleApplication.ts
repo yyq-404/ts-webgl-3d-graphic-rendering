@@ -1,7 +1,6 @@
 import {WebGL2Application} from '../../base/WebGL2Application';
 import {Triangle} from '../../../common/geometry/solid/Triangle';
 import {Vector3} from '../../../common/math/vector/Vector3';
-import {Matrix4} from '../../../common/math/matrix/Matrix4';
 import {GLProgramCache} from '../../../webgl/program/GLProgramCache';
 import {GLShaderConstants} from '../../../webgl/GLShaderConstants';
 import {GLAttributeHelper} from '../../../webgl/GLAttributeHelper';
@@ -25,8 +24,6 @@ export class RotationTriangleApplication extends WebGL2Application {
         [GLAttributeHelper.POSITION, this._triangle.vertexData()],
         [GLAttributeHelper.COLOR, this._colorData]
     ]);
-    /** 顶点缓冲 */
-    private _buffers: Map<IGLAttribute, WebGLBuffer> = new Map<IGLAttribute, WebGLBuffer>();
     /** 旋转角度 */
     private _currentAngle = 0;
     /** 旋转角度步进值 */
@@ -38,11 +35,11 @@ export class RotationTriangleApplication extends WebGL2Application {
     public constructor() {
         super();
         this._bufferData.forEach((bufferData: number[], attribute: IGLAttribute) => {
-            this.bindBuffer(attribute, bufferData);
+            let buffer = this.bindBuffer(bufferData);
+            this._buffers.set(attribute, buffer);
         });
         this.camera.z = 10;
     }
-    
     
     /** 更新。
      * @param elapsedMsec
@@ -73,24 +70,12 @@ export class RotationTriangleApplication extends WebGL2Application {
         program.loadSampler();
         this.worldMatrixStack.pushMatrix();
         this.worldMatrixStack.rotate(this._currentAngle, Vector3.up);
-        let mvp = Matrix4.product(this.camera.viewProjectionMatrix, this.worldMatrixStack.modelViewMatrix);
         //将总变换矩阵送入渲染管线
-        program.setMatrix4(GLShaderConstants.MVPMatrix, mvp);
+        program.setMatrix4(GLShaderConstants.MVPMatrix, this.mvpMatrix());
         program.setVertexAttribute('aPosition', this._buffers.get(GLAttributeHelper.POSITION), GLAttributeHelper.POSITION.COMPONENT);
         program.setVertexAttribute('aColor', this._buffers.get(GLAttributeHelper.COLOR), GLAttributeHelper.COLOR.COMPONENT);
         this.webglContext.drawArrays(this.webglContext.TRIANGLES, 0, this._triangle.vertexCount());
         this.worldMatrixStack.popMatrix();
         program.unbind();
-    }
-    
-    /**
-     * 绑定buffer
-     * @private
-     */
-    private bindBuffer(attribute: IGLAttribute, bufferData: number[]): void {
-        let buffer = this.webglContext.createBuffer();
-        this.webglContext.bindBuffer(this.webglContext.ARRAY_BUFFER, buffer);
-        this.webglContext.bufferData(this.webglContext.ARRAY_BUFFER, new Float32Array(bufferData), this.webglContext.STATIC_DRAW);
-        this._buffers.set(attribute, buffer);
     }
 }

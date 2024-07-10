@@ -6,6 +6,7 @@ import {MeshBuilderApplication} from './app/demo/webgl/MeshBuilderApplication';
 import {RotationTriangleApplication} from './app/demo/webgl2/RotationTriangleApplication';
 import {SixPointStarApplication} from './app/demo/webgl2/SixPointedStarApplication';
 import {TransformCubeApplication} from './app/demo/webgl2/TransformCubeApplication';
+import {LineDrawModeApplication} from './app/demo/webgl2/LineDrawModeApplication';
 
 /** 应用集合 */
 const apps = {
@@ -15,7 +16,8 @@ const apps = {
     '4: MeshBuilder': MeshBuilderApplication,
     '5: RotationTriangle': RotationTriangleApplication,
     '6: SixPointStar': SixPointStarApplication,
-    '6: TranslateCube': TransformCubeApplication
+    '7: TransformCube': TransformCubeApplication,
+    '7: DrawMode': LineDrawModeApplication
 };
 
 /** 当前正在运行的App */
