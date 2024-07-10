@@ -1,7 +1,10 @@
-import {ECameraType} from '../enum/ECameraType';
+import {ECameraViewType} from '../enum/ECameraViewType';
 import {Vector3} from '../common/math/vector/Vector3';
 import {Matrix4} from '../common/math/matrix/Matrix4';
 import {MathHelper} from '../common/math/MathHelper';
+import {ECanvasKeyboardEventType} from '../enum/ECanvasKeyboardEventType';
+import {CanvasKeyboardEventManager} from '../event/keyboard/CanvasKeyboardEventManager';
+import {ECameraObservationType} from '../enum/ECameraObservationType';
 
 /**
  * 摄像机。
@@ -11,12 +14,14 @@ export class CameraComponent {
     private _viewMatrix: Matrix4;
     /** 投影矩阵 */
     private _projectionMatrix: Matrix4;
-    /** 投影矩阵*摄像机矩阵及其逆矩阵 */
+    /** 投影矩阵*摄像机矩阵 */
     private _viewProjectionMatrix: Matrix4;
-    /** view_matrix矩阵及其逆矩阵 */
+    /** 投影矩阵*摄像机矩阵的逆矩阵 */
     private _invViewProjectionMatrix: Matrix4;
-    /** 摄像机类型 */
-    private _type: ECameraType = ECameraType.FLY;
+    /** 摄像机视角类型 */
+    private _viewType: ECameraViewType = ECameraViewType.FLY;
+    /** 摄影机观察类型 */
+    private _observationType: ECameraObservationType = ECameraObservationType.PERSPECTIVE;
     /** 位置 */
     private _position: Vector3 = new Vector3();
     /** 摄像机世界坐标系x轴 */
@@ -33,6 +38,10 @@ export class CameraComponent {
     private _fovY: number;
     /** 纵横比 */
     private _aspectRatio: number;
+    /** 摄影机移动速速 */
+    private _speed: number = 1;
+    /** 摄影机旋转角度 */
+    private _degree: number = 1;
     
     /**
      * 构造
@@ -53,6 +62,21 @@ export class CameraComponent {
         this._invViewProjectionMatrix = new Matrix4().setIdentity();
         // 摄影机默认位置。
         this.position.z = 5;
+        // 注册摄影机事件。
+        CanvasKeyboardEventManager.instance.registers(this, [
+            {type: ECanvasKeyboardEventType.KEY_PRESS, key: 'w', callback: () => this.onZAxisMove(this.speed)},
+            {type: ECanvasKeyboardEventType.KEY_PRESS, key: 's', callback: () => this.onZAxisMove(-this.speed)},
+            {type: ECanvasKeyboardEventType.KEY_PRESS, key: 'a', callback: () => this.onXAxisMove(this.speed)},
+            {type: ECanvasKeyboardEventType.KEY_PRESS, key: 'd', callback: () => this.onXAxisMove(-this.speed)},
+            {type: ECanvasKeyboardEventType.KEY_PRESS, key: 'z', callback: () => this.onYAxisMove(this.speed)},
+            {type: ECanvasKeyboardEventType.KEY_PRESS, key: 'x', callback: () => this.onYAxisMove(-this.speed)},
+            {type: ECanvasKeyboardEventType.KEY_PRESS, key: 'y', callback: () => this.yaw(this.degree)},
+            {type: ECanvasKeyboardEventType.KEY_PRESS, key: 'u', callback: () => this.yaw(-this.degree)},
+            {type: ECanvasKeyboardEventType.KEY_PRESS, key: 'p', callback: () => this.pitch(this.degree)},
+            {type: ECanvasKeyboardEventType.KEY_PRESS, key: 'o', callback: () => this.pitch(-this.degree)},
+            {type: ECanvasKeyboardEventType.KEY_PRESS, key: 'r', callback: () => this.roll(this.degree)},
+            {type: ECanvasKeyboardEventType.KEY_PRESS, key: 't', callback: () => this.roll(-this.degree)}
+        ]);
     }
     
     /**
@@ -101,18 +125,33 @@ export class CameraComponent {
     }
     
     /**
-     * 获取摄像机类型
+     * 获取摄像机视角类型
      */
-    public get type(): ECameraType {
-        return this._type;
+    public get viewType(): ECameraViewType {
+        return this._viewType;
     }
     
     /**
-     * 设置摄像机类型
+     * 设置摄像机视角类型
      * @param value
      */
-    public set type(value: ECameraType) {
-        this._type = value;
+    public set viewType(value: ECameraViewType) {
+        this._viewType = value;
+    }
+    
+    /**
+     * 获取摄像机观察类型
+     */
+    public get observationType(): ECameraObservationType {
+        return this._observationType;
+    }
+    
+    /**
+     * 设置摄像机观察类型
+     * @param value
+     */
+    public set observationType(value: ECameraObservationType) {
+        this._observationType = value;
     }
     
     /**
@@ -281,49 +320,81 @@ export class CameraComponent {
     }
     
     /**
-     * 前移
-     * @param speed
+     * 设置摄影机移动速度。
+     * @param {number} value
      */
-    public moveForward(speed: number): void {
-        this.position.x += this.zAxis.x * speed;
-        // 对于第一人称摄像机来说，你双脚不能离地，因此运动时不能变动y轴上的数据
-        if (this.type == ECameraType.FLY) {
-            this.position.y += this.zAxis.y * speed;
-        }
-        this.position.z += this.zAxis.z * speed;
+    public set speed(value: number) {
+        this._speed = value;
     }
     
     /**
-     * 右移
+     * 获取摄影机移动角度。
+     * @return {number}
+     */
+    public get degree(): number {
+        return this._degree;
+    }
+    
+    /**
+     * 设置摄影机移动角度。
+     * @param {number} value
+     */
+    public set degree(value: number) {
+        this._degree = value;
+    }
+    
+    /**
+     * 获取摄影机移动速度。
+     * @return {number}
+     */
+    public get speed(): number {
+        return this._speed;
+    }
+    
+    /**
+     * 沿X轴移动
      * @param speed
      */
-    public moveRightward(speed: number): void {
+    private onXAxisMove(speed: number = 1): void {
         this.position.x += this.xAxis.x * speed;
         // 对于第一人称摄像机来说，你双脚不能离地，因此运动时不能变动y轴上的数据
-        if (this.type == ECameraType.FLY) {
+        if (this.viewType == ECameraViewType.FLY) {
             this.position.y += this.xAxis.y * speed;
         }
         this.position.z += this.xAxis.z * speed;
     }
     
     /**
-     * 上移
+     * 沿Y轴移动
      * @param speed
      */
-    public moveUpward(speed: number): void {
+    private onYAxisMove(speed: number = 1): void {
         // 对于第一人称摄像机来说，只调整上下的高度，目的是模拟眼睛的高度
         this.position.y += this.yAxis.y * speed;
-        if (this.type == ECameraType.FLY) {
+        if (this.viewType == ECameraViewType.FLY) {
             this.position.x += this.yAxis.x * speed;
             this.position.z += this.yAxis.z * speed;
         }
     }
     
     /**
+     * 沿Z轴移动。
+     * @param speed
+     */
+    private onZAxisMove(speed: number = 1): void {
+        this.position.x += this.zAxis.x * speed;
+        // 对于第一人称摄像机来说，你双脚不能离地，因此运动时不能变动y轴上的数据
+        if (this.viewType == ECameraViewType.FLY) {
+            this.position.y += this.zAxis.y * speed;
+        }
+        this.position.z += this.zAxis.z * speed;
+    }
+    
+    /**
      * X轴旋转，局部坐标轴的上下旋转，角度表示。
      * @param degree
      */
-    public pitch(degree: number): void {
+    private pitch(degree: number = 1): void {
         Matrix4.m0.setIdentity();
         let radian = MathHelper.toRadian(degree);
         Matrix4.m0.rotate(radian, this.xAxis);
@@ -335,12 +406,12 @@ export class CameraComponent {
      * Y轴旋转，局部坐标轴的左右旋转， 角度表示。
      * @param degree
      */
-    public yaw(degree: number): void {
+    private yaw(degree: number = 1): void {
         Matrix4.m0.setIdentity();
         let radian = MathHelper.toRadian(degree);
-        if (this.type === ECameraType.FPS) {
+        if (this.viewType === ECameraViewType.FPS) {
             Matrix4.m0.rotate(radian, Vector3.up);
-        } else if (this.type === ECameraType.FLY) {
+        } else if (this.viewType === ECameraViewType.FLY) {
             Matrix4.m0.rotate(radian, this.yAxis);
         }
         this.xAxis = Matrix4.m0.multiplyVector3(this.xAxis);
@@ -351,8 +422,8 @@ export class CameraComponent {
      * Z轴旋转，局部坐标系的倾斜旋转，角度表示。
      * @param degree
      */
-    public roll(degree: number): void {
-        if (this.type == ECameraType.FLY) {
+    private roll(degree: number = 1): void {
+        if (this.viewType == ECameraViewType.FLY) {
             Matrix4.m0.setIdentity();
             let radian = MathHelper.toRadian(degree);
             Matrix4.m0.rotate(radian, this.zAxis);
@@ -371,20 +442,46 @@ export class CameraComponent {
      * @param intervalSec
      */
     public update(intervalSec: number): void {
-        // 使用mat4的perspective静态方法计算投影矩阵
-        this._projectionMatrix = Matrix4.perspective(this.fovY, this.aspectRatio, this.near, this.far);
+        // 使用Matrix4的perspective静态方法计算透视投影矩阵
+        if (this._observationType == ECameraObservationType.ORTHOGRAPHIC) {
+            const top = this.near * Math.tan(this.fovY * Math.PI / 360.0);
+            const right = top * this.aspectRatio;
+            this._projectionMatrix = Matrix4.orthographic(-right, right, -top, top, this.near, this.far);
+        } else {
+            this._projectionMatrix = Matrix4.perspective(this.fovY, this.aspectRatio, this.near, this.far);
+        }
+        this.projectionMatrix = this.computeProjectionMatrix();
         // 计算视图矩阵
-        this.computeViewMatrix();
+        this.viewMatrix = this.computeViewMatrix();
         // 使用 _projectionMatrix * _viewMatrix顺序合成_viewProjectionMatrix，注意矩阵相乘的顺序
-        this._viewProjectionMatrix = Matrix4.product(this._projectionMatrix, this._viewMatrix);
+        this.viewProjectionMatrix = Matrix4.product(this._projectionMatrix, this._viewMatrix);
         // 然后再计算出_viewProjMatrix的逆矩阵
-        // this._invViewProjectionMatrix.inverse();
+        this._invViewProjectionMatrix = this._viewProjectionMatrix.copy().inverse();
+    }
+    
+    /**
+     * 计算投影矩阵。
+     * @return {Matrix4}
+     * @private
+     */
+    private computeProjectionMatrix(): Matrix4 {
+        switch (this._observationType) {
+            case ECameraObservationType.ORTHOGRAPHIC: {
+                const top = this.near * Math.tan(this.fovY * Math.PI / 360.0);
+                const right = top * this.aspectRatio;
+                return Matrix4.orthographic(-right, right, -top, top, this.near, this.far);
+            }
+            // 默认计算透视投影。
+            case ECameraObservationType.PERSPECTIVE:
+            default:
+                return Matrix4.perspective(this.fovY, this.aspectRatio, this.near, this.far);
+        }
     }
     
     /**
      * 计算视口矩阵
      */
-    public computeViewMatrix(): void {
+    private computeViewMatrix(): Matrix4 {
         this.zAxis.normalize();
         this.yAxis = Vector3.cross(this.zAxis, this.xAxis);
         this.yAxis.normalize();
@@ -399,7 +496,7 @@ export class CameraComponent {
             this.xAxis.z, this.yAxis.z, this.zAxis.z, 0.0,
             x, y, z, 1.0
         ];
-        this._viewMatrix.init(values);
+        return new Matrix4().init(values);
     }
     
     /**
@@ -408,7 +505,7 @@ export class CameraComponent {
      * @param target 要观察的目标，世界坐标系中的任意一个点来构建视图矩阵
      * @param up
      */
-    public lookAt(position: Vector3, target: Vector3, up: Vector3 = Vector3.up): void {
+    private lookAt(position: Vector3, target: Vector3, up: Vector3 = Vector3.up): void {
         this._viewMatrix = Matrix4.lookAt(position, target, up);
         this.xAxis.xyz = [this._viewMatrix.at(0), this._viewMatrix.at(4), this._viewMatrix.at(8)];
         this.yAxis.xyz = [this._viewMatrix.at(1), this._viewMatrix.at(5), this._viewMatrix.at(9)];
