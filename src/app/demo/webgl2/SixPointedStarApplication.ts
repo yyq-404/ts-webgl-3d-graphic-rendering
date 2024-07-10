@@ -7,10 +7,7 @@ import {GLShaderConstants} from '../../../webgl/GLShaderConstants';
 import {Vector4} from '../../../common/math/vector/Vector4';
 import {GLRenderHelper} from '../../../webgl/GLRenderHelper';
 import {Vector3} from '../../../common/math/vector/Vector3';
-import {CanvasMouseEvent} from '../../../event/mouse/CanvasMouseEvent';
-import {CanvasMouseEventManager} from '../../../event/mouse/CanvasEventEventManager';
-import {ECanvasMouseEventType} from '../../../enum/ECanvasMouseEventType';
-import {Vector2} from '../../../common/math/vector/Vector2';
+import {CanvasMouseMoveEvent} from '../../../event/mouse/CanvasMouseMoveEvent';
 
 
 /**
@@ -29,22 +26,14 @@ type SixPointedStarRenderParameters = {
  * 六角形应用。
  */
 export class SixPointStarApplication extends WebGL2Application {
-    //绕y轴旋转角度
-    private _currentYAngle = 0;
-    //绕x轴旋转角度
-    private _currentXAngle = 0;
     /** 六角星数量 */
     private _starCount = 6;
     /** 六角星渲染参数集合 */
     private _starRenderParameters: SixPointedStarRenderParameters[] = [];
     /** 每个六角星z轴间距 */
     private readonly _depth: number = 0.3;
-    /** 步进角度 */
-    private _incAngle = 0.5;
-    /** 是否移动 */
-    private _isMoved = false;
-    /** 上一次鼠标位置 */
-    private _lastPosition: Vector2 = new Vector2();
+    /** 鼠标移动事件 */
+    private readonly _mouseMoveEvent: CanvasMouseMoveEvent;
     
     /**
      * 构造
@@ -54,11 +43,7 @@ export class SixPointStarApplication extends WebGL2Application {
         this.camera.z = 4;
         this.createStars();
         GLRenderHelper.setDefaultState(this.webglContext);
-        CanvasMouseEventManager.instance.registers(this, [
-            {type: ECanvasMouseEventType.MOUSE_DOWN, callback: this.onMouseDown},
-            {type: ECanvasMouseEventType.MOUSE_UP, callback: this.onMouseUp},
-            {type: ECanvasMouseEventType.MOUSE_MOVE, callback: this.onMouseMove}
-        ]);
+        this._mouseMoveEvent = new CanvasMouseMoveEvent(this.canvas);
     }
     
     /**
@@ -76,8 +61,8 @@ export class SixPointStarApplication extends WebGL2Application {
     private renderStars() {
         this.worldMatrixStack.pushMatrix();
         //执行旋转,即按哪个轴旋转
-        this.worldMatrixStack.rotate(this._currentYAngle, Vector3.up);
-        this.worldMatrixStack.rotate(this._currentXAngle, Vector3.right);
+        this.worldMatrixStack.rotate(this._mouseMoveEvent.currentYAngle, Vector3.up);
+        this.worldMatrixStack.rotate(this._mouseMoveEvent.currentXAngle, Vector3.right);
         this._starRenderParameters.forEach(parameter => this.renderStar(parameter));
         this.worldMatrixStack.popMatrix();
     }
@@ -144,41 +129,5 @@ export class SixPointStarApplication extends WebGL2Application {
         program.setVertexAttribute('aColor', colorBuffer, GLAttributeHelper.COLOR.COMPONENT);
         this.webglContext.drawArrays(this.webglContext.TRIANGLES, 0, vertexCount);
         program.unbind();
-    }
-    
-    /**
-     * 鼠标按下
-     * @param {CanvasMouseEvent} event
-     */
-    public onMouseDown(event: CanvasMouseEvent): void {
-        let x = event.position.x;
-        let y = event.position.y;
-        //如果鼠标在<canvas>内开始移动
-        let rect = this.canvas.getBoundingClientRect();
-        if (rect.left <= x && x < rect.right && rect.top <= y && y < rect.bottom) {
-            this._isMoved = true;
-            this._lastPosition = new Vector2([x, y]);
-        }
-    }
-    
-    /**
-     * 鼠标移动
-     * @param {CanvasMouseEvent} event
-     */
-    public onMouseMove(event: CanvasMouseEvent): void {
-        let x = event.position.x;
-        let y = event.position.y;
-        if (this._isMoved) {
-            this._currentYAngle = this._currentYAngle + (x - this._lastPosition.x) * this._incAngle;
-            this._currentXAngle = this._currentXAngle + (y - this._lastPosition.y) * this._incAngle;
-        }
-        this._lastPosition = new Vector2([x, y]);
-    }
-    
-    /**
-     * 鼠标抬起
-     */
-    public onMouseUp(): void {
-        this._isMoved = false;
     }
 }

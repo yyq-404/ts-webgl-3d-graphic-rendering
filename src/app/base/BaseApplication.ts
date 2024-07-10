@@ -1,4 +1,3 @@
-import {Vector2} from '../../common/math/vector/Vector2';
 import {IBaseApplication} from './IBaseApplication';
 import {CameraComponent} from '../../component/CameraComponent';
 import {AppConstants} from '../AppConstants';
@@ -55,8 +54,9 @@ export class BaseApplication implements EventListenerObject, IBaseApplication {
         this.frameCallback = null;
         document.oncontextmenu = () => false;
         CanvasKeyboardEventManager.instance.types.forEach(type => window.addEventListener(type, this, false));
-        CanvasMouseEventManager.instance.types.forEach(type => this.canvas.addEventListener(type, this, false));
         CanvasKeyboardEventManager.instance.registers(this, this._cameraEvents);
+        CanvasMouseEventManager.instance.types.forEach(type => this.canvas.addEventListener(type, this, false));
+        CanvasMouseEventManager.instance.canvas = this.canvas;
     }
     
     /**
@@ -118,11 +118,29 @@ export class BaseApplication implements EventListenerObject, IBaseApplication {
      */
     public handleEvent(event: Event): void {
         if (event instanceof MouseEvent) {
-            CanvasMouseEventManager.instance.dispatch(this, event, this.viewPortToCanvasCoordinate);
+            this.onMouseEvent(event);
         }
         if (event instanceof KeyboardEvent) {
-            CanvasKeyboardEventManager.instance.dispatch(this, event);
+            this.onKeyboardEvent(event);
         }
+    }
+    
+    /**
+     * 响应鼠标事件。
+     * @param {MouseEvent} event
+     * @private
+     */
+    protected onMouseEvent(event: MouseEvent): void {
+        CanvasMouseEventManager.instance.dispatch(this, event);
+    }
+    
+    /**
+     * 响应按键事件。
+     * @param {KeyboardEvent} event
+     * @private
+     */
+    protected onKeyboardEvent(event: KeyboardEvent): void {
+        CanvasKeyboardEventManager.instance.dispatch(this, event);
     }
     
     /**
@@ -186,24 +204,6 @@ export class BaseApplication implements EventListenerObject, IBaseApplication {
         requestAnimationFrame((elapsedMsec: number): void => {
             this.step(elapsedMsec);
         });
-    }
-    
-    /**
-     * 视口坐标转换为画布坐标。
-     * @param event
-     * @param isFlipYCoordinate
-     */
-    protected viewPortToCanvasCoordinate(event: MouseEvent, isFlipYCoordinate = false): Vector2 {
-        if (!event.target) {
-            throw new Error('event.target is null.');
-        }
-        let rect = this.canvas.getBoundingClientRect();
-        let x: number = event.clientX - rect.left;
-        let y: number = event.clientY - rect.top;
-        if (isFlipYCoordinate) {
-            y = this.canvas.height - y;
-        }
-        return new Vector2([x, y]);
     }
     
     /**
