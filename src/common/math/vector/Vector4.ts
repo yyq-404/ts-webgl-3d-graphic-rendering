@@ -1,5 +1,4 @@
 import {Matrix4} from '../matrix/Matrix4';
-
 import {EPSILON} from '../MathConstants';
 
 /**
@@ -10,22 +9,6 @@ export class Vector4 {
     public static readonly zero = new Vector4([0, 0, 0, 1]);
     /** 单位向量 */
     public static readonly one = new Vector4([1, 1, 1, 1]);
-    /** 红色 */
-    public static red: Vector4 = new Vector4([1.0, 0.0, 0.0, 1.0]);
-    /** 绿色 */
-    public static green: Vector4 = new Vector4([0.0, 1.0, 0.0, 1.0]);
-    /** 蓝色 */
-    public static blue: Vector4 = new Vector4([0.0, 0.0, 1.0, 1.0]);
-    /** 黄色 */
-    public static yellow: Vector4 = new Vector4([1.0, 1.0, 0.0, 1.0]);
-    /** 青色 */
-    public static cyan: Vector4 = new Vector4([0.0, 1.0, 1.0, 1.0]);
-    /** 紫色 */
-    public static purple: Vector4 = new Vector4([1.0, 0.0, 1.0, 1.0]);
-    /** 白色 */
-    public static white: Vector4 = new Vector4([1.0, 1.0, 1.0, 1.0]);
-    /** 黑色 */
-    public static black: Vector4 = new Vector4([0.0, 0.0, 0.0, 1.0]);
     /** 值*/
     private _values = new Float32Array(4);
     
@@ -151,129 +134,6 @@ export class Vector4 {
      * @param {[number, number, number, number]} values
      */
     public set xyzw(values: [number, number, number, number]) {
-        this._values[0] = values[0];
-        this._values[1] = values[1];
-        this._values[2] = values[2];
-        this._values[3] = values[3];
-    }
-    
-    /**
-     * 获取r
-     * @return {number}
-     */
-    public get r(): number {
-        return this._values[0];
-    }
-    
-    /**
-     * 设置r
-     * @param {number} value
-     */
-    set r(value: number) {
-        this._values[0] = value;
-    }
-    
-    /**
-     * 获取g
-     * @return {number}
-     */
-    get g(): number {
-        return this._values[1];
-    }
-    
-    /**
-     * 设置g
-     * @param {number} value
-     */
-    set g(value: number) {
-        this._values[1] = value;
-    }
-    
-    /**
-     * 获取b
-     * @return {number}
-     */
-    get b(): number {
-        return this._values[2];
-    }
-    
-    /**
-     * 设置b
-     * @param {number} value
-     */
-    set b(value: number) {
-        this._values[2] = value;
-    }
-    
-    /**
-     * 获取a
-     * @return {number}
-     */
-    get a(): number {
-        return this._values[3];
-    }
-    
-    /**
-     * 设置a
-     * @param {number} value
-     */
-    set a(value: number) {
-        this._values[3] = value;
-    }
-    
-    /**
-     * 获取rg
-     * @return {[number, number]}
-     */
-    get rg(): [number, number] {
-        return [this._values[0], this._values[1]];
-    }
-    
-    /**
-     * 设置rg
-     * @param {[number, number]} values
-     */
-    set rg(values: [number, number]) {
-        this._values[0] = values[0];
-        this._values[1] = values[1];
-    }
-    
-    /**
-     * 获取rpg
-     * @return {[number, number, number]}
-     */
-    public get rgb(): [number, number, number] {
-        return [this._values[0], this._values[1], this._values[2]];
-    }
-    
-    /**
-     * 设置rgb
-     * @param {[number, number, number]} values
-     */
-    public set rgb(values: [number, number, number]) {
-        this._values[0] = values[0];
-        this._values[1] = values[1];
-        this._values[2] = values[2];
-    }
-    
-    /**
-     * 获取rgba
-     * @return {[number, number, number, number]}
-     */
-    public get rgba(): [number, number, number, number] {
-        return [
-            this._values[0],
-            this._values[1],
-            this._values[2],
-            this._values[3]
-        ];
-    }
-    
-    /**
-     * 设置rgba
-     * @param {[number, number, number, number]} values
-     */
-    public set rgba(values: [number, number, number, number]) {
         this._values[0] = values[0];
         this._values[1] = values[1];
         this._values[2] = values[2];

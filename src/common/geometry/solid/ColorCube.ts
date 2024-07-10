@@ -1,6 +1,7 @@
 import {Cube} from './Cube';
 import {Vector3} from '../../math/vector/Vector3';
 import {Vector4} from '../../math/vector/Vector4';
+import {Color4} from '../../color/Color4';
 
 /**
  * 色彩盒子。
@@ -90,8 +91,8 @@ export class ColorCube extends Cube {
      * @return {Vector4[]}
      * @private
      */
-    private createColor(centerColor: Vector4, pointColor: Vector4): Vector4[] {
-        let colors: Vector4[] = [];
+    private createColor(centerColor: Color4, pointColor: Color4): Color4[] {
+        let colors: Color4[] = [];
         // 每个表面有四个三角形，12个顶点位置。
         for (let i = 0; i < 12; i++) {
             colors.push(i % 3 ? pointColor : centerColor);
@@ -106,12 +107,12 @@ export class ColorCube extends Cube {
     public colorData(): number[] {
         let colorData: number[] = [];
         [
-            ...this.createColor(Vector4.white, Vector4.red), // 前
-            ...this.createColor(Vector4.white, Vector4.yellow), // 后
-            ...this.createColor(Vector4.white, Vector4.blue), // 左
-            ...this.createColor(Vector4.white, Vector4.purple), // 右
-            ...this.createColor(Vector4.white, Vector4.green), // 上
-            ...this.createColor(Vector4.white, Vector4.cyan)  // 下
+            ...this.createColor(Color4.White, Color4.Red), // 前
+            ...this.createColor(Color4.White, Color4.Yellow), // 后
+            ...this.createColor(Color4.White, Color4.Blue), // 左
+            ...this.createColor(Color4.White, Color4.Purple), // 右
+            ...this.createColor(Color4.White, Color4.Green), // 上
+            ...this.createColor(Color4.White, Color4.Cyan)  // 下
         ].forEach(color => colorData.push(...color.rgba));
         return colorData;
     }

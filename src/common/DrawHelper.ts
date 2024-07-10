@@ -3,6 +3,7 @@ import {Matrix4} from './math/matrix/Matrix4';
 import {Vector3} from './math/vector/Vector3';
 import {Vector4} from './math/vector/Vector4';
 import {Cube} from './geometry/solid/Cube';
+import {Color4} from './color/Color4';
 
 /**
  *绘制助手
@@ -25,7 +26,7 @@ export class DrawHelper {
      * @param halfLen
      * @param color
      */
-    public static drawWireFrameCubeBox(builder: GLMeshBuilder, mvp: Matrix4, halfLen: number = 0.2, color: Vector4 = Vector4.red): void {
+    public static drawWireFrameCubeBox(builder: GLMeshBuilder, mvp: Matrix4, halfLen: number = 0.2, color: Color4 = Color4.Red): void {
         const min: Vector3 = new Vector3([-halfLen, -halfLen, -halfLen]);
         const max: Vector3 = new Vector3([halfLen, halfLen, halfLen]);
         DrawHelper.drawBoundBox(builder, mvp, min, max, color);
@@ -46,7 +47,7 @@ export class DrawHelper {
      * 0---------4/
      * ```
      */
-    public static drawBoundBox(builder: GLMeshBuilder, mvp: Matrix4, min: Vector3, max: Vector3, color: Vector4 = Vector4.red): void {
+    public static drawBoundBox(builder: GLMeshBuilder, mvp: Matrix4, min: Vector3, max: Vector3, color: Color4 = Color4.Red): void {
         let vertexes = [
             new Vector3([min.x, min.y, max.z]), // 0  - - +
             new Vector3([min.x, max.y, max.z]), // 1  - + +
