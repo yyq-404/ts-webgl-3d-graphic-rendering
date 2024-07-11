@@ -1,6 +1,5 @@
 import {WebGL2Application} from '../../base/WebGL2Application';
 import {GLAttributeHelper} from '../../../webgl/GLAttributeHelper';
-import {GLProgramCache} from '../../../webgl/program/GLProgramCache';
 import {GLShaderConstants} from '../../../webgl/GLShaderConstants';
 import {Belt} from '../../../common/geometry/solid/Belt';
 import {Fan} from '../../../common/geometry/solid/Fan';
@@ -72,20 +71,13 @@ export class TriangleDrawModeApplication extends WebGL2Application {
      * @private
      */
     private drawBelt(): void {
-        let program = GLProgramCache.instance.getMust('color');
-        program.bind();
-        program.loadSampler();
-        this.worldMatrixStack.pushMatrix();
+        this.begin();
         this.worldMatrixStack.translate(new Vector3([-0.8, 0.0, 0.0]));
         this.worldMatrixStack.rotate(this._mouseMoveEvent.currentXAngle, Vector3.right);
         this.worldMatrixStack.rotate(this._mouseMoveEvent.currentYAngle, Vector3.up);
         //将总变换矩阵送入渲染管线
-        program.setMatrix4(GLShaderConstants.MVPMatrix, this.mvpMatrix());
-        program.setVertexAttribute('aPosition', this._buffers.get(GLAttributeHelper.POSITION), GLAttributeHelper.POSITION.COMPONENT);
-        program.setVertexAttribute('aColor', this._buffers.get(GLAttributeHelper.COLOR), GLAttributeHelper.COLOR.COMPONENT);
-        this.webglContext.drawArrays(this.webglContext.TRIANGLE_STRIP, 0, this._belt.vertex.count);
-        this.worldMatrixStack.popMatrix();
-        program.unbind();
+        this.drawArrays(this._belt, this.webglContext.TRIANGLE_STRIP);
+        this.end();
     }
     
     /**
@@ -93,29 +85,23 @@ export class TriangleDrawModeApplication extends WebGL2Application {
      * @private
      */
     private drawCircle(): void {
-        let program = GLProgramCache.instance.getMust('color');
-        program.bind();
-        program.loadSampler();
-        this.worldMatrixStack.pushMatrix();
+        this.begin();
         this.worldMatrixStack.translate(new Vector3([0.8, 0.0, 0.0]));
         this.worldMatrixStack.rotate(this._mouseMoveEvent.currentXAngle, Vector3.right);
         this.worldMatrixStack.rotate(this._mouseMoveEvent.currentYAngle, Vector3.up);
         //将总变换矩阵送入渲染管线
-        program.setMatrix4(GLShaderConstants.MVPMatrix, this.mvpMatrix());
-        program.setVertexAttribute('aPosition', this._circleBuffers.get(GLAttributeHelper.POSITION), GLAttributeHelper.POSITION.COMPONENT);
-        program.setVertexAttribute('aColor', this._circleBuffers.get(GLAttributeHelper.COLOR), GLAttributeHelper.COLOR.COMPONENT);
+        this.program.setMatrix4(GLShaderConstants.MVPMatrix, this.mvpMatrix());
+        this.program.setVertexAttribute('aPosition', this._circleBuffers.get(GLAttributeHelper.POSITION), GLAttributeHelper.POSITION.COMPONENT);
+        this.program.setVertexAttribute('aColor', this._circleBuffers.get(GLAttributeHelper.COLOR), GLAttributeHelper.COLOR.COMPONENT);
         this.webglContext.drawArrays(this.webglContext.TRIANGLE_FAN, 0, this._circle.vertex.count);
-        this.worldMatrixStack.popMatrix();
-        program.unbind();
+        // this.drawArrays(this._circle, this.webglContext.TRIANGLE_FAN);
+        this.end();
     }
     
     private drawBelts(): void {
         for (let i = 0; i < this._belts.length; i++) {
             let belt = this._belts[i];
-            let program = GLProgramCache.instance.getMust('color');
-            program.bind();
-            program.loadSampler();
-            this.worldMatrixStack.pushMatrix();
+            this.begin();
             if (i % 2) {
                 this.worldMatrixStack.rotate(90, Vector3.forward);
             } else {
@@ -124,12 +110,8 @@ export class TriangleDrawModeApplication extends WebGL2Application {
             this.worldMatrixStack.rotate(this._mouseMoveEvent.currentXAngle, Vector3.right);
             this.worldMatrixStack.rotate(this._mouseMoveEvent.currentYAngle, Vector3.up);
             //将总变换矩阵送入渲染管线
-            program.setMatrix4(GLShaderConstants.MVPMatrix, this.mvpMatrix());
-            program.setVertexAttribute('aPosition', this._buffers.get(GLAttributeHelper.POSITION), GLAttributeHelper.POSITION.COMPONENT);
-            program.setVertexAttribute('aColor', this._buffers.get(GLAttributeHelper.COLOR), GLAttributeHelper.COLOR.COMPONENT);
-            this.webglContext.drawArrays(this.webglContext.TRIANGLE_STRIP, 0, belt.vertex.count);
-            this.worldMatrixStack.popMatrix();
-            program.unbind();
+            this.drawArrays(belt, this.webglContext.TRIANGLE_STRIP);
+            this.end();
         }
     }
 }

@@ -2,8 +2,6 @@ import {WebGL2Application} from '../../base/WebGL2Application';
 import {Vector3} from '../../../common/math/vector/Vector3';
 import {Color4} from '../../../common/color/Color4';
 import {GLAttributeHelper} from '../../../webgl/GLAttributeHelper';
-import {GLProgramCache} from '../../../webgl/program/GLProgramCache';
-import {Matrix4} from '../../../common/math/matrix/Matrix4';
 import {GLShaderConstants} from '../../../webgl/GLShaderConstants';
 import {CanvasKeyboardEventManager} from '../../../event/keyboard/CanvasKeyboardEventManager';
 import {ECanvasKeyboardEventType} from '../../../enum/ECanvasKeyboardEventType';
@@ -61,17 +59,12 @@ export class LineDrawModeApplication extends WebGL2Application {
      * @private
      */
     private draw(): void {
-        let program = GLProgramCache.instance.getMust('color');
-        program.bind();
-        program.loadSampler();
-        this.worldMatrixStack.pushMatrix();
-        let mvp = Matrix4.product(this.camera.viewProjectionMatrix, this.worldMatrixStack.modelViewMatrix);
+        this.begin();
         //将总变换矩阵送入渲染管线
-        program.setMatrix4(GLShaderConstants.MVPMatrix, this.mvpMatrix());
-        program.setVertexAttribute('aPosition', this._buffers.get(GLAttributeHelper.POSITION), GLAttributeHelper.POSITION.COMPONENT);
-        program.setVertexAttribute('aColor', this._buffers.get(GLAttributeHelper.COLOR), GLAttributeHelper.COLOR.COMPONENT);
+        this.program.setMatrix4(GLShaderConstants.MVPMatrix, this.mvpMatrix());
+        this.program.setVertexAttribute('aPosition', this._buffers.get(GLAttributeHelper.POSITION), GLAttributeHelper.POSITION.COMPONENT);
+        this.program.setVertexAttribute('aColor', this._buffers.get(GLAttributeHelper.COLOR), GLAttributeHelper.COLOR.COMPONENT);
         this.webglContext.drawArrays(this._mode, 0, this._vertexData.length / 3);
-        this.worldMatrixStack.popMatrix();
-        program.unbind();
+        this.end();
     }
 }

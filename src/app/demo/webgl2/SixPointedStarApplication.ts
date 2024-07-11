@@ -1,6 +1,5 @@
 import {WebGL2Application} from '../../base/WebGL2Application';
 import {SixPointedStar} from '../../../common/geometry/solid/SixPointedStar';
-import {GLProgramCache} from '../../../webgl/program/GLProgramCache';
 import {GLAttributeHelper} from '../../../webgl/GLAttributeHelper';
 import {GLShaderConstants} from '../../../webgl/GLShaderConstants';
 import {GLRenderHelper} from '../../../webgl/GLRenderHelper';
@@ -13,8 +12,8 @@ import {CanvasMouseEventManager} from '../../../event/mouse/CanvasEventEventMana
  * 六角星渲染参数
  */
 type SixPointedStarRenderParameters = {
-    /** 顶点数量 */
-    vertexCount: number,
+    /** 六角星实体 */
+    star: SixPointedStar,
     /** 位置缓冲数据 */
     positionBuffer: WebGLBuffer,
     /** 颜色缓冲数据 */
@@ -84,7 +83,7 @@ export class SixPointStarApplication extends WebGL2Application {
             let star = SixPointedStar.create(i * this._depth);
             let positionBuffer = this.bindBuffer(star.vertex.positionArray);
             let colorBuffer = this.bindBuffer(star.vertex.colorArray);
-            this._starRenderParameters.push({vertexCount: star.vertex.count, positionBuffer, colorBuffer});
+            this._starRenderParameters.push({star: star, positionBuffer, colorBuffer});
         }
     }
     
@@ -94,15 +93,14 @@ export class SixPointStarApplication extends WebGL2Application {
      * @private
      */
     private renderStar(parameter: SixPointedStarRenderParameters): void {
-        const {vertexCount, positionBuffer, colorBuffer} = parameter;
-        const program = GLProgramCache.instance.getMust('color');
-        program.bind();
-        program.loadSampler();
+        const {star, positionBuffer, colorBuffer} = parameter;
+        this.program.bind();
+        this.program.loadSampler();
         //将总变换矩阵送入渲染管线
-        program.setMatrix4(GLShaderConstants.MVPMatrix, this.mvpMatrix());
-        program.setVertexAttribute('aPosition', positionBuffer, GLAttributeHelper.POSITION.COMPONENT);
-        program.setVertexAttribute('aColor', colorBuffer, GLAttributeHelper.COLOR.COMPONENT);
-        this.webglContext.drawArrays(this.webglContext.TRIANGLES, 0, vertexCount);
-        program.unbind();
+        this.program.setMatrix4(GLShaderConstants.MVPMatrix, this.mvpMatrix());
+        this.program.setVertexAttribute('aPosition', positionBuffer, GLAttributeHelper.POSITION.COMPONENT);
+        this.program.setVertexAttribute('aColor', colorBuffer, GLAttributeHelper.COLOR.COMPONENT);
+        this.webglContext.drawArrays(this.webglContext.TRIANGLES, 0, star.vertex.count);
+        this.program.unbind();
     }
 }

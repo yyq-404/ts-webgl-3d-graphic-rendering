@@ -6,6 +6,9 @@ import {GLProgram} from '../../webgl/program/GLProgram';
 import {GLMatrixStack} from '../../webgl/matrix/GLMatrixStack';
 import {Matrix4} from '../../common/math/matrix/Matrix4';
 import {IGLAttribute} from '../../webgl/attribute/IGLAttribute';
+import {GLShaderConstants} from '../../webgl/GLShaderConstants';
+import {GLAttributeHelper} from '../../webgl/GLAttributeHelper';
+import {IGeometry} from '../../common/geometry/IGeometry';
 
 /**
  * WebGL应用。
@@ -15,6 +18,8 @@ export class WebGL2Application extends BaseApplication {
     protected webglContext: WebGL2RenderingContext;
     /** 模拟 `OpenGL1.1` 中的矩阵堆栈, 封装在 `GLWorldMatrixStack` 类中 */
     protected worldMatrixStack: GLMatrixStack;
+    /** 链接器 */
+    protected program: GLProgram;
     /** 缓冲 */
     protected _buffers: Map<IGLAttribute, WebGLBuffer> = new Map<IGLAttribute, WebGLBuffer>();
     /** shader路径集合 */
@@ -69,7 +74,7 @@ export class WebGL2Application extends BaseApplication {
         let vertexShaderSource = await this.loadShaderSourceAsync(this._shaderUrls, 'bns.vert');
         // 加载颜色片元着色器代码
         let fragShaderSource = await this.loadShaderSourceAsync(this._shaderUrls, 'bns.frag');
-        let program = GLProgram.createDefaultProgram(this.webglContext, vertexShaderSource, fragShaderSource);
+        let program = this.program = GLProgram.createDefaultProgram(this.webglContext, vertexShaderSource, fragShaderSource);
         //创建颜色Program
         GLProgramCache.instance.set('color', program);
     }
@@ -79,8 +84,8 @@ export class WebGL2Application extends BaseApplication {
      * @return {Matrix4}
      * @protected
      */
-    protected mvpMatrix():Matrix4{
-        return  Matrix4.product(this.camera.viewProjectionMatrix, this.worldMatrixStack.modelViewMatrix);
+    protected mvpMatrix(): Matrix4 {
+        return Matrix4.product(this.camera.viewProjectionMatrix, this.worldMatrixStack.modelViewMatrix);
     }
     
     /**
@@ -94,5 +99,39 @@ export class WebGL2Application extends BaseApplication {
         this.webglContext.bindBuffer(this.webglContext.ARRAY_BUFFER, buffer);
         this.webglContext.bufferData(this.webglContext.ARRAY_BUFFER, new Float32Array(bufferData), this.webglContext.STATIC_DRAW);
         return buffer;
+    }
+    
+    /**
+     * 开始
+     * @protected
+     */
+    protected begin(): void {
+        this.worldMatrixStack.pushMatrix();
+        this.program.bind();
+        this.program.loadSampler();
+    }
+    
+    /**
+     * 绘制
+     * @param {IGeometry} solid
+     * @param {GLint} mode
+     * @param {number} first
+     * @protected
+     */
+    protected drawArrays(solid: IGeometry, mode: GLint, first: number = 0): void {
+        //将总变换矩阵送入渲染管线
+        this.program.setMatrix4(GLShaderConstants.MVPMatrix, this.mvpMatrix());
+        this.program.setVertexAttribute('aPosition', this._buffers.get(GLAttributeHelper.POSITION), GLAttributeHelper.POSITION.COMPONENT);
+        this.program.setVertexAttribute('aColor', this._buffers.get(GLAttributeHelper.COLOR), GLAttributeHelper.COLOR.COMPONENT);
+        this.webglContext.drawArrays(mode, first, solid.vertex.count);
+    }
+    
+    /**
+     * 结束。
+     * @protected
+     */
+    protected end(): void {
+        this.program.unbind();
+        this.worldMatrixStack.popMatrix();
     }
 }

@@ -1,8 +1,6 @@
 import {WebGL2Application} from '../../base/WebGL2Application';
 import {Triangle} from '../../../common/geometry/solid/Triangle';
 import {Vector3} from '../../../common/math/vector/Vector3';
-import {GLProgramCache} from '../../../webgl/program/GLProgramCache';
-import {GLShaderConstants} from '../../../webgl/GLShaderConstants';
 import {GLAttributeHelper} from '../../../webgl/GLAttributeHelper';
 import {IGLAttribute} from '../../../webgl/attribute/IGLAttribute';
 import {Color4} from '../../../common/color/Color4';
@@ -59,17 +57,9 @@ export class RotationTriangleApplication extends WebGL2Application {
      * @private
      */
     private renderRotationTriangle(): void {
-        let program = GLProgramCache.instance.getMust('color');
-        program.bind();
-        program.loadSampler();
-        this.worldMatrixStack.pushMatrix();
+        this.begin();
         this.worldMatrixStack.rotate(this._currentAngle, Vector3.up);
-        //将总变换矩阵送入渲染管线
-        program.setMatrix4(GLShaderConstants.MVPMatrix, this.mvpMatrix());
-        program.setVertexAttribute('aPosition', this._buffers.get(GLAttributeHelper.POSITION), GLAttributeHelper.POSITION.COMPONENT);
-        program.setVertexAttribute('aColor', this._buffers.get(GLAttributeHelper.COLOR), GLAttributeHelper.COLOR.COMPONENT);
-        this.webglContext.drawArrays(this.webglContext.TRIANGLES, 0, this._triangle.vertex.count);
-        this.worldMatrixStack.popMatrix();
-        program.unbind();
+        this.drawArrays(this._triangle, this.webglContext.TRIANGLES);
+        this.end();
     }
 }

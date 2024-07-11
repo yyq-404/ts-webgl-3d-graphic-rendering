@@ -1,7 +1,5 @@
 import {WebGL2Application} from '../../base/WebGL2Application';
-import {GLProgramCache} from '../../../webgl/program/GLProgramCache';
 import {GLAttributeHelper} from '../../../webgl/GLAttributeHelper';
-import {GLShaderConstants} from '../../../webgl/GLShaderConstants';
 import {GLRenderHelper} from '../../../webgl/GLRenderHelper';
 import {Vector3} from '../../../common/math/vector/Vector3';
 import {ColorCube} from '../../../common/geometry/solid/ColorCube';
@@ -73,10 +71,7 @@ export class TransformCubeApplication extends WebGL2Application {
      * @private
      */
     private renderTranslationCube(index: number): void {
-        const program = GLProgramCache.instance.getMust('color');
-        program.bind();
-        program.loadSampler();
-        this.worldMatrixStack.pushMatrix();
+        this.begin();
         let pos = index % 2 == 0 ? new Vector3([-0.5 * (index % 2 + 1), 0.0, 0.0]) : new Vector3([0.5 * (index % 2 + 1), 0.0, 0.0]);
         this.worldMatrixStack.translate(pos);
         this.worldMatrixStack.rotate(this._mouseMoveEvent.currentXAngle, Vector3.right);
@@ -85,12 +80,12 @@ export class TransformCubeApplication extends WebGL2Application {
             this.onTransform();
         }
         //将总变换矩阵送入渲染管线
-        program.setMatrix4(GLShaderConstants.MVPMatrix, this.mvpMatrix());
-        program.setVertexAttribute('aPosition', this._buffers.get(GLAttributeHelper.POSITION), GLAttributeHelper.POSITION.COMPONENT);
-        program.setVertexAttribute('aColor', this._buffers.get(GLAttributeHelper.COLOR), GLAttributeHelper.COLOR.COMPONENT);
-        this.webglContext.drawArrays(this.webglContext.TRIANGLES, 0, this._cube.vertex.count);
-        program.unbind();
-        this.worldMatrixStack.popMatrix();
+        // this.program.setMatrix4(GLShaderConstants.MVPMatrix, this.mvpMatrix());
+        // this.program.setVertexAttribute('aPosition', this._buffers.get(GLAttributeHelper.POSITION), GLAttributeHelper.POSITION.COMPONENT);
+        // this.program.setVertexAttribute('aColor', this._buffers.get(GLAttributeHelper.COLOR), GLAttributeHelper.COLOR.COMPONENT);
+        // this.webglContext.drawArrays(this.webglContext.TRIANGLES, 0, this._cube.vertex.count);
+        this.drawArrays(this._cube, this.webglContext.TRIANGLES);
+        this.end();
     }
     
     /**
