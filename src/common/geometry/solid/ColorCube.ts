@@ -1,7 +1,7 @@
 import {Cube} from './Cube';
 import {Vector3} from '../../math/vector/Vector3';
-import {Vector4} from '../../math/vector/Vector4';
 import {Color4} from '../../color/Color4';
+import {VertexStructure} from '../VertexStructure';
 
 /**
  * 色彩盒子。
@@ -18,7 +18,7 @@ export class ColorCube extends Cube {
      */
     public constructor(halfWidth: number = 0.2, halfHeight: number = 0.2, halfDepth: number = 0.2) {
         super(halfWidth, halfHeight, halfDepth);
-        this._surfaceCenterPoints = this.createCenterPoints();
+        this._surfaceCenterPoints = this.createSurfaceCenterPoints();
     }
     
     /**
@@ -26,7 +26,7 @@ export class ColorCube extends Cube {
      * @return {Vector3[]}
      * @private
      */
-    private createCenterPoints(): Vector3[] {
+    private createSurfaceCenterPoints(): Vector3[] {
         return [
             new Vector3([0, 0, this.halfWidth]),  // 前面
             new Vector3([0, 0, -this.halfWidth]), // 后面
@@ -43,7 +43,7 @@ export class ColorCube extends Cube {
      * @return {Vector3[]}
      * @private
      */
-    private createColorPoints(): Vector3[] {
+    private createSurfaceColorPoints(): Vector3[] {
         return [
             ...this.createTriangles(0, [5, 1, 0, 4]), // 前面
             ...this.createTriangles(1, [7, 6, 2, 3]), // 后面
@@ -73,47 +73,81 @@ export class ColorCube extends Cube {
         return points;
     }
     
-    /**
-     * 顶点数据。
-     * @return {number[]}
-     */
-    public vertexData(): number[] {
-        let data: number[] = [];
-        let positions = this.createColorPoints();
-        positions.forEach(position => data.push(...position.xyz));
-        return data;
-    }
+    // /**
+    //  * 顶点数据。
+    //  * @return {number[]}
+    //  */
+    // public vertexData(): number[] {
+    //     let data: number[] = [];
+    //     let positions = this.createSurfaceColorPoints();
+    //     positions.forEach(position => data.push(...position.xyz));
+    //     return data;
+    // }
+    //
+    // /**
+    //  * 创建颜色
+    //  * @param {Vector4} centerColor
+    //  * @param {Vector4} pointColor
+    //  * @return {Vector4[]}
+    //  * @private
+    //  */
+    // private createColor(centerColor: Color4, pointColor: Color4): Color4[] {
+    //     let colors: Color4[] = [];
+    //     // 每个表面有四个三角形，12个顶点位置。
+    //     for (let i = 0; i < 12; i++) {
+    //         colors.push(i % 3 ? pointColor : centerColor);
+    //     }
+    //     return colors;
+    // }
+    
+    // /**
+    //  * 颜色数据。
+    //  * @return {number[]}
+    //  */
+    // public colorData(): number[] {
+    //     let colorData: number[] = [];
+    //     [
+    //         ...this.createColor(Color4.White, Color4.Red),    // 前
+    //         ...this.createColor(Color4.White, Color4.Yellow), // 后
+    //         ...this.createColor(Color4.White, Color4.Blue), // 左
+    //         ...this.createColor(Color4.White, Color4.Purple), // 右
+    //         ...this.createColor(Color4.White, Color4.Green), // 上
+    //         ...this.createColor(Color4.White, Color4.Cyan)  // 下
+    //     ].forEach(color => colorData.push(...color.rgba));
+    //     return colorData;
+    // }
     
     /**
-     * 创建颜色
-     * @param {Vector4} centerColor
-     * @param {Vector4} pointColor
-     * @return {Vector4[]}
+     * 创建颜色数据。
+     * @return {Color4[]}
      * @private
      */
-    private createColor(centerColor: Color4, pointColor: Color4): Color4[] {
+    private createColors(): Color4[] {
         let colors: Color4[] = [];
-        // 每个表面有四个三角形，12个顶点位置。
-        for (let i = 0; i < 12; i++) {
-            colors.push(i % 3 ? pointColor : centerColor);
-        }
+        [
+            {center: Color4.White, point: Color4.Red},
+            {center: Color4.White, point: Color4.Yellow},
+            {center: Color4.White, point: Color4.Blue},
+            {center: Color4.White, point: Color4.Purple},
+            {center: Color4.White, point: Color4.Green},
+            {center: Color4.White, point: Color4.Cyan}
+        ].forEach((color) => {
+            // 每个表面有四个三角形，12个顶点位置。
+            for (let i = 0; i < 12; i++) {
+                colors.push(i % 3 ? color.point : color.center);
+            }
+        });
         return colors;
     }
     
     /**
-     * 颜色数据。
-     * @return {number[]}
+     * 获取顶点数据。
+     * @return {VertexStructure}
      */
-    public colorData(): number[] {
-        let colorData: number[] = [];
-        [
-            ...this.createColor(Color4.White, Color4.Red), // 前
-            ...this.createColor(Color4.White, Color4.Yellow), // 后
-            ...this.createColor(Color4.White, Color4.Blue), // 左
-            ...this.createColor(Color4.White, Color4.Purple), // 右
-            ...this.createColor(Color4.White, Color4.Green), // 上
-            ...this.createColor(Color4.White, Color4.Cyan)  // 下
-        ].forEach(color => colorData.push(...color.rgba));
-        return colorData;
+    public override get vertex(): VertexStructure {
+        const vertex = new VertexStructure();
+        vertex.positions = this.createSurfaceColorPoints();
+        vertex.colors = this.createColors();
+        return vertex;
     }
 }

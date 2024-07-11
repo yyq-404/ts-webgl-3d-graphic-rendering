@@ -1,22 +1,23 @@
 import {Vector3} from '../../math/vector/Vector3';
 import {MathHelper} from '../../math/MathHelper';
+import {Geometry} from '../Geometry';
+import {IGeometry} from '../IGeometry';
+import {VertexStructure} from '../VertexStructure';
+import {Color4} from '../../color/Color4';
 
 /**
  * 六角星定义。
  */
-export class SixPointedStar {
-    /** 点集合 */
-    private _points: Vector3[];
+export class SixPointedStar extends Geometry implements IGeometry {
     
     /**
      * 构造
      * @param {Vector3[]} points
      */
     public constructor(points?: Vector3[]) {
+        super();
         if (points instanceof Array) {
             this._points = points;
-        } else {
-            this._points = [];
         }
     }
     
@@ -26,12 +27,12 @@ export class SixPointedStar {
      * @return {SixPointedStar}
      */
     public static create(z: number = 0): SixPointedStar {
-        let sixStar = new SixPointedStar();
+        let star = new SixPointedStar();
         for (let i = 0; i < 6; i++) {
-            let points = sixStar.cratePoints(z, i * 60);
-            sixStar._points.push(...points);
+            let points = star.cratePoints(z, i * 60);
+            star._points.push(...points);
         }
-        return sixStar;
+        return star;
     }
     
     /**
@@ -56,20 +57,15 @@ export class SixPointedStar {
     }
     
     /**
-     * 顶点数量。
-     * @return {number}
+     * 获取顶点数据。
+     * @return {VertexStructure}
      */
-    public vertexCount(): number {
-        return this._points.length;
-    }
-    
-    /**
-     * 顶点数据。
-     * @return {number[]}
-     */
-    public vertexData(): number[] {
-        let data: number[] = [];
-        this._points.forEach(point => data.push(...point.xyz));
-        return data;
+    public get vertex(): VertexStructure {
+        let vertex = new VertexStructure();
+        vertex.positions = this._points;
+        for (let i = 0; i < this._points.length; i++) {
+            vertex.colors.push((i % 3 ? new Color4([0.45, 0.75, 0.75, 1.0]) : Color4.White));
+        }
+        return vertex;
     }
 }

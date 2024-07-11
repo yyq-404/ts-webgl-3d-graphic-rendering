@@ -192,27 +192,22 @@ export class GeometryHelper {
      * @param max
      * @param pts8
      */
-    public static boundBoxGet8Points(min: Vector3, max: Vector3, pts8: Vector3[]): void {
+    public static boundBoxGet8Points(min: Vector3, max: Vector3): Vector3[] {
+        const points: Vector3[] = [];
         // 获取中心点
         const center: Vector3 = GeometryHelper.boundBoxGetCenter(min, max);
         // 获取最大点到中心点之间的距离向量
         const max2center: Vector3 = Vector3.difference(center, max);
-        // 0
-        pts8.push(new Vector3([center.x + max2center.x, center.y + max2center.y, center.z + max2center.z]));
-        // 1
-        pts8.push(new Vector3([center.x + max2center.x, center.y - max2center.y, center.z + max2center.z]));
-        // 2
-        pts8.push(new Vector3([center.x + max2center.x, center.y + max2center.y, center.z - max2center.z]));
-        // 3
-        pts8.push(new Vector3([center.x + max2center.x, center.y - max2center.y, center.z - max2center.z]));
-        // 4
-        pts8.push(new Vector3([center.x - max2center.x, center.y + max2center.y, center.z + max2center.z]));
-        // 5
-        pts8.push(new Vector3([center.x - max2center.x, center.y - max2center.y, center.z + max2center.z]));
-        // 6
-        pts8.push(new Vector3([center.x - max2center.x, center.y + max2center.y, center.z - max2center.z]));
-        // 7
-        pts8.push(new Vector3([center.x - max2center.x, center.y - max2center.y, center.z - max2center.z]));
+        return [
+            new Vector3([center.x + max2center.x, center.y + max2center.y, center.z + max2center.z]), // 0
+            new Vector3([center.x + max2center.x, center.y - max2center.y, center.z + max2center.z]), // 1
+            new Vector3([center.x + max2center.x, center.y + max2center.y, center.z - max2center.z]), // 2
+            new Vector3([center.x + max2center.x, center.y - max2center.y, center.z - max2center.z]), // 3
+            new Vector3([center.x - max2center.x, center.y + max2center.y, center.z + max2center.z]), // 4
+            new Vector3([center.x - max2center.x, center.y - max2center.y, center.z + max2center.z]), // 5
+            new Vector3([center.x - max2center.x, center.y + max2center.y, center.z - max2center.z]), // 6
+            new Vector3([center.x - max2center.x, center.y - max2center.y, center.z - max2center.z])  // 7
+        ];
     }
     
     /**
@@ -222,10 +217,8 @@ export class GeometryHelper {
      * @param max
      */
     public static boundBoxTransform(mat: Matrix4, min: Vector3, max: Vector3): void {
-        // 分配数组内存，类型为Vector3
-        const pts: Vector3[] = [];
         // 获得局部坐标系表示的AABB的8个顶点坐标
-        GeometryHelper.boundBoxGet8Points(min, max, pts);
+        const pts = GeometryHelper.boundBoxGet8Points(min, max);
         const out: Vector3 = new Vector3(); // 变换后的顶点
         // 遍历局部坐标系的8个AABB包围盒的顶点坐标
         pts.forEach((pt) => {

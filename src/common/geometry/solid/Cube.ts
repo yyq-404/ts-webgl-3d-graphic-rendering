@@ -1,19 +1,19 @@
 import {Vector3} from '../../math/vector/Vector3';
 import {Vector2} from '../../math/vector/Vector2';
+import {VertexStructure} from '../VertexStructure';
 import {Geometry} from '../Geometry';
+import {IGeometry} from '../IGeometry';
 
 /**
  * 立方体定义
  */
-export class Cube {
+export class Cube extends Geometry implements IGeometry {
     /** 半宽 */
     public halfWidth: number;
     /** 半高 */
     public halfHeight: number;
     /** 半深 */
     public halfDepth: number;
-    /** 点集 */
-    protected readonly _points: Vector3[];
     /** 表面集合 */
     protected readonly _surfaces: Vector3[][];
     
@@ -30,6 +30,7 @@ export class Cube {
      * ```
      */
     public constructor(halfWidth: number = 0.2, halfHeight: number = 0.2, halfDepth: number = 0.2) {
+        super();
         this.halfWidth = halfWidth;
         this.halfHeight = halfHeight;
         this.halfDepth = halfDepth;
@@ -97,12 +98,12 @@ export class Cube {
     }
     
     /**
-     * 产生几何数据。
+     * 获取顶点数据。
      */
-    public get geometry(): Geometry {
-        const geometry: Geometry = new Geometry();
-        geometry.positions = this._points;
-        geometry.uvs = this.createUVs();
+    public get vertex(): VertexStructure {
+        const vertex: VertexStructure = new VertexStructure();
+        vertex.positions = this._points;
+        vertex.uvs = this.createUVs();
         const indices = [
             [0, 1, 3, 0, 3, 2], // 左面
             [3, 7, 6, 3, 6, 2], // 后面
@@ -111,7 +112,7 @@ export class Cube {
             [1, 5, 7, 1, 7, 3], // 上面
             [2, 6, 4, 2, 4, 0]  // 下面
         ];
-        indices.forEach(points => geometry.indices.push(...points));
-        return geometry;
+        indices.forEach(points => vertex.indices.push(...points));
+        return vertex;
     }
 }
