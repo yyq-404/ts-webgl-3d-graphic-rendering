@@ -12,7 +12,7 @@ import {GLAttributeCoordinate} from './attribute/GLAttributeCoordinate';
 export class GLAttributeHelper {
     // 一般常用的顶点属性包括：位置坐标值、颜色值、纹理坐标值、法线值和切向量值等
     /** 顶点属性：位置坐标 */
-    public static readonly POSITION: GLAttributePosition = GLAttributePosition.create('aPosition,', 1 << 0, 3, 0);
+    public static readonly POSITION: GLAttributePosition = GLAttributePosition.create('aPosition', 1 << 0, 3, 0);
     /** 顶点属性：纹理坐标0 */
     public static readonly TEX_COORDINATE_0: GLAttributeCoordinate = GLAttributeCoordinate.create('aTexCoord', 1 << 1, 2, 1);
     /** 顶点属性：纹理坐标1 */
@@ -30,6 +30,8 @@ export class GLAttributeHelper {
     static readonly WEIGHT3_BIT: 0b10_000_000_000 = (1 << 10) as 0b10_000_000_000;
     */
     public static readonly ATTRIB_BYTE_LENGTH: 'BYTE_LENGTH' = 'BYTE_LENGTH' as const;
+    /** 所有属性 */
+    private static _attributes: IGLAttribute[] = [GLAttributeHelper.POSITION, GLAttributeHelper.TEX_COORDINATE_0, GLAttributeHelper.TEX_COORDINATE_1, GLAttributeHelper.NORMAL, GLAttributeHelper.TANGENT, GLAttributeHelper.COLOR];
     
     /**
      * 顶点属性设置
@@ -55,7 +57,7 @@ export class GLAttributeHelper {
      * 获取顶点属性。
      * @param webglContext
      */
-    public static getMaxVertexAttributes(webglContext: WebGLRenderingContext): number {
+    public static getMaxVertexAttributes(webglContext: WebGLRenderingContextBase): number {
         return webglContext.getParameter(webglContext.MAX_VERTEX_ATTRIBS) as number;
     }
     
@@ -67,6 +69,19 @@ export class GLAttributeHelper {
      */
     public static hasAttribute(attributeBits: GLAttributeBits, attributeSate: number): boolean {
         return (attributeBits & attributeSate) !== 0;
+    }
+    
+    /**
+     * 获取属性集合。
+     * @param {GLAttributeBits} attributeBits
+     * @return {IGLAttribute[]}
+     */
+    public static getAttributes(attributeBits: GLAttributeBits): IGLAttribute[] {
+        return GLAttributeHelper._attributes.map(bit => {
+            if (GLAttributeHelper.hasAttribute(attributeBits, bit.BIT)) {
+                return bit;
+            }
+        });
     }
     
     /**
@@ -163,7 +178,7 @@ export class GLAttributeHelper {
      * @param gl
      * @param offsetMap
      */
-    public static setAttributeVertexArrayPointer(gl: WebGLRenderingContext, offsetMap: GLAttributeOffsetMap): void {
+    public static setAttributeVertexArrayPointer(gl: WebGLRenderingContextBase, offsetMap: GLAttributeOffsetMap): void {
         let stride: number = offsetMap[GLAttributeHelper.COLOR.STRIDE];
         if (stride === 0) throw new Error('vertex Array有问题! ! ');
         // sequenced 的话 stride 为 0
@@ -183,7 +198,7 @@ export class GLAttributeHelper {
      * @param attributeBits
      * @param [enable=true]
      */
-    public static setAttributeVertexArrayState(gl: WebGLRenderingContext, attributeBits: GLAttributeBits, enable: boolean = true): void {
+    public static setAttributeVertexArrayState(gl: WebGLRenderingContextBase, attributeBits: GLAttributeBits, enable: boolean = true): void {
         GLAttributeHelper.setAttributeVertexState(gl, attributeBits, GLAttributeHelper.POSITION, enable);
         GLAttributeHelper.setAttributeVertexState(gl, attributeBits, GLAttributeHelper.TEX_COORDINATE_0, enable);
         GLAttributeHelper.setAttributeVertexState(gl, attributeBits, GLAttributeHelper.TEX_COORDINATE_1, enable);
@@ -237,12 +252,12 @@ export class GLAttributeHelper {
     
     /**
      * 顶点属性指针
-     * @param {WebGLRenderingContext} gl
+     * @param {WebGLRenderingContextBase} gl
      * @param {GLAttributeOffsetMap} offsetMap
      * @param {IGLAttribute} attribute
      * @param {number} stride
      */
-    private static vertexAttribPointer(gl: WebGLRenderingContext, offsetMap: GLAttributeOffsetMap, attribute: IGLAttribute, stride: number): void {
+    private static vertexAttribPointer(gl: WebGLRenderingContextBase, offsetMap: GLAttributeOffsetMap, attribute: IGLAttribute, stride: number): void {
         let offset: number = offsetMap[attribute.NAME];
         if (offset !== undefined) {
             gl.vertexAttribPointer(attribute.LOCATION, attribute.COMPONENT, gl.FLOAT, false, stride, offset);
@@ -251,12 +266,12 @@ export class GLAttributeHelper {
     
     /**
      * 设置顶点属性状态。
-     * @param {WebGLRenderingContext} gl
+     * @param {WebGLRenderingContextBase} gl
      * @param {GLAttributeBits} attributeBits
      * @param attribute
      * @param {boolean} enable
      */
-    private static setAttributeVertexState(gl: WebGLRenderingContext, attributeBits: GLAttributeBits, attribute: IGLAttribute, enable: boolean = true): void {
+    private static setAttributeVertexState(gl: WebGLRenderingContextBase, attributeBits: GLAttributeBits, attribute: IGLAttribute, enable: boolean = true): void {
         if (GLAttributeHelper.hasAttribute(attributeBits, attribute.BIT) && enable) {
             gl.enableVertexAttribArray(attribute.LOCATION);
         } else {
