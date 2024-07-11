@@ -1,5 +1,4 @@
 import {WebGL2Application} from '../../base/WebGL2Application';
-import {GLAttributeHelper} from '../../../webgl/GLAttributeHelper';
 import {GLRenderHelper} from '../../../webgl/GLRenderHelper';
 import {Vector3} from '../../../common/math/vector/Vector3';
 import {ColorCube} from '../../../common/geometry/solid/ColorCube';
@@ -15,7 +14,7 @@ export class TransformCubeApplication extends WebGL2Application {
     /** 盒子对象 */
     private _cube: ColorCube = new ColorCube(0.3, 0.3, 0.3);
     /** 矩阵变换类型 */
-    private _transformType: string = 'translation';
+    private _transformType: string = '';
     /** 鼠标移动事件 */
     private readonly _mouseMoveEvent: CanvasMouseMoveEvent;
     
@@ -25,10 +24,7 @@ export class TransformCubeApplication extends WebGL2Application {
     public constructor() {
         super();
         this.camera.z = 4;
-        let positionBuffer = this.bindBuffer(this._cube.vertex.positionArray);
-        this._buffers.set(GLAttributeHelper.POSITION, positionBuffer);
-        let colorBuffer = this.bindBuffer(this._cube.vertex.colorArray);
-        this._buffers.set(GLAttributeHelper.COLOR, colorBuffer);
+        this.createBuffers(this._cube);
         GLRenderHelper.setDefaultState(this.webglContext);
         this._mouseMoveEvent = new CanvasMouseMoveEvent(this.canvas);
         CanvasKeyboardEventManager.instance.registers(this, [
@@ -79,11 +75,6 @@ export class TransformCubeApplication extends WebGL2Application {
         if (index % 2) {
             this.onTransform();
         }
-        //将总变换矩阵送入渲染管线
-        // this.program.setMatrix4(GLShaderConstants.MVPMatrix, this.mvpMatrix());
-        // this.program.setVertexAttribute('aPosition', this._buffers.get(GLAttributeHelper.POSITION), GLAttributeHelper.POSITION.COMPONENT);
-        // this.program.setVertexAttribute('aColor', this._buffers.get(GLAttributeHelper.COLOR), GLAttributeHelper.COLOR.COMPONENT);
-        // this.webglContext.drawArrays(this.webglContext.TRIANGLES, 0, this._cube.vertex.count);
         this.drawArrays(this._cube, this.webglContext.TRIANGLES);
         this.end();
     }

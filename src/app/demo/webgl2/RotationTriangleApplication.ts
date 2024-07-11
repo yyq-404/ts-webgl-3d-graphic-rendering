@@ -1,8 +1,6 @@
 import {WebGL2Application} from '../../base/WebGL2Application';
 import {Triangle} from '../../../common/geometry/solid/Triangle';
 import {Vector3} from '../../../common/math/vector/Vector3';
-import {GLAttributeHelper} from '../../../webgl/GLAttributeHelper';
-import {IGLAttribute} from '../../../webgl/attribute/IGLAttribute';
 import {Color4} from '../../../common/color/Color4';
 
 /**
@@ -11,11 +9,6 @@ import {Color4} from '../../../common/color/Color4';
 export class RotationTriangleApplication extends WebGL2Application {
     /** 三角形 */
     private _triangle: Triangle = new Triangle([new Vector3([3.0, 0.0, 0.0]), new Vector3([0.0, 0.0, 0.0]), new Vector3([0.0, 3.0, 0.0])], [Color4.White, Color4.Blue, Color4.Green]);
-    /** 顶点缓冲数据 */
-    private _bufferData: Map<IGLAttribute, number[]> = new Map<IGLAttribute, number[]>([
-        [GLAttributeHelper.POSITION, this._triangle.vertex.positionArray],
-        [GLAttributeHelper.COLOR, this._triangle.vertex.colorArray]
-    ]);
     /** 旋转角度 */
     private _currentAngle = 0;
     /** 旋转角度步进值 */
@@ -26,10 +19,7 @@ export class RotationTriangleApplication extends WebGL2Application {
      */
     public constructor() {
         super();
-        this._bufferData.forEach((bufferData: number[], attribute: IGLAttribute) => {
-            let buffer = this.bindBuffer(bufferData);
-            this._buffers.set(attribute, buffer);
-        });
+        this.createBuffers(this._triangle);
         this.camera.z = 10;
     }
     

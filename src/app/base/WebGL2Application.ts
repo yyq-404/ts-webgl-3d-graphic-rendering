@@ -9,6 +9,7 @@ import {IGLAttribute} from '../../webgl/attribute/IGLAttribute';
 import {GLShaderConstants} from '../../webgl/GLShaderConstants';
 import {GLAttributeHelper} from '../../webgl/GLAttributeHelper';
 import {IGeometry} from '../../common/geometry/IGeometry';
+import {GLAttributeBits} from '../../webgl/common/GLTypes';
 
 /**
  * WebGL应用。
@@ -20,13 +21,15 @@ export class WebGL2Application extends BaseApplication {
     protected worldMatrixStack: GLMatrixStack;
     /** 链接器 */
     protected program: GLProgram;
-    /** 缓冲 */
-    protected _buffers: Map<IGLAttribute, WebGLBuffer> = new Map<IGLAttribute, WebGLBuffer>();
+    /** 顶点缓冲集合 */
+    protected vertexBuffers: Map<IGeometry, Map<IGLAttribute, WebGLBuffer>> = new Map<IGeometry, Map<IGLAttribute, WebGLBuffer>>();
     /** shader路径集合 */
     private readonly _shaderUrls: Map<string, string> = new Map<string, string>([
         ['bns.vert', `${AppConstants.webgl2ShaderRoot}/bns.vert`],
         ['bns.frag', `${AppConstants.webgl2ShaderRoot}/bns.frag`]
     ]);
+    /** 属性集合 */
+    protected attributeBits: GLAttributeBits = GLAttributeHelper.POSITION.BIT | GLAttributeHelper.COLOR.BIT;
     
     /**
      * 构造
@@ -89,6 +92,25 @@ export class WebGL2Application extends BaseApplication {
     }
     
     /**
+     * 创建缓冲集合。
+     * @param {IGeometry} solid
+     * @protected
+     */
+    protected createBuffers(solid: IGeometry): void {
+        let buffers = this.vertexBuffers.get(solid);
+        if (!buffers) {
+            buffers = new Map<IGLAttribute, WebGLBuffer>();
+            this.vertexBuffers.set(solid, buffers);
+        }
+        if (GLAttributeHelper.hasAttribute(this.attributeBits, GLAttributeHelper.POSITION.BIT)) {
+            buffers.set(GLAttributeHelper.POSITION, this.bindBuffer(solid.vertex.positionArray));
+        }
+        if (GLAttributeHelper.hasAttribute(this.attributeBits, GLAttributeHelper.COLOR.BIT)) {
+            buffers.set(GLAttributeHelper.COLOR, this.bindBuffer(solid.vertex.colorArray));
+        }
+    }
+    
+    /**
      * 绑定缓冲。
      * @param {number[]} bufferData
      * @return {WebGLBuffer}
@@ -119,10 +141,13 @@ export class WebGL2Application extends BaseApplication {
      * @protected
      */
     protected drawArrays(solid: IGeometry, mode: GLint, first: number = 0): void {
+        const buffers = this.vertexBuffers.get(solid);
+        if (!buffers) return;
         //将总变换矩阵送入渲染管线
         this.program.setMatrix4(GLShaderConstants.MVPMatrix, this.mvpMatrix());
-        this.program.setVertexAttribute('aPosition', this._buffers.get(GLAttributeHelper.POSITION), GLAttributeHelper.POSITION.COMPONENT);
-        this.program.setVertexAttribute('aColor', this._buffers.get(GLAttributeHelper.COLOR), GLAttributeHelper.COLOR.COMPONENT);
+        for (const entity of buffers.entries()) {
+            this.program.setVertexAttribute(entity[0].NAME, entity[1], entity[0].COMPONENT);
+        }
         this.webglContext.drawArrays(mode, first, solid.vertex.count);
     }
     

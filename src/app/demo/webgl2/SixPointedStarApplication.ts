@@ -1,24 +1,12 @@
 import {WebGL2Application} from '../../base/WebGL2Application';
 import {SixPointedStar} from '../../../common/geometry/solid/SixPointedStar';
-import {GLAttributeHelper} from '../../../webgl/GLAttributeHelper';
 import {GLShaderConstants} from '../../../webgl/GLShaderConstants';
 import {GLRenderHelper} from '../../../webgl/GLRenderHelper';
 import {Vector3} from '../../../common/math/vector/Vector3';
 import {CanvasMouseMoveEvent} from '../../../event/mouse/CanvasMouseMoveEvent';
 import {CanvasMouseEventManager} from '../../../event/mouse/CanvasEventEventManager';
-
-
-/**
- * 六角星渲染参数
- */
-type SixPointedStarRenderParameters = {
-    /** 六角星实体 */
-    star: SixPointedStar,
-    /** 位置缓冲数据 */
-    positionBuffer: WebGLBuffer,
-    /** 颜色缓冲数据 */
-    colorBuffer: WebGLBuffer
-}
+import {IGLAttribute} from '../../../webgl/attribute/IGLAttribute';
+import {IGeometry} from '../../../common/geometry/IGeometry';
 
 /**
  * 六角形应用。
@@ -26,8 +14,6 @@ type SixPointedStarRenderParameters = {
 export class SixPointStarApplication extends WebGL2Application {
     /** 六角星数量 */
     private _starCount = 6;
-    /** 六角星渲染参数集合 */
-    private _starRenderParameters: SixPointedStarRenderParameters[] = [];
     /** 每个六角星z轴间距 */
     private readonly _depth: number = 0.3;
     /** 鼠标移动事件 */
@@ -70,7 +56,9 @@ export class SixPointStarApplication extends WebGL2Application {
         //执行旋转,即按哪个轴旋转
         this.worldMatrixStack.rotate(this._mouseMoveEvent.currentYAngle, Vector3.up);
         this.worldMatrixStack.rotate(this._mouseMoveEvent.currentXAngle, Vector3.right);
-        this._starRenderParameters.forEach(parameter => this.renderStar(parameter));
+        this.vertexBuffers.forEach((buffers, star) => {
+            this.renderStar(star, buffers);
+        });
         this.worldMatrixStack.popMatrix();
     }
     
@@ -81,25 +69,24 @@ export class SixPointStarApplication extends WebGL2Application {
     private createStars() {
         for (let i = 0; i < this._starCount; i++) {
             let star = SixPointedStar.create(i * this._depth);
-            let positionBuffer = this.bindBuffer(star.vertex.positionArray);
-            let colorBuffer = this.bindBuffer(star.vertex.colorArray);
-            this._starRenderParameters.push({star: star, positionBuffer, colorBuffer});
+            this.createBuffers(star);
         }
     }
     
     /**
      * 渲染六角星
-     * @param {SixPointedStarRenderParameters} parameter
      * @private
+     * @param star
+     * @param buffers
      */
-    private renderStar(parameter: SixPointedStarRenderParameters): void {
-        const {star, positionBuffer, colorBuffer} = parameter;
+    private renderStar(star: IGeometry, buffers: Map<IGLAttribute, WebGLBuffer>): void {
         this.program.bind();
         this.program.loadSampler();
         //将总变换矩阵送入渲染管线
         this.program.setMatrix4(GLShaderConstants.MVPMatrix, this.mvpMatrix());
-        this.program.setVertexAttribute('aPosition', positionBuffer, GLAttributeHelper.POSITION.COMPONENT);
-        this.program.setVertexAttribute('aColor', colorBuffer, GLAttributeHelper.COLOR.COMPONENT);
+        for (const entity of buffers.entries()) {
+            this.program.setVertexAttribute(entity[0].NAME, entity[1], entity[0].COMPONENT);
+        }
         this.webglContext.drawArrays(this.webglContext.TRIANGLES, 0, star.vertex.count);
         this.program.unbind();
     }
