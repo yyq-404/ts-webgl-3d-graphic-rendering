@@ -2,7 +2,7 @@ import {GLStaticMesh} from './mesh/GLStaticMesh';
 import {GLAttributeBits} from './common/GLTypes';
 import {GLAttributeHelper} from './GLAttributeHelper';
 import {Vector3} from '../common/math/vector/Vector3';
-import {Geometry} from '../common/geometry/Geometry';
+import {VertexStructure} from '../common/geometry/VertexStructure';
 import {GeometryHelper} from '../common/geometry/GeometryHelper';
 
 /**
@@ -16,7 +16,7 @@ export class GLMeshHelper {
      * @param optionNormal
      * @param optionUV
      */
-    public static makeStaticMesh(webglContext: WebGLRenderingContext, geometry: Geometry, optionNormal: boolean = false, optionUV: boolean = true): GLStaticMesh {
+    public static makeStaticMesh(webglContext: WebGLRenderingContext, geometry: VertexStructure, optionNormal: boolean = false, optionUV: boolean = true): GLStaticMesh {
         let bits: GLAttributeBits = GLMeshHelper.getAttribBits(geometry);
         if (!optionNormal) bits &= ~GLAttributeHelper.NORMAL.BIT;
         if (!optionUV) bits &= ~GLAttributeHelper.TEX_COORDINATE_0.BIT;
@@ -34,14 +34,14 @@ export class GLMeshHelper {
     
     /**
      * 填充缓冲。
-     * @param {Geometry} geometry
+     * @param {VertexStructure} geometry
      * @param {Float32Array} buffer
      * @param {GLAttributeBits} bits
      * @param {number} i
      * @param {number} step
      * @private
      */
-    private static fillGeometryBuffer(geometry: Geometry, buffer: Float32Array, bits: GLAttributeBits, i: number, step: number): void {
+    private static fillGeometryBuffer(geometry: VertexStructure, buffer: Float32Array, bits: GLAttributeBits, i: number, step: number): void {
         let bufferIndex = i * step;
         geometry.positions[i].xyz.forEach(value => buffer[bufferIndex++] = value);
         // 法线(用了bits后，不能用length来判断了!!!)
@@ -54,7 +54,7 @@ export class GLMeshHelper {
         }
         //颜色
         if (GLAttributeHelper.hasAttribute(bits, GLAttributeHelper.COLOR.BIT)) {
-            geometry.colors[i].xyzw.forEach(value => buffer[bufferIndex++] = value);
+            geometry.colors[i].rgba.forEach(value => buffer[bufferIndex++] = value);
         }
         //切线
         if (GLAttributeHelper.hasAttribute(bits, GLAttributeHelper.TANGENT.BIT)) {
@@ -69,7 +69,7 @@ export class GLMeshHelper {
      * @param max
      * @private
      */
-    private static buildBoundingBox(geometry: Geometry, min: Vector3, max: Vector3): void {
+    private static buildBoundingBox(geometry: VertexStructure, min: Vector3, max: Vector3): void {
         for (let i: number = 0; i < geometry.positions.length; i++) {
             GeometryHelper.boundBoxAddPoint(geometry.positions[i], min, max);
         }
@@ -78,7 +78,7 @@ export class GLMeshHelper {
     /**
      * 获取属性集合。
      */
-    private static getAttribBits(geometry: Geometry): GLAttributeBits {
+    private static getAttribBits(geometry: VertexStructure): GLAttributeBits {
         if (geometry.positions.length === 0) {
             throw new Error('必须要有顶数据!!!');
         }

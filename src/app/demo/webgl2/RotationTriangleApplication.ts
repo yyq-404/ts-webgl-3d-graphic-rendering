@@ -12,17 +12,11 @@ import {Color4} from '../../../common/color/Color4';
  */
 export class RotationTriangleApplication extends WebGL2Application {
     /** 三角形 */
-    private _triangle: Triangle = new Triangle([new Vector3([3.0, 0.0, 0.0]), new Vector3([0.0, 0.0, 0.0]), new Vector3([0.0, 3.0, 0.0])]);
-    /** 颜色数据 */
-    private _colorData: number[] = [
-        ...new Color4([1.0, 1.0, 1.0, 1.0]).rgba,
-        ...new Color4([0.0, 0.0, 1.0, 1.0]).rgba,
-        ...new Color4([0.0, 1.0, 0.0, 1.0]).rgba
-    ];
+    private _triangle: Triangle = new Triangle([new Vector3([3.0, 0.0, 0.0]), new Vector3([0.0, 0.0, 0.0]), new Vector3([0.0, 3.0, 0.0])], [Color4.White, Color4.Blue, Color4.Green]);
     /** 顶点缓冲数据 */
     private _bufferData: Map<IGLAttribute, number[]> = new Map<IGLAttribute, number[]>([
-        [GLAttributeHelper.POSITION, this._triangle.vertexData()],
-        [GLAttributeHelper.COLOR, this._colorData]
+        [GLAttributeHelper.POSITION, this._triangle.vertex.positionArray],
+        [GLAttributeHelper.COLOR, this._triangle.vertex.colorArray]
     ]);
     /** 旋转角度 */
     private _currentAngle = 0;
@@ -74,7 +68,7 @@ export class RotationTriangleApplication extends WebGL2Application {
         program.setMatrix4(GLShaderConstants.MVPMatrix, this.mvpMatrix());
         program.setVertexAttribute('aPosition', this._buffers.get(GLAttributeHelper.POSITION), GLAttributeHelper.POSITION.COMPONENT);
         program.setVertexAttribute('aColor', this._buffers.get(GLAttributeHelper.COLOR), GLAttributeHelper.COLOR.COMPONENT);
-        this.webglContext.drawArrays(this.webglContext.TRIANGLES, 0, this._triangle.vertexCount());
+        this.webglContext.drawArrays(this.webglContext.TRIANGLES, 0, this._triangle.vertex.count);
         this.worldMatrixStack.popMatrix();
         program.unbind();
     }

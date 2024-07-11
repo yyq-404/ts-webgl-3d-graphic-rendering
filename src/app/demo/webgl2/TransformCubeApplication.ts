@@ -27,9 +27,9 @@ export class TransformCubeApplication extends WebGL2Application {
     public constructor() {
         super();
         this.camera.z = 4;
-        let vertexBuffer = this.bindBuffer(this._cube.vertexData());
-        this._buffers.set(GLAttributeHelper.POSITION, vertexBuffer);
-        let colorBuffer = this.bindBuffer(this._cube.colorData());
+        let positionBuffer = this.bindBuffer(this._cube.vertex.positionArray);
+        this._buffers.set(GLAttributeHelper.POSITION, positionBuffer);
+        let colorBuffer = this.bindBuffer(this._cube.vertex.colorArray);
         this._buffers.set(GLAttributeHelper.COLOR, colorBuffer);
         GLRenderHelper.setDefaultState(this.webglContext);
         this._mouseMoveEvent = new CanvasMouseMoveEvent(this.canvas);
@@ -88,7 +88,7 @@ export class TransformCubeApplication extends WebGL2Application {
         program.setMatrix4(GLShaderConstants.MVPMatrix, this.mvpMatrix());
         program.setVertexAttribute('aPosition', this._buffers.get(GLAttributeHelper.POSITION), GLAttributeHelper.POSITION.COMPONENT);
         program.setVertexAttribute('aColor', this._buffers.get(GLAttributeHelper.COLOR), GLAttributeHelper.COLOR.COMPONENT);
-        this.webglContext.drawArrays(this.webglContext.TRIANGLES, 0, this._cube.vertexData().length / 3);
+        this.webglContext.drawArrays(this.webglContext.TRIANGLES, 0, this._cube.vertex.count);
         program.unbind();
         this.worldMatrixStack.popMatrix();
     }

@@ -7,7 +7,6 @@ import {GLRenderHelper} from '../../../webgl/GLRenderHelper';
 import {Vector3} from '../../../common/math/vector/Vector3';
 import {CanvasMouseMoveEvent} from '../../../event/mouse/CanvasMouseMoveEvent';
 import {CanvasMouseEventManager} from '../../../event/mouse/CanvasEventEventManager';
-import {Color4} from '../../../common/color/Color4';
 
 
 /**
@@ -83,24 +82,10 @@ export class SixPointStarApplication extends WebGL2Application {
     private createStars() {
         for (let i = 0; i < this._starCount; i++) {
             let star = SixPointedStar.create(i * this._depth);
-            let positionBuffer = this.bindBuffer(star.vertexData());
-            let colorBuffer = this.bindBuffer(this.createColorData(star));
-            this._starRenderParameters.push({vertexCount: star.vertexCount(), positionBuffer, colorBuffer});
+            let positionBuffer = this.bindBuffer(star.vertex.positionArray);
+            let colorBuffer = this.bindBuffer(star.vertex.colorArray);
+            this._starRenderParameters.push({vertexCount: star.vertex.count, positionBuffer, colorBuffer});
         }
-    }
-    
-    /**
-     * 创建顶点颜色数据。
-     * @param {SixPointedStar} star
-     * @return {number[]}
-     * @private
-     */
-    private createColorData(star: SixPointedStar): number[] {
-        let colorData: number[] = [];
-        for (let i = 0; i < star.vertexCount(); i++) {
-            colorData.push(...(i % 3 ? new Color4([0.45, 0.75, 0.75, 1.0]).rgba : Color4.White.rgba));
-        }
-        return colorData;
     }
     
     /**
