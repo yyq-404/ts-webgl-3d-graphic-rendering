@@ -2,11 +2,9 @@ import {WebGL2Application} from '../../base/WebGL2Application';
 import {Belt} from '../../../common/geometry/solid/Belt';
 import {Fan} from '../../../common/geometry/solid/Fan';
 import {Vector3} from '../../../common/math/vector/Vector3';
-import {CanvasMouseMoveEvent} from '../../../event/mouse/CanvasMouseMoveEvent';
-import {CanvasMouseEventManager} from '../../../event/mouse/CanvasEventEventManager';
-import {IGeometry} from '../../../common/geometry/IGeometry';
 import {CanvasKeyboardEventManager} from '../../../event/keyboard/CanvasKeyboardEventManager';
 import {ECanvasKeyboardEventType} from '../../../enum/ECanvasKeyboardEventType';
+import {Geometry} from "../../../common/geometry/Geometry";
 
 /**
  * 三角形绘制模式应用。
@@ -18,10 +16,10 @@ export class TriangleDrawModeApplication extends WebGL2Application {
         new Belt(180, 270, 3)
     ];
     /** 扇形和条形 */
-    private _solids: IGeometry[] = [new Belt(), new Fan()];
+    private _solids: Geometry[] = [new Belt(), new Fan()];
     /** 挡墙绘制方式 */
     private _currentDrawMethod: () => void;
-    
+
     /**
      * 构造。
      */
@@ -35,14 +33,14 @@ export class TriangleDrawModeApplication extends WebGL2Application {
         ]);
         this._currentDrawMethod = this.drawSolids;
     }
-    
+
     /**
      * 渲染。
      */
     public override render(): void {
         this._currentDrawMethod();
     }
-    
+
     /**
      * 绘制条形和扇形
      * @private
@@ -57,7 +55,7 @@ export class TriangleDrawModeApplication extends WebGL2Application {
             this.end();
         });
     }
-    
+
     /**
      * 绘制条形集合。
      * @private

@@ -1,15 +1,14 @@
 import {Vector3} from '../../math/vector/Vector3';
 import {MathHelper} from '../../math/MathHelper';
 import {Geometry} from '../Geometry';
-import {IGeometry} from '../IGeometry';
 import {VertexStructure} from '../VertexStructure';
 import {Color4} from '../../color/Color4';
 
 /**
  * 六角星定义。
  */
-export class SixPointedStar extends Geometry implements IGeometry {
-    
+export class SixPointedStar extends Geometry {
+
     /**
      * 构造
      * @param {Vector3[]} points
@@ -20,7 +19,7 @@ export class SixPointedStar extends Geometry implements IGeometry {
             this._points = points;
         }
     }
-    
+
     /**
      * 创建
      * @param {number} z
@@ -34,7 +33,7 @@ export class SixPointedStar extends Geometry implements IGeometry {
         }
         return star;
     }
-    
+
     /**
      * 创建点集合
      *
@@ -55,7 +54,7 @@ export class SixPointedStar extends Geometry implements IGeometry {
         let p6 = new Vector3([0.2 * Math.cos(p6Radian), 0.2 * Math.sin(p6Radian), z]);
         return [p1, p2, p3, p4, p5, p6];
     }
-    
+
     /**
      * 获取顶点数据。
      * @return {VertexStructure}

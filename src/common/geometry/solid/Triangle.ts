@@ -1,16 +1,15 @@
 import {Vector3} from '../../math/vector/Vector3';
 import {Geometry} from '../Geometry';
-import {IGeometry} from '../IGeometry';
 import {VertexStructure} from '../VertexStructure';
 import {Color4} from '../../color/Color4';
 
 /**
  * 三角形定义。
  */
-export class Triangle extends Geometry implements IGeometry {
+export class Triangle extends Geometry {
     /** 颜色集合 */
     private readonly _colors: Color4[] = [];
-    
+
     /**
      * 构造
      * @param {Vector3[]} points
@@ -27,8 +26,8 @@ export class Triangle extends Geometry implements IGeometry {
             this._colors = [];
         }
     }
-    
-    
+
+
     /**
      * 获取顶点数据。
      * @return {VertexStructure}

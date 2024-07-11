@@ -4,7 +4,7 @@ import {GLShaderConstants} from '../../../webgl/GLShaderConstants';
 import {GLRenderHelper} from '../../../webgl/GLRenderHelper';
 import {Vector3} from '../../../common/math/vector/Vector3';
 import {IGLAttribute} from '../../../webgl/attribute/IGLAttribute';
-import {IGeometry} from '../../../common/geometry/IGeometry';
+import {Geometry} from "../../../common/geometry/Geometry";
 
 /**
  * 六角形应用。
@@ -14,7 +14,7 @@ export class SixPointStarApplication extends WebGL2Application {
     private _starCount = 6;
     /** 每个六角星z轴间距 */
     private readonly _depth: number = 0.3;
-    
+
     /**
      * 构造
      */
@@ -24,7 +24,7 @@ export class SixPointStarApplication extends WebGL2Application {
         this.createStars();
         GLRenderHelper.setDefaultState(this.webglContext);
     }
-    
+
     /**
      * 渲染。
      */
@@ -32,7 +32,7 @@ export class SixPointStarApplication extends WebGL2Application {
         GLRenderHelper.clearBuffer(this.webglContext);
         this.renderStars();
     }
-    
+
     /**
      * 渲染六角星列表。
      * @private
@@ -45,7 +45,7 @@ export class SixPointStarApplication extends WebGL2Application {
         this.vertexBuffers.forEach((buffers, star) => this.renderStar(star, buffers));
         this.worldMatrixStack.popMatrix();
     }
-    
+
     /**
      * 创建六角星渲染参数。
      * @private
@@ -56,14 +56,14 @@ export class SixPointStarApplication extends WebGL2Application {
             this.createBuffers(star);
         }
     }
-    
+
     /**
      * 渲染六角星
      * @private
      * @param star
      * @param buffers
      */
-    private renderStar(star: IGeometry, buffers: Map<IGLAttribute, WebGLBuffer>): void {
+    private renderStar(star: Geometry, buffers: Map<IGLAttribute, WebGLBuffer>): void {
         this.program.bind();
         this.program.loadSampler();
         //将总变换矩阵送入渲染管线

@@ -1,5 +1,4 @@
 import {Geometry} from '../Geometry';
-import {IGeometry} from '../IGeometry';
 import {VertexStructure} from '../VertexStructure';
 import {Color4} from '../../color/Color4';
 import {Vector3} from '../../math/vector/Vector3';
@@ -7,12 +6,12 @@ import {Vector3} from '../../math/vector/Vector3';
 /**
  * 色彩矩形。
  */
-export class ColorRect extends Geometry implements IGeometry {
+export class ColorRect extends Geometry {
     /** 一半尺寸 */
     private readonly _halfSize: number = 1;
     /** 颜色集合 */
     private readonly _colors: Color4[] = [];
-    
+
     /**
      * 构造
      * @param {number} size
@@ -24,7 +23,7 @@ export class ColorRect extends Geometry implements IGeometry {
         this._colors = colors;
         this.init();
     }
-    
+
     /**
      * 初始化
      * @private
@@ -39,7 +38,7 @@ export class ColorRect extends Geometry implements IGeometry {
             new Vector3([this._halfSize, this._halfSize, 0])
         ];
     }
-    
+
     /**
      * 获取顶点数据。
      * @return {VertexStructure}

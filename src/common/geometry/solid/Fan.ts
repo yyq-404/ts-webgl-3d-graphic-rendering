@@ -1,19 +1,18 @@
 import {Vector3} from '../../math/vector/Vector3';
 import {Color4} from '../../color/Color4';
 import {Geometry} from '../Geometry';
-import {IGeometry} from '../IGeometry';
 import {VertexStructure} from '../VertexStructure';
 import {MathHelper} from '../../math/MathHelper';
 
 /**
  * 扇形
  */
-export class Fan extends Geometry implements IGeometry {
+export class Fan extends Geometry {
     /** 步进次数 */
     private readonly _steps: number = 10;
     /** 步进角度 */
     private readonly _stepAngle: number = 36;
-    
+
     /**
      * 构造
      */
@@ -23,7 +22,7 @@ export class Fan extends Geometry implements IGeometry {
         this._stepAngle = 360 / this._steps;
         this.init();
     }
-    
+
     /**
      * 初始化
      * @private
@@ -37,7 +36,7 @@ export class Fan extends Geometry implements IGeometry {
             this._points.push(new Vector3([0.5 * Math.sin(radian), 0.5 * Math.cos(radian), 0]));
         }
     }
-    
+
     // /**
     //  * 顶点位置数据。
     //  * @return {number[]}
@@ -68,7 +67,7 @@ export class Fan extends Geometry implements IGeometry {
     // public vertexCount(): number {
     //     return this._points.length;
     // }
-    
+
     /**
      * 获取顶点数据。
      * @return {VertexStructure}

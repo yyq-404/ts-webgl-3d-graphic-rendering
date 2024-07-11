@@ -2,12 +2,11 @@ import {Vector3} from '../../math/vector/Vector3';
 import {Vector2} from '../../math/vector/Vector2';
 import {VertexStructure} from '../VertexStructure';
 import {Geometry} from '../Geometry';
-import {IGeometry} from '../IGeometry';
 
 /**
  * 立方体定义
  */
-export class Cube extends Geometry implements IGeometry {
+export class Cube extends Geometry {
     /** 半宽 */
     public halfWidth: number;
     /** 半高 */
@@ -16,7 +15,7 @@ export class Cube extends Geometry implements IGeometry {
     public halfDepth: number;
     /** 表面集合 */
     protected readonly _surfaces: Vector3[][];
-    
+
     /**
      * ```plaintext
      *    /3--------/7
@@ -37,7 +36,7 @@ export class Cube extends Geometry implements IGeometry {
         this._points = this.createPoints();
         this._surfaces = this.createSurfaces();
     }
-    
+
     /**
      * 获取表面集合。
      * @return {Vector3[][]}
@@ -45,7 +44,7 @@ export class Cube extends Geometry implements IGeometry {
     public get surfaces(): Vector3[][] {
         return this._surfaces;
     }
-    
+
     /**
      * 创建点集。
      * @return {Vector3[]}
@@ -62,7 +61,7 @@ export class Cube extends Geometry implements IGeometry {
             new Vector3([this.halfWidth, this.halfHeight, -this.halfDepth])    // 7
         ];
     }
-    
+
     /**
      * 创建uv坐标
      * @return {Vector2[]}
@@ -80,7 +79,7 @@ export class Cube extends Geometry implements IGeometry {
             new Vector2([1, 1])  // 7
         ];
     }
-    
+
     /**
      * 创建表面集合。
      * @return {Vector3[][]}
@@ -96,7 +95,7 @@ export class Cube extends Geometry implements IGeometry {
             [this._points[0], this._points[2], this._points[6], this._points[4]]  // 下面
         ];
     }
-    
+
     /**
      * 获取顶点数据。
      */
