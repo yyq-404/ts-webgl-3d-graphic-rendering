@@ -442,14 +442,7 @@ export class CameraComponent {
      * @param intervalSec
      */
     public update(intervalSec: number): void {
-        // 使用Matrix4的perspective静态方法计算透视投影矩阵
-        if (this._observationType == ECameraObservationType.ORTHOGRAPHIC) {
-            const top = this.near * Math.tan(this.fovY * Math.PI / 360.0);
-            const right = top * this.aspectRatio;
-            this._projectionMatrix = Matrix4.orthographic(-right, right, -top, top, this.near, this.far);
-        } else {
-            this._projectionMatrix = Matrix4.perspective(this.fovY, this.aspectRatio, this.near, this.far);
-        }
+        // 计算投影矩阵
         this.projectionMatrix = this.computeProjectionMatrix();
         // 计算视图矩阵
         this.viewMatrix = this.computeViewMatrix();
@@ -474,12 +467,13 @@ export class CameraComponent {
             // 默认计算透视投影。
             case ECameraObservationType.PERSPECTIVE:
             default:
+                // 使用Matrix4的perspective静态方法计算透视投影矩阵
                 return Matrix4.perspective(this.fovY, this.aspectRatio, this.near, this.far);
         }
     }
     
     /**
-     * 计算视口矩阵
+     * 计算视图矩阵
      */
     private computeViewMatrix(): Matrix4 {
         this.zAxis.normalize();
