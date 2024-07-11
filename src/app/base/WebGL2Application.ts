@@ -30,10 +30,10 @@ export class WebGL2Application extends BaseApplication {
     /** 鼠标移动事件 */
     protected readonly mouseMoveEvent: CanvasMouseMoveEvent;
     /** shader路径集合 */
-    private readonly _shaderUrls: Map<string, string> = new Map<string, string>([
-        ['bns.vert', `${AppConstants.webgl2ShaderRoot}/bns.vert`],
-        ['bns.frag', `${AppConstants.webgl2ShaderRoot}/bns.frag`]
-    ]);
+    // private readonly _shaderUrls: Map<string, string> = new Map<string, string>([
+    //     ['bns.vert', `${AppConstants.webgl2ShaderRoot}/bns.vert`],
+    //     ['bns.frag', `${AppConstants.webgl2ShaderRoot}/bns.frag`]
+    // ]);
     
     /**
      * 构造
@@ -51,6 +51,17 @@ export class WebGL2Application extends BaseApplication {
         if (optionMouseMove) {
             this.mouseMoveEvent = new CanvasMouseMoveEvent(this.canvas);
         }
+    }
+    
+    /**
+     * 获取shader路径集合。
+     * @return {Map<string, string>}
+     */
+    public get shaderUrls(): Map<string, string> {
+        return new Map<string, string>([
+            ['bns.vert', `${AppConstants.webgl2ShaderRoot}/bns.vert`],
+            ['bns.frag', `${AppConstants.webgl2ShaderRoot}/bns.frag`]
+        ]);
     }
     
     /**
@@ -82,9 +93,9 @@ export class WebGL2Application extends BaseApplication {
      */
     protected async initAsync(): Promise<void> {
         // 加载颜色顶点着色器代码
-        let vertexShaderSource = await this.loadShaderSourceAsync(this._shaderUrls, 'bns.vert');
+        let vertexShaderSource = await this.loadShaderSourceAsync(this.shaderUrls, 'bns.vert');
         // 加载颜色片元着色器代码
-        let fragShaderSource = await this.loadShaderSourceAsync(this._shaderUrls, 'bns.frag');
+        let fragShaderSource = await this.loadShaderSourceAsync(this.shaderUrls, 'bns.frag');
         let program = this.program = GLProgram.createDefaultProgram(this.webglContext, vertexShaderSource, fragShaderSource);
         //创建颜色Program
         GLProgramCache.instance.set('color', program);
