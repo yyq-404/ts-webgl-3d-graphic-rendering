@@ -4,7 +4,6 @@ import {Vector3} from '../../../common/math/vector/Vector3';
 import {ColorCube} from '../../../common/geometry/solid/ColorCube';
 import {CanvasKeyboardEventManager} from '../../../event/keyboard/CanvasKeyboardEventManager';
 import {ECanvasKeyboardEventType} from '../../../enum/ECanvasKeyboardEventType';
-import {CanvasMouseMoveEvent} from '../../../event/mouse/CanvasMouseMoveEvent';
 import {CanvasMouseEventManager} from '../../../event/mouse/CanvasEventEventManager';
 
 /**
@@ -15,18 +14,15 @@ export class TransformCubeApplication extends WebGL2Application {
     private _cube: ColorCube = new ColorCube(0.3, 0.3, 0.3);
     /** 矩阵变换类型 */
     private _transformType: string = '';
-    /** 鼠标移动事件 */
-    private readonly _mouseMoveEvent: CanvasMouseMoveEvent;
     
     /**
      * 构造
      */
     public constructor() {
-        super();
+        super(true);
         this.camera.z = 4;
         this.createBuffers(this._cube);
         GLRenderHelper.setDefaultState(this.webglContext);
-        this._mouseMoveEvent = new CanvasMouseMoveEvent(this.canvas);
         CanvasKeyboardEventManager.instance.registers(this, [
             {type: ECanvasKeyboardEventType.KEY_PRESS, key: '1', callback: () => this._transformType = 'translation'},
             {type: ECanvasKeyboardEventType.KEY_PRESS, key: '2', callback: () => this._transformType = 'rotation'},
@@ -40,15 +36,6 @@ export class TransformCubeApplication extends WebGL2Application {
     public override render(): void {
         GLRenderHelper.clearBuffer(this.webglContext);
         this.renderCubes();
-    }
-    
-    /**
-     * 处理鼠标事件。
-     * @param {MouseEvent} event
-     * @protected
-     */
-    protected override onMouseEvent(event: MouseEvent): void {
-        CanvasMouseEventManager.instance.dispatch(this._mouseMoveEvent, event);
     }
     
     /**
@@ -70,8 +57,8 @@ export class TransformCubeApplication extends WebGL2Application {
         this.begin();
         let pos = index % 2 == 0 ? new Vector3([-0.5 * (index % 2 + 1), 0.0, 0.0]) : new Vector3([0.5 * (index % 2 + 1), 0.0, 0.0]);
         this.worldMatrixStack.translate(pos);
-        this.worldMatrixStack.rotate(this._mouseMoveEvent.currentXAngle, Vector3.right);
-        this.worldMatrixStack.rotate(this._mouseMoveEvent.currentYAngle, Vector3.up);
+        this.worldMatrixStack.rotate(this.mouseMoveEvent.currentXAngle, Vector3.right);
+        this.worldMatrixStack.rotate(this.mouseMoveEvent.currentYAngle, Vector3.up);
         if (index % 2) {
             this.onTransform();
         }

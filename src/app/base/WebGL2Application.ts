@@ -10,6 +10,8 @@ import {GLShaderConstants} from '../../webgl/GLShaderConstants';
 import {GLAttributeHelper} from '../../webgl/GLAttributeHelper';
 import {IGeometry} from '../../common/geometry/IGeometry';
 import {GLAttributeBits} from '../../webgl/common/GLTypes';
+import {CanvasMouseMoveEvent} from '../../event/mouse/CanvasMouseMoveEvent';
+import {CanvasMouseEventManager} from '../../event/mouse/CanvasEventEventManager';
 
 /**
  * WebGL应用。
@@ -23,19 +25,22 @@ export class WebGL2Application extends BaseApplication {
     protected program: GLProgram;
     /** 顶点缓冲集合 */
     protected vertexBuffers: Map<IGeometry, Map<IGLAttribute, WebGLBuffer>> = new Map<IGeometry, Map<IGLAttribute, WebGLBuffer>>();
+    /** 属性集合 */
+    protected attributeBits: GLAttributeBits = GLAttributeHelper.POSITION.BIT | GLAttributeHelper.COLOR.BIT;
+    /** 鼠标移动事件 */
+    protected readonly mouseMoveEvent: CanvasMouseMoveEvent;
     /** shader路径集合 */
     private readonly _shaderUrls: Map<string, string> = new Map<string, string>([
         ['bns.vert', `${AppConstants.webgl2ShaderRoot}/bns.vert`],
         ['bns.frag', `${AppConstants.webgl2ShaderRoot}/bns.frag`]
     ]);
-    /** 属性集合 */
-    protected attributeBits: GLAttributeBits = GLAttributeHelper.POSITION.BIT | GLAttributeHelper.COLOR.BIT;
     
     /**
      * 构造
+     * @param optionMouseMove
      * @param contextAttributes
      */
-    public constructor(contextAttributes: WebGLContextAttributes = {antialias: true, premultipliedAlpha: false}) {
+    public constructor(optionMouseMove = false, contextAttributes: WebGLContextAttributes = {antialias: true, premultipliedAlpha: false}) {
         super();
         this.webglContext = this.canvas.getContext('webgl2', contextAttributes);
         if (!this.webglContext) {
@@ -43,6 +48,9 @@ export class WebGL2Application extends BaseApplication {
             throw new Error(' 无法创建WebGL2RenderingContext上下文对象 ');
         }
         this.worldMatrixStack = new GLMatrixStack();
+        if (optionMouseMove) {
+            this.mouseMoveEvent = new CanvasMouseMoveEvent(this.canvas);
+        }
     }
     
     /**
@@ -80,6 +88,17 @@ export class WebGL2Application extends BaseApplication {
         let program = this.program = GLProgram.createDefaultProgram(this.webglContext, vertexShaderSource, fragShaderSource);
         //创建颜色Program
         GLProgramCache.instance.set('color', program);
+    }
+    
+    /**
+     * 处理鼠标事件。
+     * @param {MouseEvent} event
+     * @protected
+     */
+    protected override onMouseEvent(event: MouseEvent): void {
+        if (this.mouseMoveEvent) {
+            CanvasMouseEventManager.instance.dispatch(this.mouseMoveEvent, event);
+        }
     }
     
     /**

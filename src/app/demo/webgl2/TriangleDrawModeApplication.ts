@@ -19,8 +19,6 @@ export class TriangleDrawModeApplication extends WebGL2Application {
     ];
     /** 扇形和条形 */
     private _solids: IGeometry[] = [new Belt(), new Fan()];
-    /** 鼠标移动事件 */
-    private readonly _mouseMoveEvent: CanvasMouseMoveEvent;
     /** 挡墙绘制方式 */
     private _currentDrawMethod: () => void;
     
@@ -28,8 +26,7 @@ export class TriangleDrawModeApplication extends WebGL2Application {
      * 构造。
      */
     public constructor() {
-        super();
-        this._mouseMoveEvent = new CanvasMouseMoveEvent(this.canvas);
+        super(true);
         this._solids.forEach(solid => this.createBuffers(solid));
         this._belts.forEach(belt => this.createBuffers(belt));
         CanvasKeyboardEventManager.instance.registers(this, [
@@ -47,16 +44,6 @@ export class TriangleDrawModeApplication extends WebGL2Application {
     }
     
     /**
-     * 处理鼠标事件。
-     * @param {MouseEvent} event
-     * @protected
-     */
-    protected override onMouseEvent(event: MouseEvent): void {
-        CanvasMouseEventManager.instance.dispatch(this._mouseMoveEvent, event);
-    }
-    
-    
-    /**
      * 绘制条形和扇形
      * @private
      */
@@ -64,8 +51,8 @@ export class TriangleDrawModeApplication extends WebGL2Application {
         this._solids.forEach((solid, index) => {
             this.begin();
             this.worldMatrixStack.translate(new Vector3([(solid instanceof Belt) ? -0.8 : 0.8, 0.0, 0.0]));
-            this.worldMatrixStack.rotate(this._mouseMoveEvent.currentXAngle, Vector3.right);
-            this.worldMatrixStack.rotate(this._mouseMoveEvent.currentYAngle, Vector3.up);
+            this.worldMatrixStack.rotate(this.mouseMoveEvent.currentXAngle, Vector3.right);
+            this.worldMatrixStack.rotate(this.mouseMoveEvent.currentYAngle, Vector3.up);
             this.drawArrays(solid, (solid instanceof Belt) ? this.webglContext.TRIANGLE_STRIP : this.webglContext.TRIANGLE_FAN);
             this.end();
         });
@@ -78,8 +65,8 @@ export class TriangleDrawModeApplication extends WebGL2Application {
     private drawBelts(): void {
         this._belts.forEach((belt, index) => {
             this.begin();
-            this.worldMatrixStack.rotate(this._mouseMoveEvent.currentXAngle, Vector3.right);
-            this.worldMatrixStack.rotate(this._mouseMoveEvent.currentYAngle, Vector3.up);
+            this.worldMatrixStack.rotate(this.mouseMoveEvent.currentXAngle, Vector3.right);
+            this.worldMatrixStack.rotate(this.mouseMoveEvent.currentYAngle, Vector3.up);
             //将总变换矩阵送入渲染管线
             this.drawArrays(belt, this.webglContext.TRIANGLE_STRIP);
             this.end();

@@ -3,8 +3,6 @@ import {SixPointedStar} from '../../../common/geometry/solid/SixPointedStar';
 import {GLShaderConstants} from '../../../webgl/GLShaderConstants';
 import {GLRenderHelper} from '../../../webgl/GLRenderHelper';
 import {Vector3} from '../../../common/math/vector/Vector3';
-import {CanvasMouseMoveEvent} from '../../../event/mouse/CanvasMouseMoveEvent';
-import {CanvasMouseEventManager} from '../../../event/mouse/CanvasEventEventManager';
 import {IGLAttribute} from '../../../webgl/attribute/IGLAttribute';
 import {IGeometry} from '../../../common/geometry/IGeometry';
 
@@ -16,18 +14,15 @@ export class SixPointStarApplication extends WebGL2Application {
     private _starCount = 6;
     /** 每个六角星z轴间距 */
     private readonly _depth: number = 0.3;
-    /** 鼠标移动事件 */
-    private readonly _mouseMoveEvent: CanvasMouseMoveEvent;
     
     /**
      * 构造
      */
     public constructor() {
-        super();
+        super(true);
         this.camera.z = 4;
         this.createStars();
         GLRenderHelper.setDefaultState(this.webglContext);
-        this._mouseMoveEvent = new CanvasMouseMoveEvent(this.canvas);
     }
     
     /**
@@ -39,26 +34,15 @@ export class SixPointStarApplication extends WebGL2Application {
     }
     
     /**
-     * 处理鼠标事件。
-     * @param {MouseEvent} event
-     * @protected
-     */
-    protected override onMouseEvent(event: MouseEvent): void {
-        CanvasMouseEventManager.instance.dispatch(this._mouseMoveEvent, event);
-    }
-    
-    /**
      * 渲染六角星列表。
      * @private
      */
     private renderStars() {
         this.worldMatrixStack.pushMatrix();
         //执行旋转,即按哪个轴旋转
-        this.worldMatrixStack.rotate(this._mouseMoveEvent.currentYAngle, Vector3.up);
-        this.worldMatrixStack.rotate(this._mouseMoveEvent.currentXAngle, Vector3.right);
-        this.vertexBuffers.forEach((buffers, star) => {
-            this.renderStar(star, buffers);
-        });
+        this.worldMatrixStack.rotate(this.mouseMoveEvent.currentYAngle, Vector3.up);
+        this.worldMatrixStack.rotate(this.mouseMoveEvent.currentXAngle, Vector3.right);
+        this.vertexBuffers.forEach((buffers, star) => this.renderStar(star, buffers));
         this.worldMatrixStack.popMatrix();
     }
     
