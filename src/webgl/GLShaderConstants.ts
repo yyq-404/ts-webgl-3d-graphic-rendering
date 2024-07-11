@@ -5,7 +5,7 @@ export class GLShaderConstants {
     /** 模型视图矩阵 */
     public static readonly MVMatrix: string = 'uMVMatrix';
     /** 模型矩阵 */
-    public static readonly ModelMatrix: string = 'uModelMatrix';
+    public static readonly MMatrix: string = 'uMMatrix';
     /** 视矩阵 */
     public static readonly ViewMatrix: string = 'uViewMatrix';
     /** 投影矩阵 */

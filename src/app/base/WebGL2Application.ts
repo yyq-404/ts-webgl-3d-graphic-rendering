@@ -173,6 +173,8 @@ export class WebGL2Application extends BaseApplication {
     protected drawArrays(solid: IGeometry, mode: GLint, first: number = 0): void {
         const buffers = this.vertexBuffers.get(solid);
         if (!buffers) return;
+        //将位置、旋转变换矩阵传入shader程序
+        this.program.setMatrix4(GLShaderConstants.MMatrix, this.worldMatrixStack.worldMatrix());
         //将总变换矩阵送入渲染管线
         this.program.setMatrix4(GLShaderConstants.MVPMatrix, this.mvpMatrix());
         for (const entity of buffers.entries()) {
