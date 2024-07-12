@@ -6,7 +6,6 @@ import {ECameraObservationType} from '../../../enum/ECameraObservationType';
 import {CanvasKeyboardEventManager} from '../../../event/keyboard/CanvasKeyboardEventManager';
 import {ECanvasKeyboardEventType} from '../../../enum/ECanvasKeyboardEventType';
 import {AppConstants} from '../../AppConstants';
-import {GLShaderConstants} from '../../../webgl/GLShaderConstants';
 
 /**
  * 相机视角应用。
@@ -114,7 +113,7 @@ export class CameraViewApplication extends WebGL2Application {
         if (!buffers) return;
         this.program.bind();
         this.program.loadSampler();
-        this.drawArrays(this._rect, this.webglContext.TRIANGLE_FAN)
+        this.drawArrays(this._rect, this.webglContext.TRIANGLE_FAN);
         this.program.unbind();
     }
 }
