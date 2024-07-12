@@ -6,7 +6,7 @@ import {ECanvasKeyboardEventType} from '../../../enum/ECanvasKeyboardEventType';
 import {Triangle} from '../../../common/geometry/solid/Triangle';
 
 /**
- * 相机视角应用。
+ * 背面裁剪应用。
  */
 export class CullFaceApplication extends WebGL2Application {
     /** 矩形 */
