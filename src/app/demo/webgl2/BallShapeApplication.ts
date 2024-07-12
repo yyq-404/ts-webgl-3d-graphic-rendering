@@ -20,6 +20,7 @@ export class BallShapeApplication extends WebGL2Application {
         super(true);
         this.attributeBits = GLAttributeHelper.POSITION.BIT;
         this.createBuffers(this._ball);
+        this.createAmbientSliderBar();
         GLRenderHelper.setDefaultState(this.webglContext);
     }
     
@@ -63,5 +64,26 @@ export class BallShapeApplication extends WebGL2Application {
         this.webglContext.drawArrays(this.webglContext.TRIANGLES, 0, this._ball.vertex.count);
         this.worldMatrixStack.popMatrix();
         this.program.unbind();
+    }
+    
+    /**
+     * 环境光滑动条。
+     * @private
+     */
+    private createAmbientSliderBar(): void {
+        const br = document.createElement('br');
+        this.canvas.parentElement.appendChild(br);
+        const label = document.createElement('b');
+        label.textContent = '请调整拖拉条的位置改变光照位置：';
+        // label.style.marginTop = this.canvas.height + '10';
+        this.canvas.parentElement.appendChild(label);
+        const input: HTMLInputElement = document.createElement('input');
+        input.id = 'ambient-input';
+        input.type = 'range';
+        input.style.width = '500px';
+        input.style.marginTop = this.canvas.height + 'px';
+        input.max = '20';
+        input.min = '-20';
+        this.canvas.parentElement.appendChild(input);
     }
 }

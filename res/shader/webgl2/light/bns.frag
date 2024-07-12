@@ -2,10 +2,10 @@
 
 precision mediump float;
 uniform float uR;
-//接收从顶点着色器过来的参数
-in vec2 mcLongLat;
 //接收从顶点着色器过来的顶点位置
 in vec3 vPosition;
+//接受从顶点位置传过来的环境光强度
+in vec4 vAmbient;
 //输出的片元颜色
 out vec4 fragColor;
 
@@ -31,6 +31,8 @@ void main()
         //偶数时为白色
         color = vec3(1.0, 1.0, 1.0);//白色
     }
-    //将计算出的颜色传递给管线
-    fragColor = vec4(color, 1);
+    //计算最终颜色。
+    vec4 finalColr = vec4(color, 1.0);
+    //根据环境光强度计算最终片元颜色值
+    fragColor = finalColr * vAmbient;
 }
