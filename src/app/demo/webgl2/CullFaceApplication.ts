@@ -24,7 +24,7 @@ export class CullFaceApplication extends WebGL2Application {
      */
     public constructor() {
         super(true);
-        this._triangles.forEach(triangle => this.createBuffers(triangle));
+        this.createBuffers(...this._triangles);
         CanvasKeyboardEventManager.instance.registers(this, [
             {type: ECanvasKeyboardEventType.KEY_PRESS, key: '1', callback: () => this._optionCullFace = !this._optionCullFace},
             {type: ECanvasKeyboardEventType.KEY_PRESS, key: '2', callback: () => this._optionCW = !this._optionCW}

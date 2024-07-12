@@ -57,8 +57,8 @@ export class WebGL2Application extends BaseApplication {
      */
     public get shaderUrls(): Map<string, string> {
         return new Map<string, string>([
-            ['bns.vert', `${AppConstants.webgl2ShaderRoot}/bns.vert`],
-            ['bns.frag', `${AppConstants.webgl2ShaderRoot}/bns.frag`]
+            ['bns.vert', `${AppConstants.webgl2ShaderRoot}/basic/bns.vert`],
+            ['bns.frag', `${AppConstants.webgl2ShaderRoot}/basic/bns.frag`]
         ]);
     }
     
