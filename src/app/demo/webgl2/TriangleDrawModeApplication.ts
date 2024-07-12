@@ -4,7 +4,7 @@ import {Fan} from '../../../common/geometry/solid/Fan';
 import {Vector3} from '../../../common/math/vector/Vector3';
 import {CanvasKeyboardEventManager} from '../../../event/keyboard/CanvasKeyboardEventManager';
 import {ECanvasKeyboardEventType} from '../../../enum/ECanvasKeyboardEventType';
-import {Geometry} from "../../../common/geometry/Geometry";
+import {Geometry} from '../../../common/geometry/Geometry';
 
 /**
  * 三角形绘制模式应用。
@@ -19,28 +19,28 @@ export class TriangleDrawModeApplication extends WebGL2Application {
     private _solids: Geometry[] = [new Belt(), new Fan()];
     /** 挡墙绘制方式 */
     private _currentDrawMethod: () => void;
-
+    
     /**
      * 构造。
      */
     public constructor() {
         super(true);
-        this._solids.forEach(solid => this.createBuffers(solid));
-        this._belts.forEach(belt => this.createBuffers(belt));
+        this.createBuffers(...this._solids);
+        this.createBuffers(...this._belts);
         CanvasKeyboardEventManager.instance.registers(this, [
             {type: ECanvasKeyboardEventType.KEY_PRESS, key: '1', callback: () => this._currentDrawMethod = this.drawSolids},
             {type: ECanvasKeyboardEventType.KEY_PRESS, key: '2', callback: () => this._currentDrawMethod = this.drawBelts}
         ]);
         this._currentDrawMethod = this.drawSolids;
     }
-
+    
     /**
      * 渲染。
      */
     public override render(): void {
         this._currentDrawMethod();
     }
-
+    
     /**
      * 绘制条形和扇形
      * @private
@@ -55,7 +55,7 @@ export class TriangleDrawModeApplication extends WebGL2Application {
             this.end();
         });
     }
-
+    
     /**
      * 绘制条形集合。
      * @private

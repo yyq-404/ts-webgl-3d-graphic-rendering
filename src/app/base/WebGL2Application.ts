@@ -11,7 +11,7 @@ import {GLAttributeHelper} from '../../webgl/GLAttributeHelper';
 import {GLAttributeBits} from '../../webgl/common/GLTypes';
 import {CanvasMouseMoveEvent} from '../../event/mouse/CanvasMouseMoveEvent';
 import {CanvasMouseEventManager} from '../../event/mouse/CanvasEventEventManager';
-import {Geometry} from "../../common/geometry/Geometry";
+import {Geometry} from '../../common/geometry/Geometry';
 
 /**
  * WebGL应用。
@@ -29,7 +29,7 @@ export class WebGL2Application extends BaseApplication {
     protected attributeBits: GLAttributeBits = GLAttributeHelper.POSITION.BIT | GLAttributeHelper.COLOR.BIT;
     /** 鼠标移动事件 */
     protected readonly mouseMoveEvent: CanvasMouseMoveEvent;
-
+    
     /**
      * 构造
      * @param optionMouseMove
@@ -50,7 +50,7 @@ export class WebGL2Application extends BaseApplication {
             this.mouseMoveEvent = new CanvasMouseMoveEvent(this.canvas);
         }
     }
-
+    
     /**
      * 获取shader路径集合。
      * @return {Map<string, string>}
@@ -61,7 +61,7 @@ export class WebGL2Application extends BaseApplication {
             ['bns.frag', `${AppConstants.webgl2ShaderRoot}/bns.frag`]
         ]);
     }
-
+    
     /**
      * 运行。
      * @return {Promise<void>}
@@ -70,7 +70,7 @@ export class WebGL2Application extends BaseApplication {
         await this.initAsync();
         this.start();
     }
-
+    
     /**
      * 释放d
      */
@@ -83,7 +83,7 @@ export class WebGL2Application extends BaseApplication {
         }
         super.dispose();
     }
-
+    
     /**
      * 初始化
      * @return {Promise<void>}
@@ -98,7 +98,7 @@ export class WebGL2Application extends BaseApplication {
         //创建颜色Program
         GLProgramCache.instance.set('color', program);
     }
-
+    
     /**
      * 处理鼠标事件。
      * @param {MouseEvent} event
@@ -109,7 +109,7 @@ export class WebGL2Application extends BaseApplication {
             CanvasMouseEventManager.instance.dispatch(this.mouseMoveEvent, event);
         }
     }
-
+    
     /**
      * 获取最终变换矩阵。
      * @return {Matrix4}
@@ -118,26 +118,28 @@ export class WebGL2Application extends BaseApplication {
     protected mvpMatrix(): Matrix4 {
         return Matrix4.product(this.camera.viewProjectionMatrix, this.worldMatrixStack.modelViewMatrix);
     }
-
+    
     /**
      * 创建缓冲集合。
-     * @param {IGeometry} solid
      * @protected
+     * @param solids
      */
-    protected createBuffers(solid: Geometry): void {
-        let buffers = this.vertexBuffers.get(solid);
-        if (!buffers) {
-            buffers = new Map<IGLAttribute, WebGLBuffer>();
-            this.vertexBuffers.set(solid, buffers);
-        }
-        if (GLAttributeHelper.hasAttribute(this.attributeBits, GLAttributeHelper.POSITION.BIT)) {
-            buffers.set(GLAttributeHelper.POSITION, this.bindBuffer(solid.vertex.positionArray));
-        }
-        if (GLAttributeHelper.hasAttribute(this.attributeBits, GLAttributeHelper.COLOR.BIT)) {
-            buffers.set(GLAttributeHelper.COLOR, this.bindBuffer(solid.vertex.colorArray));
-        }
+    protected createBuffers(...solids: Geometry[]): void {
+        solids.forEach(solid => {
+            let buffers = this.vertexBuffers.get(solid);
+            if (!buffers) {
+                buffers = new Map<IGLAttribute, WebGLBuffer>();
+                this.vertexBuffers.set(solid, buffers);
+            }
+            if (GLAttributeHelper.hasAttribute(this.attributeBits, GLAttributeHelper.POSITION.BIT)) {
+                buffers.set(GLAttributeHelper.POSITION, this.bindBuffer(solid.vertex.positionArray));
+            }
+            if (GLAttributeHelper.hasAttribute(this.attributeBits, GLAttributeHelper.COLOR.BIT)) {
+                buffers.set(GLAttributeHelper.COLOR, this.bindBuffer(solid.vertex.colorArray));
+            }
+        });
     }
-
+    
     /**
      * 绑定缓冲。
      * @param {number[]} bufferData
@@ -150,7 +152,7 @@ export class WebGL2Application extends BaseApplication {
         this.webglContext.bufferData(this.webglContext.ARRAY_BUFFER, new Float32Array(bufferData), this.webglContext.STATIC_DRAW);
         return buffer;
     }
-
+    
     /**
      * 开始
      * @protected
@@ -160,7 +162,7 @@ export class WebGL2Application extends BaseApplication {
         this.program.bind();
         this.program.loadSampler();
     }
-
+    
     /**
      * 绘制
      * @param {IGeometry} solid
@@ -180,7 +182,7 @@ export class WebGL2Application extends BaseApplication {
         }
         this.webglContext.drawArrays(mode, first, solid.vertex.count);
     }
-
+    
     /**
      * 结束。
      * @protected
