@@ -137,6 +137,9 @@ export class WebGL2Application extends BaseApplication {
             if (GLAttributeHelper.hasAttribute(this.attributeBits, GLAttributeHelper.COLOR.BIT)) {
                 buffers.set(GLAttributeHelper.COLOR, this.bindBuffer(solid.vertex.colorArray));
             }
+            if (GLAttributeHelper.hasAttribute(this.attributeBits, GLAttributeHelper.NORMAL.BIT)) {
+                buffers.set(GLAttributeHelper.NORMAL, this.bindBuffer(solid.vertex.normalArray));
+            }
         });
     }
     
