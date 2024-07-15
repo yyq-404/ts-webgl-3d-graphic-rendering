@@ -12,6 +12,7 @@ import {CameraViewApplication} from './app/demo/webgl2/CameraViewApplication';
 import {CullFaceApplication} from './app/demo/webgl2/CullFaceApplication';
 import {AmbientApplication} from './app/demo/webgl2/AmbientApplication';
 import {DiffuseApplication} from './app/demo/webgl2/DiffuseApplication';
+import {SpecularApplication} from './app/demo/webgl2/SpecularApplication';
 
 /** 应用集合 */
 const apps = {
@@ -27,7 +28,8 @@ const apps = {
     '10: CameraView': CameraViewApplication,
     '11: CullFace': CullFaceApplication,
     '12: Ambient': AmbientApplication,
-    '13: Diffuse': DiffuseApplication
+    '13: Diffuse': DiffuseApplication,
+    '14: Specular': SpecularApplication
 };
 
 /** 当前正在运行的App */
