@@ -47,4 +47,14 @@ export class VertexStructure {
         this.colors.forEach(color => colorArray.push(...color.rgba));
         return colorArray;
     }
+    
+    /**
+     * 获取法线数组
+     * @return {number[]}
+     */
+    public get normalArray(): number[] {
+        const normalArray: number[] = [];
+        this.normals.forEach(normal => normalArray.push(...normal.xyz));
+        return normalArray;
+    }
 }

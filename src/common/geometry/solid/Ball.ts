@@ -58,6 +58,7 @@ export class Ball extends Geometry {
     public get vertex(): VertexStructure {
         let vertex = new VertexStructure();
         vertex.positions = this._points;
+        vertex.normals = this._points;
         return vertex;
     }
 }
