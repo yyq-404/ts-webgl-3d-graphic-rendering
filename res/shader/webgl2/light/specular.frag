@@ -1,11 +1,10 @@
 #version 300 es
-
 precision mediump float;
 uniform float uR;
 //接收从顶点着色器过来的顶点位置
 in vec3 vPosition;
-//接收从顶点着色器过来的散射光最终强度
-in vec4 vDiffuse;
+//接收从顶点着色器过来的镜面反射光最终强度
+in vec4 vSpecular;
 //输出的片元颜色
 out vec4 fragColor;
 
@@ -31,7 +30,7 @@ void main()
         color = vec3(1.0, 1.0, 1.0);
     }
     //最终颜色
-    vec4 finalColor = vec4(color, 1.0) * vDiffuse;
+    vec4 finalColor = vec4(color, 1.0) * vSpecular;
     //根据散射光最终强度计算片元的最终颜色值
     fragColor = vec4(finalColor.xyz, 1.0);
 }
