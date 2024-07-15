@@ -10,7 +10,7 @@ import {LineDrawModeApplication} from './app/demo/webgl2/LineDrawModeApplication
 import {TriangleDrawModeApplication} from './app/demo/webgl2/TriangleDrawModeApplication';
 import {CameraViewApplication} from './app/demo/webgl2/CameraViewApplication';
 import {CullFaceApplication} from './app/demo/webgl2/CullFaceApplication';
-import {BallShapeApplication} from './app/demo/webgl2/BallShapeApplication';
+import {AmbientApplication} from './app/demo/webgl2/AmbientApplication';
 
 /** 应用集合 */
 const apps = {
@@ -25,7 +25,7 @@ const apps = {
     '9: TriangleDrawMode': TriangleDrawModeApplication,
     '10: CameraView': CameraViewApplication,
     '11: CullFace': CullFaceApplication,
-    '12: BallShape': BallShapeApplication
+    '12: Ambient': AmbientApplication
 };
 
 /** 当前正在运行的App */

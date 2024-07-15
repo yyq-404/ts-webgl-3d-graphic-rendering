@@ -1,6 +1,7 @@
 #version 300 es
 
 precision mediump float;
+//半径
 uniform float uR;
 //接收从顶点着色器过来的顶点位置
 in vec3 vPosition;

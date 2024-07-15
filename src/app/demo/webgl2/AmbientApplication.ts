@@ -5,13 +5,17 @@ import {GLShaderConstants} from '../../../webgl/GLShaderConstants';
 import {AppConstants} from '../../AppConstants';
 import {GLAttributeHelper} from '../../../webgl/GLAttributeHelper';
 import {GLRenderHelper} from '../../../webgl/GLRenderHelper';
+import {CanvasKeyboardEventManager} from '../../../event/keyboard/CanvasKeyboardEventManager';
+import {ECanvasKeyboardEventType} from '../../../enum/ECanvasKeyboardEventType';
 
 /**
- * 球体切割应用。
+ * 环境光应用。
  */
-export class BallShapeApplication extends WebGL2Application {
+export class AmbientApplication extends WebGL2Application {
     /** 球体 */
     private _ball: Ball = new Ball();
+    /** 环境光强度 */
+    private _ambient: number = 1;
     
     /**
      * 构造。
@@ -20,8 +24,24 @@ export class BallShapeApplication extends WebGL2Application {
         super(true);
         this.attributeBits = GLAttributeHelper.POSITION.BIT;
         this.createBuffers(this._ball);
-        this.createAmbientSliderBar();
+        // this.createAmbientSliderBar();
         GLRenderHelper.setDefaultState(this.webglContext);
+        CanvasKeyboardEventManager.instance.registers(this, [
+            {
+                type: ECanvasKeyboardEventType.KEY_PRESS, key: '+', callback: () => {
+                    if (this._ambient < 1.0) {
+                        this._ambient += 0.1;
+                    }
+                }
+            },
+            {
+                type: ECanvasKeyboardEventType.KEY_PRESS, key: '-', callback: () => {
+                    if (this._ambient >= 0.1) {
+                        this._ambient -= 0.1;
+                    }
+                }
+            }
+        ]);
     }
     
     /**
@@ -30,8 +50,8 @@ export class BallShapeApplication extends WebGL2Application {
      */
     public override get shaderUrls(): Map<string, string> {
         return new Map<string, string>([
-            ['bns.vert', `${AppConstants.webgl2ShaderRoot}/light/bns.vert`],
-            ['bns.frag', `${AppConstants.webgl2ShaderRoot}/light/bns.frag`]
+            ['bns.vert', `${AppConstants.webgl2ShaderRoot}/light/ambient.vert`],
+            ['bns.frag', `${AppConstants.webgl2ShaderRoot}/light/ambient.frag`]
         ]);
     }
     
@@ -61,29 +81,30 @@ export class BallShapeApplication extends WebGL2Application {
             this.program.setVertexAttribute(entity[0].NAME, entity[1], entity[0].COMPONENT);
         }
         this.program.setFloat('uR', this._ball.r);
+        this.program.setVector3('aAmbient', new Vector3([this._ambient, this._ambient, this._ambient]));
         this.webglContext.drawArrays(this.webglContext.TRIANGLES, 0, this._ball.vertex.count);
         this.worldMatrixStack.popMatrix();
         this.program.unbind();
     }
     
-    /**
-     * 环境光滑动条。
-     * @private
-     */
-    private createAmbientSliderBar(): void {
-        const br = document.createElement('br');
-        this.canvas.parentElement.appendChild(br);
-        const label = document.createElement('b');
-        label.textContent = '请调整拖拉条的位置改变光照位置：';
-        // label.style.marginTop = this.canvas.height + '10';
-        this.canvas.parentElement.appendChild(label);
-        const input: HTMLInputElement = document.createElement('input');
-        input.id = 'ambient-input';
-        input.type = 'range';
-        input.style.width = '500px';
-        input.style.marginTop = this.canvas.height + 'px';
-        input.max = '20';
-        input.min = '-20';
-        this.canvas.parentElement.appendChild(input);
-    }
+    // /**
+    //  * 环境光滑动条。
+    //  * @private
+    //  */
+    // private createAmbientSliderBar(): void {
+    //     const br = document.createElement('br');
+    //     this.canvas.parentElement.appendChild(br);
+    //     const label = document.createElement('b');
+    //     label.textContent = '请调整拖拉条的位置改变光照位置：';
+    //     // label.style.marginTop = this.canvas.height + '10';
+    //     this.canvas.parentElement.appendChild(label);
+    //     const input: HTMLInputElement = document.createElement('input');
+    //     input.id = 'ambient-input';
+    //     input.type = 'range';
+    //     input.style.width = '500px';
+    //     input.style.marginTop = this.canvas.height + 'px';
+    //     input.max = '20';
+    //     input.min = '-20';
+    //     this.canvas.parentElement.appendChild(input);
+    // }
 }
