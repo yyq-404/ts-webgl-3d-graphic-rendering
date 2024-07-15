@@ -11,7 +11,7 @@ export class CanvasMouseEventManager {
     /** 画布 */
     private _canvas: HTMLCanvasElement;
     /** 支持的鼠标事件类型 */
-    private _types = [ECanvasMouseEventType.MOUSE_DOWN, ECanvasMouseEventType.MOUSE_UP, ECanvasMouseEventType.MOUSE_MOVE];
+    private _types: ECanvasMouseEventType[] = [ECanvasMouseEventType.MOUSE_DOWN, ECanvasMouseEventType.MOUSE_UP, ECanvasMouseEventType.MOUSE_MOVE];
     /** 鼠标事件集合 */
     private _events: Map<any, Map<ECanvasMouseEventType, (...args: any[]) => void>> = new Map<any, Map<ECanvasMouseEventType, (...args: any[]) => void>>();
     /** 指示如何计算Y轴的坐标，由于Canvas是左手系，而webGL是右手系，需要FlipYCoordinate */

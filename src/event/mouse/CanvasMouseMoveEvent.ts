@@ -1,6 +1,6 @@
 import {CanvasMouseEvent} from './CanvasMouseEvent';
 import {Vector2} from '../../common/math/vector/Vector2';
-import {CanvasMouseEventManager} from './CanvasEventEventManager';
+import {CanvasMouseEventManager} from './CanvasMouseEventManager';
 import {ECanvasMouseEventType} from '../../enum/ECanvasMouseEventType';
 
 /**

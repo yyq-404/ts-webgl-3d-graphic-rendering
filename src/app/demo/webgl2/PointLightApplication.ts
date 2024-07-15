@@ -9,13 +9,15 @@ import {CanvasKeyboardEventManager} from '../../../event/keyboard/CanvasKeyboard
 import {ECanvasKeyboardEventType} from '../../../enum/ECanvasKeyboardEventType';
 
 /**
- * 散射光应用。
+ * 点光源应用。
  */
-export class DiffuseApplication extends WebGL2Application {
+export class PointLightApplication extends WebGL2Application {
     /** 球体 */
     private _balls: Ball[] = [new Ball(), new Ball()];
     /** 环境光强度 */
-    private _diffuseX: number = 0;
+    private _locationX: number = 0;
+    /** 当前按键 */
+    private _currentKey: string = '3';
     
     /**
      * 构造。
@@ -28,16 +30,34 @@ export class DiffuseApplication extends WebGL2Application {
         CanvasKeyboardEventManager.instance.registers(this, [
             {
                 type: ECanvasKeyboardEventType.KEY_PRESS, key: '+', callback: () => {
-                    if (this._diffuseX < 10) {
-                        this._diffuseX += 1;
+                    if (this._locationX < 10) {
+                        this._locationX += 1;
                     }
                 }
             },
             {
                 type: ECanvasKeyboardEventType.KEY_PRESS, key: '-', callback: () => {
-                    if (this._diffuseX > -10) {
-                        this._diffuseX -= 1;
+                    if (this._locationX > -10) {
+                        this._locationX -= 1;
                     }
+                }
+            },
+            {
+                type: ECanvasKeyboardEventType.KEY_PRESS, key: '1', callback: () => {
+                    this._currentKey = '1';
+                    this.runAsync.call(this);
+                }
+            },
+            {
+                type: ECanvasKeyboardEventType.KEY_PRESS, key: '2', callback: () => {
+                    this._currentKey = '2';
+                    this.runAsync.call(this);
+                }
+            },
+            {
+                type: ECanvasKeyboardEventType.KEY_PRESS, key: '3', callback: () => {
+                    this._currentKey = '3';
+                    this.runAsync.call(this);
                 }
             }
         ]);
@@ -48,10 +68,26 @@ export class DiffuseApplication extends WebGL2Application {
      * @return {Map<string, string>}
      */
     public override get shaderUrls(): Map<string, string> {
-        return new Map<string, string>([
-            ['bns.vert', `${AppConstants.webgl2ShaderRoot}/light/diffuse.vert`],
-            ['bns.frag', `${AppConstants.webgl2ShaderRoot}/light/diffuse.frag`]
-        ]);
+        const shaderUrls: Map<string, string> = new Map<string, string>();
+        switch (this._currentKey) {
+            // 散射光
+            case '1':
+                shaderUrls.set('bns.vert', `${AppConstants.webgl2ShaderRoot}/light/diffuse.vert`);
+                shaderUrls.set('bns.frag', `${AppConstants.webgl2ShaderRoot}/light/diffuse.frag`);
+                break;
+            // 镜面光
+            case '2':
+                shaderUrls.set('bns.vert', `${AppConstants.webgl2ShaderRoot}/light/specular.vert`);
+                shaderUrls.set('bns.frag', `${AppConstants.webgl2ShaderRoot}/light/specular.frag`);
+                break;
+            // 合成光
+            case '3':
+            default:
+                shaderUrls.set('bns.vert', `${AppConstants.webgl2ShaderRoot}/light/light.vert`);
+                shaderUrls.set('bns.frag', `${AppConstants.webgl2ShaderRoot}/light/light.frag`);
+                break;
+        }
+        return shaderUrls;
     }
     
     /**
@@ -77,7 +113,8 @@ export class DiffuseApplication extends WebGL2Application {
         //将总变换矩阵送入渲染管线
         this.program.setMatrix4(GLShaderConstants.MVPMatrix, this.mvpMatrix());
         this.program.setMatrix4(GLShaderConstants.MMatrix, this.worldMatrixStack.worldMatrix());
-        this.program.setVector3('uLightLocation', new Vector3([this._diffuseX, 0, 4]));
+        this.program.setVector3('uLightLocation', new Vector3([this._locationX, 0, 4]));
+        this.program.setVector3('uCamera', this.camera.position);
         for (const entity of buffers.entries()) {
             this.program.setVertexAttribute(entity[0].NAME, entity[1], entity[0].COMPONENT);
         }
@@ -86,25 +123,4 @@ export class DiffuseApplication extends WebGL2Application {
         this.worldMatrixStack.popMatrix();
         this.program.unbind();
     }
-    
-    // /**
-    //  * 环境光滑动条。
-    //  * @private
-    //  */
-    // private createAmbientSliderBar(): void {
-    //     const br = document.createElement('br');
-    //     this.canvas.parentElement.appendChild(br);
-    //     const label = document.createElement('b');
-    //     label.textContent = '请调整拖拉条的位置改变光照位置：';
-    //     // label.style.marginTop = this.canvas.height + '10';
-    //     this.canvas.parentElement.appendChild(label);
-    //     const input: HTMLInputElement = document.createElement('input');
-    //     input.id = 'ambient-input';
-    //     input.type = 'range';
-    //     input.style.width = '500px';
-    //     input.style.marginTop = this.canvas.height + 'px';
-    //     input.max = '20';
-    //     input.min = '-20';
-    //     this.canvas.parentElement.appendChild(input);
-    // }
 }

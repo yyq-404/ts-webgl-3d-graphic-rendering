@@ -8,7 +8,7 @@ export class CanvasKeyboardEventManager {
     /** 实例 */
     private static _instance: CanvasKeyboardEventManager;
     /** 支持的键盘事件类型 */
-    private _types = [ECanvasKeyboardEventType.KEY_DOWN, ECanvasKeyboardEventType.KEY_UP, ECanvasKeyboardEventType.KEY_PRESS];
+    private _types: ECanvasKeyboardEventType[] = [ECanvasKeyboardEventType.KEY_DOWN, ECanvasKeyboardEventType.KEY_UP, ECanvasKeyboardEventType.KEY_PRESS];
     /** 键盘事件集合 */
     private _events: Map<any, Map<ECanvasKeyboardEventType, Map<string, (...args: any[]) => void>>> = new Map<any, Map<ECanvasKeyboardEventType, Map<string, (...args: any[]) => void>>>();
     

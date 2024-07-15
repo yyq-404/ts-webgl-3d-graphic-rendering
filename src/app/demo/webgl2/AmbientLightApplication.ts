@@ -11,7 +11,7 @@ import {ECanvasKeyboardEventType} from '../../../enum/ECanvasKeyboardEventType';
 /**
  * 环境光应用。
  */
-export class AmbientApplication extends WebGL2Application {
+export class AmbientLightApplication extends WebGL2Application {
     /** 球体 */
     private _ball: Ball = new Ball();
     /** 环境光强度 */

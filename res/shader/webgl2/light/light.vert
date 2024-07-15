@@ -14,17 +14,23 @@ in vec3 aPosition;
 in vec3 aNormal;
 //用于传递给片元着色器的顶点位置
 out vec3 vPosition;
-//用于传递给片元着色器的镜面光最终强度
-out vec4 vSpecular;
+//用于传递给片元着色器的最终光照强度
+out vec4 finalLight;
 
 /**
  * 定位光光照计算的方法
  * @param normal 法向量
  * @param lightLocation 光源位置
+ * @param lightAmbient  环境光强度
+ * @param lightDiffuse 散射光强度
  * @param lightSpecular 镜面光强度
  */
-vec4 pointLight(in vec3 normal, in vec3 lightLocation, in vec4 lightSpecular) {
-    vec4 finalSpecular;
+vec4 pointLight(in vec3 normal, in vec3 lightLocation, in vec4 lightAmbient, in vec4 lightDiffuse, in vec4 lightSpecular) {
+    vec4 ambient;
+    vec4 diffuse;
+    vec4 specular;
+    //直接得出环境光的最终强度
+    ambient = lightAmbient;
     //计算变换后的法向量
     vec3 normalTarget = aPosition + normal;
     vec3 newNormal = (uMMatrix * vec4(normalTarget, 1)).xyz - (uMMatrix * vec4(aPosition, 1)).xyz;
@@ -39,21 +45,26 @@ vec4 pointLight(in vec3 normal, in vec3 lightLocation, in vec4 lightSpecular) {
     //求视线与光线的半向量
     vec3 halfVector = normalize(vp + eye);
     //粗糙度，越小越光滑
-    float shininess = 25.0;
+    float shininess = 5.0;
+    //求法向量与vp的点积与0的最大值
+    float nDotViewPosition = max(0.0, dot(newNormal, vp));
+    //计算散射光的最终强度
+    diffuse = lightDiffuse * nDotViewPosition;
     //法线与半向量的点积
     float nDotViewHalfVector = dot(newNormal, halfVector);
     //镜面反射光强度因子
     float powerFactor = max(0.0, pow(nDotViewHalfVector, shininess));
-    finalSpecular = lightSpecular * powerFactor;
-    //最终的镜面光强度
-    return finalSpecular;
+    //计算镜面光的最终强度
+    specular = lightSpecular * powerFactor;
+    return ambient + diffuse + specular;
 }
 
 void main() {
-    //根据总变换矩阵计算此次绘制此顶点的位置
+    //根据总变换矩阵计算此次绘制此顶点位置
     gl_Position = uMVPMatrix * vec4(aPosition, 1);
-    //计算定位光
-    vSpecular = pointLight(normalize(aNormal), uLightLocation, vec4(0.9, 0.9, 0.9, 1.0));
+    //设置粒子大小 只有在点绘制方式时才有效
+    //gl_PointSize = 10.0;
+    finalLight = pointLight(normalize(aNormal), uLightLocation, vec4(0.15, 0.15, 0.15, 1.0), vec4(0.8, 0.8, 0.8, 1.0), vec4(0.7, 0.7, 0.7, 1.0));
     //将顶点的位置传给片元着色器
     vPosition = aPosition;
 }

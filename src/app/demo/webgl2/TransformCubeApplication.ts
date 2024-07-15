@@ -4,7 +4,7 @@ import {Vector3} from '../../../common/math/vector/Vector3';
 import {ColorCube} from '../../../common/geometry/solid/ColorCube';
 import {CanvasKeyboardEventManager} from '../../../event/keyboard/CanvasKeyboardEventManager';
 import {ECanvasKeyboardEventType} from '../../../enum/ECanvasKeyboardEventType';
-import {CanvasMouseEventManager} from '../../../event/mouse/CanvasEventEventManager';
+import {CanvasMouseEventManager} from '../../../event/mouse/CanvasMouseEventManager';
 
 /**
  * 变换盒子应用。。

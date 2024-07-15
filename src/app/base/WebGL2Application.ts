@@ -10,7 +10,7 @@ import {GLShaderConstants} from '../../webgl/GLShaderConstants';
 import {GLAttributeHelper} from '../../webgl/GLAttributeHelper';
 import {GLAttributeBits} from '../../webgl/common/GLTypes';
 import {CanvasMouseMoveEvent} from '../../event/mouse/CanvasMouseMoveEvent';
-import {CanvasMouseEventManager} from '../../event/mouse/CanvasEventEventManager';
+import {CanvasMouseEventManager} from '../../event/mouse/CanvasMouseEventManager';
 import {Geometry} from '../../common/geometry/Geometry';
 
 /**

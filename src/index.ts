@@ -10,9 +10,8 @@ import {LineDrawModeApplication} from './app/demo/webgl2/LineDrawModeApplication
 import {TriangleDrawModeApplication} from './app/demo/webgl2/TriangleDrawModeApplication';
 import {CameraViewApplication} from './app/demo/webgl2/CameraViewApplication';
 import {CullFaceApplication} from './app/demo/webgl2/CullFaceApplication';
-import {AmbientApplication} from './app/demo/webgl2/AmbientApplication';
-import {DiffuseApplication} from './app/demo/webgl2/DiffuseApplication';
-import {SpecularApplication} from './app/demo/webgl2/SpecularApplication';
+import {AmbientLightApplication} from './app/demo/webgl2/AmbientLightApplication';
+import {PointLightApplication} from './app/demo/webgl2/PointLightApplication';
 
 /** 应用集合 */
 const apps = {
@@ -27,9 +26,8 @@ const apps = {
     '9: TriangleDrawMode': TriangleDrawModeApplication,
     '10: CameraView': CameraViewApplication,
     '11: CullFace': CullFaceApplication,
-    '12: Ambient': AmbientApplication,
-    '13: Diffuse': DiffuseApplication,
-    '14: Specular': SpecularApplication
+    '12: Ambient': AmbientLightApplication,
+    '13: PointLight': PointLightApplication
 };
 
 /** 当前正在运行的App */

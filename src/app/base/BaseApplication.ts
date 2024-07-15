@@ -3,7 +3,7 @@ import {AppConstants} from '../AppConstants';
 import {HttpHelper} from '../../net/HttpHelper';
 import {TimerManager} from '../../timer/TimerManager';
 import {CanvasKeyboardEventManager} from '../../event/keyboard/CanvasKeyboardEventManager';
-import {CanvasMouseEventManager} from '../../event/mouse/CanvasEventEventManager';
+import {CanvasMouseEventManager} from '../../event/mouse/CanvasMouseEventManager';
 
 /**
  * 基础应用
