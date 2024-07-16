@@ -12,10 +12,16 @@ export class Vector3 {
     public static readonly one = new Vector3([1, 1, 1]);
     /** 上 */
     public static readonly up = new Vector3([0, 1, 0]);
+    /** 下 */
+    public static readonly down = new Vector3([0, -1, 0]);
+    /** 左 */
+    public static readonly left = new Vector3([-1, 0, 0]);
     /** 右 */
     public static readonly right = new Vector3([1, 0, 0]);
     /** 前 */
     public static readonly forward = new Vector3([0, 0, 1]);
+    /** 后 */
+    public static readonly backward = new Vector3([0, 0, -1]);
     /** 值 */
     private _values = new Float32Array(3);
     
