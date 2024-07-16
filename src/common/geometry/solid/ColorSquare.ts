@@ -4,9 +4,9 @@ import {Color4} from '../../color/Color4';
 import {Vector3} from '../../math/vector/Vector3';
 
 /**
- * 色彩矩形。
+ * 彩色正方形。
  */
-export class ColorRect extends Geometry {
+export class ColorSquare extends Geometry {
     /** 一半尺寸 */
     private readonly _halfSize: number = 1;
     /** 颜色集合 */

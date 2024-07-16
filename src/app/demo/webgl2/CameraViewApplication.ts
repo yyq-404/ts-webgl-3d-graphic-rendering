@@ -1,5 +1,5 @@
 import {WebGL2Application} from '../../base/WebGL2Application';
-import {ColorRect} from '../../../common/geometry/solid/ColorRect';
+import {ColorSquare} from '../../../common/geometry/solid/ColorSquare';
 import {Color4} from '../../../common/color/Color4';
 import {Vector3} from '../../../common/math/vector/Vector3';
 import {ECameraObservationType} from '../../../enum/ECameraObservationType';
@@ -12,7 +12,7 @@ import {AppConstants} from '../../AppConstants';
  */
 export class CameraViewApplication extends WebGL2Application {
     /** 矩形 */
-    private _rect: ColorRect = new ColorRect(0.25, [Color4.White, Color4.Blue, Color4.Blue, Color4.Blue, Color4.Blue, Color4.Blue]);
+    private _rect: ColorSquare = new ColorSquare(0.25, [Color4.White, Color4.Blue, Color4.Blue, Color4.Blue, Color4.Blue, Color4.Blue]);
     
     /**
      * 构造
