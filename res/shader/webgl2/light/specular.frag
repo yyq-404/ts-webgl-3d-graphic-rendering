@@ -24,8 +24,7 @@ void main()
     if (whichColor == 1) {
         //奇数时为红色
         color = vec3(0.678, 0.231, 0.129);
-    }
-    else {
+    } else {
         //偶数时为白色
         color = vec3(1.0, 1.0, 1.0);
     }
