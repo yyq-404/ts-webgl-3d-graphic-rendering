@@ -6,7 +6,9 @@ uniform float uR;
 in vec3 vPosition;
 //接受顶点着色器传过来的最终光照强度
 in vec4 finalLight;
+//输出的片元颜色
 out vec4 fragColor;
+
 void main()
 {
     vec3 color;

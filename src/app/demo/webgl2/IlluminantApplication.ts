@@ -10,13 +10,15 @@ import {ECanvasKeyboardEventType} from '../../../enum/ECanvasKeyboardEventType';
 import {CanvasKeyboardEvent} from '../../../event/keyboard/CanvasKeyboardEvent';
 
 /**
- * 点光源应用。
+ * 光源应用。
  */
-export class PointLightApplication extends WebGL2Application {
+export class IlluminantApplication extends WebGL2Application {
     /** 球体 */
     private _balls: Ball[] = [new Ball(), new Ball()];
-    /** 环境光强度 */
+    /** 光源X轴位置 */
     private _locationX: number = 0;
+    /** 光源Y轴位置 */
+    private _locationY: number = 0;
     /** 当前按键 */
     private _currentKey: string = '3';
     
@@ -29,11 +31,14 @@ export class PointLightApplication extends WebGL2Application {
         this.createBuffers(...this._balls);
         GLRenderHelper.setDefaultState(this.webglContext);
         CanvasKeyboardEventManager.instance.registers(this, [
-            {type: ECanvasKeyboardEventType.KEY_PRESS, key: '+', callback: this.changeLocationX},
-            {type: ECanvasKeyboardEventType.KEY_PRESS, key: '-', callback: this.changeLocationX},
-            {type: ECanvasKeyboardEventType.KEY_PRESS, key: '1', callback: this.changeLightMode},
-            {type: ECanvasKeyboardEventType.KEY_PRESS, key: '2', callback: this.changeLightMode},
-            {type: ECanvasKeyboardEventType.KEY_PRESS, key: '3', callback: this.changeLightMode}
+            {type: ECanvasKeyboardEventType.KEY_DOWN, key: 'ArrowLeft', callback: this.changeLocationX},
+            {type: ECanvasKeyboardEventType.KEY_DOWN, key: 'ArrowRight', callback: this.changeLocationX},
+            {type: ECanvasKeyboardEventType.KEY_DOWN, key: 'ArrowUp', callback: this.changeLocationY},
+            {type: ECanvasKeyboardEventType.KEY_DOWN, key: 'ArrowDown', callback: this.changeLocationY},
+            {type: ECanvasKeyboardEventType.KEY_DOWN, key: '1', callback: this.changeLightMode},
+            {type: ECanvasKeyboardEventType.KEY_DOWN, key: '2', callback: this.changeLightMode},
+            {type: ECanvasKeyboardEventType.KEY_DOWN, key: '3', callback: this.changeLightMode},
+            {type: ECanvasKeyboardEventType.KEY_DOWN, key: '4', callback: this.changeLightMode}
         ]);
     }
     
@@ -54,11 +59,16 @@ export class PointLightApplication extends WebGL2Application {
                 shaderUrls.set('bns.vert', `${AppConstants.webgl2ShaderRoot}/light/specular.vert`);
                 shaderUrls.set('bns.frag', `${AppConstants.webgl2ShaderRoot}/light/specular.frag`);
                 break;
-            // 合成光
+            // 合成光光源
             case '3':
+                shaderUrls.set('bns.vert', `${AppConstants.webgl2ShaderRoot}/light/point.vert`);
+                shaderUrls.set('bns.frag', `${AppConstants.webgl2ShaderRoot}/light/point.frag`);
+                break;
+            case '4':
+                shaderUrls.set('bns.vert', `${AppConstants.webgl2ShaderRoot}/light/direction.vert`);
+                shaderUrls.set('bns.frag', `${AppConstants.webgl2ShaderRoot}/light/direction.frag`);
+                break;
             default:
-                shaderUrls.set('bns.vert', `${AppConstants.webgl2ShaderRoot}/light/light.vert`);
-                shaderUrls.set('bns.frag', `${AppConstants.webgl2ShaderRoot}/light/light.frag`);
                 break;
         }
         return shaderUrls;
@@ -87,7 +97,7 @@ export class PointLightApplication extends WebGL2Application {
         //将总变换矩阵送入渲染管线
         this.program.setMatrix4(GLShaderConstants.MVPMatrix, this.mvpMatrix());
         this.program.setMatrix4(GLShaderConstants.MMatrix, this.worldMatrixStack.worldMatrix());
-        this.program.setVector3('uLightLocation', new Vector3([this._locationX, 0, 4]));
+        this.program.setVector3(this._currentKey === '4' ? 'uLightDirection' : 'uLightLocation', new Vector3([this._locationX, this._locationY, 4]));
         this.program.setVector3('uCamera', this.camera.position);
         for (const entity of buffers.entries()) {
             this.program.setVertexAttribute(entity[0].NAME, entity[1], entity[0].COMPONENT);
@@ -105,8 +115,24 @@ export class PointLightApplication extends WebGL2Application {
      */
     private changeLocationX(event: CanvasKeyboardEvent): void {
         if (this._locationX > -10 && this._locationX < 10) {
-            const incX = event.key === '-' ? -1 : 1;
+            const incX: number = event.key === 'ArrowLeft' ? -1 : 1;
             this._locationX += incX;
+        } else {
+            this._locationX = 0;
+        }
+    }
+    
+    /**
+     * 改变光源X轴位置
+     * @param {CanvasKeyboardEvent} event
+     * @private
+     */
+    private changeLocationY(event: CanvasKeyboardEvent): void {
+        if (this._locationY > -10 && this._locationY < 10) {
+            const incY: number = event.key === 'ArrowDown' ? -1 : 1;
+            this._locationY += incY;
+        } else {
+            this._locationY = 0;
         }
     }
     

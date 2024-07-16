@@ -11,7 +11,7 @@ import {TriangleDrawModeApplication} from './app/demo/webgl2/TriangleDrawModeApp
 import {CameraViewApplication} from './app/demo/webgl2/CameraViewApplication';
 import {CullFaceApplication} from './app/demo/webgl2/CullFaceApplication';
 import {AmbientLightApplication} from './app/demo/webgl2/AmbientLightApplication';
-import {PointLightApplication} from './app/demo/webgl2/PointLightApplication';
+import {IlluminantApplication} from './app/demo/webgl2/IlluminantApplication';
 
 /** 应用集合 */
 const apps = {
@@ -27,7 +27,7 @@ const apps = {
     '10: CameraView': CameraViewApplication,
     '11: CullFace': CullFaceApplication,
     '12: Ambient': AmbientLightApplication,
-    '13: PointLight': PointLightApplication
+    '13: Illuminant': IlluminantApplication
 };
 
 /** 当前正在运行的App */
