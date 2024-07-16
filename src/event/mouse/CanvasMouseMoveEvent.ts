@@ -60,7 +60,6 @@ export class CanvasMouseMoveEvent {
         let rect = this.canvas.getBoundingClientRect();
         if (rect.left <= x && x < rect.right && rect.top <= y && y < rect.bottom) {
             this._isMoved = true;
-            this._lastPosition = new Vector2([x, y]);
         }
     }
     
