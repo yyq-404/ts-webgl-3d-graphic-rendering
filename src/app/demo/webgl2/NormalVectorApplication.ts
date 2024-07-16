@@ -10,10 +10,10 @@ import {CanvasKeyboardEvent} from '../../../event/keyboard/CanvasKeyboardEvent';
 import {ColorCube} from '../../../common/geometry/solid/ColorCube';
 
 /**
- * 法向量应用。
+ * 法向量模式应用。
  */
 export class NormalVectorApplication extends WebGL2Application {
-    /** 球体 */
+    /** 立方体 */
     private _cubes: ColorCube[] = [new ColorCube(), new ColorCube()];
     /** 光源X轴位置 */
     private _locationX: number = 0;

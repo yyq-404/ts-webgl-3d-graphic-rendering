@@ -13,6 +13,7 @@ import {CullFaceApplication} from './app/demo/webgl2/CullFaceApplication';
 import {AmbientLightApplication} from './app/demo/webgl2/AmbientLightApplication';
 import {IlluminantApplication} from './app/demo/webgl2/IlluminantApplication';
 import {NormalVectorApplication} from './app/demo/webgl2/NormalVectorApplication';
+import {LightComputeApplication} from './app/demo/webgl2/LightComputeApplication';
 
 /** 应用集合 */
 const apps = {
@@ -29,7 +30,8 @@ const apps = {
     '11: CullFace': CullFaceApplication,
     '12: Ambient': AmbientLightApplication,
     '13: Illuminant': IlluminantApplication,
-    '14: NormalVector': NormalVectorApplication
+    '14: NormalVector': NormalVectorApplication,
+    '14: LightComputeMode': LightComputeApplication
 };
 
 /** 当前正在运行的App */
