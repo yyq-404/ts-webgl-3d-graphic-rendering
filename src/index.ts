@@ -12,6 +12,7 @@ import {CameraViewApplication} from './app/demo/webgl2/CameraViewApplication';
 import {CullFaceApplication} from './app/demo/webgl2/CullFaceApplication';
 import {AmbientLightApplication} from './app/demo/webgl2/AmbientLightApplication';
 import {IlluminantApplication} from './app/demo/webgl2/IlluminantApplication';
+import {NormalVectorApplication} from './app/demo/webgl2/NormalVectorApplication';
 
 /** 应用集合 */
 const apps = {
@@ -27,7 +28,8 @@ const apps = {
     '10: CameraView': CameraViewApplication,
     '11: CullFace': CullFaceApplication,
     '12: Ambient': AmbientLightApplication,
-    '13: Illuminant': IlluminantApplication
+    '13: Illuminant': IlluminantApplication,
+    '14: NormalVector': NormalVectorApplication
 };
 
 /** 当前正在运行的App */

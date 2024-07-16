@@ -168,7 +168,7 @@ export class WebGL2Application extends BaseApplication {
     
     /**
      * 绘制
-     * @param {IGeometry} solid
+     * @param {Geometry} solid
      * @param {GLint} mode
      * @param {number} first
      * @protected

@@ -27,8 +27,8 @@ export class AmbientLightApplication extends WebGL2Application {
         this.createBuffers(this._ball);
         GLRenderHelper.setDefaultState(this.webglContext);
         CanvasKeyboardEventManager.instance.registers(this, [
-            {type: ECanvasKeyboardEventType.KEY_PRESS, key: '+', callback: this.changeAmbient},
-            {type: ECanvasKeyboardEventType.KEY_PRESS, key: '-', callback: this.changeAmbient}
+            {type: ECanvasKeyboardEventType.KEY_PRESS, key: 'ArrowLeft', callback: this.changeAmbient},
+            {type: ECanvasKeyboardEventType.KEY_PRESS, key: 'ArrowRight', callback: this.changeAmbient}
         ]);
     }
     
@@ -82,7 +82,7 @@ export class AmbientLightApplication extends WebGL2Application {
      */
     private changeAmbient(event: CanvasKeyboardEvent): void {
         if (this._ambient > 0 && this._ambient < 1) {
-            const incAmbient: number = event.key === '-' ? -0.1 : 0.1;
+            const incAmbient: number = event.key === 'ArrowLeft' ? -0.1 : 0.1;
             this._ambient += incAmbient;
         }
     }

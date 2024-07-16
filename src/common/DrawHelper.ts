@@ -1,7 +1,6 @@
 import {GLMeshBuilder} from '../webgl/mesh/GLMeshBuilder';
 import {Matrix4} from './math/matrix/Matrix4';
 import {Vector3} from './math/vector/Vector3';
-import {Vector4} from './math/vector/Vector4';
 import {Cube} from './geometry/solid/Cube';
 import {Color4} from './color/Color4';
 
@@ -89,12 +88,12 @@ export class DrawHelper {
      * ```
      * @param builder
      * @param mvp
-     * @param halfLen
+     * @param halfSize
      * @param textureCoordinate 纹理坐标数组，该数组保存48个number类型，共6组纹理坐标，
      * 每组8个纹理坐标值，可以映射到立方体的某个面上，其顺序是前、右、后、左、上、下。
      */
-    public static drawTextureCubeBox(builder: GLMeshBuilder, mvp: Matrix4, halfLen: number = 0.2, textureCoordinate: number[] = DrawHelper._defaultTextureCoordinates): void {
-        let cube = new Cube(halfLen, halfLen,halfLen);
+    public static drawTextureCubeBox(builder: GLMeshBuilder, mvp: Matrix4, halfSize: number = 0.2, textureCoordinate: number[] = DrawHelper._defaultTextureCoordinates): void {
+        let cube = new Cube(halfSize);
         for (let i = 0; i < cube.surfaces.length; i++) {
             let positions: Vector3[] = cube.surfaces[i];
             builder.begin(builder.webglContext.TRIANGLE_FAN);

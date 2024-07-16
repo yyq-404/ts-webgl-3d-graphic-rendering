@@ -4,14 +4,13 @@ import {Vector3} from '../../../common/math/vector/Vector3';
 import {ColorCube} from '../../../common/geometry/solid/ColorCube';
 import {CanvasKeyboardEventManager} from '../../../event/keyboard/CanvasKeyboardEventManager';
 import {ECanvasKeyboardEventType} from '../../../enum/ECanvasKeyboardEventType';
-import {CanvasMouseEventManager} from '../../../event/mouse/CanvasMouseEventManager';
 
 /**
  * 变换盒子应用。。
  */
 export class TransformCubeApplication extends WebGL2Application {
     /** 盒子对象 */
-    private _cube: ColorCube = new ColorCube(0.3, 0.3, 0.3);
+    private _cube: ColorCube = new ColorCube();
     /** 矩阵变换类型 */
     private _transformType: string = '';
     
