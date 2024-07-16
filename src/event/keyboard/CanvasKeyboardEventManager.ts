@@ -1,6 +1,8 @@
 import {ECanvasKeyboardEventType} from '../../enum/ECanvasKeyboardEventType';
 import {CanvasKeyboardEvent} from './CanvasKeyboardEvent';
 
+export type KeyboardEventCallback = (event: CanvasKeyboardEvent, ...args: any[]) => void;
+
 /**
  * 画布键盘事件管理。
  */
@@ -10,7 +12,7 @@ export class CanvasKeyboardEventManager {
     /** 支持的键盘事件类型 */
     private _types: ECanvasKeyboardEventType[] = [ECanvasKeyboardEventType.KEY_DOWN, ECanvasKeyboardEventType.KEY_UP, ECanvasKeyboardEventType.KEY_PRESS];
     /** 键盘事件集合 */
-    private _events: Map<any, Map<ECanvasKeyboardEventType, Map<string, (...args: any[]) => void>>> = new Map<any, Map<ECanvasKeyboardEventType, Map<string, (...args: any[]) => void>>>();
+    private _events: Map<any, Map<ECanvasKeyboardEventType, Map<string, KeyboardEventCallback>>> = new Map<any, Map<ECanvasKeyboardEventType, Map<string, KeyboardEventCallback>>>();
     
     /**
      * 获取单例。
@@ -39,10 +41,10 @@ export class CanvasKeyboardEventManager {
      * @param {(...args: any[]) => void} callback
      * @protected
      */
-    public register(owner: any, type: ECanvasKeyboardEventType, key: string, callback: (...args: any[]) => void): void {
+    public register(owner: any, type: ECanvasKeyboardEventType, key: string, callback: KeyboardEventCallback): void {
         let ownerEvents = this._events.get(owner);
         if (!ownerEvents) {
-            ownerEvents = new Map<ECanvasKeyboardEventType, Map<string, (...args: any[]) => void>>();
+            ownerEvents = new Map<ECanvasKeyboardEventType, Map<string, (event: CanvasKeyboardEvent, ...args: any[]) => void>>();
             this._events.set(owner, ownerEvents);
         }
         let typeEvents = ownerEvents.get(type);
@@ -64,7 +66,7 @@ export class CanvasKeyboardEventManager {
      * @param owner
      * @param events
      */
-    public registers(owner: any, events: { type: ECanvasKeyboardEventType, key: string, callback: (...args: any[]) => void }[]): void {
+    public registers(owner: any, events: { type: ECanvasKeyboardEventType, key: string, callback: KeyboardEventCallback }[]): void {
         events.forEach(event => {
             this.register(owner, event.type, event.key, event.callback);
         });
@@ -84,7 +86,7 @@ export class CanvasKeyboardEventManager {
         if (!typeEvents) return;
         const callback = typeEvents.get(canvasEvent.key);
         if (!callback) return;
-        callback.apply(owner, args);
+        callback.call(owner, canvasEvent, args);
     }
     
     /**

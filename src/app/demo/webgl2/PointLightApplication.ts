@@ -7,6 +7,7 @@ import {GLAttributeHelper} from '../../../webgl/GLAttributeHelper';
 import {GLRenderHelper} from '../../../webgl/GLRenderHelper';
 import {CanvasKeyboardEventManager} from '../../../event/keyboard/CanvasKeyboardEventManager';
 import {ECanvasKeyboardEventType} from '../../../enum/ECanvasKeyboardEventType';
+import {CanvasKeyboardEvent} from '../../../event/keyboard/CanvasKeyboardEvent';
 
 /**
  * 点光源应用。
@@ -28,38 +29,11 @@ export class PointLightApplication extends WebGL2Application {
         this.createBuffers(...this._balls);
         GLRenderHelper.setDefaultState(this.webglContext);
         CanvasKeyboardEventManager.instance.registers(this, [
-            {
-                type: ECanvasKeyboardEventType.KEY_PRESS, key: '+', callback: () => {
-                    if (this._locationX < 10) {
-                        this._locationX += 1;
-                    }
-                }
-            },
-            {
-                type: ECanvasKeyboardEventType.KEY_PRESS, key: '-', callback: () => {
-                    if (this._locationX > -10) {
-                        this._locationX -= 1;
-                    }
-                }
-            },
-            {
-                type: ECanvasKeyboardEventType.KEY_PRESS, key: '1', callback: () => {
-                    this._currentKey = '1';
-                    this.runAsync.call(this);
-                }
-            },
-            {
-                type: ECanvasKeyboardEventType.KEY_PRESS, key: '2', callback: () => {
-                    this._currentKey = '2';
-                    this.runAsync.call(this);
-                }
-            },
-            {
-                type: ECanvasKeyboardEventType.KEY_PRESS, key: '3', callback: () => {
-                    this._currentKey = '3';
-                    this.runAsync.call(this);
-                }
-            }
+            {type: ECanvasKeyboardEventType.KEY_PRESS, key: '+', callback: this.changeLocationX},
+            {type: ECanvasKeyboardEventType.KEY_PRESS, key: '-', callback: this.changeLocationX},
+            {type: ECanvasKeyboardEventType.KEY_PRESS, key: '1', callback: this.changeLightMode},
+            {type: ECanvasKeyboardEventType.KEY_PRESS, key: '2', callback: this.changeLightMode},
+            {type: ECanvasKeyboardEventType.KEY_PRESS, key: '3', callback: this.changeLightMode}
         ]);
     }
     
@@ -122,5 +96,28 @@ export class PointLightApplication extends WebGL2Application {
         this.webglContext.drawArrays(this.webglContext.TRIANGLES, 0, ball.vertex.count);
         this.worldMatrixStack.popMatrix();
         this.program.unbind();
+    }
+    
+    /**
+     * 改变光源X轴位置
+     * @param {CanvasKeyboardEvent} event
+     * @private
+     */
+    private changeLocationX(event: CanvasKeyboardEvent): void {
+        if (this._locationX > -10 && this._locationX < 10) {
+            const incX = event.key === '-' ? -1 : 1;
+            this._locationX += incX;
+        }
+    }
+    
+    /**
+     * 改变光照模式
+     * @param {CanvasKeyboardEvent} event
+     * @private
+     */
+    private changeLightMode(event: CanvasKeyboardEvent): void {
+        this._currentKey = event.key;
+        this.stop();
+        this.runAsync.call(this);
     }
 }

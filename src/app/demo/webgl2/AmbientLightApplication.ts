@@ -7,6 +7,7 @@ import {GLAttributeHelper} from '../../../webgl/GLAttributeHelper';
 import {GLRenderHelper} from '../../../webgl/GLRenderHelper';
 import {CanvasKeyboardEventManager} from '../../../event/keyboard/CanvasKeyboardEventManager';
 import {ECanvasKeyboardEventType} from '../../../enum/ECanvasKeyboardEventType';
+import {CanvasKeyboardEvent} from '../../../event/keyboard/CanvasKeyboardEvent';
 
 /**
  * 环境光应用。
@@ -26,20 +27,8 @@ export class AmbientLightApplication extends WebGL2Application {
         this.createBuffers(this._ball);
         GLRenderHelper.setDefaultState(this.webglContext);
         CanvasKeyboardEventManager.instance.registers(this, [
-            {
-                type: ECanvasKeyboardEventType.KEY_PRESS, key: '+', callback: () => {
-                    if (this._ambient < 1.0) {
-                        this._ambient += 0.1;
-                    }
-                }
-            },
-            {
-                type: ECanvasKeyboardEventType.KEY_PRESS, key: '-', callback: () => {
-                    if (this._ambient >= 0.1) {
-                        this._ambient -= 0.1;
-                    }
-                }
-            }
+            {type: ECanvasKeyboardEventType.KEY_PRESS, key: '+', callback: this.changeAmbient},
+            {type: ECanvasKeyboardEventType.KEY_PRESS, key: '-', callback: this.changeAmbient}
         ]);
     }
     
@@ -84,5 +73,17 @@ export class AmbientLightApplication extends WebGL2Application {
         this.webglContext.drawArrays(this.webglContext.TRIANGLES, 0, this._ball.vertex.count);
         this.worldMatrixStack.popMatrix();
         this.program.unbind();
+    }
+    
+    /**
+     * 改变环境光强度。
+     * @param {CanvasKeyboardEvent} event
+     * @private
+     */
+    private changeAmbient(event: CanvasKeyboardEvent): void {
+        if (this._ambient > 0 && this._ambient < 1) {
+            const incAmbient: number = event.key === '-' ? -0.1 : 0.1;
+            this._ambient += incAmbient;
+        }
     }
 }
