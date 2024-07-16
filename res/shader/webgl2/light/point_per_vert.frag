@@ -1,26 +1,18 @@
 #version 300 es
-
 precision mediump float;
-uniform float uR;
-//接收从顶点着色器过来的顶点位置
-in vec3 vPosition;
-//接受顶点着色器传过来的最终光照强度
+in vec3 vPosition;//接收从顶点着色器过来的顶点位置
 in vec4 finalLight;
-//输出的片元颜色
 out vec4 fragColor;
-
-void main() {
+void main()
+{
     vec3 color;
-    //一个坐标分量分的总份数
-    float n = 8.0;
-    //每一份的长度
-    float span = 2.0 * uR / n;
+    float n = 8.0;//一个坐标分量分的总份数
+    float span = 2.0 * 2.0 / n;//每一份的长度
     //每一维在立方体内的行列数
-    int i = int((vPosition.x + uR) / span);
-    int j = int((vPosition.y + uR) / span);
-    int k = int((vPosition.z + uR) / span);
+    int i = int((vPosition.x + 3.0) / span);
+    int j = int((vPosition.y + 2.0) / span);
     //计算当点应位于白色块还是黑色块中
-    int whichColor = int(mod(float(i + j + k), 2.0));
+    int whichColor = int(mod(float(i + j), 2.0));
     if (whichColor == 1) {
         //奇数时为红色
         color = vec3(0.678, 0.231, 0.129);

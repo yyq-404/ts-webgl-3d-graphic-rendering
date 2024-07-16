@@ -8,8 +8,7 @@ in vec4 vSpecular;
 //输出的片元颜色
 out vec4 fragColor;
 
-void main()
-{
+void main() {
     vec3 color;
     //一个坐标分量分的总份数
     float n = 8.0;

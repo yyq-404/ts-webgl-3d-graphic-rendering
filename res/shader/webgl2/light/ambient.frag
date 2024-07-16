@@ -10,8 +10,7 @@ in vec4 vAmbient;
 //输出的片元颜色
 out vec4 fragColor;
 
-void main()
-{
+void main() {
     vec3 color;
     //外接立方体每个坐标轴方向切分的份数
     float n = 8.0;

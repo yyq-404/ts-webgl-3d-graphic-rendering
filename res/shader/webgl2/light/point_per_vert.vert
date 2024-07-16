@@ -4,8 +4,8 @@
 uniform mat4 uMVPMatrix;
 //变换矩阵
 uniform mat4 uMMatrix;
-//定向光方向
-uniform vec3 uLightDirection;
+//光源位置
+uniform vec3 uLightLocation;
 //摄像机位置
 uniform vec3 uCamera;
 //顶点位置
@@ -17,20 +17,18 @@ out vec3 vPosition;
 //用于传递给片元着色器的最终光照强度
 out vec4 finalLight;
 
+
 /**
- * 定向光光照计算的方法
+ * 定位光光照计算的方法
  * @param normal 法向量
- * @param ligthDirection 定向光方向
- * @param ligthAmbient 环境光强度
- * @param ligthDiffuse 散射光强度
- * @param ligthSpecular 镜面光强度
+ * @param lightLocation 光源位置
+ * @param lightAmbient 环境光强度
+ * @param lightDiffuse 散射光强度
+ * @param lightSpecular 镜面光强度
  */
-vec4 directionalLight(in vec3 normal, in vec3 lightDirection, in vec4 lightAmbient, in vec4 lightDiffuse, in vec4 lightSpecular) {
-    //环境光最终强度
+vec4 pointLight(in vec3 normal, in vec3 lightLocation, in vec4 lightAmbient, in vec4 lightDiffuse, in vec4 lightSpecular) {
     vec4 ambient;
-    //散射光最终强度
     vec4 diffuse;
-    //镜面光最终强度
     vec4 specular;
     //直接得出环境光的最终强度
     ambient = lightAmbient;
@@ -41,8 +39,9 @@ vec4 directionalLight(in vec3 normal, in vec3 lightDirection, in vec4 lightAmbie
     newNormal = normalize(newNormal);
     //计算从表面点到摄像机的向量
     vec3 eye = normalize(uCamera - (uMMatrix * vec4(aPosition, 1)).xyz);
-    //规格化定向光方向向量
-    vec3 vp = normalize(lightDirection);
+    //计算从表面点到光源位置的向量vp
+    vec3 vp = normalize(lightLocation - (uMMatrix * vec4(aPosition, 1)).xyz);
+    vp = normalize(vp);//格式化vp
     //求视线与光线的半向量
     vec3 halfVector = normalize(vp + eye);
     //粗糙度，越小越光滑
@@ -63,8 +62,7 @@ vec4 directionalLight(in vec3 normal, in vec3 lightDirection, in vec4 lightAmbie
 void main() {
     //根据总变换矩阵计算此次绘制此顶点位置
     gl_Position = uMVPMatrix * vec4(aPosition, 1);
-    //计算最终光照强度
-    finalLight = directionalLight(normalize(aNormal), uLightDirection, vec4(0.15, 0.15, 0.15, 1.0), vec4(0.8, 0.8, 0.8, 1.0), vec4(0.7, 0.7, 0.7, 1.0));
+    finalLight = pointLight(normalize(aNormal), uLightLocation, vec4(0.05, 0.05, 0.05, 1.0), vec4(0.8, 0.8, 0.8, 1.0), vec4(0.5, 0.5, 0.5, 1.0));
     //将顶点的位置传给片元着色器
     vPosition = aPosition;
 }
