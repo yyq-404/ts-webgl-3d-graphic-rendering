@@ -23,7 +23,6 @@ export class WallTextureApplication extends WebGL2Application {
         super(true);
         this.attributeBits = GLAttributeHelper.POSITION.BIT | GLAttributeHelper.TEX_COORDINATE_0.BIT;
         this.createBuffers(this._triangle);
-        // GLRenderHelper.setDefaultState(this.gl);
     }
     
     /**

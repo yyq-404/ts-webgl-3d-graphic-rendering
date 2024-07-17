@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,10 +7,8 @@
     <style>
         .container {
             position: relative;
-        }
-
-        #webgl {
-            background: lightgray;
+            width: 800px;
+            height: 600px;
         }
 
         #overlay {
@@ -18,11 +16,21 @@
             /*相对左上角*/
             left: 0;
             top: 0;
-            background-color: rgba(0, 0, 0, 1.0);
+            background-color: rgba(0, 0, 0, 0.8);
             color: white;
             font-family: "Arial", serif;
-            font-size: 14px;
+            font-weight: bold;
+            font-size: 18px;
             padding: 1em;
+            z-index: 10;
+        }
+
+        #controls {
+            position: relative;
+            float: right;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            z-index: 11;
         }
     </style>
     <title>ts-webgl-3d-graphic-rendering</title>
@@ -30,11 +38,12 @@
 <body>
 <label for='select'>Select Demo <select id='select'> </select></label>
 <div id="webgl-canvas" class="container">
-    <div id="overlay" style="z-index: 1000">
+    <div id="overlay">
         <div>FPS: <span id="fps"></span></div>
         <div>Tris: <span id="tris"></span></div>
         <div>Verts: <span id="verts"></span></div>
     </div>
+    <div id="controls"></div>
 </div>
 <script src="./dist/bundle.js"></script>
 </body>

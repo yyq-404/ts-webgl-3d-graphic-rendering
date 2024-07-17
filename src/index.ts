@@ -15,6 +15,7 @@ import {LightTypeApplication} from './app/demo/webgl2/LightTypeApplication';
 import {NormalVectorApplication} from './app/demo/webgl2/NormalVectorApplication';
 import {LightComputeApplication} from './app/demo/webgl2/LightComputeApplication';
 import {WallTextureApplication} from './app/demo/webgl2/WallTextureApplication';
+import {TextureRepeatApplication} from './app/demo/webgl2/TextureRepeatApplication';
 
 /** 应用集合 */
 const apps = {
@@ -33,7 +34,8 @@ const apps = {
     '13: LightType': LightTypeApplication,
     '14: NormalVector': NormalVectorApplication,
     '15: LightComputeMode': LightComputeApplication,
-    '16: WallTexture': WallTextureApplication
+    '16: WallTexture': WallTextureApplication,
+    '17: TextureRepeat': TextureRepeatApplication
 };
 
 /** 当前正在运行的App */
