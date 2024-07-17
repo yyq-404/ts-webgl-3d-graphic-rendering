@@ -8,6 +8,7 @@ import {GLRenderHelper} from '../../../webgl/GLRenderHelper';
 import {CanvasKeyboardEventManager} from '../../../event/keyboard/CanvasKeyboardEventManager';
 import {ECanvasKeyboardEventType} from '../../../enum/ECanvasKeyboardEventType';
 import {CanvasKeyboardEvent} from '../../../event/keyboard/CanvasKeyboardEvent';
+import {Vector4} from '../../../common/math/vector/Vector4';
 
 /**
  * 环境光应用。
@@ -15,8 +16,10 @@ import {CanvasKeyboardEvent} from '../../../event/keyboard/CanvasKeyboardEvent';
 export class AmbientLightApplication extends WebGL2Application {
     /** 球体 */
     private _ball: Ball = new Ball();
+    /** 环境光颜色 */
+    private _ambientColor: number = 1;
     /** 环境光强度 */
-    private _ambient: number = 1;
+    private _ambientStrength: number = 1;
     
     /**
      * 构造。
@@ -27,8 +30,10 @@ export class AmbientLightApplication extends WebGL2Application {
         this.createBuffers(this._ball);
         GLRenderHelper.setDefaultState(this.webglContext);
         CanvasKeyboardEventManager.instance.registers(this, [
-            {type: ECanvasKeyboardEventType.KEY_PRESS, key: 'ArrowLeft', callback: this.changeAmbient},
-            {type: ECanvasKeyboardEventType.KEY_PRESS, key: 'ArrowRight', callback: this.changeAmbient}
+            {type: ECanvasKeyboardEventType.KEY_DOWN, key: 'ArrowLeft', callback: this.changeAmbientColor},
+            {type: ECanvasKeyboardEventType.KEY_DOWN, key: 'ArrowRight', callback: this.changeAmbientColor},
+            {type: ECanvasKeyboardEventType.KEY_DOWN, key: 'ArrowUp', callback: this.changeAmbientStrength},
+            {type: ECanvasKeyboardEventType.KEY_DOWN, key: 'ArrowDown', callback: this.changeAmbientStrength}
         ]);
     }
     
@@ -69,10 +74,24 @@ export class AmbientLightApplication extends WebGL2Application {
             this.program.setVertexAttribute(entity[0].NAME, entity[1], entity[0].COMPONENT);
         }
         this.program.setFloat('uR', this._ball.r);
-        this.program.setVector3('aAmbient', new Vector3([this._ambient, this._ambient, this._ambient]));
+        this.program.setVector4('aAmbient', new Vector4([this._ambientColor, this._ambientColor, this._ambientColor, this._ambientStrength]));
         this.webglContext.drawArrays(this.webglContext.TRIANGLES, 0, this._ball.vertex.count);
         this.worldMatrixStack.popMatrix();
         this.program.unbind();
+    }
+    
+    /**
+     * 改变环境光颜色。
+     * @param {CanvasKeyboardEvent} event
+     * @private
+     */
+    private changeAmbientColor(event: CanvasKeyboardEvent): void {
+        if (this._ambientColor >= 0 && this._ambientColor <= 1) {
+            const incColor: number = event.key === 'ArrowLeft' ? -0.1 : 0.1;
+            this._ambientColor += incColor;
+        } else {
+            this._ambientColor = 1;
+        }
     }
     
     /**
@@ -80,10 +99,12 @@ export class AmbientLightApplication extends WebGL2Application {
      * @param {CanvasKeyboardEvent} event
      * @private
      */
-    private changeAmbient(event: CanvasKeyboardEvent): void {
-        if (this._ambient > 0 && this._ambient < 1) {
-            const incAmbient: number = event.key === 'ArrowLeft' ? -0.1 : 0.1;
-            this._ambient += incAmbient;
+    private changeAmbientStrength(event: CanvasKeyboardEvent): void {
+        if (this._ambientStrength >= 0 && this._ambientStrength <= 1) {
+            const incStrength: number = event.key === 'ArrowDown' ? -0.1 : 0.1;
+            this._ambientStrength += incStrength;
+        } else {
+            this._ambientStrength = 1;
         }
     }
 }

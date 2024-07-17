@@ -11,7 +11,7 @@ import {TriangleDrawModeApplication} from './app/demo/webgl2/TriangleDrawModeApp
 import {CameraViewApplication} from './app/demo/webgl2/CameraViewApplication';
 import {CullFaceApplication} from './app/demo/webgl2/CullFaceApplication';
 import {AmbientLightApplication} from './app/demo/webgl2/AmbientLightApplication';
-import {IlluminantApplication} from './app/demo/webgl2/IlluminantApplication';
+import {LightTypeApplication} from './app/demo/webgl2/LightTypeApplication';
 import {NormalVectorApplication} from './app/demo/webgl2/NormalVectorApplication';
 import {LightComputeApplication} from './app/demo/webgl2/LightComputeApplication';
 
@@ -28,11 +28,11 @@ const apps = {
     '9: TriangleDrawMode': TriangleDrawModeApplication,
     '10: CameraView': CameraViewApplication,
     '11: CullFace': CullFaceApplication,
-    '12: Ambient': AmbientLightApplication,
-    '13: Illuminant': IlluminantApplication,
+    '12: AmbientLight': AmbientLightApplication,
+    '13: LightType': LightTypeApplication,
     '14: NormalVector': NormalVectorApplication,
-    '14: LightComputeMode': LightComputeApplication
-};
+    '15: LightComputeMode': LightComputeApplication
+}
 
 /** 当前正在运行的App */
 let currentApp: BaseApplication = null;

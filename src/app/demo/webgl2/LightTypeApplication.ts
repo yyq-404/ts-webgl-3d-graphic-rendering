@@ -12,7 +12,7 @@ import {CanvasKeyboardEvent} from '../../../event/keyboard/CanvasKeyboardEvent';
 /**
  * 光源类型应用。
  */
-export class IlluminantApplication extends WebGL2Application {
+export class LightTypeApplication extends WebGL2Application {
     /** 球体 */
     private _balls: Ball[] = [new Ball(), new Ball()];
     /** 光源X轴位置 */
