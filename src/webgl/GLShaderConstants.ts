@@ -26,4 +26,12 @@ export class GLShaderConstants {
     public static readonly SpecularSampler: string = 'uSpecularSampler';
     /** 深度取样器 */
     public static readonly DepthSampler: string = 'uDepthSampler';
+    /** 光源位置 */
+    public static readonly lightLocation: string = 'uLightLocation';
+    /** 光源方向 */
+    public static readonly lightDirection: string = 'uLightDirection';
+    /** 相机位置 */
+    public static readonly cameraPosition: string = 'uCamera';
+    /** 环境光 */
+    public static readonly ambient: string = 'uAmbient';
 }

@@ -57,4 +57,14 @@ export class VertexStructure {
         this.normals.forEach(normal => normalArray.push(...normal.xyz));
         return normalArray;
     }
+    
+    /**
+     * 获取纹理贴图坐标。
+     * @return {number[]}
+     */
+    public get uvArray():number[]{
+        const uvArray: number[] = [];
+       this.uvs.forEach(uv=>uvArray.push(...uv.xy))
+        return uvArray;
+    }
 }

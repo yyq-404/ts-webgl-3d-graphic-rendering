@@ -15,7 +15,7 @@ import {IGLAttribute} from '../attribute/IGLAttribute';
  */
 export class GLProgram {
     /** WebGL上下文渲染对象 */
-    public webglContext: WebGLRenderingContext | WebGL2RenderingContext;
+    public gl: WebGLRenderingContext | WebGL2RenderingContext;
     /** 名称 */
     public name: string;
     /** 链接器 */
@@ -39,19 +39,19 @@ export class GLProgram {
      * @param fragShader
      */
     public constructor(context: WebGLRenderingContext | WebGL2RenderingContext, attributesState: GLAttributeBits, vertShader: string = null, fragShader: string = null) {
-        this.webglContext = context;
+        this.gl = context;
         this._attributeBits = attributesState;
         // 最好能从shader源码中抽取，目前暂时使用参数传递方式
         this.bindCallback = null;
         this.unbindCallback = null;
         // 创建Vertex Shaders
-        this.vsShader = GLRenderHelper.createShader(this.webglContext, EGLShaderType.VS_SHADER);
+        this.vsShader = GLRenderHelper.createShader(this.gl, EGLShaderType.VS_SHADER);
         if (!this.vsShader) throw new Error('Create Vertex Shader Object Fail! ! ! ');
         // 创建Fragment Shader
-        this.fsShader = GLRenderHelper.createShader(this.webglContext, EGLShaderType.FS_SHADER);
+        this.fsShader = GLRenderHelper.createShader(this.gl, EGLShaderType.FS_SHADER);
         if (!this.fsShader) throw new Error('Create Fragment Shader Object Fail! ! ! ');
         // 创建WebGLProgram链接器对象
-        const program: WebGLProgram = GLRenderHelper.createProgram(this.webglContext);
+        const program: WebGLProgram = GLRenderHelper.createProgram(this.gl);
         if (!program) throw new Error('Create WebGLProgram Object Fail! ! ! ');
         this.program = program;
         // 如果构造函数参数包含GLSL ES源码，就调用loadShaders方法
@@ -82,24 +82,24 @@ export class GLProgram {
      * @param fs 片段着色器
      */
     public loadShaders(vs: string, fs: string): void {
-        this.programBeforeLink(this.webglContext, this.program);
-        if (!GLRenderHelper.compileShader(this.webglContext, vs, this.vsShader)) {
+        this.programBeforeLink(this.gl, this.program);
+        if (!GLRenderHelper.compileShader(this.gl, vs, this.vsShader)) {
             throw new Error(' WebGL顶点Shader链接不成功! ');
         }
-        if (!GLRenderHelper.compileShader(this.webglContext, fs, this.fsShader)) {
+        if (!GLRenderHelper.compileShader(this.gl, fs, this.fsShader)) {
             throw new Error(' WebGL像素片段Shader链接不成功! ');
         }
-        if (!GLRenderHelper.linkProgram(this.webglContext, this.program, this.vsShader, this.fsShader, this.programBeforeLink.bind(this), GLRenderHelper.printProgramActiveInfos)) {
+        if (!GLRenderHelper.linkProgram(this.gl, this.program, this.vsShader, this.fsShader, this.programBeforeLink.bind(this), GLRenderHelper.printProgramActiveInfos)) {
             throw new Error(' WebGLProgram链接不成功! ');
         }
-        GLRenderHelper.printProgramActiveInfos(this.webglContext, this.program);
+        GLRenderHelper.printProgramActiveInfos(this.gl, this.program);
     }
     
     /**
      * 将定义好的 `WebGLProgram` 对象添加到当前的 `WebGLRenderingContext`中
      */
     public bind(): void {
-        this.webglContext.useProgram(this.program);
+        this.gl.useProgram(this.program);
         this.bindCallback && this.bindCallback(this);
     }
     
@@ -108,7 +108,7 @@ export class GLProgram {
      */
     public unbind(): void {
         this.unbindCallback && this.unbindCallback(this);
-        this.webglContext.useProgram(null);
+        this.gl.useProgram(null);
     }
     
     /**
@@ -116,7 +116,7 @@ export class GLProgram {
      * @param name
      */
     public getUniformLocation(name: string): WebGLUniformLocation {
-        return this.webglContext.getUniformLocation(this.program, name);
+        return this.gl.getUniformLocation(this.program, name);
     }
     
     /**
@@ -124,7 +124,7 @@ export class GLProgram {
      * @param name
      */
     public getAttributeLocation(name: string): number {
-        return this.webglContext.getAttribLocation(this.program, name);
+        return this.gl.getAttribLocation(this.program, name);
     }
     
     /**
@@ -133,7 +133,7 @@ export class GLProgram {
      * @param location
      */
     public setAttributeLocation(name: string, location: number): void {
-        this.webglContext.bindAttribLocation(this.program, location, name);
+        this.gl.bindAttribLocation(this.program, location, name);
     }
     
     /**
@@ -147,14 +147,14 @@ export class GLProgram {
      * @param {number} stride
      * @param {number} offset
      */
-    public setVertexAttribute(name: string, buffer: WebGLBuffer, size: number, target: number = this.webglContext.ARRAY_BUFFER, type: number = this.webglContext.FLOAT, normalized: boolean = false, stride: number = 0, offset: number = 0): void {
+    public setVertexAttribute(name: string, buffer: WebGLBuffer, size: number, target: number = this.gl.ARRAY_BUFFER, type: number = this.gl.FLOAT, normalized: boolean = false, stride: number = 0, offset: number = 0): void {
         let location = this.getAttributeLocation(name);
         //启用顶点数据数组
-        this.webglContext.enableVertexAttribArray(location);
+        this.gl.enableVertexAttribArray(location);
         //绑定顶点数据缓冲
-        this.webglContext.bindBuffer(target, buffer);
+        this.gl.bindBuffer(target, buffer);
         //给管线指定顶点数据
-        this.webglContext.vertexAttribPointer(location, size, type, normalized, stride, offset);
+        this.gl.vertexAttribPointer(location, size, type, normalized, stride, offset);
     }
     
     /**
@@ -165,7 +165,7 @@ export class GLProgram {
     public setInt(name: string, i: number): void {
         const location: WebGLUniformLocation = this.getUniformLocation(name);
         if (location) {
-            this.webglContext.uniform1i(location, i);
+            this.gl.uniform1i(location, i);
         }
     }
     
@@ -177,7 +177,7 @@ export class GLProgram {
     public setFloat(name: string, f: number): void {
         const location: WebGLUniformLocation = this.getUniformLocation(name);
         if (location) {
-            this.webglContext.uniform1f(location, f);
+            this.gl.uniform1f(location, f);
         }
     }
     
@@ -189,7 +189,7 @@ export class GLProgram {
     public setVector2(name: string, vec2: Vector2): void {
         const location: WebGLUniformLocation = this.getUniformLocation(name);
         if (location) {
-            this.webglContext.uniform2fv(location, vec2.xy);
+            this.gl.uniform2fv(location, vec2.xy);
         }
     }
     
@@ -201,7 +201,7 @@ export class GLProgram {
     public setVector3(name: string, vec3: Vector3): void {
         const location: WebGLUniformLocation = this.getUniformLocation(name);
         if (location) {
-            this.webglContext.uniform3fv(location, vec3.xyz);
+            this.gl.uniform3fv(location, vec3.xyz);
         }
     }
     
@@ -213,7 +213,7 @@ export class GLProgram {
     public setVector4(name: string, vec4: Vector4): void {
         const location: WebGLUniformLocation = this.getUniformLocation(name);
         if (location) {
-            this.webglContext.uniform4fv(location, vec4.xyzw);
+            this.gl.uniform4fv(location, vec4.xyzw);
         }
     }
     
@@ -225,7 +225,7 @@ export class GLProgram {
     public setQuaternion(name: string, quaternion: Quaternion): void {
         const location: WebGLUniformLocation = this.getUniformLocation(name);
         if (location) {
-            this.webglContext.uniform4fv(location, quaternion.xyzw);
+            this.gl.uniform4fv(location, quaternion.xyzw);
         }
     }
     
@@ -237,7 +237,7 @@ export class GLProgram {
     public setMatrix3(name: string, mat: Matrix4): void {
         const location: WebGLUniformLocation = this.getUniformLocation(name);
         if (location) {
-            this.webglContext.uniformMatrix3fv(location, false, mat.all());
+            this.gl.uniformMatrix3fv(location, false, mat.all());
         }
     }
     
@@ -249,7 +249,7 @@ export class GLProgram {
     public setMatrix4(name: string, mat: Matrix4): void {
         const location: WebGLUniformLocation = this.getUniformLocation(name);
         if (location) {
-            this.webglContext.uniformMatrix4fv(location, false, mat.all());
+            this.gl.uniformMatrix4fv(location, false, mat.all());
         }
     }
     
@@ -261,7 +261,7 @@ export class GLProgram {
     public setSampler(name: string, sampler: number): void {
         const location: WebGLUniformLocation = this.getUniformLocation(name);
         if (location) {
-            this.webglContext.uniform1i(location, sampler);
+            this.gl.uniform1i(location, sampler);
         }
     }
     

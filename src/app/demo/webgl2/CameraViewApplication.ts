@@ -113,7 +113,7 @@ export class CameraViewApplication extends WebGL2Application {
         if (!buffers) return;
         this.program.bind();
         this.program.loadSampler();
-        this.drawArrays(this._rect, this.webglContext.TRIANGLE_FAN);
+        this.drawArrays(this._rect, this.gl.TRIANGLE_FAN);
         this.program.unbind();
     }
 }

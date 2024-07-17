@@ -55,10 +55,10 @@ export class GLAttributeHelper {
     
     /**
      * 获取顶点属性。
-     * @param webglContext
+     * @param gl
      */
-    public static getMaxVertexAttributes(webglContext: WebGLRenderingContextBase): number {
-        return webglContext.getParameter(webglContext.MAX_VERTEX_ATTRIBS) as number;
+    public static getMaxVertexAttributes(gl: WebGLRenderingContextBase): number {
+        return gl.getParameter(gl.MAX_VERTEX_ATTRIBS) as number;
     }
     
     /**

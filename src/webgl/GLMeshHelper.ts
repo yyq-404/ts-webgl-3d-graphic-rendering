@@ -11,12 +11,12 @@ import {GeometryHelper} from '../common/geometry/GeometryHelper';
 export class GLMeshHelper {
     /**
      * 产生静态网格对象。
-     * @param webglContext
+     * @param gl
      * @param geometry
      * @param optionNormal
      * @param optionUV
      */
-    public static makeStaticMesh(webglContext: WebGLRenderingContext, geometry: VertexStructure, optionNormal: boolean = false, optionUV: boolean = true): GLStaticMesh {
+    public static makeStaticMesh(gl: WebGLRenderingContext, geometry: VertexStructure, optionNormal: boolean = false, optionUV: boolean = true): GLStaticMesh {
         let bits: GLAttributeBits = GLMeshHelper.getAttribBits(geometry);
         if (!optionNormal) bits &= ~GLAttributeHelper.NORMAL.BIT;
         if (!optionUV) bits &= ~GLAttributeHelper.TEX_COORDINATE_0.BIT;
@@ -27,7 +27,7 @@ export class GLMeshHelper {
         for (let i: number = 0; i < geometry.positions.length; i++) {
             GLMeshHelper.fillGeometryBuffer(geometry, buffer, bits, i, step);
         }
-        const mesh: GLStaticMesh = new GLStaticMesh(webglContext, bits, buffer, geometry.indices.length > 0 ? new Uint16Array(geometry.indices) : null);
+        const mesh: GLStaticMesh = new GLStaticMesh(gl, bits, buffer, geometry.indices.length > 0 ? new Uint16Array(geometry.indices) : null);
         GLMeshHelper.buildBoundingBox(geometry, mesh.mins, mesh.maxs);
         return mesh;
     }

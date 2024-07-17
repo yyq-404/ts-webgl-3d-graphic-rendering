@@ -54,7 +54,7 @@ export class RotatingCubeApplication extends WebGLApplication {
         // 调用基类构造函数，最后一个参数为true，意味着我们要创建一个Canvas2D上下文渲染对象
         // 这样我们才能使用该上下文对象进行2D文字渲染
         super({premultipliedAlpha: false}, true);
-        if (!this.webglContext) throw new Error('this.gl is not defined');
+        if (!this.gl) throw new Error('this.gl is not defined');
         // 初始化角位移和角速度
         this._cubeAngle = 0;
         this._triangleAngle = 0;
@@ -68,7 +68,7 @@ export class RotatingCubeApplication extends WebGLApplication {
         // 创建cube的渲染数据
         // 对于三角形的渲染数据，我们使用GLMeshBuilder中立即模式绘制方式
         this._cube = new Cube();
-        this._cubeVAO = GLMeshHelper.makeStaticMesh(this.webglContext, this._cube.vertex);
+        this._cubeVAO = GLMeshHelper.makeStaticMesh(this.gl, this._cube.vertex);
         // 初始化时没选中任何一条坐标轴
         this._hitAxis = EAxisType.NONE;
         CanvasKeyboardEventManager.instance.registers(this, [
@@ -82,7 +82,7 @@ export class RotatingCubeApplication extends WebGLApplication {
      * 执行
      */
     public override async runAsync(): Promise<void> {
-        if (!this.webglContext) throw new Error('this.webglContext is not defined');
+        if (!this.gl) throw new Error('this.webglContext is not defined');
         let loadResults = new Array<Promise<boolean>>();
         this._imageUrls.forEach((url: string) => {
             loadResults.push(this.loadTextureAsync(url));
@@ -116,12 +116,12 @@ export class RotatingCubeApplication extends WebGLApplication {
      * 渲染
      */
     public override render(): void {
-        if (!this.webglContext) throw new Error('this.gl is not defined');
+        if (!this.gl) throw new Error('this.gl is not defined');
         if (this.context2d) {
             this.context2d.clearRect(0, 0, this.canvas.width, this.canvas.height);
         }
         // FIXME: 切记，一定要先清屏（清除掉颜色缓冲区和深度缓冲区）(书上有，随书源码中无？？？)
-        GLRenderHelper.clearBuffer(this.webglContext);
+        GLRenderHelper.clearBuffer(this.gl);
         this.renderCube();
         this.renderTriangle();
         this.renderText('First WebGL Demo');
@@ -151,12 +151,12 @@ export class RotatingCubeApplication extends WebGLApplication {
      * @private
      */
     private async loadTextureAsync(imgUrl: string): Promise<boolean> {
-        if (!this.webglContext) return false;
+        if (!this.gl) return false;
         let img: HTMLImageElement = await HttpHelper.loadImageAsync(imgUrl);
         if (!img) return false;
-        let texture: GLTexture = new GLTexture(this.webglContext);
+        let texture: GLTexture = new GLTexture(this.gl);
         texture.upload(img, 0, true);
-        texture.filter();
+        texture.bind();
         this._textures.push(texture);
         console.log(`纹理[${imgUrl}]载入成功!`);
         return true;
@@ -187,9 +187,9 @@ export class RotatingCubeApplication extends WebGLApplication {
         // 使用当前绑定的texture和program绘制cubeVao对象
         this._cubeVAO.draw();
         // 使用辅助方法绘制坐标系
-        GLCoordinateSystemHelper.drawAxis(this.builder, mvp, this._hitAxis, 1);
+        GLCoordinateSystemHelper.drawAxis(this.meshBuilder, mvp, this._hitAxis, 1);
         if (this.context2d) {
-            GLCoordinateSystemHelper.drawText(this.context2d, mvp, GLRenderHelper.getViewport(this.webglContext), this.canvas.height, false);
+            GLCoordinateSystemHelper.drawText(this.context2d, mvp, GLRenderHelper.getViewport(this.gl), this.canvas.height, false);
         }
         // 矩阵出栈
         this.worldMatrixStack.popMatrix();
@@ -207,7 +207,7 @@ export class RotatingCubeApplication extends WebGLApplication {
     private renderTriangle(): void {
         let textureProgram = GLProgramCache.instance.getMust('color');
         // 禁止渲染三角形时启用背面剔除功能
-        this.webglContext.disable(this.webglContext.CULL_FACE);
+        this.gl.disable(this.gl.CULL_FACE);
         // 由于三角形使用颜色+位置信息进行绘制，因此要绑定当前的GPU Program为colorProgram
         textureProgram.bind();
         // 新产生一个矩阵
@@ -219,22 +219,22 @@ export class RotatingCubeApplication extends WebGLApplication {
         this.worldMatrixStack.rotate(this._triangleAngle, Vector3.forward, true);
         // 使用类似OpenGL1.1的立即绘制模式
         // 开始绘制，default使用gl.TRIANGLES方式绘制
-        this.builder.begin();
+        this.meshBuilder.begin();
         // 三角形第一个点的颜色与坐标
-        this.builder.color(1, 0, 0).vertex(-0.5, 0, 0);
+        this.meshBuilder.color(1, 0, 0).vertex(-0.5, 0, 0);
         // 三角形第二个点的颜色与坐标
-        this.builder.color(0, 1, 0).vertex(0.5, 0, 0);
+        this.meshBuilder.color(0, 1, 0).vertex(0.5, 0, 0);
         // 三角形第三个点的颜色与坐标
-        this.builder.color(0, 0, 1).vertex(0, 0.5, 0);
+        this.meshBuilder.color(0, 0, 1).vertex(0, 0.5, 0);
         // 合成model-view-projection matrix
         const mvp = Matrix4.product(this.camera.viewProjectionMatrix, this.worldMatrixStack.modelViewMatrix);
         // 将mvpMatrix传递给GLMeshBuilder的end方法，该方法会正确的显示图形
-        this.builder.end(mvp);
+        this.meshBuilder.end(mvp);
         // 删除一个矩阵
         this.worldMatrixStack.popMatrix();
         textureProgram.unbind();
         // 恢复背面剔除功能
-        this.webglContext.enable(this.webglContext.CULL_FACE);
+        this.gl.enable(this.gl.CULL_FACE);
     }
     
     /**

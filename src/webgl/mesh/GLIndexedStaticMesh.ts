@@ -46,11 +46,11 @@ export class GLIndexedStaticMesh extends GLStaticMesh {
      * @protected
      */
     protected setIBO(ibo: Uint16Array): void {
-        this._ibo = this.webglContext.createBuffer();
+        this._ibo = this.gl.createBuffer();
         if (this._ibo === null) {
             throw new Error('IBO creation fail');
         }
-        this.webglContext.bindBuffer(this.webglContext.ELEMENT_ARRAY_BUFFER, this._ibo);
+        this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this._ibo);
     }
 
     /**
@@ -59,11 +59,11 @@ export class GLIndexedStaticMesh extends GLStaticMesh {
     public draw(): void {
         this.bind();
         if (this._ibo !== null) {
-            this.webglContext.bindBuffer(this.webglContext.ELEMENT_ARRAY_BUFFER, this._ibo);
-            this.webglContext.bufferData(this.webglContext.ELEMENT_ARRAY_BUFFER, this._indices.subArray(), this._indexCount);
-            this.webglContext.drawElements(this.drawMode, this._indexCount, this.webglContext.UNSIGNED_SHORT, 0);
+            this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this._ibo);
+            this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, this._indices.subArray(), this._indexCount);
+            this.gl.drawElements(this.drawMode, this._indexCount, this.gl.UNSIGNED_SHORT, 0);
         } else {
-            this.webglContext.drawArrays(this.drawMode, 0, this._vertexCount);
+            this.gl.drawArrays(this.drawMode, 0, this._vertexCount);
         }
         this.unbind();
     }

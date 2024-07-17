@@ -35,8 +35,8 @@ export class CullFaceApplication extends WebGL2Application {
      * 渲染。
      */
     public override render(): void {
-        this._optionCullFace ? this.webglContext.enable(this.webglContext.CULL_FACE) : this.webglContext.disable(this.webglContext.CULL_FACE);
-        this.webglContext.frontFace(this._optionCW ? this.webglContext.CW : this.webglContext.CCW);
+        this._optionCullFace ? this.gl.enable(this.gl.CULL_FACE) : this.gl.disable(this.gl.CULL_FACE);
+        this.gl.frontFace(this._optionCW ? this.gl.CW : this.gl.CCW);
         this.drawTriangles();
     };
     
@@ -63,7 +63,7 @@ export class CullFaceApplication extends WebGL2Application {
     private drawTriangle(triangle: Triangle): void {
         this.program.bind();
         this.program.loadSampler();
-        this.drawArrays(triangle, this.webglContext.TRIANGLES);
+        this.drawArrays(triangle, this.gl.TRIANGLES);
         this.program.unbind();
     }
 }

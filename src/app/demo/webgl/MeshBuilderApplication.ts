@@ -56,17 +56,17 @@ export class MeshBuilderApplication extends WebGLApplication {
     public constructor() {
         // 调用基类构造函数
         super({preserveDrawingBuffer: false}, true);
-        if (!this.webglContext) throw new Error('this.webglContext is undefined.');
+        if (!this.gl) throw new Error('this.webglContext is undefined.');
         // 使用default纹理和着色器
         this._texture = GLTextureCache.instance.getMust('default');
         // 创建不同EGLVertexLayoutType的颜色着色器
-        this._colorBuilder0 = new GLMeshBuilder(this.webglContext, GLAttributeHelper.POSITION.BIT | GLAttributeHelper.COLOR.BIT, null, null, EGLVertexLayoutType.INTERLEAVED);
-        this._colorBuilder1 = new GLMeshBuilder(this.webglContext, GLAttributeHelper.POSITION.BIT | GLAttributeHelper.COLOR.BIT, null, null, EGLVertexLayoutType.SEQUENCED);
-        this._colorBuilder2 = new GLMeshBuilder(this.webglContext, GLAttributeHelper.POSITION.BIT | GLAttributeHelper.COLOR.BIT, null, null, EGLVertexLayoutType.SEPARATED);
+        this._colorBuilder0 = new GLMeshBuilder(this.gl, GLAttributeHelper.POSITION.BIT | GLAttributeHelper.COLOR.BIT, null, null, EGLVertexLayoutType.INTERLEAVED);
+        this._colorBuilder1 = new GLMeshBuilder(this.gl, GLAttributeHelper.POSITION.BIT | GLAttributeHelper.COLOR.BIT, null, null, EGLVertexLayoutType.SEQUENCED);
+        this._colorBuilder2 = new GLMeshBuilder(this.gl, GLAttributeHelper.POSITION.BIT | GLAttributeHelper.COLOR.BIT, null, null, EGLVertexLayoutType.SEPARATED);
         // 创建不同EGLVertexLayoutType的纹理着色器
-        this._texBuilder0 = new GLMeshBuilder(this.webglContext, GLAttributeHelper.POSITION.BIT | GLAttributeHelper.TEX_COORDINATE_0.BIT, null, this._texture.texture, EGLVertexLayoutType.INTERLEAVED);
-        this._texBuilder1 = new GLMeshBuilder(this.webglContext, GLAttributeHelper.POSITION.BIT | GLAttributeHelper.TEX_COORDINATE_0.BIT, null, this._texture.texture, EGLVertexLayoutType.SEQUENCED);
-        this._texBuilder2 = new GLMeshBuilder(this.webglContext, GLAttributeHelper.POSITION.BIT | GLAttributeHelper.TEX_COORDINATE_0.BIT, null, this._texture.texture, EGLVertexLayoutType.SEPARATED);
+        this._texBuilder0 = new GLMeshBuilder(this.gl, GLAttributeHelper.POSITION.BIT | GLAttributeHelper.TEX_COORDINATE_0.BIT, null, this._texture.texture, EGLVertexLayoutType.INTERLEAVED);
+        this._texBuilder1 = new GLMeshBuilder(this.gl, GLAttributeHelper.POSITION.BIT | GLAttributeHelper.TEX_COORDINATE_0.BIT, null, this._texture.texture, EGLVertexLayoutType.SEQUENCED);
+        this._texBuilder2 = new GLMeshBuilder(this.gl, GLAttributeHelper.POSITION.BIT | GLAttributeHelper.TEX_COORDINATE_0.BIT, null, this._texture.texture, EGLVertexLayoutType.SEPARATED);
         // 可以随便该行列数量，用于多视口渲染使用
         this._coords = GLCoordinateSystem.makeViewportCoordinateSystems(this.canvas.width, this.canvas.height, 2, 3);
         // 初始化时指向页面1的绘图函数
@@ -123,19 +123,19 @@ export class MeshBuilderApplication extends WebGLApplication {
      * @private
      */
     private drawByMultiViewportsWithTextureShader(): void {
-        if (!this.webglContext) return;
+        if (!this.gl) return;
         // 第一步，设置viewport
         this.setViewport(this._coords[0]);
         // 第二步，设置viewport的背景色（可选，如果你不想使用default深灰色的背景色）
         // this.webglContext.clearColor(0.0, 0, 0, 1);
         // 第三步，将viewport设置为第二步设置的背景色（可选，如果你不想使用default深灰色的背景色）
-        this.webglContext.clear(this.webglContext.COLOR_BUFFER_BIT | this.webglContext.DEPTH_BUFFER_BIT);
+        this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
         // 在viewport0中绘制绕z轴旋转的三角形
         {
             this.worldMatrixStack.pushMatrix();
             this.worldMatrixStack.rotate(this._angle, Vector3.forward);
             Matrix4.product(this.camera.viewProjectionMatrix, this.worldMatrixStack.modelViewMatrix, Matrix4.m0);
-            this._texBuilder0.begin(this.webglContext.TRIANGLES);
+            this._texBuilder0.begin(this.gl.TRIANGLES);
             this._texBuilder0.texCoordinate(0, 0).vertex(-1, 0, 0);
             this._texBuilder0.texCoordinate(1, 0).vertex(1, 0, 0);
             this._texBuilder0.texCoordinate(0.5, 0.5).vertex(0, 1, 0);
@@ -148,7 +148,7 @@ export class MeshBuilderApplication extends WebGLApplication {
         {
             this.setViewport(this._coords[1]);
             this.worldMatrixStack.pushMatrix();
-            this._texBuilder1.begin(this.webglContext.TRIANGLE_FAN);
+            this._texBuilder1.begin(this.gl.TRIANGLE_FAN);
             this.worldMatrixStack.rotate(-this._angle, Vector3.forward);
             Matrix4.product(this.camera.viewProjectionMatrix, this.worldMatrixStack.modelViewMatrix, Matrix4.m0);
             this._texBuilder1.texCoordinate(0, 0).vertex(-1, -0.5, 0);
@@ -215,21 +215,21 @@ export class MeshBuilderApplication extends WebGLApplication {
      * @private
      */
     private drawByMatrixWithColorShader(): void {
-        if (!this.webglContext) return;
+        if (!this.gl) return;
         // 很重要，由于我们后续使用多视口渲染，因此必须要调用camera的setViewport方法
-        GLRenderHelper.setViewport(this.webglContext, {
+        GLRenderHelper.setViewport(this.gl, {
             x: 0,
             y: 0,
             width: this.canvas.width,
             height: this.canvas.height
         });
         // 使用clearColor方法设置当前颜色缓冲区背景色是什么颜色
-        this.webglContext.clearColor(0.8, 0.8, 0.8, 1);
+        this.gl.clearColor(0.8, 0.8, 0.8, 1);
         // 调用clear清屏操作
-        this.webglContext.clear(this.webglContext.COLOR_BUFFER_BIT | this.webglContext.DEPTH_BUFFER_BIT);
+        this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
         // 关闭三角形背面剔除功能，这是因为在初始化是，我们是开启了该功能
         // 但是由于我们下面会渲染三角形和四边形这两个2d形体，所以要关闭，否则不会显示三角形或四边形的背面部分
-        this.webglContext.disable(this.webglContext.CULL_FACE);
+        this.gl.disable(this.gl.CULL_FACE);
         
         // EGLVertexLayoutType.INTERLEAVED 顶点存储格式绘制绕z轴旋转的三角形
         this.worldMatrixStack.pushMatrix();
@@ -238,7 +238,7 @@ export class MeshBuilderApplication extends WebGLApplication {
         // 合成model-view-projection矩阵，存储到Matrix4的静态变量中，减少内存的重新分配
         Matrix4.product(this.camera.viewProjectionMatrix, this.worldMatrixStack.modelViewMatrix, Matrix4.m0);
         // 在使用GLMeshBuilder时，必须要调用beging方法
-        this._colorBuilder0.begin(this.webglContext.TRIANGLES);
+        this._colorBuilder0.begin(this.gl.TRIANGLES);
         // 顶点0为红色  左
         this._colorBuilder0.color(1, 0, 0).vertex(-0.5, 0, 0);
         // 顶点1为绿色  右
@@ -259,7 +259,7 @@ export class MeshBuilderApplication extends WebGLApplication {
         // 合成model-view-projection矩阵，存储到Matrix4的静态变量中，减少内存的重新分配
         Matrix4.product(this.camera.viewProjectionMatrix, this.worldMatrixStack.modelViewMatrix, Matrix4.m0);
         // 注意这里我们使用TRIANGLE_FAN图元而不是TRIANGLES图元绘制
-        this._colorBuilder1.begin(this.webglContext.TRIANGLE_FAN);
+        this._colorBuilder1.begin(this.gl.TRIANGLE_FAN);
         // 顶点0为红色  左下
         this._colorBuilder1.color(1, 0, 0).vertex(-0.5, 0, 0);
         // 顶点1为绿色  右下
@@ -289,7 +289,7 @@ export class MeshBuilderApplication extends WebGLApplication {
         this.worldMatrixStack.popMatrix();
         this.drawCoordinateAxis(this._colorBuilder2, 0.8);
         // 恢复三角形背面剔除功能
-        this.webglContext.enable(this.webglContext.CULL_FACE);
+        this.gl.enable(this.gl.CULL_FACE);
     }
     
     /**
@@ -303,7 +303,7 @@ export class MeshBuilderApplication extends WebGLApplication {
         // 2、gl.scissor (x, y, width, height)方法
         // 而在WebGLApplication的构造函数调用的GLHelper.setDefaultState方法已经开启了SCISSOR_TEST
         // 因此可以进行视口大小的裁剪操作了，超出视口部分的内容都被裁剪掉了!!
-        GLRenderHelper.setViewport(this.webglContext, glCoordinateSystem.viewport);
+        GLRenderHelper.setViewport(this.gl, glCoordinateSystem.viewport);
     }
     
     /**
@@ -315,6 +315,6 @@ export class MeshBuilderApplication extends WebGLApplication {
     private drawCoordinateAxis(builder: GLMeshBuilder, length: number = 1.0): void {
         GLCoordinateSystemHelper.drawAxis(builder, Matrix4.m0, EAxisType.NONE, length);
         if (!this.context2d) return;
-        GLCoordinateSystemHelper.drawText(this.context2d, Matrix4.m0, GLRenderHelper.getViewport(this.webglContext), this.canvas.height, false, length);
+        GLCoordinateSystemHelper.drawText(this.context2d, Matrix4.m0, GLRenderHelper.getViewport(this.gl), this.canvas.height, false, length);
     }
 }

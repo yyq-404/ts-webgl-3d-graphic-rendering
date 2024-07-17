@@ -22,14 +22,14 @@ export class SixPointStarApplication extends WebGL2Application {
         super(true);
         this.camera.z = 4;
         this.createStars();
-        GLRenderHelper.setDefaultState(this.webglContext);
+        GLRenderHelper.setDefaultState(this.gl);
     }
 
     /**
      * 渲染。
      */
     public override render(): void {
-        GLRenderHelper.clearBuffer(this.webglContext);
+        GLRenderHelper.clearBuffer(this.gl);
         this.renderStars();
     }
 
@@ -71,7 +71,7 @@ export class SixPointStarApplication extends WebGL2Application {
         for (const entity of buffers.entries()) {
             this.program.setVertexAttribute(entity[0].NAME, entity[1], entity[0].COMPONENT);
         }
-        this.webglContext.drawArrays(this.webglContext.TRIANGLES, 0, star.vertex.count);
+        this.gl.drawArrays(this.gl.TRIANGLES, 0, star.vertex.count);
         this.program.unbind();
     }
 }

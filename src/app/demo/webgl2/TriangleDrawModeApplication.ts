@@ -51,7 +51,7 @@ export class TriangleDrawModeApplication extends WebGL2Application {
             this.worldMatrixStack.translate(new Vector3([(solid instanceof Belt) ? -0.8 : 0.8, 0.0, 0.0]));
             this.worldMatrixStack.rotate(this.mouseMoveEvent.currentXAngle, Vector3.right);
             this.worldMatrixStack.rotate(this.mouseMoveEvent.currentYAngle, Vector3.up);
-            this.drawArrays(solid, (solid instanceof Belt) ? this.webglContext.TRIANGLE_STRIP : this.webglContext.TRIANGLE_FAN);
+            this.drawArrays(solid, (solid instanceof Belt) ? this.gl.TRIANGLE_STRIP : this.gl.TRIANGLE_FAN);
             this.end();
         });
     }
@@ -66,7 +66,7 @@ export class TriangleDrawModeApplication extends WebGL2Application {
             this.worldMatrixStack.rotate(this.mouseMoveEvent.currentXAngle, Vector3.right);
             this.worldMatrixStack.rotate(this.mouseMoveEvent.currentYAngle, Vector3.up);
             //将总变换矩阵送入渲染管线
-            this.drawArrays(belt, this.webglContext.TRIANGLE_STRIP);
+            this.drawArrays(belt, this.gl.TRIANGLE_STRIP);
             this.end();
         });
     }

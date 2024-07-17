@@ -28,7 +28,7 @@ export class AmbientLightApplication extends WebGL2Application {
         super(true);
         this.attributeBits = GLAttributeHelper.POSITION.BIT;
         this.createBuffers(this._ball);
-        GLRenderHelper.setDefaultState(this.webglContext);
+        GLRenderHelper.setDefaultState(this.gl);
         CanvasKeyboardEventManager.instance.registers(this, [
             {type: ECanvasKeyboardEventType.KEY_DOWN, key: 'ArrowLeft', callback: this.changeAmbientColor},
             {type: ECanvasKeyboardEventType.KEY_DOWN, key: 'ArrowRight', callback: this.changeAmbientColor},
@@ -74,8 +74,8 @@ export class AmbientLightApplication extends WebGL2Application {
             this.program.setVertexAttribute(entity[0].NAME, entity[1], entity[0].COMPONENT);
         }
         this.program.setFloat('uR', this._ball.r);
-        this.program.setVector4('aAmbient', new Vector4([this._ambientColor, this._ambientColor, this._ambientColor, this._ambientStrength]));
-        this.webglContext.drawArrays(this.webglContext.TRIANGLES, 0, this._ball.vertex.count);
+        this.program.setVector4(GLShaderConstants.ambient, new Vector4([this._ambientColor, this._ambientColor, this._ambientColor, this._ambientStrength]));
+        this.gl.drawArrays(this.gl.TRIANGLES, 0, this._ball.vertex.count);
         this.worldMatrixStack.popMatrix();
         this.program.unbind();
     }

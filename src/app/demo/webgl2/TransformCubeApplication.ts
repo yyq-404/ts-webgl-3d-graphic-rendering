@@ -21,7 +21,7 @@ export class TransformCubeApplication extends WebGL2Application {
         super(true);
         this.camera.z = 4;
         this.createBuffers(this._cube);
-        GLRenderHelper.setDefaultState(this.webglContext);
+        GLRenderHelper.setDefaultState(this.gl);
         CanvasKeyboardEventManager.instance.registers(this, [
             {type: ECanvasKeyboardEventType.KEY_PRESS, key: '1', callback: () => this._transformType = 'translation'},
             {type: ECanvasKeyboardEventType.KEY_PRESS, key: '2', callback: () => this._transformType = 'rotation'},
@@ -33,7 +33,7 @@ export class TransformCubeApplication extends WebGL2Application {
      * 渲染。
      */
     public override render(): void {
-        GLRenderHelper.clearBuffer(this.webglContext);
+        GLRenderHelper.clearBuffer(this.gl);
         this.renderCubes();
     }
     
@@ -61,7 +61,7 @@ export class TransformCubeApplication extends WebGL2Application {
         if (index % 2) {
             this.onTransform();
         }
-        this.drawArrays(this._cube, this.webglContext.TRIANGLES);
+        this.drawArrays(this._cube, this.gl.TRIANGLES);
         this.end();
     }
     

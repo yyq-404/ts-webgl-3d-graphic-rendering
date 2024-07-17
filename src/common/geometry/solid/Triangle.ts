@@ -2,6 +2,7 @@ import {Vector3} from '../../math/vector/Vector3';
 import {Geometry} from '../Geometry';
 import {VertexStructure} from '../VertexStructure';
 import {Color4} from '../../color/Color4';
+import {Vector2} from '../../math/vector/Vector2';
 
 /**
  * 三角形定义。
@@ -9,7 +10,7 @@ import {Color4} from '../../color/Color4';
 export class Triangle extends Geometry {
     /** 颜色集合 */
     private readonly _colors: Color4[] = [];
-
+    
     /**
      * 构造
      * @param {Vector3[]} points
@@ -26,8 +27,8 @@ export class Triangle extends Geometry {
             this._colors = [];
         }
     }
-
-
+    
+    
     /**
      * 获取顶点数据。
      * @return {VertexStructure}
@@ -38,6 +39,7 @@ export class Triangle extends Geometry {
         for (let i = 0; i < this._colors.length; i++) {
             vertex.colors.push(this._colors[i]);
         }
+        vertex.uvs = [new Vector2([0, 1]), new Vector2([1, 1]), new Vector2([0.5, 0])];
         return vertex;
     }
 }

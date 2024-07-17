@@ -59,17 +59,17 @@ export class DrawHelper {
         ];
         // 使用LINE_LOOP绘制底面，注意顶点顺序，逆时针方向，根据右手螺旋定则可知，法线朝外
         // 使用的是LINE_LOOP图元绘制模式
-        builder.begin(builder.webglContext.LINE_LOOP);
+        builder.begin(builder.gl.LINE_LOOP);
         [vertexes[2], vertexes[0], vertexes[4], vertexes[6]].forEach((vertex: Vector3) => builder.color(color.r, color.g, color.b).vertex(vertex.x, vertex.y, vertex.z));
         builder.end(mvp);
         // 使用LINE_LOOP绘制顶面，注意顶点顺序，逆时针方向，根据右手螺旋定则可知，法线朝外
         // 使用的是LINE_LOOP图元绘制模式
-        builder.begin(builder.webglContext.LINE_LOOP);
+        builder.begin(builder.gl.LINE_LOOP);
         [vertexes[3], vertexes[7], vertexes[5], vertexes[1]].forEach((vertex: Vector3) => builder.color(color.r, color.g, color.b).vertex(vertex.x, vertex.y, vertex.z));
         builder.end(mvp);
         // 使用LINES绘制
         // 使用的是LINES图元绘制模式
-        builder.begin(builder.webglContext.LINES);
+        builder.begin(builder.gl.LINES);
         [vertexes[2], vertexes[3], vertexes[0], vertexes[1], vertexes[4], vertexes[5], vertexes[6], vertexes[7]].forEach((vertex: Vector3) => builder.color(color.r, color.g, color.b).vertex(vertex.x, vertex.y, vertex.z));
         builder.end(mvp);
     }
@@ -96,7 +96,7 @@ export class DrawHelper {
         let cube = new Cube(halfSize);
         for (let i = 0; i < cube.surfaces.length; i++) {
             let positions: Vector3[] = cube.surfaces[i];
-            builder.begin(builder.webglContext.TRIANGLE_FAN);
+            builder.begin(builder.gl.TRIANGLE_FAN);
             for (let j = 0; j < positions.length; j++) {
                 let vertex = positions[j];
                 let uIndex = j * 2 + i * 8;

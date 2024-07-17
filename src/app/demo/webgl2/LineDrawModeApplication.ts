@@ -21,13 +21,13 @@ export class LineDrawModeApplication extends WebGL2Application {
      */
     public constructor() {
         super();
-        this._mode = this.webglContext.POINTS;
+        this._mode = this.gl.POINTS;
         this.createBuffers(this._points);
         CanvasKeyboardEventManager.instance.registers(this, [
-            {type: ECanvasKeyboardEventType.KEY_PRESS, key: '1', callback: () => this._mode = this.webglContext.POINTS},
-            {type: ECanvasKeyboardEventType.KEY_PRESS, key: '2', callback: () => this._mode = this.webglContext.LINES},
-            {type: ECanvasKeyboardEventType.KEY_PRESS, key: '3', callback: () => this._mode = this.webglContext.LINE_STRIP},
-            {type: ECanvasKeyboardEventType.KEY_PRESS, key: '4', callback: () => this._mode = this.webglContext.LINE_LOOP}
+            {type: ECanvasKeyboardEventType.KEY_PRESS, key: '1', callback: () => this._mode = this.gl.POINTS},
+            {type: ECanvasKeyboardEventType.KEY_PRESS, key: '2', callback: () => this._mode = this.gl.LINES},
+            {type: ECanvasKeyboardEventType.KEY_PRESS, key: '3', callback: () => this._mode = this.gl.LINE_STRIP},
+            {type: ECanvasKeyboardEventType.KEY_PRESS, key: '4', callback: () => this._mode = this.gl.LINE_LOOP}
         ]);
     }
     

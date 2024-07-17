@@ -10,24 +10,24 @@ export class MathHelper {
     
     /**
      * 静态辅助数学方法，判断参数x（必须是4）是否是2的n次方，即x是不是1、2、4、8、16、32、64.....
-     * @param x
+     * @param value
      */
-    public static isPowerOfTwo(x: number): boolean {
-        return (x & (x - 1)) == 0;
+    public static isPowerOfTwo(value: number): boolean {
+        return (value & (value - 1)) == 0;
     }
     
     /**
      * 静态辅助数学方法，给定整数参数x，取下一个2的n次方数
      * 如果x为3，则返回4；如果x为4，则返回4；如果x为5，则返回8；以此类推
-     * @param x
+     * @param value
      */
-    public static getNextPowerOfTwo(x: number): number {
-        if (x <= 0) throw new Error('参数必须要大于0! ');
-        --x;
+    public static getNextPowerOfTwo(value: number): number {
+        if (value <= 0) throw new Error('参数必须要大于0! ');
+        --value;
         for (let i = 1; i < 32; i <<= 1) {
-            x = x | (x >> i);
+            value = value | (value >> i);
         }
-        return x + 1;
+        return value + 1;
     }
     
     /**
@@ -57,12 +57,12 @@ export class MathHelper {
     
     /**
      * 检测目标值是否在区间之内
-     * @param x
+     * @param value
      * @param min
      * @param max
      */
-    public static clamp(x: number, min: number, max: number): number {
-        return x < min ? min : x > max ? max : x;
+    public static clamp(value: number, min: number, max: number): number {
+        return value < min ? min : value > max ? max : value;
     }
     
     /**

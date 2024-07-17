@@ -29,7 +29,7 @@ export class LightTypeApplication extends WebGL2Application {
         super(true);
         this.attributeBits = GLAttributeHelper.POSITION.BIT | GLAttributeHelper.NORMAL.BIT;
         this.createBuffers(...this._balls);
-        GLRenderHelper.setDefaultState(this.webglContext);
+        GLRenderHelper.setDefaultState(this.gl);
         CanvasKeyboardEventManager.instance.registers(this, [
             {type: ECanvasKeyboardEventType.KEY_DOWN, key: 'ArrowLeft', callback: this.changeLocationX},
             {type: ECanvasKeyboardEventType.KEY_DOWN, key: 'ArrowRight', callback: this.changeLocationX},
@@ -97,13 +97,13 @@ export class LightTypeApplication extends WebGL2Application {
         //将总变换矩阵送入渲染管线
         this.program.setMatrix4(GLShaderConstants.MVPMatrix, this.mvpMatrix());
         this.program.setMatrix4(GLShaderConstants.MMatrix, this.worldMatrixStack.worldMatrix());
-        this.program.setVector3(this._currentKey === '4' ? 'uLightDirection' : 'uLightLocation', new Vector3([this._locationX, this._locationY, 4]));
-        this.program.setVector3('uCamera', this.camera.position);
+        this.program.setVector3(this._currentKey === '4' ? GLShaderConstants.lightDirection : GLShaderConstants.lightLocation, new Vector3([this._locationX, this._locationY, 4]));
+        this.program.setVector3(GLShaderConstants.cameraPosition, this.camera.position);
         for (const entity of buffers.entries()) {
             this.program.setVertexAttribute(entity[0].NAME, entity[1], entity[0].COMPONENT);
         }
         this.program.setFloat('uR', ball.r);
-        this.webglContext.drawArrays(this.webglContext.TRIANGLES, 0, ball.vertex.count);
+        this.gl.drawArrays(this.gl.TRIANGLES, 0, ball.vertex.count);
         this.worldMatrixStack.popMatrix();
         this.program.unbind();
     }

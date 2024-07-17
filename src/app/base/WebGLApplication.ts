@@ -14,11 +14,11 @@ import {GLMatrixStack} from '../../webgl/matrix/GLMatrixStack';
  */
 export class WebGLApplication extends BaseApplication {
     /* 可以直接操作WebGL相关内容 */
-    protected webglContext: WebGLRenderingContext;
+    protected gl: WebGLRenderingContext;
     /** 模拟 `OpenGL1.1` 中的矩阵堆栈, 封装在 `GLWorldMatrixStack` 类中 */
     protected worldMatrixStack: GLMatrixStack;
     /** 模拟OpenGL1.1中的立即绘制模式, 封装在GLMeshBuilder类中 */
-    protected builder: GLMeshBuilder;
+    protected meshBuilder: GLMeshBuilder;
     /** 为了在3D环境中同时支持Canvas2D绘制，特别是为了实现文字绘制 */
     protected canvas2d: HTMLCanvasElement;
     /** 2D渲染环境 */
@@ -38,8 +38,8 @@ export class WebGLApplication extends BaseApplication {
      */
     public constructor(contextAttributes: WebGLContextAttributes = {premultipliedAlpha: false}, option2d: boolean = false) {
         super();
-        this.webglContext = this.canvas.getContext('webgl', contextAttributes);
-        if (!this.webglContext) {
+        this.gl = this.canvas.getContext('webgl', contextAttributes);
+        if (!this.gl) {
             alert(' 无法创建WebGLRenderingContext上下文对象 ');
             throw new Error(' 无法创建WebGLRenderingContext上下文对象 ');
         }
@@ -49,11 +49,11 @@ export class WebGLApplication extends BaseApplication {
         }
         this.worldMatrixStack = new GLMatrixStack();
         // 初始化渲染状态
-        GLRenderHelper.setDefaultState(this.webglContext);
+        GLRenderHelper.setDefaultState(this.gl);
         // 初始化时，创建default纹理
-        GLTextureCache.instance.set('default', GLTexture.createDefaultTexture(this.webglContext));
+        GLTextureCache.instance.set('default', GLTexture.createDefaultTexture(this.gl));
         // 初始化时，创建颜色GLMeshBuilder对象
-        this.builder = new GLMeshBuilder(this.webglContext, GLAttributeHelper.POSITION.BIT | GLAttributeHelper.COLOR.BIT);
+        this.meshBuilder = new GLMeshBuilder(this.gl, GLAttributeHelper.POSITION.BIT | GLAttributeHelper.COLOR.BIT);
     }
     
     
@@ -81,9 +81,9 @@ export class WebGLApplication extends BaseApplication {
         if (this.context2d) {
             this.context2d = null;
         }
-        GLRenderHelper.clearBuffer(this.webglContext);
-        if (this.webglContext) {
-            this.webglContext = null;
+        GLRenderHelper.clearBuffer(this.gl);
+        if (this.gl) {
+            this.gl = null;
         }
         super.dispose();
     }
@@ -94,23 +94,23 @@ export class WebGLApplication extends BaseApplication {
      * @private
      */
     protected async initAsync(): Promise<void> {
-        if (!this.webglContext) throw new Error('this.webglContext is not defined');
+        if (!this.gl) throw new Error('this.webglContext is not defined');
         // 加载颜色顶点着色器代码
         let colorVertShader = await this.loadShaderSourceAsync(this._shaderUrls, 'color.vert');
         // 加载颜色片元着色器代码
         let colorFragShader = await this.loadShaderSourceAsync(this._shaderUrls, 'color.frag');
-        let defaultColorProgram = GLProgram.createDefaultProgram(this.webglContext, colorVertShader, colorFragShader);
+        let defaultColorProgram = GLProgram.createDefaultProgram(this.gl, colorVertShader, colorFragShader);
         // 创建颜色Program
         GLProgramCache.instance.set('color', defaultColorProgram);
         // 加载纹理顶点着色器代码
         let textureVertShader = await this.loadShaderSourceAsync(this._shaderUrls, 'texture.vert');
         // 加载纹理片元着色器代码
         let textureFragShader = await this.loadShaderSourceAsync(this._shaderUrls, 'texture.frag');
-        let defaultTextureProgram = GLProgram.createDefaultProgram(this.webglContext, textureVertShader, textureFragShader, false);
+        let defaultTextureProgram = GLProgram.createDefaultProgram(this.gl, textureVertShader, textureFragShader, false);
         // 创建纹理Program
         GLProgramCache.instance.set('texture', defaultTextureProgram);
         // 设置颜色GLMeshBuilder对象
-        this.builder.program = defaultColorProgram;
+        this.meshBuilder.program = defaultColorProgram;
     }
     
     /**

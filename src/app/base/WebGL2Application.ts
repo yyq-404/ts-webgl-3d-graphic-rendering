@@ -18,7 +18,7 @@ import {Geometry} from '../../common/geometry/Geometry';
  */
 export class WebGL2Application extends BaseApplication {
     /* 可以直接操作WebGL2相关内容 */
-    protected webglContext: WebGL2RenderingContext;
+    protected gl: WebGL2RenderingContext;
     /** 模拟 `OpenGL1.1` 中的矩阵堆栈, 封装在 `GLWorldMatrixStack` 类中 */
     protected worldMatrixStack: GLMatrixStack;
     /** 链接器 */
@@ -40,8 +40,8 @@ export class WebGL2Application extends BaseApplication {
         premultipliedAlpha: false
     }) {
         super();
-        this.webglContext = this.canvas.getContext('webgl2', contextAttributes);
-        if (!this.webglContext) {
+        this.gl = this.canvas.getContext('webgl2', contextAttributes);
+        if (!this.gl) {
             alert(' 无法创建WebGL2RenderingContext上下文对象 ');
             throw new Error(' 无法创建WebGL2RenderingContext上下文对象 ');
         }
@@ -77,9 +77,9 @@ export class WebGL2Application extends BaseApplication {
     public override dispose(): void {
         this.worldMatrixStack.clear();
         GLProgramCache.instance.clear();
-        GLRenderHelper.clearBuffer(this.webglContext);
-        if (this.webglContext) {
-            this.webglContext = null;
+        GLRenderHelper.clearBuffer(this.gl);
+        if (this.gl) {
+            this.gl = null;
         }
         super.dispose();
     }
@@ -94,7 +94,7 @@ export class WebGL2Application extends BaseApplication {
         let vertexShaderSource = await this.loadShaderSourceAsync(this.shaderUrls, 'bns.vert');
         // 加载颜色片元着色器代码
         let fragShaderSource = await this.loadShaderSourceAsync(this.shaderUrls, 'bns.frag');
-        let program = this.program = GLProgram.createDefaultProgram(this.webglContext, vertexShaderSource, fragShaderSource);
+        let program = this.program = GLProgram.createDefaultProgram(this.gl, vertexShaderSource, fragShaderSource);
         //创建颜色Program
         GLProgramCache.instance.set('color', program);
     }
@@ -140,6 +140,9 @@ export class WebGL2Application extends BaseApplication {
             if (GLAttributeHelper.hasAttribute(this.attributeBits, GLAttributeHelper.NORMAL.BIT)) {
                 buffers.set(GLAttributeHelper.NORMAL, this.bindBuffer(solid.vertex.normalArray));
             }
+            if (GLAttributeHelper.hasAttribute(this.attributeBits, GLAttributeHelper.TEX_COORDINATE_0.BIT)) {
+                buffers.set(GLAttributeHelper.TEX_COORDINATE_0, this.bindBuffer(solid.vertex.uvArray));
+            }
         });
     }
     
@@ -150,9 +153,9 @@ export class WebGL2Application extends BaseApplication {
      * @private
      */
     protected bindBuffer(bufferData: number[]): WebGLBuffer {
-        let buffer = this.webglContext.createBuffer();
-        this.webglContext.bindBuffer(this.webglContext.ARRAY_BUFFER, buffer);
-        this.webglContext.bufferData(this.webglContext.ARRAY_BUFFER, new Float32Array(bufferData), this.webglContext.STATIC_DRAW);
+        let buffer = this.gl.createBuffer();
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(bufferData), this.gl.STATIC_DRAW);
         return buffer;
     }
     
@@ -183,7 +186,7 @@ export class WebGL2Application extends BaseApplication {
         for (const entity of buffers.entries()) {
             this.program.setVertexAttribute(entity[0].NAME, entity[1], entity[0].COMPONENT);
         }
-        this.webglContext.drawArrays(mode, first, solid.vertex.count);
+        this.gl.drawArrays(mode, first, solid.vertex.count);
     }
     
     /**

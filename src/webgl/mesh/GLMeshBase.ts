@@ -12,7 +12,7 @@ import {GLAttributeBits} from '../common/GLTypes';
  */
 export abstract class GLMeshBase {
     /** WebGL渲染上下文 */
-    public webglContext: WebGLRenderingContext;
+    public gl: WebGLRenderingContext;
     /** `gl.TRIANGLES` 等7种基本几何图元之一 */
     protected drawMode: number;
     /** 顶点属性格式，和绘制当前网格时使用的 `GLProgram` 具有一致的 `attribBits` */
@@ -33,10 +33,10 @@ export abstract class GLMeshBase {
      * @protected
      */
     protected constructor(webGLRenderingContext: WebGLRenderingContext, attributesState: GLAttributeBits, drawMode: number = webGLRenderingContext.TRIANGLES) {
-        this.webglContext = webGLRenderingContext;
+        this.gl = webGLRenderingContext;
         // 获取VAO的步骤
         // 1．使用gl.getExtension( "OES_vertex_array_object" )方式获取 VAO 扩展
-        const vaoExtension: OES_vertex_array_object = this.webglContext.getExtension('OES_vertex_array_object');
+        const vaoExtension: OES_vertex_array_object = this.gl.getExtension('OES_vertex_array_object');
         if (!vaoExtension) throw new Error('Not Support OES_vertex_array_object');
         this._vaoExtension = vaoExtension;
         // 2．调用createVertexArrayOES获取 `WebGLVertexArrayObject` 对象

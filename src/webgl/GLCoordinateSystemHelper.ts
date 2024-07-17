@@ -86,10 +86,10 @@ export class GLCoordinateSystemHelper {
      */
     public static drawAxis(builder: GLMeshBuilder, mvp: Matrix4, hitAxis: EAxisType, length: number = 1, rotateAxis: Vector3 = null, inverse: boolean = false, isLeftHardness: boolean = false): void {
         // 用5个像素大小的直径绘制线段，但目前仅Safari浏览器实现
-        builder.webglContext.lineWidth(5);
+        builder.gl.lineWidth(5);
         // 关闭帧缓存深度测试
-        builder.webglContext.disable(builder.webglContext.DEPTH_TEST);
-        builder.begin(builder.webglContext.LINES);
+        builder.gl.disable(builder.gl.DEPTH_TEST);
+        builder.begin(builder.gl.LINES);
         // X轴
         let xAxisColor: Color4 = hitAxis === EAxisType.X_AXIS ? GLCoordinateSystemHelper.defaultHitColor : new Color4([1.0, 0.0, 0.0, 1.0]);
         this.setAxisColor(builder, xAxisColor, new Vector3([length, 0.0, 0.0]), inverse);
@@ -108,9 +108,9 @@ export class GLCoordinateSystemHelper {
         // 将渲染数据提交给GPU进行渲染
         builder.end(mvp);
         // 恢复线宽为1个像素
-        builder.webglContext.lineWidth(1);
+        builder.gl.lineWidth(1);
         // 恢复开始帧缓存深度测试
-        builder.webglContext.enable(builder.webglContext.DEPTH_TEST);
+        builder.gl.enable(builder.gl.DEPTH_TEST);
     }
     
     /**

@@ -54,7 +54,7 @@ export class GLTexture {
     /** css标准色字符串 */
     private static readonly Colors: ReadonlyArray<CSSColor> = CSSColors;
     /** 渲染环境 */
-    public gl: WebGLRenderingContext;
+    public gl: WebGLRenderingContext | WebGL2RenderingContext;
     /** 是否使用mipmap多级渐进纹理生成纹理对象 */
     public isMipmap: boolean;
     /** 当前纹理对象的像素宽度 */
@@ -77,15 +77,15 @@ export class GLTexture {
      * @param gl WebGLRenderingContext
      * @param name 纹理的名称
      */
-    public constructor(gl: WebGLRenderingContext, public name: string = '') {
+    public constructor(gl: WebGLRenderingContext | WebGL2RenderingContext, public name: string = '') {
         this.gl = gl;
+        const glTexture: WebGLTexture = gl.createTexture();
+        if (!glTexture) throw new Error('WebGLTexture创建不成功!');
+        this.texture = glTexture;
         this.isMipmap = false;
         this.width = this.height = 0;
         this.format = gl.RGBA;
         this.type = gl.UNSIGNED_BYTE;
-        const tex: WebGLTexture = gl.createTexture();
-        if (!tex) throw new Error('WebGLTexture创建不成功!');
-        this.texture = tex;
         this.target = gl.TEXTURE_2D;
         this.name = name;
         this.texParameters = new Map<EGLTextureWrapType, GLint>([
@@ -93,8 +93,8 @@ export class GLTexture {
             [EGLTextureWrapType.GL_MIRRORED_REPEAT, this.gl.MIRRORED_REPEAT],
             [EGLTextureWrapType.GL_CLAMP_TO_EDGE, this.gl.CLAMP_TO_EDGE]
         ]);
-        this.wrap();
         this.filter();
+        this.wrap();
     }
     
     /**
@@ -118,7 +118,7 @@ export class GLTexture {
      * 创建默认的2的n次方的纹理对象
      * @param gl
      */
-    public static createDefaultTexture(gl: WebGLRenderingContext): GLTexture {
+    public static createDefaultTexture(gl: WebGLRenderingContext | WebGL2RenderingContext): GLTexture {
         const step: number = 4;
         const canvas: HTMLCanvasElement = document.createElement('canvas') as HTMLCanvasElement;
         canvas.width = 32 * step;
@@ -138,7 +138,6 @@ export class GLTexture {
             }
         }
         const texture: GLTexture = new GLTexture(gl);
-        texture.wrap();
         texture.upload(canvas);
         return texture;
     }
