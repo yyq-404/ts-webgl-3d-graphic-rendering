@@ -3,6 +3,8 @@
 precision mediump float;
 //半径
 uniform float uR;
+//环境光系数
+uniform vec4 uAmbient;
 //接收从顶点着色器过来的顶点位置
 in vec3 vPosition;
 //接受从顶点位置传过来的环境光强度
@@ -34,5 +36,5 @@ void main() {
     //计算最终颜色。
     vec4 finalColr = vec4(color, 1.0);
     //根据环境光强度计算最终片元颜色值
-    fragColor = finalColr * vAmbient;
+    fragColor = finalColr * uAmbient;
 }
