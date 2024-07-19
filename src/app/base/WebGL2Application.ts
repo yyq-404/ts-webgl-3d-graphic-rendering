@@ -81,6 +81,10 @@ export class WebGL2Application extends BaseApplication {
         if (this.gl) {
             this.gl = null;
         }
+        const controls = document.getElementById('controls');
+        if (controls) {
+            controls.replaceChildren();
+        }
         super.dispose();
     }
     
