@@ -10,8 +10,8 @@ import {LineDrawModeApplication} from './app/demo/webgl2/LineDrawModeApplication
 import {TriangleDrawModeApplication} from './app/demo/webgl2/TriangleDrawModeApplication';
 import {CameraViewApplication} from './app/demo/webgl2/CameraViewApplication';
 import {CullFaceApplication} from './app/demo/webgl2/CullFaceApplication';
-import {AmbientLightApplication} from './app/demo/webgl2/AmbientLightApplication';
-import {LightTypeApplication} from './app/demo/webgl2/LightTypeApplication';
+import {LightReflectionApplication} from './app/demo/webgl2/LightReflectionApplication';
+import {LightSourceApplication} from './app/demo/webgl2/LightSourceApplication';
 import {NormalVectorApplication} from './app/demo/webgl2/NormalVectorApplication';
 import {LightComputeApplication} from './app/demo/webgl2/LightComputeApplication';
 import {WallTextureApplication} from './app/demo/webgl2/WallTextureApplication';
@@ -30,9 +30,9 @@ const apps = {
     '9: TriangleDrawMode': TriangleDrawModeApplication,
     '10: CameraView': CameraViewApplication,
     '11: CullFace': CullFaceApplication,
-    '12: AmbientLight': AmbientLightApplication,
-    '13: LightType': LightTypeApplication,
-    '14: NormalVector': NormalVectorApplication,
+    '12: LightReflection': LightReflectionApplication,
+    '13: LightSource': LightSourceApplication,
+    '14: LightNormal': NormalVectorApplication,
     '15: LightComputeMode': LightComputeApplication,
     '16: WallTexture': WallTextureApplication,
     '17: TextureRepeat': TextureRepeatApplication
