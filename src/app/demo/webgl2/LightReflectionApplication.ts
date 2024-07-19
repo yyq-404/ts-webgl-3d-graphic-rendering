@@ -5,8 +5,8 @@ import {GLShaderConstants} from '../../../webgl/GLShaderConstants';
 import {AppConstants} from '../../AppConstants';
 import {GLAttributeHelper} from '../../../webgl/GLAttributeHelper';
 import {GLRenderHelper} from '../../../webgl/GLRenderHelper';
-import {Vector4} from '../../../common/math/vector/Vector4';
-import {HtmlHelper, HtmlRangeProps} from '../HtmlHelper';
+import {HtmlHelper} from '../HtmlHelper';
+import {LightController} from '../LightController';
 
 /**
  * 光反射应用。
@@ -16,14 +16,8 @@ export class LightReflectionApplication extends WebGL2Application {
     private _ball: Ball = new Ball();
     /** 反射类型 */
     private _reflectionType: string = 'ambient';
-    /** UI配置 */
-    private _lightControls: Map<string, HtmlRangeProps[]>;
-    /** 光照参数 */
-    private readonly _lightArgs: Map<string, number> = new Map<string, number>([
-        ['ambient_color', 0.8],
-        ['diffuse_color', 0.8],
-        ['specular_color', 0.7]
-    ]);
+    /** 光照控制器 */
+    private _lightController = new LightController();
     
     /**
      * 构造。
@@ -31,12 +25,6 @@ export class LightReflectionApplication extends WebGL2Application {
     public constructor() {
         super(true);
         this.attributeBits = GLAttributeHelper.POSITION.BIT | GLAttributeHelper.NORMAL.BIT;
-        this._lightControls = new Map<string, HtmlRangeProps[]>([
-                ['ambient', [{id: 'ambient_color', name: '颜色', value: '80', onChange: this.onColorChange, min: '0', max: '100'}]],
-                ['diffuse', [{id: 'diffuse_color', name: '颜色', value: '80', onChange: this.onColorChange, min: '0', max: '100'}]],
-                ['specular', [{id: 'specular_color', name: '颜色', value: '80', onChange: this.onColorChange, min: '0', max: '100'}]]
-            ]
-        );
         this.createBuffers(this._ball);
         GLRenderHelper.setDefaultState(this.gl);
     }
@@ -57,17 +45,18 @@ export class LightReflectionApplication extends WebGL2Application {
      * @return {Promise<void>}
      */
     public override async runAsync(): Promise<void> {
-        HtmlHelper.createSelect('光照类型', {
-            options: [
-                {name: '环境光', value: 'ambient'},
-                {name: '散射光', value: 'diffuse'},
-                {name: '镜面光', value: 'specular'}
-            ],
-            onChange: this.onReflectionTypeChange, value: this._reflectionType
+        const options = [
+            {name: '环境光', value: 'ambient'},
+            {name: '散射光', value: 'diffuse'},
+            {name: '镜面光', value: 'specular'}
+        ];
+        HtmlHelper.createSelect('光照类型', {options, onChange: this.onReflectionTypeChange, value: this._reflectionType});
+        options.forEach(value => {
+            if (value.value === this._reflectionType) {
+                this._lightController.createLightControlByType(value.name);
+            }
         });
-        this.createLightControlByType();
-        await this.initAsync();
-        this.start();
+        await super.runAsync();
     }
     
     /**
@@ -96,7 +85,7 @@ export class LightReflectionApplication extends WebGL2Application {
         this.setLightColor();
         buffers.forEach((value, attribute) => {
             this.program.setVertexAttribute(attribute.NAME, value, attribute.COMPONENT);
-        })
+        });
         this.gl.drawArrays(this.gl.TRIANGLES, 0, this._ball.vertex.count);
         this.worldMatrixStack.popMatrix();
         this.program.unbind();
@@ -107,50 +96,25 @@ export class LightReflectionApplication extends WebGL2Application {
      * @private
      */
     private setLightColor(): void {
-        let color: number = this._lightArgs.get(`${this._reflectionType}_color`);
         switch (this._reflectionType) {
             case 'ambient':
-                this.program.setVector4(GLShaderConstants.ambient, new Vector4([color, color, color, 1.0]));
+                this.program.setVector4(GLShaderConstants.ambient, this._lightController.getColor(GLShaderConstants.ambient));
                 break;
             case 'diffuse':
                 this.program.setMatrix4(GLShaderConstants.MMatrix, this.worldMatrixStack.worldMatrix());
-                this.program.setVector4(GLShaderConstants.diffuse, new Vector4([color, color, color, 1.0]));
-                this.program.setVector3(GLShaderConstants.lightLocation, new Vector3([0, 0, this.camera.z]));
+                this.program.setVector4(GLShaderConstants.diffuse, this._lightController.getColor(GLShaderConstants.diffuse));
+                this.program.setVector3(GLShaderConstants.lightLocation, this._lightController.location);
                 break;
             case 'specular':
                 this.program.setMatrix4(GLShaderConstants.MMatrix, this.worldMatrixStack.worldMatrix());
-                this.program.setVector4(GLShaderConstants.specular, new Vector4([color, color, color, 1.0]));
-                this.program.setVector3(GLShaderConstants.lightLocation, new Vector3([0, 0, this.camera.z]));
+                this.program.setVector4(GLShaderConstants.specular, this._lightController.getColor(GLShaderConstants.specular));
+                this.program.setVector3(GLShaderConstants.lightLocation, this._lightController.location);
                 this.program.setVector3(GLShaderConstants.cameraPosition, this.camera.position);
                 break;
             default:
                 break;
         }
     }
-    
-    /**
-     * 根据类型创建光照控制控件。
-     * @private
-     */
-    private createLightControlByType(): void {
-        const props = this._lightControls.get(this._reflectionType);
-        if (props) {
-            const parent = document.getElementById('controls');
-            HtmlHelper.createRanges(parent, props);
-        }
-    }
-    
-    /**
-     * 颜色更改
-     * @param {Event} event
-     */
-    private onColorChange = (event: Event) => {
-        const element = event.target as HTMLInputElement;
-        if (element) {
-            const value: number = parseFloat(element.value) / 100;
-            this._lightArgs.set(element.id, isNaN(value) ? 1 : value);
-        }
-    };
     
     /**
      * 反射类型更改。

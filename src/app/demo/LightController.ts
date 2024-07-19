@@ -8,8 +8,10 @@ import {Vector4} from '../../common/math/vector/Vector4';
  * 光照参数控制器。
  */
 export class LightController {
-    /** UI配置 */
-    private _lightControls: Map<string, HtmlRangeProps[]>;
+    /** 光照类型UI配置 */
+    private _lightTypeControls: Map<string, HtmlRangeProps[]>;
+    /** 光照位置UI配置 */
+    private _lightLocationControls: Map<string, HtmlRangeProps[]>;
     /** 光照参数 */
     private _args: Map<string, number> = new Map<string, number>([
         [GLShaderConstants.ambient, 0.15],
@@ -24,10 +26,12 @@ export class LightController {
      * 构造
      */
     public constructor() {
-        this._lightControls = new Map<string, HtmlRangeProps[]>([
+        this._lightTypeControls = new Map<string, HtmlRangeProps[]>([
             ['环境光', [{id: GLShaderConstants.ambient, name: '颜色', value: '15', onChange: this.onColorChange, min: '0', max: '100'}]],
             ['散射光', [{id: GLShaderConstants.diffuse, name: '颜色', value: '80', onChange: this.onColorChange, min: '0', max: '100'}]],
-            ['镜面光', [{id: GLShaderConstants.specular, name: '颜色', value: '70', onChange: this.onColorChange, min: '0', max: '100'}]],
+            ['镜面光', [{id: GLShaderConstants.specular, name: '颜色', value: '70', onChange: this.onColorChange, min: '0', max: '100'}]]
+        ]);
+        this._lightLocationControls = new Map<string, HtmlRangeProps[]>([
             ['光源位置', [
                 {id: 'location_x', name: 'X轴', value: '0', onChange: this.onLocationChange, min: '-50', max: '50'},
                 {id: 'location_y', name: 'Y轴', value: '0', onChange: this.onLocationChange, min: '-50', max: '50'},
@@ -54,10 +58,53 @@ export class LightController {
     }
     
     /**
+     * 获取光照颜色
+     * @param {string} type
+     * @return {Vector4}
+     */
+    public getColor(type: string): Vector4 {
+        const color = this.args.get(type);
+        if (color) {
+            return new Vector4([color, color, color, 1]);
+        } else {
+            return new Vector4();
+        }
+    }
+    
+    /**
      * 创建控件。
      */
     public create(): void {
-        this._lightControls.forEach((value, key) => {
+        this.createTypeControls();
+        this.createLocationControls();
+    }
+    
+    /**
+     * 创建类型控件。
+     */
+    public createTypeControls(): void {
+        this._lightTypeControls.forEach((value, key) => {
+            HtmlHelper.createRangesWithLabel(key, value);
+        });
+    }
+    
+    /**
+     * 根据类型创建光照控制控件。
+     * @private
+     */
+    public createLightControlByType(type: string): void {
+        const props = this._lightTypeControls.get(type);
+        if (props) {
+            const parent = document.getElementById('controls');
+            HtmlHelper.createRanges(parent, props);
+        }
+    }
+    
+    /**
+     * 创建位置控件。
+     */
+    public createLocationControls() {
+        this._lightLocationControls.forEach((value, key) => {
             HtmlHelper.createRangesWithLabel(key, value);
         });
     }

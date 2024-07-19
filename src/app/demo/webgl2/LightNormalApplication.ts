@@ -33,10 +33,10 @@ export class LightNormalApplication extends WebGL2Application {
      * @return {Map<string, string>}
      */
     public override get shaderUrls(): Map<string, string> {
-        const shaderUrls: Map<string, string> = new Map<string, string>();
-        shaderUrls.set('bns.vert', `${AppConstants.webgl2ShaderRoot}/light/point.vert`);
-        shaderUrls.set('bns.frag', `${AppConstants.webgl2ShaderRoot}/light/point.frag`);
-        return shaderUrls;
+        return new Map<string, string>([
+            ['bns.vert', `${AppConstants.webgl2ShaderRoot}/light/point.vert`],
+            ['bns.frag', `${AppConstants.webgl2ShaderRoot}/light/point.frag`]
+        ]);
     }
     
     /**
