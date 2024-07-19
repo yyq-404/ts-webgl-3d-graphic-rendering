@@ -1,12 +1,12 @@
-import {WebGL2Application} from '../../base/WebGL2Application';
-import {Ball} from '../../../common/geometry/solid/Ball';
-import {Vector3} from '../../../common/math/vector/Vector3';
-import {GLShaderConstants} from '../../../webgl/GLShaderConstants';
-import {AppConstants} from '../../AppConstants';
-import {GLAttributeHelper} from '../../../webgl/GLAttributeHelper';
-import {GLRenderHelper} from '../../../webgl/GLRenderHelper';
-import {HtmlHelper} from '../HtmlHelper';
-import {LightController} from '../LightController';
+import {WebGL2Application} from '../../../base/WebGL2Application';
+import {Ball} from '../../../../common/geometry/solid/Ball';
+import {Vector3} from '../../../../common/math/vector/Vector3';
+import {GLShaderConstants} from '../../../../webgl/GLShaderConstants';
+import {AppConstants} from '../../../AppConstants';
+import {GLAttributeHelper} from '../../../../webgl/GLAttributeHelper';
+import {GLRenderHelper} from '../../../../webgl/GLRenderHelper';
+import {HtmlHelper} from '../../HtmlHelper';
+import {LightController} from '../../LightController';
 
 /**
  * 光源类型应用。

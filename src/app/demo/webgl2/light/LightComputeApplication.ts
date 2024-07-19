@@ -1,12 +1,12 @@
-import {WebGL2Application} from '../../base/WebGL2Application';
-import {Vector3} from '../../../common/math/vector/Vector3';
-import {GLShaderConstants} from '../../../webgl/GLShaderConstants';
-import {AppConstants} from '../../AppConstants';
-import {GLAttributeHelper} from '../../../webgl/GLAttributeHelper';
-import {GLRenderHelper} from '../../../webgl/GLRenderHelper';
-import {Rect} from '../../../common/geometry/solid/Rect';
-import {HtmlHelper} from '../HtmlHelper';
-import {LightController} from '../LightController';
+import {WebGL2Application} from '../../../base/WebGL2Application';
+import {Vector3} from '../../../../common/math/vector/Vector3';
+import {GLShaderConstants} from '../../../../webgl/GLShaderConstants';
+import {AppConstants} from '../../../AppConstants';
+import {GLAttributeHelper} from '../../../../webgl/GLAttributeHelper';
+import {GLRenderHelper} from '../../../../webgl/GLRenderHelper';
+import {Rect} from '../../../../common/geometry/solid/Rect';
+import {HtmlHelper} from '../../HtmlHelper';
+import {LightController} from '../../LightController';
 
 /**
  * 光照计算模式应用。

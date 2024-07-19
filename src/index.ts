@@ -10,10 +10,10 @@ import {LineDrawModeApplication} from './app/demo/webgl2/LineDrawModeApplication
 import {TriangleDrawModeApplication} from './app/demo/webgl2/TriangleDrawModeApplication';
 import {CameraViewApplication} from './app/demo/webgl2/CameraViewApplication';
 import {CullFaceApplication} from './app/demo/webgl2/CullFaceApplication';
-import {LightReflectionApplication} from './app/demo/webgl2/LightReflectionApplication';
-import {LightSourceApplication} from './app/demo/webgl2/LightSourceApplication';
-import {LightNormalApplication} from './app/demo/webgl2/LightNormalApplication';
-import {LightComputeApplication} from './app/demo/webgl2/LightComputeApplication';
+import {LightReflectionApplication} from './app/demo/webgl2/light/LightReflectionApplication';
+import {LightSourceApplication} from './app/demo/webgl2/light/LightSourceApplication';
+import {LightNormalApplication} from './app/demo/webgl2/light/LightNormalApplication';
+import {LightComputeApplication} from './app/demo/webgl2/light/LightComputeApplication';
 import {WallTextureApplication} from './app/demo/webgl2/WallTextureApplication';
 import {TextureRepeatApplication} from './app/demo/webgl2/TextureRepeatApplication';
 
