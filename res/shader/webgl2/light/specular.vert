@@ -8,6 +8,8 @@ uniform mat4 uMMatrix;
 uniform vec3 uLightLocation;
 //摄像机位置
 uniform vec3 uCamera;
+//镜面光系数
+uniform vec4 uSpecular;
 //顶点位置
 in vec3 aPosition;
 //法向量
@@ -53,7 +55,7 @@ void main() {
     //根据总变换矩阵计算此次绘制此顶点的位置
     gl_Position = uMVPMatrix * vec4(aPosition, 1);
     //计算定位光
-    vSpecular = pointLight(normalize(aNormal), uLightLocation, vec4(0.9, 0.9, 0.9, 1.0));
+    vSpecular = pointLight(normalize(aNormal), uLightLocation, uSpecular);
     //将顶点的位置传给片元着色器
     vPosition = aPosition;
 }

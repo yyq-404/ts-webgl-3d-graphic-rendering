@@ -6,6 +6,8 @@ uniform mat4 uMVPMatrix;
 uniform mat4 uMMatrix;
 //光源位置
 uniform vec3 uLightLocation;
+//散射光光系数
+uniform vec4 uDiffuse;
 //顶点位置
 in vec3 aPosition;
 //顶点法向量
@@ -42,7 +44,7 @@ void main() {
     //根据总变换矩阵计算此次绘制此顶点的位置
     gl_Position = uMVPMatrix * vec4(aPosition, 1);
     //将散射光最终强度传给片元着色器
-    vDiffuse = pointLight(normalize(aNormal), uLightLocation, vec4(0.8, 0.8, 0.8, 1.0));
+    vDiffuse = pointLight(normalize(aNormal), uLightLocation, uDiffuse);
     //将顶点的位置传给片元着色器
     vPosition = aPosition;
 }
