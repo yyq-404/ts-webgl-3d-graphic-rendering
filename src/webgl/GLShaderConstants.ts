@@ -34,4 +34,8 @@ export class GLShaderConstants {
     public static readonly cameraPosition: string = 'uCamera';
     /** 环境光 */
     public static readonly ambient: string = 'uAmbient';
+    /** 散射光 */
+    public static readonly diffuse: string = 'uDiffuse';
+    /** 镜面光 */
+    public static readonly specular: string = 'uSpecular';
 }
