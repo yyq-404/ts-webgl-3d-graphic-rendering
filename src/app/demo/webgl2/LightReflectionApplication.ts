@@ -6,27 +6,23 @@ import {AppConstants} from '../../AppConstants';
 import {GLAttributeHelper} from '../../../webgl/GLAttributeHelper';
 import {GLRenderHelper} from '../../../webgl/GLRenderHelper';
 import {Vector4} from '../../../common/math/vector/Vector4';
+import {HtmlHelper, HtmlRangeProps} from '../HtmlHelper';
 
 /**
- * 环境光应用。
+ * 光反射应用。
  */
-export class AmbientLightApplication extends WebGL2Application {
+export class LightReflectionApplication extends WebGL2Application {
     /** 球体 */
     private _ball: Ball = new Ball();
-    /** 光照类型 */
-    private _lightType: string = 'ambient';
+    /** 反射类型 */
+    private _reflectionType: string = 'ambient';
+    /** UI配置 */
+    private _lightControls: Map<string, HtmlRangeProps[]>;
     /** 光照参数 */
-    private _lightArgs: Map<string, number> = new Map<string, number>([
+    private readonly _lightArgs: Map<string, number> = new Map<string, number>([
         ['ambient_color', 0.8],
-        ['ambient_strength', 1.0],
         ['diffuse_color', 0.8],
         ['specular_color', 0.7]
-    ]);
-    /** UI配置 */
-    private _lightControls: Map<string, { id: string, name: string, value: string }[]> = new Map<string, { id: string, name: string, value: string }[]>([
-        ['ambient', [{id: 'ambient_color', name: '颜色', value: '80'}, {id: 'ambient_strength', name: '强度', value: '100'}]],
-        ['diffuse', [{id: 'diffuse_color', name: '颜色', value: '80'}]],
-        ['specular', [{id: 'specular_color', name: '颜色', value: '80'}]]
     ]);
     
     /**
@@ -35,6 +31,12 @@ export class AmbientLightApplication extends WebGL2Application {
     public constructor() {
         super(true);
         this.attributeBits = GLAttributeHelper.POSITION.BIT | GLAttributeHelper.NORMAL.BIT;
+        this._lightControls = new Map<string, HtmlRangeProps[]>([
+                ['ambient', [{id: 'ambient_color', name: '颜色', value: '80', onChange: this.onColorChange, min: '0', max: '100'}]],
+                ['diffuse', [{id: 'diffuse_color', name: '颜色', value: '80', onChange: this.onColorChange, min: '0', max: '100'}]],
+                ['specular', [{id: 'specular_color', name: '颜色', value: '80', onChange: this.onColorChange, min: '0', max: '100'}]]
+            ]
+        );
         this.createBuffers(this._ball);
         GLRenderHelper.setDefaultState(this.gl);
     }
@@ -45,8 +47,8 @@ export class AmbientLightApplication extends WebGL2Application {
      */
     public override get shaderUrls(): Map<string, string> {
         return new Map<string, string>([
-            ['bns.vert', `${AppConstants.webgl2ShaderRoot}/light/${this._lightType}.vert`],
-            ['bns.frag', `${AppConstants.webgl2ShaderRoot}/light/${this._lightType}.frag`]
+            ['bns.vert', `${AppConstants.webgl2ShaderRoot}/light/${this._reflectionType}.vert`],
+            ['bns.frag', `${AppConstants.webgl2ShaderRoot}/light/${this._reflectionType}.frag`]
         ]);
     }
     
@@ -55,11 +57,14 @@ export class AmbientLightApplication extends WebGL2Application {
      * @return {Promise<void>}
      */
     public override async runAsync(): Promise<void> {
-        this.createLightTypeControl('光照类型', [
-            {name: '环境光', value: 'ambient'},
-            {name: '散射光', value: 'diffuse'},
-            {name: '镜面光', value: 'specular'}
-        ]);
+        HtmlHelper.createSelect('光照类型', {
+            options: [
+                {name: '环境光', value: 'ambient'},
+                {name: '散射光', value: 'diffuse'},
+                {name: '镜面光', value: 'specular'}
+            ],
+            onChange: this.onReflectionTypeChange, value: this._reflectionType
+        });
         this.createLightControlByType();
         await this.initAsync();
         this.start();
@@ -102,20 +107,19 @@ export class AmbientLightApplication extends WebGL2Application {
      * @private
      */
     private setLightColor(): void {
-        let color: number = this._lightArgs.get(`${this._lightType}_color`);
-        let strength: number = this._lightType === 'ambient' ? this._lightArgs.get(`${this._lightType}_strength`) : 1;
-        switch (this._lightType) {
+        let color: number = this._lightArgs.get(`${this._reflectionType}_color`);
+        switch (this._reflectionType) {
             case 'ambient':
-                this.program.setVector4(GLShaderConstants.ambient, new Vector4([color, color, color, strength]));
+                this.program.setVector4(GLShaderConstants.ambient, new Vector4([color, color, color, 1.0]));
                 break;
             case 'diffuse':
                 this.program.setMatrix4(GLShaderConstants.MMatrix, this.worldMatrixStack.worldMatrix());
-                this.program.setVector4(GLShaderConstants.diffuse, new Vector4([color, color, color, strength]));
+                this.program.setVector4(GLShaderConstants.diffuse, new Vector4([color, color, color, 1.0]));
                 this.program.setVector3(GLShaderConstants.lightLocation, new Vector3([0, 0, this.camera.z]));
                 break;
             case 'specular':
                 this.program.setMatrix4(GLShaderConstants.MMatrix, this.worldMatrixStack.worldMatrix());
-                this.program.setVector4(GLShaderConstants.specular, new Vector4([color, color, color, strength]));
+                this.program.setVector4(GLShaderConstants.specular, new Vector4([color, color, color, 1.0]));
                 this.program.setVector3(GLShaderConstants.lightLocation, new Vector3([0, 0, this.camera.z]));
                 this.program.setVector3(GLShaderConstants.cameraPosition, this.camera.position);
                 break;
@@ -129,22 +133,22 @@ export class AmbientLightApplication extends WebGL2Application {
      * @private
      */
     private createLightControlByType(): void {
-        const configs = this._lightControls.get(this._lightType);
-        if (configs) {
-            this.createLightControl(configs);
+        const props = this._lightControls.get(this._reflectionType);
+        if (props) {
+            this.createLightControl(props);
         }
     }
     
     /**
      * 创建光源控制控件。
-     * @param {{id: string, name: string, value: string}[]} configs
      * @private
+     * @param props
      */
-    private createLightControl(configs: { id: string, name: string, value: string }[]): void {
+    private createLightControl(props: HtmlRangeProps[]): void {
         const parent = document.getElementById('controls');
-        configs.forEach((arg) => {
-            const colorRange = this.createInputRange(arg.id, arg.value);
-            parent.append(arg.name + ' ');
+        props.forEach((prop) => {
+            const colorRange = HtmlHelper.createRange(prop);
+            parent.append(prop.name + ' ');
             parent.appendChild(colorRange);
             const b1 = document.createElement('br');
             parent.appendChild(b1);
@@ -152,30 +156,10 @@ export class AmbientLightApplication extends WebGL2Application {
     }
     
     /**
-     * 创建滑动条。
-     * @param {string} id
-     * @param {string} value
-     * @param {string} min
-     * @param {string} max
-     * @return {HTMLInputElement}
-     * @private
-     */
-    private createInputRange(id: string, value: string, min: string = '0', max: string = '100'): HTMLInputElement {
-        const range: HTMLInputElement = document.createElement('input');
-        range.type = 'range';
-        range.id = id;
-        range.value = value;
-        range.onchange = this.onRangeChange;
-        range.min = min;
-        range.max = max;
-        return range;
-    }
-    
-    /**
-     * 更改
+     * 颜色更改
      * @param {Event} event
      */
-    private onRangeChange = (event: Event) => {
+    private onColorChange = (event: Event) => {
         const element = event.target as HTMLInputElement;
         if (element) {
             const value: number = parseFloat(element.value) / 100;
@@ -184,35 +168,13 @@ export class AmbientLightApplication extends WebGL2Application {
     };
     
     /**
-     * 床架光照类型选择菜单。
-     * @param {string} textContent
-     * @param {{name: string, value: string}[]} args
-     * @private
-     */
-    private createLightTypeControl(textContent: string, args: { name: string, value: string }[]) {
-        const parent = document.getElementById('controls');
-        const label = document.createElement('label');
-        label.textContent = textContent + ' ';
-        label.style.position = 'relative';
-        label.style.float = 'left';
-        const select = document.createElement('select');
-        args.forEach(arg => select.options.add(new Option(arg.name, arg.value)));
-        select.onchange = this.onLightTypeChange;
-        select.value = this._lightType;
-        label.appendChild(select);
-        parent.appendChild(label);
-        const br = document.createElement('br');
-        parent.appendChild(br);
-    }
-    
-    /**
-     * 光照类型更改。
+     * 反射类型更改。
      * @param {Event} event
      */
-    private onLightTypeChange = (event: Event): void => {
+    private onReflectionTypeChange = (event: Event): void => {
         const element = event.target as HTMLSelectElement;
         if (element) {
-            this._lightType = element.value;
+            this._reflectionType = element.value;
         }
         const controls = document.getElementById('controls');
         controls.replaceChildren();
