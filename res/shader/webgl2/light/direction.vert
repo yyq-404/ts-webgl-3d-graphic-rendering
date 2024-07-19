@@ -8,6 +8,12 @@ uniform mat4 uMMatrix;
 uniform vec3 uLightDirection;
 //摄像机位置
 uniform vec3 uCamera;
+//环境光系数
+uniform vec4 uAmbient;
+//散射光系数
+uniform vec4 uDiffuse;
+//镜面光系数
+uniform vec4 uSpecular;
 //顶点位置
 in vec3 aPosition;
 //法向量
@@ -64,7 +70,7 @@ void main() {
     //根据总变换矩阵计算此次绘制此顶点位置
     gl_Position = uMVPMatrix * vec4(aPosition, 1);
     //计算最终光照强度
-    finalLight = directionalLight(normalize(aNormal), uLightDirection, vec4(0.15, 0.15, 0.15, 1.0), vec4(0.8, 0.8, 0.8, 1.0), vec4(0.7, 0.7, 0.7, 1.0));
+    finalLight = directionalLight(normalize(aNormal), uLightDirection, uAmbient, uDiffuse, uSpecular);
     //将顶点的位置传给片元着色器
     vPosition = aPosition;
 }

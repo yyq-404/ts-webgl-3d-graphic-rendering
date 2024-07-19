@@ -8,6 +8,12 @@ uniform mat4 uMMatrix;
 uniform vec3 uLightLocation;
 //摄像机位置
 uniform vec3 uCamera;
+//环境光系数
+uniform vec4 uAmbient;
+//散射光系数
+uniform vec4 uDiffuse;
+//镜面光系数
+uniform vec4 uSpecular;
 //顶点位置
 in vec3 aPosition;
 //法向量
@@ -64,7 +70,7 @@ void main() {
     gl_Position = uMVPMatrix * vec4(aPosition, 1);
     //设置粒子大小 只有在点绘制方式时才有效
     //gl_PointSize = 10.0;
-    finalLight = pointLight(normalize(aNormal), uLightLocation, vec4(0.15, 0.15, 0.15, 1.0), vec4(0.8, 0.8, 0.8, 1.0), vec4(0.7, 0.7, 0.7, 1.0));
+    finalLight = pointLight(normalize(aNormal), uLightLocation, uAmbient, uDiffuse, uSpecular);
     //将顶点的位置传给片元着色器
     vPosition = aPosition;
 }
