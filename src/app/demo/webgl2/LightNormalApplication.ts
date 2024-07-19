@@ -4,21 +4,20 @@ import {GLShaderConstants} from '../../../webgl/GLShaderConstants';
 import {AppConstants} from '../../AppConstants';
 import {GLAttributeHelper} from '../../../webgl/GLAttributeHelper';
 import {GLRenderHelper} from '../../../webgl/GLRenderHelper';
-import {CanvasKeyboardEventManager} from '../../../event/keyboard/CanvasKeyboardEventManager';
-import {ECanvasKeyboardEventType} from '../../../enum/ECanvasKeyboardEventType';
-import {CanvasKeyboardEvent} from '../../../event/keyboard/CanvasKeyboardEvent';
 import {ColorCube} from '../../../common/geometry/solid/ColorCube';
+import {HtmlHelper} from '../HtmlHelper';
+import {LightController} from '../LightController';
 
 /**
- * 法向量模式应用。
+ * 光法向量应用。
  */
-export class NormalVectorApplication extends WebGL2Application {
+export class LightNormalApplication extends WebGL2Application {
     /** 立方体 */
     private _cubes: ColorCube[] = [new ColorCube(), new ColorCube()];
-    /** 光源X轴位置 */
-    private _locationX: number = 0;
-    /** 光源Y轴位置 */
-    private _locationY: number = 0;
+    /** 法线计算方式 */
+    private _normalType: string = 'point';
+    /** 光照控制器 */
+    private _lightController = new LightController();
     
     /**
      * 构造。
@@ -27,14 +26,6 @@ export class NormalVectorApplication extends WebGL2Application {
         super(true);
         this.attributeBits = GLAttributeHelper.POSITION.BIT | GLAttributeHelper.NORMAL.BIT;
         GLRenderHelper.setDefaultState(this.gl);
-        CanvasKeyboardEventManager.instance.registers(this, [
-            {type: ECanvasKeyboardEventType.KEY_DOWN, key: 'ArrowLeft', callback: this.changeLocationX},
-            {type: ECanvasKeyboardEventType.KEY_DOWN, key: 'ArrowRight', callback: this.changeLocationX},
-            {type: ECanvasKeyboardEventType.KEY_DOWN, key: 'ArrowUp', callback: this.changeLocationY},
-            {type: ECanvasKeyboardEventType.KEY_DOWN, key: 'ArrowDown', callback: this.changeLocationY},
-            {type: ECanvasKeyboardEventType.KEY_DOWN, key: '1', callback: this.changeNormalMode},
-            {type: ECanvasKeyboardEventType.KEY_DOWN, key: '2', callback: this.changeNormalMode}
-        ]);
     }
     
     /**
@@ -54,6 +45,13 @@ export class NormalVectorApplication extends WebGL2Application {
      */
     public override async runAsync(): Promise<void> {
         this.createBuffers(...this._cubes);
+        HtmlHelper.createSelect('光照类型', {
+            options: [
+                {name: '点法向量', value: 'point'},
+                {name: '面法向量', value: 'plane'}
+            ], onChange: this.onNormalTypeChange, value: this._normalType
+        });
+        this._lightController.create();
         await super.runAsync();
     }
     
@@ -80,43 +78,16 @@ export class NormalVectorApplication extends WebGL2Application {
         //将总变换矩阵送入渲染管线
         this.program.setMatrix4(GLShaderConstants.MVPMatrix, this.mvpMatrix());
         this.program.setMatrix4(GLShaderConstants.MMatrix, this.worldMatrixStack.worldMatrix());
-        this.program.setVector3(GLShaderConstants.lightLocation, new Vector3([this._locationX, this._locationY, 4]));
+        this.program.setVector3(GLShaderConstants.lightLocation, this._lightController.location);
         this.program.setVector3(GLShaderConstants.cameraPosition, this.camera.position);
-        for (const entity of buffers.entries()) {
-            this.program.setVertexAttribute(entity[0].NAME, entity[1], entity[0].COMPONENT);
-        }
-        this.program.setFloat('uR', 0.5);
+        this.program.setFloat('uR', cube.halfSize);
+        this._lightController.setColor(this.program);
+        buffers.forEach((value, attribute) => {
+            this.program.setVertexAttribute(attribute.NAME, value, attribute.COMPONENT);
+        });
         this.gl.drawArrays(this.gl.TRIANGLES, 0, cube.vertex.count);
         this.worldMatrixStack.popMatrix();
         this.program.unbind();
-    }
-    
-    /**
-     * 改变光源X轴位置
-     * @param {CanvasKeyboardEvent} event
-     * @private
-     */
-    private changeLocationX(event: CanvasKeyboardEvent): void {
-        if (this._locationX > -10 && this._locationX < 10) {
-            const incX: number = event.key === 'ArrowLeft' ? -1 : 1;
-            this._locationX += incX;
-        } else {
-            this._locationX = 0;
-        }
-    }
-    
-    /**
-     * 改变光源X轴位置
-     * @param {CanvasKeyboardEvent} event
-     * @private
-     */
-    private changeLocationY(event: CanvasKeyboardEvent): void {
-        if (this._locationY > -10 && this._locationY < 10) {
-            const incY: number = event.key === 'ArrowDown' ? -1 : 1;
-            this._locationY += incY;
-        } else {
-            this._locationY = 0;
-        }
     }
     
     /**
@@ -124,9 +95,14 @@ export class NormalVectorApplication extends WebGL2Application {
      * @param {CanvasKeyboardEvent} event
      * @private
      */
-    private changeNormalMode(event: CanvasKeyboardEvent): void {
+    private onNormalTypeChange = (event: Event): void => {
+        const element = event.target as HTMLSelectElement;
+        if (element) {
+            this._normalType = element.value;
+            this._cubes.forEach(cube => cube.normals = element.value === 'point' ? cube.createSurfaceNormals() : cube.vertex.positions);
+        }
+        this.clearControls();
         this.stop();
-        this._cubes.forEach(cube => cube.normals = event.key === '1' ? cube.createSurfaceNormals() : cube.vertex.positions);
         this.runAsync.call(this);
-    }
+    };
 }

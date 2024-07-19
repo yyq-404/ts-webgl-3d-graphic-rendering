@@ -12,7 +12,7 @@ import {CameraViewApplication} from './app/demo/webgl2/CameraViewApplication';
 import {CullFaceApplication} from './app/demo/webgl2/CullFaceApplication';
 import {LightReflectionApplication} from './app/demo/webgl2/LightReflectionApplication';
 import {LightSourceApplication} from './app/demo/webgl2/LightSourceApplication';
-import {NormalVectorApplication} from './app/demo/webgl2/NormalVectorApplication';
+import {LightNormalApplication} from './app/demo/webgl2/LightNormalApplication';
 import {LightComputeApplication} from './app/demo/webgl2/LightComputeApplication';
 import {WallTextureApplication} from './app/demo/webgl2/WallTextureApplication';
 import {TextureRepeatApplication} from './app/demo/webgl2/TextureRepeatApplication';
@@ -32,8 +32,8 @@ const apps = {
     '11: CullFace': CullFaceApplication,
     '12: LightReflection': LightReflectionApplication,
     '13: LightSource': LightSourceApplication,
-    '14: LightNormal': NormalVectorApplication,
-    '15: LightComputeMode': LightComputeApplication,
+    '14: LightNormal': LightNormalApplication,
+    '15: LightCompute': LightComputeApplication,
     '16: WallTexture': WallTextureApplication,
     '17: TextureRepeat': TextureRepeatApplication
 };

@@ -92,11 +92,11 @@ export class LightReflectionApplication extends WebGL2Application {
         this.worldMatrixStack.rotate(this.mouseMoveEvent.currentXAngle, Vector3.right);
         //将总变换矩阵送入渲染管线
         this.program.setMatrix4(GLShaderConstants.MVPMatrix, this.mvpMatrix());
-        this.setLightColor();
         this.program.setFloat('uR', this._ball.r);
-        for (const entity of buffers.entries()) {
-            this.program.setVertexAttribute(entity[0].NAME, entity[1], entity[0].COMPONENT);
-        }
+        this.setLightColor();
+        buffers.forEach((value, attribute) => {
+            this.program.setVertexAttribute(attribute.NAME, value, attribute.COMPONENT);
+        })
         this.gl.drawArrays(this.gl.TRIANGLES, 0, this._ball.vertex.count);
         this.worldMatrixStack.popMatrix();
         this.program.unbind();
@@ -135,24 +135,9 @@ export class LightReflectionApplication extends WebGL2Application {
     private createLightControlByType(): void {
         const props = this._lightControls.get(this._reflectionType);
         if (props) {
-            this.createLightControl(props);
+            const parent = document.getElementById('controls');
+            HtmlHelper.createRanges(parent, props);
         }
-    }
-    
-    /**
-     * 创建光源控制控件。
-     * @private
-     * @param props
-     */
-    private createLightControl(props: HtmlRangeProps[]): void {
-        const parent = document.getElementById('controls');
-        props.forEach((prop) => {
-            const colorRange = HtmlHelper.createRange(prop);
-            parent.append(prop.name + ' ');
-            parent.appendChild(colorRange);
-            const b1 = document.createElement('br');
-            parent.appendChild(b1);
-        });
     }
     
     /**
@@ -176,8 +161,7 @@ export class LightReflectionApplication extends WebGL2Application {
         if (element) {
             this._reflectionType = element.value;
         }
-        const controls = document.getElementById('controls');
-        controls.replaceChildren();
+        this.clearControls();
         this.stop();
         this.runAsync.apply(this);
     };

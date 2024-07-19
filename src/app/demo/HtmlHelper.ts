@@ -42,10 +42,40 @@ export type HtmlSelectProps = {
  * Html工具类。
  */
 export class HtmlHelper {
+    
+    /**
+     * 创建光源控制控件。
+     * @param {string} textContent
+     * @param {HtmlRangeProps} props
+     */
+    public static createRangesWithLabel(textContent: string, props: HtmlRangeProps[]): void {
+        const parent = document.getElementById('controls');
+        const label = HtmlHelper.createCenterLabel(textContent);
+        parent.appendChild(label);
+        const br = document.createElement('br');
+        parent.appendChild(br);
+        HtmlHelper.createRanges(parent, props);
+    }
+    
+    /**
+     * 创建滑动条集合。
+     * @param parent
+     * @param props
+     * @return {HTMLInputElement}
+     */
+    public static createRanges(parent: HTMLElement, props: HtmlRangeProps[]): void {
+        props.forEach((prop) => {
+            const colorRange = HtmlHelper.createRange(prop);
+            parent.append(prop.name + ' ');
+            parent.appendChild(colorRange);
+            const b1 = document.createElement('br');
+            parent.appendChild(b1);
+        });
+    }
+    
     /**
      * 创建滑动条。
      * @return {HTMLInputElement}
-     * @private
      * @param props
      */
     public static createRange(props: HtmlRangeProps): HTMLInputElement {
@@ -64,7 +94,6 @@ export class HtmlHelper {
      * 创建选择菜单。
      * @param {string} textContent
      * @param props
-     * @private
      */
     public static createSelect(textContent: string, props: HtmlSelectProps) {
         const {options, onChange, value} = props;

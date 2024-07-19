@@ -81,10 +81,7 @@ export class WebGL2Application extends BaseApplication {
         if (this.gl) {
             this.gl = null;
         }
-        const controls = document.getElementById('controls');
-        if (controls) {
-            controls.replaceChildren();
-        }
+        this.clearControls();
         super.dispose();
     }
     
@@ -187,9 +184,9 @@ export class WebGL2Application extends BaseApplication {
         this.program.setMatrix4(GLShaderConstants.MMatrix, this.worldMatrixStack.worldMatrix());
         //将总变换矩阵送入渲染管线
         this.program.setMatrix4(GLShaderConstants.MVPMatrix, this.mvpMatrix());
-        for (const entity of buffers.entries()) {
-            this.program.setVertexAttribute(entity[0].NAME, entity[1], entity[0].COMPONENT);
-        }
+        buffers.forEach((value, attribute) => {
+            this.program.setVertexAttribute(attribute.NAME, value, attribute.COMPONENT);
+        })
         this.gl.drawArrays(mode, first, solid.vertex.count);
     }
     
@@ -200,5 +197,16 @@ export class WebGL2Application extends BaseApplication {
     protected end(): void {
         this.program.unbind();
         this.worldMatrixStack.popMatrix();
+    }
+    
+    /**
+     * 清空控件。
+     * @protected
+     */
+    protected clearControls(): void {
+        const controls = document.getElementById('controls');
+        if (controls) {
+            controls.replaceChildren();
+        }
     }
 }
