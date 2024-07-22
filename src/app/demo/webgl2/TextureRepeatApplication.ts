@@ -14,7 +14,7 @@ export class TextureRepeatApplication extends WebGL2Application {
     
     private _currentSize: string = '1*1';
     
-    private _currentStretchingMode: string = 'EDGE';
+    private _currentWrapMode: string = 'EDGE';
     
     /**
      * 构造
@@ -58,6 +58,14 @@ export class TextureRepeatApplication extends WebGL2Application {
     }
     
     /**
+     * 释放对象。
+     */
+    public override dispose(): void {
+        this.unbind();
+        super.dispose();
+    }
+    
+    /**
      * 绘制矩形。
      * @private
      */
@@ -75,11 +83,10 @@ export class TextureRepeatApplication extends WebGL2Application {
         for (const entity of buffers.entries()) {
             this.program.setVertexAttribute(entity[0].NAME, entity[1], entity[0].COMPONENT);
         }
-        this.gl.activeTexture(this.gl.TEXTURE0);
-        this.gl.bindTexture(this.gl.TEXTURE_2D, this._texture);
         this.program.setInt('sTexture', 0);
         this.gl.drawArrays(this.gl.TRIANGLES, 0, this._rect.vertex.count);
         this.worldMatrixStack.popMatrix();
+        // this.unbind();
         this.program.unbind();
     }
     
@@ -89,23 +96,74 @@ export class TextureRepeatApplication extends WebGL2Application {
      * @private
      */
     private async loadTextureAsync(): Promise<WebGLTexture> {
-        const img = await HttpHelper.loadImageAsync('res/image/robot.png');
+        const image = await HttpHelper.loadImageAsync('res/image/robot.png');
         const texture = this.gl.createTexture();
+        // 上传数据。
+        this.upload(image, texture);
+        // 采样方式
+        this.filter();
+        // 拉伸方式
+        this.wrap();
+        // 激活纹理。
+        this.active();
+        return texture;
+    }
+    
+    /**
+     * 上传纹理数据。
+     * @param {HTMLImageElement} image
+     * @param {WebGLTexture} texture
+     * @private
+     */
+    private upload(image: HTMLImageElement, texture: WebGLTexture): void {
         //绑定纹理ID
         this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
         //加载纹理进缓存
-        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, img);
-        //设置MAG采样方式
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
+        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, image);
+    }
+    
+    /**
+     * 激活纹理
+     * @private
+     */
+    private active(): void {
+        if (this._texture) {
+            this.gl.activeTexture(this.gl.TEXTURE0);
+        }
+    }
+    
+    /**
+     * 采样器。
+     * @param {GLint} minFilter
+     * @param {GLint} magFilter
+     * @private
+     */
+    private filter(minFilter: GLint = this.gl.LINEAR, magFilter: GLint = this.gl.LINEAR): void {
         //设置MIN采样方式
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, minFilter);
+        //设置MAG采样方式
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, magFilter);
+    }
+    
+    /**
+     * 拉伸方式。
+     * @private
+     */
+    private wrap(): void {
         //设置S轴拉伸方式
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this._currentStretchingMode === 'EDGE' ? this.gl.CLAMP_TO_EDGE : this.gl.REPEAT);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this._currentWrapMode === 'EDGE' ? this.gl.CLAMP_TO_EDGE : this.gl.REPEAT);
         //设置T轴拉伸方式
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this._currentStretchingMode === 'EDGE' ? this.gl.CLAMP_TO_EDGE : this.gl.REPEAT);
-        //纹理加载成功后释放纹理图
-        this.gl.bindTexture(this.gl.TEXTURE_2D, null);
-        return texture;
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this._currentWrapMode === 'EDGE' ? this.gl.CLAMP_TO_EDGE : this.gl.REPEAT);
+    }
+    
+    /**
+     * 解绑纹理。
+     * @private
+     */
+    private unbind(): void {
+        if (this._texture) {
+            this.gl.bindTexture(this.gl.TEXTURE_2D, null);
+        }
     }
     
     /**
@@ -114,7 +172,7 @@ export class TextureRepeatApplication extends WebGL2Application {
      */
     private createControls(): void {
         const modes = ['EDGE', 'REPEAT'];
-        this.createRadios('stretching', '拉伸方式: ', modes, this.onStretchingModeChange);
+        this.createRadios('stretching', '拉伸方式: ', modes, this.onWarpModeChange);
         const sizes = ['1*1', '4*2', '4*4'];
         this.createRadios('size', '纹理尺寸坐标: ', sizes, this.onTextureCoordinateSizeChange);
     }
@@ -122,26 +180,22 @@ export class TextureRepeatApplication extends WebGL2Application {
     /**
      * 拉伸模式更改
      */
-    private onStretchingModeChange = (): void => {
-        const elements = document.getElementsByName('stretching') as NodeListOf<HTMLInputElement>;
-        elements.forEach(element => {
-            if (element.checked) {
-                this._currentStretchingMode = element.value;
-            }
-        });
+    private onWarpModeChange = (event: Event): void => {
+        let element = event.target as HTMLInputElement;
+        if (element.checked) {
+            this._currentWrapMode = element.value;
+        }
         this.runAsync.apply(this);
     };
     
     /**
      * 纹理坐标尺寸更改
      */
-    private onTextureCoordinateSizeChange = (): void => {
-        const elements = document.getElementsByName('size') as NodeListOf<HTMLInputElement>;
-        elements.forEach(element => {
-            if (element.checked) {
-                this._currentSize = element.value;
-            }
-        });
+    private onTextureCoordinateSizeChange = (event: Event): void => {
+        let element = event.target as HTMLInputElement;
+        if (element.checked) {
+            this._currentSize = element.value;
+        }
         this.runAsync.apply(this);
     };
     
@@ -153,7 +207,7 @@ export class TextureRepeatApplication extends WebGL2Application {
      * @param {() => void} onClick
      * @private
      */
-    private createRadios(name: string, textContent: string, args: string[], onClick: () => void): void {
+    private createRadios(name: string, textContent: string, args: string[], onClick: (event: Event) => void): void {
         const parent = document.getElementById('controls');
         const label = document.createElement('label');
         label.textContent = textContent;
