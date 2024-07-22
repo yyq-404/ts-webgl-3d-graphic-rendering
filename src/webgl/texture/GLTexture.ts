@@ -93,8 +93,6 @@ export class GLTexture {
             [EGLTextureWrapType.GL_MIRRORED_REPEAT, this.gl.MIRRORED_REPEAT],
             [EGLTextureWrapType.GL_CLAMP_TO_EDGE, this.gl.CLAMP_TO_EDGE]
         ]);
-        this.filter();
-        this.wrap();
     }
     
     /**
@@ -139,6 +137,9 @@ export class GLTexture {
         }
         const texture: GLTexture = new GLTexture(gl);
         texture.upload(canvas);
+        texture.filter();
+        texture.wrap();
+        texture.unbind();
         return texture;
     }
     
@@ -210,7 +211,7 @@ export class GLTexture {
         } else {
             this.gl.texParameteri(this.target, this.gl.TEXTURE_MIN_FILTER, minLinear ? this.gl.LINEAR : this.gl.NEAREST);
         }
-        this.gl.texParameteri(this.target, this.gl.TEXTURE_MIN_FILTER, magLinear ? this.gl.LINEAR : this.gl.NEAREST);
+        this.gl.texParameteri(this.target, this.gl.TEXTURE_MAG_FILTER, magLinear ? this.gl.LINEAR : this.gl.NEAREST);
     }
     
     /**

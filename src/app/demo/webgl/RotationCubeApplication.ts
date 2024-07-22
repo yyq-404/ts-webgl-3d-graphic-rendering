@@ -156,7 +156,8 @@ export class RotatingCubeApplication extends WebGLApplication {
         if (!img) return false;
         let texture: GLTexture = new GLTexture(this.gl);
         texture.upload(img, 0, true);
-        texture.bind();
+        texture.filter(false, false);
+        texture.wrap();
         this._textures.push(texture);
         console.log(`纹理[${imgUrl}]载入成功!`);
         return true;
