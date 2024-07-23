@@ -47,7 +47,7 @@ export class TriangleDrawModeScene extends WebGL2Scene {
      * @private
      */
     private drawSolids(): void {
-        this._solids.forEach((solid, index) => {
+        this._solids.forEach((solid) => {
             this.begin();
             this.worldMatrixStack.translate(new Vector3([(solid instanceof Belt) ? -0.8 : 0.8, 0.0, 0.0]));
             this.worldMatrixStack.rotate(this.mouseMoveEvent.currentXAngle, Vector3.right);
@@ -62,7 +62,7 @@ export class TriangleDrawModeScene extends WebGL2Scene {
      * @private
      */
     private drawBelts(): void {
-        this._belts.forEach((belt, index) => {
+        this._belts.forEach((belt) => {
             this.begin();
             this.worldMatrixStack.rotate(this.mouseMoveEvent.currentXAngle, Vector3.right);
             this.worldMatrixStack.rotate(this.mouseMoveEvent.currentYAngle, Vector3.up);

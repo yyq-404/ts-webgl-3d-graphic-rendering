@@ -383,7 +383,7 @@ export class BasicWebGLScene extends WebGLScene {
         // 由于normalize只对gl.BYTE / gl.SHORT [-1 , 1 ]和gl.UNSIGNED_BYTE / gl.UNSIGNED_SHORT [ 0 , 1 ]有效
         // 而我们的aPosition和aColor在WebGLBuffer被定义为FLOAT表示的vec3和vec4,因此直接设置false
         // 4、关于最后两个参数，需要参考图5.12，因此请参考本书内容
-        this._webglContext.vertexAttribPointer(this._attributeMap['aPosition'].location, 3, this._webglContext.FLOAT, false, Float32Array.BYTES_PER_ELEMENT * 7, Float32Array.BYTES_PER_ELEMENT * 0);
+        this._webglContext.vertexAttribPointer(this._attributeMap['aPosition'].location, 3, this._webglContext.FLOAT, false, Float32Array.BYTES_PER_ELEMENT * 7, 0);
         this._webglContext.vertexAttribPointer(this._attributeMap['aColor'].location, 4, this._webglContext.FLOAT, false, Float32Array.BYTES_PER_ELEMENT * 7, Float32Array.BYTES_PER_ELEMENT * 3);
         // 默认情况下，是关闭vertexAttribArray对象的，因此需要开启
         // 一旦开启后，当我们调用draw开头的WebGL方法时，WebGL驱动会自动将VBO中的顶点数据上传到对应的Vertex Shader中
