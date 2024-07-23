@@ -1,12 +1,16 @@
-import {WebGL2Application} from '../../base/WebGL2Application';
-import {AppConstants} from '../../AppConstants';
-import {GLAttributeHelper} from '../../../webgl/GLAttributeHelper';
-import {Rect} from '../../../common/geometry/solid/Rect';
-import {HttpHelper} from '../../../net/HttpHelper';
-import {Vector3} from '../../../common/math/vector/Vector3';
-import {GLShaderConstants} from '../../../webgl/GLShaderConstants';
+import {WebGL2Scene} from '../base/WebGL2Scene';
+import {Rect} from '../../common/geometry/solid/Rect';
+import {GLAttributeHelper} from '../../webgl/GLAttributeHelper';
+import {SceneConstants} from '../SceneConstants';
+import {Vector3} from '../../common/math/vector/Vector3';
+import {GLShaderConstants} from '../../webgl/GLShaderConstants';
+import {HttpHelper} from '../../net/HttpHelper';
 
-export class TextureRepeatApplication extends WebGL2Application {
+
+/**
+ * 材质拉伸模式场景。
+ */
+export class TextureWrapScene extends WebGL2Scene {
     /** 矩形 */
     private _rect: Rect = new Rect(2, 2);
     /** 纹理贴图 */
@@ -31,8 +35,8 @@ export class TextureRepeatApplication extends WebGL2Application {
      */
     public override get shaderUrls(): Map<string, string> {
         return new Map<string, string>([
-            ['bns.vert', `${AppConstants.webgl2ShaderRoot}/texture/texture.vert`],
-            ['bns.frag', `${AppConstants.webgl2ShaderRoot}/texture/texture.frag`]
+            ['bns.vert', `${SceneConstants.webgl2ShaderRoot}/texture/texture.vert`],
+            ['bns.frag', `${SceneConstants.webgl2ShaderRoot}/texture/texture.frag`]
         ]);
     }
     
@@ -41,13 +45,11 @@ export class TextureRepeatApplication extends WebGL2Application {
      * @return {Promise<void>}
      */
     public override async runAsync(): Promise<void> {
-        this.stop();
         await this.initAsync();
         const sizes = this._currentSize.split('*');
         this._rect.uvs = this._rect.createUVs(parseInt(sizes[0]), parseInt(sizes[1]));
         this.createBuffers(this._rect);
         this._texture = await this.loadTextureAsync();
-        this.start();
     }
     
     /**

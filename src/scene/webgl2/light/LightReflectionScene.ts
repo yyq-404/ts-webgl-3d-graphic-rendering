@@ -1,17 +1,18 @@
-import {WebGL2Application} from '../../../base/WebGL2Application';
-import {Ball} from '../../../../common/geometry/solid/Ball';
-import {Vector3} from '../../../../common/math/vector/Vector3';
-import {GLShaderConstants} from '../../../../webgl/GLShaderConstants';
-import {AppConstants} from '../../../AppConstants';
-import {GLAttributeHelper} from '../../../../webgl/GLAttributeHelper';
-import {GLRenderHelper} from '../../../../webgl/GLRenderHelper';
-import {HtmlHelper} from '../../HtmlHelper';
+import {WebGL2Scene} from '../../base/WebGL2Scene';
+import {Ball} from '../../../common/geometry/solid/Ball';
 import {LightController} from '../../LightController';
+import {GLAttributeHelper} from '../../../webgl/GLAttributeHelper';
+import {GLRenderHelper} from '../../../webgl/GLRenderHelper';
+import {SceneConstants} from '../../SceneConstants';
+import {HtmlHelper} from '../../HtmlHelper';
+import {Vector3} from '../../../common/math/vector/Vector3';
+import {GLShaderConstants} from '../../../webgl/GLShaderConstants';
+
 
 /**
- * 光反射应用。
+ * 光反射场景。
  */
-export class LightReflectionApplication extends WebGL2Application {
+export class LightReflectionScene extends WebGL2Scene {
     /** 球体 */
     private _ball: Ball = new Ball();
     /** 反射类型 */
@@ -35,8 +36,8 @@ export class LightReflectionApplication extends WebGL2Application {
      */
     public override get shaderUrls(): Map<string, string> {
         return new Map<string, string>([
-            ['bns.vert', `${AppConstants.webgl2ShaderRoot}/light/${this._reflectionType}.vert`],
-            ['bns.frag', `${AppConstants.webgl2ShaderRoot}/light/${this._reflectionType}.frag`]
+            ['bns.vert', `${SceneConstants.webgl2ShaderRoot}/light/${this._reflectionType}.vert`],
+            ['bns.frag', `${SceneConstants.webgl2ShaderRoot}/light/${this._reflectionType}.frag`]
         ]);
     }
     
@@ -126,7 +127,6 @@ export class LightReflectionApplication extends WebGL2Application {
             this._reflectionType = element.value;
         }
         this.clearControls();
-        this.stop();
         this.runAsync.apply(this);
     };
 }

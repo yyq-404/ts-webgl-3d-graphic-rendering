@@ -1,6 +1,6 @@
 const path = require('path');
 module.exports = {
-    entry: './src/index.ts',
+    entry: './src/App.ts',
     output: {
         filename: './bundle.js',
     },
@@ -16,14 +16,14 @@ module.exports = {
         ]
     },
     devServer: {
-        static:{
+        static: {
             directory: path.resolve(__dirname, './'),
         },
         compress: true,
-        host:'localhost',
-        port:3000,
+        host: 'localhost',
+        port: 3000,
         historyApiFallback: true,
         open: true,
-        liveReload:true
+        liveReload: true
     }
 }

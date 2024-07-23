@@ -1,14 +1,15 @@
-import {WebGL2Application} from '../../base/WebGL2Application';
-import {GLRenderHelper} from '../../../webgl/GLRenderHelper';
-import {Vector3} from '../../../common/math/vector/Vector3';
-import {ColorCube} from '../../../common/geometry/solid/ColorCube';
-import {CanvasKeyboardEventManager} from '../../../event/keyboard/CanvasKeyboardEventManager';
-import {ECanvasKeyboardEventType} from '../../../enum/ECanvasKeyboardEventType';
+import {WebGL2Scene} from '../base/WebGL2Scene';
+import {ColorCube} from '../../common/geometry/solid/ColorCube';
+import {GLRenderHelper} from '../../webgl/GLRenderHelper';
+import {CanvasKeyboardEventManager} from '../../event/keyboard/CanvasKeyboardEventManager';
+import {ECanvasKeyboardEventType} from '../../enum/ECanvasKeyboardEventType';
+import {Vector3} from '../../common/math/vector/Vector3';
+
 
 /**
- * 变换盒子应用。。
+ * 立方体变换场景。
  */
-export class TransformCubeApplication extends WebGL2Application {
+export class TransformCubeScene extends WebGL2Scene {
     /** 盒子对象 */
     private _cube: ColorCube = new ColorCube();
     /** 矩阵变换类型 */

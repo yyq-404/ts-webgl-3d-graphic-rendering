@@ -1,20 +1,19 @@
-import {GLCoordinateSystem} from '../../../webgl/common/GLCoordinateSystem';
-import {Matrix4} from '../../../common/math/matrix/Matrix4';
-import {Vector3} from '../../../common/math/vector/Vector3';
-import {EAxisType} from '../../../enum/EAxisType';
-import {DrawHelper} from '../../../common/DrawHelper';
-import {Vector4} from '../../../common/math/vector/Vector4';
-import {WebGLApplication} from '../../base/WebGLApplication';
-import {GLCoordinateSystemHelper} from '../../../webgl/GLCoordinateSystemHelper';
-import {GLRenderHelper} from '../../../webgl/GLRenderHelper';
-import {ECanvasKeyboardEventType} from '../../../enum/ECanvasKeyboardEventType';
-import {CanvasKeyboardEventManager} from '../../../event/keyboard/CanvasKeyboardEventManager';
-import {Color4} from '../../../common/color/Color4';
+import {GLCoordinateSystem} from '../../webgl/common/GLCoordinateSystem';
+import {WebGLScene} from '../base/WebGLScene';
+import {Matrix4} from '../../common/math/matrix/Matrix4';
+import {CanvasKeyboardEventManager} from '../../event/keyboard/CanvasKeyboardEventManager';
+import {ECanvasKeyboardEventType} from '../../enum/ECanvasKeyboardEventType';
+import {GLRenderHelper} from '../../webgl/GLRenderHelper';
+import {Vector3} from '../../common/math/vector/Vector3';
+import {GLCoordinateSystemHelper} from '../../webgl/GLCoordinateSystemHelper';
+import {EAxisType} from '../../enum/EAxisType';
+import {DrawHelper} from '../../common/DrawHelper';
+import {Color4} from '../../common/color/Color4';
 
 /**
- * 坐标系统应用。
+ * 坐标系统场景。
  */
-export class CoordinateSystemApplication extends WebGLApplication {
+export class CoordinateSystemScene extends WebGLScene {
     /** 存储当前使用的坐标系、视口以及旋转轴、旋转角度等信息的数组 */
     private _cubeMVP: Matrix4 = new Matrix4();
     // 下面两个成员变量排列组合后，形成6种不同的绘制方式
@@ -36,9 +35,10 @@ export class CoordinateSystemApplication extends WebGLApplication {
      */
     public constructor() {
         // 调用基类构造函数
-        super({preserveDrawingBuffer: false}, true);
+        super();
         this.makeFourGLCoordinateSystems();
         this._currentDrawMethod = this.drawCoordinateSystem;
+        this.create2dCanvas();
         CanvasKeyboardEventManager.instance.registers(this, [
             {type: ECanvasKeyboardEventType.KEY_PRESS, key: '1', callback: () => this._currentDrawMethod = this.drawCoordinateSystem},
             {type: ECanvasKeyboardEventType.KEY_PRESS, key: '2', callback: () => this._currentDrawMethod = this.drawFullCoordinateSystem},

@@ -1,18 +1,18 @@
+import {BaseScene} from './BaseScene';
 import {GLMeshBuilder} from '../../webgl/mesh/GLMeshBuilder';
-import {BaseApplication} from './BaseApplication';
+import {GLMatrixStack} from '../../webgl/matrix/GLMatrixStack';
 import {GLRenderHelper} from '../../webgl/GLRenderHelper';
 import {GLTextureCache} from '../../webgl/texture/GLTextureCache';
-import {GLProgramCache} from '../../webgl/program/GLProgramCache';
-import {GLAttributeHelper} from '../../webgl/GLAttributeHelper';
-import {GLProgram} from '../../webgl/program/GLProgram';
 import {GLTexture} from '../../webgl/texture/GLTexture';
-import {AppConstants} from '../AppConstants';
-import {GLMatrixStack} from '../../webgl/matrix/GLMatrixStack';
+import {GLAttributeHelper} from '../../webgl/GLAttributeHelper';
+import {SceneConstants} from '../SceneConstants';
+import {GLProgramCache} from '../../webgl/program/GLProgramCache';
+import {GLProgram} from '../../webgl/program/GLProgram';
 
 /**
- * WebGL应用。
+ * WebGL场景。
  */
-export class WebGLApplication extends BaseApplication {
+export class WebGLScene extends BaseScene {
     /* 可以直接操作WebGL相关内容 */
     protected gl: WebGLRenderingContext;
     /** 模拟 `OpenGL1.1` 中的矩阵堆栈, 封装在 `GLWorldMatrixStack` 类中 */
@@ -23,29 +23,15 @@ export class WebGLApplication extends BaseApplication {
     protected canvas2d: HTMLCanvasElement;
     /** 2D渲染环境 */
     protected context2d: CanvasRenderingContext2D;
-    /** shader路径集合 */
-    private readonly _shaderUrls: Map<string, string> = new Map<string, string>([
-        ['color.vert', `${AppConstants.webglShaderRoot}/common/color/color.vert`],
-        ['color.frag', `${AppConstants.webglShaderRoot}/common/color/color.frag`],
-        ['texture.vert', `${AppConstants.webglShaderRoot}/common/texture/texture.vert`],
-        ['texture.frag', `${AppConstants.webglShaderRoot}/common/texture/texture.frag`]
-    ]);
-    
+
     /**
      * 构造
-     * @param contextAttributes
-     * @param option2d
      */
-    public constructor(contextAttributes: WebGLContextAttributes = {premultipliedAlpha: false}, option2d: boolean = false) {
+    public constructor() {
         super();
-        this.gl = this.canvas.getContext('webgl', contextAttributes);
+        this.gl = this.canvas.getContext('webgl', this.getContextAttributes());
         if (!this.gl) {
-            alert(' 无法创建WebGLRenderingContext上下文对象 ');
             throw new Error(' 无法创建WebGLRenderingContext上下文对象 ');
-        }
-        // 从canvas元素中获得webgl上下文渲染对象，WebGL API都通过该上下文渲染对象进行调用
-        if (option2d) {
-            this.create2dCanvas();
         }
         this.worldMatrixStack = new GLMatrixStack();
         // 初始化渲染状态
@@ -56,6 +42,18 @@ export class WebGLApplication extends BaseApplication {
         this.meshBuilder = new GLMeshBuilder(this.gl, GLAttributeHelper.POSITION.BIT | GLAttributeHelper.COLOR.BIT);
     }
     
+    /**
+     * 获取shader路径集合。
+     * @return {Map<string, string>}
+     */
+    public get shaderUrls(): Map<string, string> {
+        return new Map<string, string>([
+            ['color.vert', `${SceneConstants.webglShaderRoot}/common/color/color.vert`],
+            ['color.frag', `${SceneConstants.webglShaderRoot}/common/color/color.frag`],
+            ['texture.vert', `${SceneConstants.webglShaderRoot}/common/texture/texture.vert`],
+            ['texture.frag', `${SceneConstants.webglShaderRoot}/common/texture/texture.frag`]
+        ]);
+    }
     
     /**
      * 运行。
@@ -63,9 +61,18 @@ export class WebGLApplication extends BaseApplication {
      */
     public override async runAsync(): Promise<void> {
         await this.initAsync();
-        await super.runAsync();
+        // await super.runAsync();
     }
     
+    /**
+     * 更新。
+     * @param {number} elapsedMsec
+     * @param {number} intervalSec
+     */
+    public override update(elapsedMsec: number, intervalSec: number): void {
+        GLRenderHelper.clearBuffer(this.gl);
+        super.update(elapsedMsec, intervalSec);
+    }
     
     /**
      * 释放
@@ -96,16 +103,16 @@ export class WebGLApplication extends BaseApplication {
     protected async initAsync(): Promise<void> {
         if (!this.gl) throw new Error('this.webglContext is not defined');
         // 加载颜色顶点着色器代码
-        let colorVertShader = await this.loadShaderSourceAsync(this._shaderUrls, 'color.vert');
+        let colorVertShader = await this.loadShaderSourceAsync(this.shaderUrls, 'color.vert');
         // 加载颜色片元着色器代码
-        let colorFragShader = await this.loadShaderSourceAsync(this._shaderUrls, 'color.frag');
+        let colorFragShader = await this.loadShaderSourceAsync(this.shaderUrls, 'color.frag');
         let defaultColorProgram = GLProgram.createDefaultProgram(this.gl, colorVertShader, colorFragShader);
         // 创建颜色Program
         GLProgramCache.instance.set('color', defaultColorProgram);
         // 加载纹理顶点着色器代码
-        let textureVertShader = await this.loadShaderSourceAsync(this._shaderUrls, 'texture.vert');
+        let textureVertShader = await this.loadShaderSourceAsync(this.shaderUrls, 'texture.vert');
         // 加载纹理片元着色器代码
-        let textureFragShader = await this.loadShaderSourceAsync(this._shaderUrls, 'texture.frag');
+        let textureFragShader = await this.loadShaderSourceAsync(this.shaderUrls, 'texture.frag');
         let defaultTextureProgram = GLProgram.createDefaultProgram(this.gl, textureVertShader, textureFragShader, false);
         // 创建纹理Program
         GLProgramCache.instance.set('texture', defaultTextureProgram);
@@ -125,7 +132,7 @@ export class WebGLApplication extends BaseApplication {
         canvas2d.style.position = 'absolute';
         canvas2d.style.left = '0px';
         canvas2d.style.top = '0px';
-        canvas2d.style.pointerEvents = 'none'
+        canvas2d.style.pointerEvents = 'none';
         const parent: HTMLElement = this.canvas.parentElement;
         if (!parent) throw new Error('canvas元素必须要有父亲!!');
         this.context2d = canvas2d.getContext('2d');

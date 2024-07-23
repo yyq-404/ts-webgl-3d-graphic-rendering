@@ -1,16 +1,16 @@
-import {WebGL2Application} from '../../base/WebGL2Application';
-import {Triangle} from '../../../common/geometry/solid/Triangle';
-import {Vector3} from '../../../common/math/vector/Vector3';
-import {GLAttributeHelper} from '../../../webgl/GLAttributeHelper';
-import {HttpHelper} from '../../../net/HttpHelper';
-import {GLRenderHelper} from '../../../webgl/GLRenderHelper';
-import {GLShaderConstants} from '../../../webgl/GLShaderConstants';
-import {AppConstants} from '../../AppConstants';
+import {WebGL2Scene} from '../base/WebGL2Scene';
+import {Triangle} from '../../common/geometry/solid/Triangle';
+import {Vector3} from '../../common/math/vector/Vector3';
+import {GLAttributeHelper} from '../../webgl/GLAttributeHelper';
+import {SceneConstants} from '../SceneConstants';
+import {GLRenderHelper} from '../../webgl/GLRenderHelper';
+import {GLShaderConstants} from '../../webgl/GLShaderConstants';
+import {HttpHelper} from '../../net/HttpHelper';
 
 /**
  * 枪支贴图示例。
  */
-export class WallTextureApplication extends WebGL2Application {
+export class WallTextureScene extends WebGL2Scene {
     /** 三角形 */
     private _triangle = new Triangle([new Vector3([3.0, 0.0, 0.0]), new Vector3([-3.0, 0.0, 0.0]), new Vector3([0.0, 3.0, 0.0])]);
     /** 纹理贴图 */
@@ -31,8 +31,8 @@ export class WallTextureApplication extends WebGL2Application {
      */
     public override get shaderUrls(): Map<string, string> {
         return new Map<string, string>([
-            ['bns.vert', `${AppConstants.webgl2ShaderRoot}/texture/texture.vert`],
-            ['bns.frag', `${AppConstants.webgl2ShaderRoot}/texture/texture.frag`]
+            ['bns.vert', `${SceneConstants.webgl2ShaderRoot}/texture/texture.vert`],
+            ['bns.frag', `${SceneConstants.webgl2ShaderRoot}/texture/texture.frag`]
         ]);
     }
     

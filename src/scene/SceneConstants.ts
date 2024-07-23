@@ -1,7 +1,7 @@
 /**
- * App常量定义。
+ * 场景常量定义。
  */
-export class AppConstants {
+export class SceneConstants {
     /** 画布宽度 */
     public static readonly canvasWidth: number = 1200;
     /** 画布高度 */

@@ -1,14 +1,14 @@
-import {BaseApplication} from '../../base/BaseApplication';
-import {GLRenderHelper} from '../../../webgl/GLRenderHelper';
-import {Matrix4} from '../../../common/math/matrix/Matrix4';
-import {Vector3} from '../../../common/math/vector/Vector3';
-import {EGLShaderType} from '../../../webgl/enum/EGLShaderType';
-import {TypedArrayList} from '../../../common/container/TypedArrayList';
-import {GLCoordinateSystem} from '../../../webgl/common/GLCoordinateSystem';
-import {GLAttributeMap, GLUniformMap} from '../../../webgl/common/GLTypes';
-import {CanvasKeyboardEvent} from '../../../event/keyboard/CanvasKeyboardEvent';
-import {HttpHelper} from '../../../net/HttpHelper';
-import {AppConstants} from '../../AppConstants';
+
+import {SceneConstants} from '../SceneConstants';
+import {WebGLScene} from '../base/WebGLScene';
+import {GLAttributeMap, GLUniformMap} from '../../webgl/common/GLTypes';
+import {Matrix4} from '../../common/math/matrix/Matrix4';
+import {TypedArrayList} from '../../common/container/TypedArrayList';
+import {GLCoordinateSystem} from '../../webgl/common/GLCoordinateSystem';
+import {EGLShaderType} from '../../webgl/enum/EGLShaderType';
+import {GLRenderHelper} from '../../webgl/GLRenderHelper';
+import {Vector3} from '../../common/math/vector/Vector3';
+import {HttpHelper} from '../../net/HttpHelper';
 
 /**
  * 9视图参数类型
@@ -37,7 +37,7 @@ type DrawParameters4s = {
 /**
  * 基础WEBGL应用。
  */
-export class BasicWebGLApplication extends BaseApplication {
+export class BasicWebGLScene extends WebGLScene {
     /** gl全局变量信息 */
     private _uniformMap: GLUniformMap = {};
     /** gl属性信息 */
@@ -68,8 +68,8 @@ export class BasicWebGLApplication extends BaseApplication {
     private _isFourViewport: boolean = false;
     /** shader路径集合 */
     private readonly _shaderUrls: Map<EGLShaderType, string> = new Map<EGLShaderType, string>([
-        [EGLShaderType.VS_SHADER, `${AppConstants.webglShaderRoot}/basic/color.vert`],
-        [EGLShaderType.FS_SHADER, `${AppConstants.webglShaderRoot}/basic/color.frag`]
+        [EGLShaderType.VS_SHADER, `${SceneConstants.webglShaderRoot}/basic/color.vert`],
+        [EGLShaderType.FS_SHADER, `${SceneConstants.webglShaderRoot}/basic/color.frag`]
     ]);
     
     /**
@@ -276,22 +276,6 @@ export class BasicWebGLApplication extends BaseApplication {
         await super.runAsync();
     }
     
-    // /**
-    //  * 按键按下。
-    //  * @param {CanvasKeyboardEvent} evt
-    //  */
-    // public override onKeyPress(evt: CanvasKeyboardEvent): void {
-    //     // 调用基类方法，这样摄像机键盘事件全部有效了
-    //     super.onKeyPress(evt);
-    //     switch (evt.key) {
-    //         case 'c':
-    //             this._isFourViewport = !this._isFourViewport;
-    //             break;
-    //         default:
-    //             break;
-    //     }
-    // }
-    
     /**
      * 更新
      * @param {number} elapsedMsec
@@ -304,7 +288,6 @@ export class BasicWebGLApplication extends BaseApplication {
      * 渲染处理。
      */
     public override render(): void {
-        // this.clearBuffer();
         if (this._isFourViewport) {
             this.render4Viewports();
         } else {

@@ -1,14 +1,15 @@
-import {WebGL2Application} from '../../base/WebGL2Application';
-import {Color4} from '../../../common/color/Color4';
-import {Vector3} from '../../../common/math/vector/Vector3';
-import {CanvasKeyboardEventManager} from '../../../event/keyboard/CanvasKeyboardEventManager';
-import {ECanvasKeyboardEventType} from '../../../enum/ECanvasKeyboardEventType';
-import {Triangle} from '../../../common/geometry/solid/Triangle';
+import {WebGL2Scene} from '../base/WebGL2Scene';
+import {Triangle} from '../../common/geometry/solid/Triangle';
+import {Vector3} from '../../common/math/vector/Vector3';
+import {Color4} from '../../common/color/Color4';
+import {CanvasKeyboardEventManager} from '../../event/keyboard/CanvasKeyboardEventManager';
+import {ECanvasKeyboardEventType} from '../../enum/ECanvasKeyboardEventType';
+
 
 /**
- * 背面裁剪应用。
+ * 背面裁剪场景。
  */
-export class CullFaceApplication extends WebGL2Application {
+export class CullFaceScene extends WebGL2Scene {
     /** 矩形 */
     private _triangles: Triangle[] = [
         new Triangle([new Vector3([-8 * 0.125, 10 * 0.125, 0]), new Vector3([-2 * 0.125, 2 * 0.125, 0]), new Vector3([-8 * 0.125, 2 * 0.125, 0])], [Color4.White, Color4.Blue, Color4.Blue]),

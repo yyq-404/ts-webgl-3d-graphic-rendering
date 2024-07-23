@@ -1,8 +1,9 @@
-import {GLShaderConstants} from '../../webgl/GLShaderConstants';
 import {HtmlHelper, HtmlRangeProps} from './HtmlHelper';
-import {Vector3} from '../../common/math/vector/Vector3';
-import {GLProgram} from '../../webgl/program/GLProgram';
-import {Vector4} from '../../common/math/vector/Vector4';
+import {GLShaderConstants} from '../webgl/GLShaderConstants';
+import {Vector3} from '../common/math/vector/Vector3';
+import {Vector4} from '../common/math/vector/Vector4';
+import {GLProgram} from '../webgl/program/GLProgram';
+
 
 /**
  * 光照参数控制器。

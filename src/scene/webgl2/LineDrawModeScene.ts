@@ -1,14 +1,15 @@
-import {WebGL2Application} from '../../base/WebGL2Application';
-import {Vector3} from '../../../common/math/vector/Vector3';
-import {Color4} from '../../../common/color/Color4';
-import {CanvasKeyboardEventManager} from '../../../event/keyboard/CanvasKeyboardEventManager';
-import {ECanvasKeyboardEventType} from '../../../enum/ECanvasKeyboardEventType';
-import {Point3s} from '../../../common/geometry/solid/Point3s';
+import {WebGL2Scene} from '../base/WebGL2Scene';
+import {Point3s} from '../../common/geometry/solid/Point3s';
+import {Vector3} from '../../common/math/vector/Vector3';
+import {Color4} from '../../common/color/Color4';
+import {CanvasKeyboardEventManager} from '../../event/keyboard/CanvasKeyboardEventManager';
+import {ECanvasKeyboardEventType} from '../../enum/ECanvasKeyboardEventType';
+
 
 /**
- * 线段绘制模式应用。
+ * 线段绘制模式场景。
  */
-export class LineDrawModeApplication extends WebGL2Application {
+export class LineDrawModeScene extends WebGL2Scene {
     /** 绘制模式 */
     private _mode: GLint;
     /** 点集 */

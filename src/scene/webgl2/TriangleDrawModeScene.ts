@@ -1,15 +1,16 @@
-import {WebGL2Application} from '../../base/WebGL2Application';
-import {Belt} from '../../../common/geometry/solid/Belt';
-import {Fan} from '../../../common/geometry/solid/Fan';
-import {Vector3} from '../../../common/math/vector/Vector3';
-import {CanvasKeyboardEventManager} from '../../../event/keyboard/CanvasKeyboardEventManager';
-import {ECanvasKeyboardEventType} from '../../../enum/ECanvasKeyboardEventType';
-import {Geometry} from '../../../common/geometry/Geometry';
+import {WebGL2Scene} from '../base/WebGL2Scene';
+import {Belt} from '../../common/geometry/solid/Belt';
+import {Geometry} from '../../common/geometry/Geometry';
+import {Fan} from '../../common/geometry/solid/Fan';
+import {CanvasKeyboardEventManager} from '../../event/keyboard/CanvasKeyboardEventManager';
+import {ECanvasKeyboardEventType} from '../../enum/ECanvasKeyboardEventType';
+import {Vector3} from '../../common/math/vector/Vector3';
+
 
 /**
- * 三角形绘制模式应用。
+ * 三角形绘制模式场景。
  */
-export class TriangleDrawModeApplication extends WebGL2Application {
+export class TriangleDrawModeScene extends WebGL2Scene {
     /** 条形集合 */
     private _belts: Belt[] = [
         new Belt(0, 90, 3),

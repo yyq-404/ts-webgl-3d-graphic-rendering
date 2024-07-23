@@ -1,17 +1,17 @@
-import {WebGL2Application} from '../../../base/WebGL2Application';
-import {Vector3} from '../../../../common/math/vector/Vector3';
-import {GLShaderConstants} from '../../../../webgl/GLShaderConstants';
-import {AppConstants} from '../../../AppConstants';
-import {GLAttributeHelper} from '../../../../webgl/GLAttributeHelper';
-import {GLRenderHelper} from '../../../../webgl/GLRenderHelper';
-import {ColorCube} from '../../../../common/geometry/solid/ColorCube';
-import {HtmlHelper} from '../../HtmlHelper';
+import {WebGL2Scene} from '../../base/WebGL2Scene';
+import {ColorCube} from '../../../common/geometry/solid/ColorCube';
 import {LightController} from '../../LightController';
+import {GLAttributeHelper} from '../../../webgl/GLAttributeHelper';
+import {GLRenderHelper} from '../../../webgl/GLRenderHelper';
+import {SceneConstants} from '../../SceneConstants';
+import {HtmlHelper} from '../../HtmlHelper';
+import {Vector3} from '../../../common/math/vector/Vector3';
+import {GLShaderConstants} from '../../../webgl/GLShaderConstants';
 
 /**
- * 光法向量应用。
+ * 光法向量场景。
  */
-export class LightNormalApplication extends WebGL2Application {
+export class LightNormalScene extends WebGL2Scene {
     /** 立方体 */
     private _cubes: ColorCube[] = [new ColorCube(), new ColorCube()];
     /** 法线计算方式 */
@@ -34,8 +34,8 @@ export class LightNormalApplication extends WebGL2Application {
      */
     public override get shaderUrls(): Map<string, string> {
         return new Map<string, string>([
-            ['bns.vert', `${AppConstants.webgl2ShaderRoot}/light/point.vert`],
-            ['bns.frag', `${AppConstants.webgl2ShaderRoot}/light/point.frag`]
+            ['bns.vert', `${SceneConstants.webgl2ShaderRoot}/light/point.vert`],
+            ['bns.frag', `${SceneConstants.webgl2ShaderRoot}/light/point.frag`]
         ]);
     }
     
@@ -102,7 +102,6 @@ export class LightNormalApplication extends WebGL2Application {
             this._cubes.forEach(cube => cube.normals = element.value === 'point' ? cube.createSurfaceNormals() : cube.vertex.positions);
         }
         this.clearControls();
-        this.stop();
         this.runAsync.call(this);
     };
 }

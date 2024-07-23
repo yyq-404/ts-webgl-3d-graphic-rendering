@@ -1,17 +1,17 @@
-import {WebGL2Application} from '../../../base/WebGL2Application';
-import {Ball} from '../../../../common/geometry/solid/Ball';
-import {Vector3} from '../../../../common/math/vector/Vector3';
-import {GLShaderConstants} from '../../../../webgl/GLShaderConstants';
-import {AppConstants} from '../../../AppConstants';
-import {GLAttributeHelper} from '../../../../webgl/GLAttributeHelper';
-import {GLRenderHelper} from '../../../../webgl/GLRenderHelper';
-import {HtmlHelper} from '../../HtmlHelper';
+import {WebGL2Scene} from '../../base/WebGL2Scene';
+import {Ball} from '../../../common/geometry/solid/Ball';
 import {LightController} from '../../LightController';
+import {GLAttributeHelper} from '../../../webgl/GLAttributeHelper';
+import {GLRenderHelper} from '../../../webgl/GLRenderHelper';
+import {SceneConstants} from '../../SceneConstants';
+import {HtmlHelper} from '../../HtmlHelper';
+import {Vector3} from '../../../common/math/vector/Vector3';
+import {GLShaderConstants} from '../../../webgl/GLShaderConstants';
 
 /**
- * 光源类型应用。
+ * 光源类型场景。
  */
-export class LightSourceApplication extends WebGL2Application {
+export class LightSourceScene extends WebGL2Scene {
     /** 球体 */
     private _balls: Ball[] = [new Ball(), new Ball()];
     /** 光源类型 */
@@ -35,8 +35,8 @@ export class LightSourceApplication extends WebGL2Application {
      */
     public override get shaderUrls(): Map<string, string> {
         return new Map<string, string>([
-            ['bns.vert', `${AppConstants.webgl2ShaderRoot}/light/${this._sourceType}.vert`],
-            ['bns.frag', `${AppConstants.webgl2ShaderRoot}/light/${this._sourceType}.frag`]
+            ['bns.vert', `${SceneConstants.webgl2ShaderRoot}/light/${this._sourceType}.vert`],
+            ['bns.frag', `${SceneConstants.webgl2ShaderRoot}/light/${this._sourceType}.frag`]
         ]);
     }
     
@@ -53,7 +53,6 @@ export class LightSourceApplication extends WebGL2Application {
         });
         this._lightController.create();
         await this.initAsync();
-        this.start();
     }
     
     /**
@@ -101,7 +100,6 @@ export class LightSourceApplication extends WebGL2Application {
             this._sourceType = element.value;
         }
         this.clearControls();
-        this.stop();
         this.runAsync.apply(this);
     };
 }

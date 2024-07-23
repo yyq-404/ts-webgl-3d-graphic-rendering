@@ -1,16 +1,16 @@
-import {WebGL2Application} from '../../base/WebGL2Application';
-import {ColorSquare} from '../../../common/geometry/solid/ColorSquare';
-import {Color4} from '../../../common/color/Color4';
-import {Vector3} from '../../../common/math/vector/Vector3';
-import {ECameraObservationType} from '../../../enum/ECameraObservationType';
-import {CanvasKeyboardEventManager} from '../../../event/keyboard/CanvasKeyboardEventManager';
-import {ECanvasKeyboardEventType} from '../../../enum/ECanvasKeyboardEventType';
-import {AppConstants} from '../../AppConstants';
+import {SceneConstants} from '../SceneConstants';
+import {WebGL2Scene} from '../base/WebGL2Scene';
+import {ColorSquare} from '../../common/geometry/solid/ColorSquare';
+import {Color4} from '../../common/color/Color4';
+import {ECameraObservationType} from '../../enum/ECameraObservationType';
+import {CanvasKeyboardEventManager} from '../../event/keyboard/CanvasKeyboardEventManager';
+import {ECanvasKeyboardEventType} from '../../enum/ECanvasKeyboardEventType';
+import {Vector3} from '../../common/math/vector/Vector3';
 
 /**
- * 相机视角应用。
+ * 相机视角场景。
  */
-export class CameraViewApplication extends WebGL2Application {
+export class CameraViewScene extends WebGL2Scene {
     /** 矩形 */
     private _rect: ColorSquare = new ColorSquare(0.25, [Color4.White, Color4.Blue, Color4.Blue, Color4.Blue, Color4.Blue, Color4.Blue]);
     
@@ -35,8 +35,8 @@ export class CameraViewApplication extends WebGL2Application {
      */
     public override get shaderUrls(): Map<string, string> {
         return new Map<string, string>([
-            ['bns.vert', `${AppConstants.webgl2ShaderRoot}/effect/bns.vert`],
-            ['bns.frag', `${AppConstants.webgl2ShaderRoot}/effect/bns.frag`]
+            ['bns.vert', `${SceneConstants.webgl2ShaderRoot}/effect/bns.vert`],
+            ['bns.frag', `${SceneConstants.webgl2ShaderRoot}/effect/bns.frag`]
         ]);
     }
     

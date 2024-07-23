@@ -1,22 +1,22 @@
-import {BaseApplication} from './BaseApplication';
-import {GLRenderHelper} from '../../webgl/GLRenderHelper';
-import {GLProgramCache} from '../../webgl/program/GLProgramCache';
-import {AppConstants} from '../AppConstants';
-import {GLProgram} from '../../webgl/program/GLProgram';
+import {BaseScene} from './BaseScene';
 import {GLMatrixStack} from '../../webgl/matrix/GLMatrixStack';
-import {Matrix4} from '../../common/math/matrix/Matrix4';
-import {IGLAttribute} from '../../webgl/attribute/IGLAttribute';
-import {GLShaderConstants} from '../../webgl/GLShaderConstants';
-import {GLAttributeHelper} from '../../webgl/GLAttributeHelper';
-import {GLAttributeBits} from '../../webgl/common/GLTypes';
-import {CanvasMouseMoveEvent} from '../../event/mouse/CanvasMouseMoveEvent';
-import {CanvasMouseEventManager} from '../../event/mouse/CanvasMouseEventManager';
+import {GLProgram} from '../../webgl/program/GLProgram';
 import {Geometry} from '../../common/geometry/Geometry';
+import {IGLAttribute} from '../../webgl/attribute/IGLAttribute';
+import {GLAttributeBits} from '../../webgl/common/GLTypes';
+import {GLAttributeHelper} from '../../webgl/GLAttributeHelper';
+import {CanvasMouseMoveEvent} from '../../event/mouse/CanvasMouseMoveEvent';
+import {SceneConstants} from '../SceneConstants';
+import {GLProgramCache} from '../../webgl/program/GLProgramCache';
+import {GLRenderHelper} from '../../webgl/GLRenderHelper';
+import {CanvasMouseEventManager} from '../../event/mouse/CanvasMouseEventManager';
+import {Matrix4} from '../../common/math/matrix/Matrix4';
+import {GLShaderConstants} from '../../webgl/GLShaderConstants';
 
 /**
- * WebGL应用。
+ * WebGL2场景基类。
  */
-export class WebGL2Application extends BaseApplication {
+export class WebGL2Scene extends BaseScene {
     /* 可以直接操作WebGL2相关内容 */
     protected gl: WebGL2RenderingContext;
     /** 模拟 `OpenGL1.1` 中的矩阵堆栈, 封装在 `GLWorldMatrixStack` 类中 */
@@ -32,17 +32,11 @@ export class WebGL2Application extends BaseApplication {
     
     /**
      * 构造
-     * @param optionMouseMove
-     * @param contextAttributes
      */
-    public constructor(optionMouseMove = false, contextAttributes: WebGLContextAttributes = {
-        antialias: true,
-        premultipliedAlpha: false
-    }) {
+    public constructor(optionMouseMove = false) {
         super();
-        this.gl = this.canvas.getContext('webgl2', contextAttributes);
+        this.gl = this.canvas.getContext('webgl2', this.getContextAttributes());
         if (!this.gl) {
-            alert(' 无法创建WebGL2RenderingContext上下文对象 ');
             throw new Error(' 无法创建WebGL2RenderingContext上下文对象 ');
         }
         this.worldMatrixStack = new GLMatrixStack();
@@ -57,8 +51,8 @@ export class WebGL2Application extends BaseApplication {
      */
     public get shaderUrls(): Map<string, string> {
         return new Map<string, string>([
-            ['bns.vert', `${AppConstants.webgl2ShaderRoot}/basic/bns.vert`],
-            ['bns.frag', `${AppConstants.webgl2ShaderRoot}/basic/bns.frag`]
+            ['bns.vert', `${SceneConstants.webgl2ShaderRoot}/basic/bns.vert`],
+            ['bns.frag', `${SceneConstants.webgl2ShaderRoot}/basic/bns.frag`]
         ]);
     }
     
@@ -68,7 +62,6 @@ export class WebGL2Application extends BaseApplication {
      */
     public override async runAsync(): Promise<void> {
         await this.initAsync();
-        this.start();
     }
     
     /**
@@ -186,7 +179,7 @@ export class WebGL2Application extends BaseApplication {
         this.program.setMatrix4(GLShaderConstants.MVPMatrix, this.mvpMatrix());
         buffers.forEach((value, attribute) => {
             this.program.setVertexAttribute(attribute.NAME, value, attribute.COMPONENT);
-        })
+        });
         this.gl.drawArrays(mode, first, solid.vertex.count);
     }
     

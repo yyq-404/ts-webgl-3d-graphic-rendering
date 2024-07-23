@@ -1,15 +1,15 @@
-import {WebGL2Application} from '../../base/WebGL2Application';
-import {SixPointedStar} from '../../../common/geometry/solid/SixPointedStar';
-import {GLShaderConstants} from '../../../webgl/GLShaderConstants';
-import {GLRenderHelper} from '../../../webgl/GLRenderHelper';
-import {Vector3} from '../../../common/math/vector/Vector3';
-import {IGLAttribute} from '../../../webgl/attribute/IGLAttribute';
-import {Geometry} from "../../../common/geometry/Geometry";
+import {WebGL2Scene} from '../base/WebGL2Scene';
+import {GLRenderHelper} from '../../webgl/GLRenderHelper';
+import {Vector3} from '../../common/math/vector/Vector3';
+import {SixPointedStar} from '../../common/geometry/solid/SixPointedStar';
+import {Geometry} from '../../common/geometry/Geometry';
+import {IGLAttribute} from '../../webgl/attribute/IGLAttribute';
+import {GLShaderConstants} from '../../webgl/GLShaderConstants';
 
 /**
- * 六角形应用。
+ * 六角形场景。
  */
-export class SixPointStarApplication extends WebGL2Application {
+export class SixPointStarScene extends WebGL2Scene {
     /** 六角星数量 */
     private _starCount = 6;
     /** 每个六角星z轴间距 */

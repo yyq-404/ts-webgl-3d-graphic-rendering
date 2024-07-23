@@ -1,25 +1,25 @@
-import {GLTexture} from '../../../webgl/texture/GLTexture';
-import {Cube} from '../../../common/geometry/solid/Cube';
-import {GLStaticMesh} from '../../../webgl/mesh/GLStaticMesh';
-import {Matrix4} from '../../../common/math/matrix/Matrix4';
-import {GLProgramCache} from '../../../webgl/program/GLProgramCache';
-import {GLTextureCache} from '../../../webgl/texture/GLTextureCache';
-import {Vector3} from '../../../common/math/vector/Vector3';
-import {HttpHelper} from '../../../net/HttpHelper';
-import {GLShaderConstants} from '../../../webgl/GLShaderConstants';
-import {EAxisType} from '../../../enum/EAxisType';
-import {WebGLApplication} from '../../base/WebGLApplication';
-import {GLCoordinateSystemHelper} from '../../../webgl/GLCoordinateSystemHelper';
-import {GLMeshHelper} from '../../../webgl/GLMeshHelper';
-import {GLRenderHelper} from '../../../webgl/GLRenderHelper';
-import {ECanvasKeyboardEventType} from '../../../enum/ECanvasKeyboardEventType';
-import {TimerManager} from '../../../timer/TimerManager';
-import {CanvasKeyboardEventManager} from '../../../event/keyboard/CanvasKeyboardEventManager';
+import {WebGLScene} from '../base/WebGLScene';
+import {GLTexture} from '../../webgl/texture/GLTexture';
+import {Cube} from '../../common/geometry/solid/Cube';
+import {GLStaticMesh} from '../../webgl/mesh/GLStaticMesh';
+import {EAxisType} from '../../enum/EAxisType';
+import {GLTextureCache} from '../../webgl/texture/GLTextureCache';
+import {GLMeshHelper} from '../../webgl/GLMeshHelper';
+import {CanvasKeyboardEventManager} from '../../event/keyboard/CanvasKeyboardEventManager';
+import {ECanvasKeyboardEventType} from '../../enum/ECanvasKeyboardEventType';
+import {TimerManager} from '../../timer/TimerManager';
+import {GLRenderHelper} from '../../webgl/GLRenderHelper';
+import {HttpHelper} from '../../net/HttpHelper';
+import {GLProgramCache} from '../../webgl/program/GLProgramCache';
+import {Vector3} from '../../common/math/vector/Vector3';
+import {Matrix4} from '../../common/math/matrix/Matrix4';
+import {GLShaderConstants} from '../../webgl/GLShaderConstants';
+import {GLCoordinateSystemHelper} from '../../webgl/GLCoordinateSystemHelper';
 
 /**
- * 立方体旋转应用
+ * 立方体旋转场景
  */
-export class RotatingCubeApplication extends WebGLApplication {
+export class RotatingCubeScene extends WebGLScene {
     // 纹理对象
     /** 由于cube会进行周而复始的换纹理操作，因此需要记录当前纹理的索引号 */
     private _currentTexIdx: number;
@@ -53,7 +53,7 @@ export class RotatingCubeApplication extends WebGLApplication {
     public constructor() {
         // 调用基类构造函数，最后一个参数为true，意味着我们要创建一个Canvas2D上下文渲染对象
         // 这样我们才能使用该上下文对象进行2D文字渲染
-        super({premultipliedAlpha: false}, true);
+        super();
         if (!this.gl) throw new Error('this.gl is not defined');
         // 初始化角位移和角速度
         this._cubeAngle = 0;
@@ -71,6 +71,7 @@ export class RotatingCubeApplication extends WebGLApplication {
         this._cubeVAO = GLMeshHelper.makeStaticMesh(this.gl, this._cube.vertex);
         // 初始化时没选中任何一条坐标轴
         this._hitAxis = EAxisType.NONE;
+        this.create2dCanvas();
         CanvasKeyboardEventManager.instance.registers(this, [
                 {type: ECanvasKeyboardEventType.KEY_DOWN, key: 'q', callback: this.startRotateTriangle},
                 {type: ECanvasKeyboardEventType.KEY_DOWN, key: 'e', callback: this.stopRotateTriangle}

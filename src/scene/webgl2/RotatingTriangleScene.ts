@@ -1,12 +1,13 @@
-import {WebGL2Application} from '../../base/WebGL2Application';
-import {Triangle} from '../../../common/geometry/solid/Triangle';
-import {Vector3} from '../../../common/math/vector/Vector3';
-import {Color4} from '../../../common/color/Color4';
+import {WebGL2Scene} from '../base/WebGL2Scene';
+import {Triangle} from '../../common/geometry/solid/Triangle';
+import {Vector3} from '../../common/math/vector/Vector3';
+import {Color4} from '../../common/color/Color4';
+
 
 /**
- * 立方体旋转应用
+ * 立方体旋转场景
  */
-export class RotationTriangleApplication extends WebGL2Application {
+export class RotatingTriangleScene extends WebGL2Scene {
     /** 三角形 */
     private _triangle: Triangle = new Triangle([new Vector3([3.0, 0.0, 0.0]), new Vector3([0.0, 0.0, 0.0]), new Vector3([0.0, 3.0, 0.0])], [Color4.White, Color4.Blue, Color4.Green]);
     /** 旋转角度 */

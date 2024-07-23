@@ -1,24 +1,24 @@
-import {GLTexture} from '../../../webgl/texture/GLTexture';
-import {GLMeshBuilder} from '../../../webgl/mesh/GLMeshBuilder';
-import {GLCoordinateSystem} from '../../../webgl/common/GLCoordinateSystem';
-import {GLTextureCache} from '../../../webgl/texture/GLTextureCache';
-import {GLProgramCache} from '../../../webgl/program/GLProgramCache';
-import {GLAttributeHelper} from '../../../webgl/GLAttributeHelper';
-import {EGLVertexLayoutType} from '../../../webgl/enum/EGLVertexLayoutType';
-import {WebGLApplication} from '../../base/WebGLApplication';
-import {Vector3} from '../../../common/math/vector/Vector3';
-import {GLCoordinateSystemHelper} from '../../../webgl/GLCoordinateSystemHelper';
-import {EAxisType} from '../../../enum/EAxisType';
-import {DrawHelper} from '../../../common/DrawHelper';
-import {Matrix4} from '../../../common/math/matrix/Matrix4';
-import {GLRenderHelper} from '../../../webgl/GLRenderHelper';
-import {ECanvasKeyboardEventType} from '../../../enum/ECanvasKeyboardEventType';
-import {CanvasKeyboardEventManager} from '../../../event/keyboard/CanvasKeyboardEventManager';
+import {WebGLScene} from '../base/WebGLScene';
+import {GLMeshBuilder} from '../../webgl/mesh/GLMeshBuilder';
+import {GLCoordinateSystem} from '../../webgl/common/GLCoordinateSystem';
+import {GLTexture} from '../../webgl/texture/GLTexture';
+import {GLTextureCache} from '../../webgl/texture/GLTextureCache';
+import {GLAttributeHelper} from '../../webgl/GLAttributeHelper';
+import {EGLVertexLayoutType} from '../../webgl/enum/EGLVertexLayoutType';
+import {CanvasKeyboardEventManager} from '../../event/keyboard/CanvasKeyboardEventManager';
+import {ECanvasKeyboardEventType} from '../../enum/ECanvasKeyboardEventType';
+import {GLProgramCache} from '../../webgl/program/GLProgramCache';
+import {Vector3} from '../../common/math/vector/Vector3';
+import {Matrix4} from '../../common/math/matrix/Matrix4';
+import {DrawHelper} from '../../common/DrawHelper';
+import {GLCoordinateSystemHelper} from '../../webgl/GLCoordinateSystemHelper';
+import {EAxisType} from '../../enum/EAxisType';
+import {GLRenderHelper} from '../../webgl/GLRenderHelper';
 
 /**
- * 网格构建器应用
+ * 网格构建器场景
  */
-export class MeshBuilderApplication extends WebGLApplication {
+export class MeshBuilderScene extends WebGLScene {
     /** 使用`EGLVertexLayoutType.INTERLEAVED`存储顶点数据的基于颜色着色器的`GLMeshBuilder`对象 */
     private readonly _colorBuilder0: GLMeshBuilder;
     /** 使用`EGLVertexLayoutType.SEQUENCED`存储顶点数据的基于颜色着色器的`GLMeshBuilder`对象 */
@@ -51,11 +51,10 @@ export class MeshBuilderApplication extends WebGLApplication {
     
     /**
      * 构造
-     * @param {HTMLCanvasElement} canvas
      */
     public constructor() {
         // 调用基类构造函数
-        super({preserveDrawingBuffer: false}, true);
+        super();
         if (!this.gl) throw new Error('this.webglContext is undefined.');
         // 使用default纹理和着色器
         this._texture = GLTextureCache.instance.getMust('default');
@@ -71,8 +70,7 @@ export class MeshBuilderApplication extends WebGLApplication {
         this._coords = GLCoordinateSystem.makeViewportCoordinateSystems(this.canvas.width, this.canvas.height, 2, 3);
         // 初始化时指向页面1的绘图函数
         this._currentDrawMethod = this.drawByMatrixWithColorShader;
-        // BUG
-        // this.currentDrawMethod = this.drawByMultiViewportsWithTextureShader;
+        this.create2dCanvas();
         CanvasKeyboardEventManager.instance.registers(this, [
             {type: ECanvasKeyboardEventType.KEY_PRESS, key: '1', callback: () => this._currentDrawMethod = this.drawByMatrixWithColorShader},
             {type: ECanvasKeyboardEventType.KEY_PRESS, key: '2', callback: () => this._currentDrawMethod = this.drawByMultiViewportsWithTextureShader}
@@ -93,7 +91,6 @@ export class MeshBuilderApplication extends WebGLApplication {
         this._texBuilder0.program = textureShaderProgram;
         this._texBuilder1.program = textureShaderProgram;
         this._texBuilder2.program = textureShaderProgram;
-        this.start();
     }
     
     /**
