@@ -1,9 +1,9 @@
-import {WebGL2Scene} from '../base/WebGL2Scene';
-import {ColorCube} from '../../common/geometry/solid/ColorCube';
-import {GLRenderHelper} from '../../webgl/GLRenderHelper';
-import {CanvasKeyboardEventManager} from '../../event/keyboard/CanvasKeyboardEventManager';
-import {ECanvasKeyboardEventType} from '../../enum/ECanvasKeyboardEventType';
-import {Vector3} from '../../common/math/vector/Vector3';
+import {WebGL2Scene} from '../../base/WebGL2Scene';
+import {ColorCube} from '../../../common/geometry/solid/ColorCube';
+import {GLRenderHelper} from '../../../webgl/GLRenderHelper';
+import {CanvasKeyboardEventManager} from '../../../event/keyboard/CanvasKeyboardEventManager';
+import {ECanvasKeyboardEventType} from '../../../enum/ECanvasKeyboardEventType';
+import {Vector3} from '../../../common/math/vector/Vector3';
 
 
 /**

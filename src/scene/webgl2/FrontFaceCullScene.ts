@@ -9,14 +9,14 @@ import {ECanvasKeyboardEventType} from '../../enum/ECanvasKeyboardEventType';
 /**
  * 背面裁剪场景。
  */
-export class CullFaceScene extends WebGL2Scene {
+export class FrontFaceCullScene extends WebGL2Scene {
     /** 矩形 */
     private _triangles: Triangle[] = [
         new Triangle([new Vector3([-8 * 0.125, 10 * 0.125, 0]), new Vector3([-2 * 0.125, 2 * 0.125, 0]), new Vector3([-8 * 0.125, 2 * 0.125, 0])], [Color4.White, Color4.Blue, Color4.Blue]),
         new Triangle([new Vector3([8 * 0.125, 2 * 0.125, 0]), new Vector3([8 * 0.125, 10 * 0.125, 0]), new Vector3([2 * 0.125, 10 * 0.125, 0])], [Color4.White, Color4.Green, Color4.Green])
     ];
     /** 背面裁剪 */
-    private _optionCullFace = false;
+    private _optionCull = false;
     /** 正面（顺时针） */
     private _optionCW = false;
     
@@ -27,7 +27,7 @@ export class CullFaceScene extends WebGL2Scene {
         super(true);
         this.createBuffers(...this._triangles);
         CanvasKeyboardEventManager.instance.registers(this, [
-            {type: ECanvasKeyboardEventType.KEY_PRESS, key: '1', callback: () => this._optionCullFace = !this._optionCullFace},
+            {type: ECanvasKeyboardEventType.KEY_PRESS, key: '1', callback: () => this._optionCull = !this._optionCull},
             {type: ECanvasKeyboardEventType.KEY_PRESS, key: '2', callback: () => this._optionCW = !this._optionCW}
         ]);
     }
@@ -36,7 +36,7 @@ export class CullFaceScene extends WebGL2Scene {
      * 渲染。
      */
     public override render(): void {
-        this._optionCullFace ? this.gl.enable(this.gl.CULL_FACE) : this.gl.disable(this.gl.CULL_FACE);
+        this._optionCull ? this.gl.enable(this.gl.CULL_FACE) : this.gl.disable(this.gl.CULL_FACE);
         this.gl.frontFace(this._optionCW ? this.gl.CW : this.gl.CCW);
         this.drawTriangles();
     };

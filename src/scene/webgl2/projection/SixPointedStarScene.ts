@@ -1,10 +1,10 @@
-import {WebGL2Scene} from '../base/WebGL2Scene';
-import {GLRenderHelper} from '../../webgl/GLRenderHelper';
-import {Vector3} from '../../common/math/vector/Vector3';
-import {SixPointedStar} from '../../common/geometry/solid/SixPointedStar';
-import {Geometry} from '../../common/geometry/Geometry';
-import {IGLAttribute} from '../../webgl/attribute/IGLAttribute';
-import {GLShaderConstants} from '../../webgl/GLShaderConstants';
+import {WebGL2Scene} from '../../base/WebGL2Scene';
+import {GLRenderHelper} from '../../../webgl/GLRenderHelper';
+import {Vector3} from '../../../common/math/vector/Vector3';
+import {SixPointedStar} from '../../../common/geometry/solid/SixPointedStar';
+import {Geometry} from '../../../common/geometry/Geometry';
+import {IGLAttribute} from '../../../webgl/attribute/IGLAttribute';
+import {GLShaderConstants} from '../../../webgl/GLShaderConstants';
 
 /**
  * 六角形场景。

@@ -1,10 +1,10 @@
-import {WebGL2Scene} from '../base/WebGL2Scene';
-import {Rect} from '../../common/geometry/solid/Rect';
-import {GLAttributeHelper} from '../../webgl/GLAttributeHelper';
-import {SceneConstants} from '../SceneConstants';
-import {Vector3} from '../../common/math/vector/Vector3';
-import {GLShaderConstants} from '../../webgl/GLShaderConstants';
-import {HttpHelper} from '../../net/HttpHelper';
+import {WebGL2Scene} from '../../base/WebGL2Scene';
+import {Rect} from '../../../common/geometry/solid/Rect';
+import {GLAttributeHelper} from '../../../webgl/GLAttributeHelper';
+import {SceneConstants} from '../../SceneConstants';
+import {Vector3} from '../../../common/math/vector/Vector3';
+import {GLShaderConstants} from '../../../webgl/GLShaderConstants';
+import {HttpHelper} from '../../../net/HttpHelper';
 
 
 /**

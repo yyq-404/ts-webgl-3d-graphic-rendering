@@ -1,10 +1,10 @@
-import {WebGL2Scene} from '../base/WebGL2Scene';
-import {Belt} from '../../common/geometry/solid/Belt';
-import {Geometry} from '../../common/geometry/Geometry';
-import {Fan} from '../../common/geometry/solid/Fan';
-import {CanvasKeyboardEventManager} from '../../event/keyboard/CanvasKeyboardEventManager';
-import {ECanvasKeyboardEventType} from '../../enum/ECanvasKeyboardEventType';
-import {Vector3} from '../../common/math/vector/Vector3';
+import {WebGL2Scene} from '../../base/WebGL2Scene';
+import {Belt} from '../../../common/geometry/solid/Belt';
+import {Geometry} from '../../../common/geometry/Geometry';
+import {Fan} from '../../../common/geometry/solid/Fan';
+import {CanvasKeyboardEventManager} from '../../../event/keyboard/CanvasKeyboardEventManager';
+import {ECanvasKeyboardEventType} from '../../../enum/ECanvasKeyboardEventType';
+import {Vector3} from '../../../common/math/vector/Vector3';
 
 
 /**

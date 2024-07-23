@@ -1,11 +1,11 @@
-import {WebGL2Scene} from '../base/WebGL2Scene';
-import {Triangle} from '../../common/geometry/solid/Triangle';
-import {Vector3} from '../../common/math/vector/Vector3';
-import {GLAttributeHelper} from '../../webgl/GLAttributeHelper';
-import {SceneConstants} from '../SceneConstants';
-import {GLRenderHelper} from '../../webgl/GLRenderHelper';
-import {GLShaderConstants} from '../../webgl/GLShaderConstants';
-import {HttpHelper} from '../../net/HttpHelper';
+import {WebGL2Scene} from '../../base/WebGL2Scene';
+import {Triangle} from '../../../common/geometry/solid/Triangle';
+import {Vector3} from '../../../common/math/vector/Vector3';
+import {GLAttributeHelper} from '../../../webgl/GLAttributeHelper';
+import {SceneConstants} from '../../SceneConstants';
+import {GLRenderHelper} from '../../../webgl/GLRenderHelper';
+import {GLShaderConstants} from '../../../webgl/GLShaderConstants';
+import {HttpHelper} from '../../../net/HttpHelper';
 
 /**
  * 枪支贴图示例。

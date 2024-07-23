@@ -1,7 +1,7 @@
-import {WebGL2Scene} from '../base/WebGL2Scene';
-import {Triangle} from '../../common/geometry/solid/Triangle';
-import {Vector3} from '../../common/math/vector/Vector3';
-import {Color4} from '../../common/color/Color4';
+import {WebGL2Scene} from '../../base/WebGL2Scene';
+import {Triangle} from '../../../common/geometry/solid/Triangle';
+import {Vector3} from '../../../common/math/vector/Vector3';
+import {Color4} from '../../../common/color/Color4';
 
 
 /**

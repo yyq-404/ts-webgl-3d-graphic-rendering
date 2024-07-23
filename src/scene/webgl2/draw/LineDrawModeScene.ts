@@ -1,9 +1,9 @@
-import {WebGL2Scene} from '../base/WebGL2Scene';
-import {Point3s} from '../../common/geometry/solid/Point3s';
-import {Vector3} from '../../common/math/vector/Vector3';
-import {Color4} from '../../common/color/Color4';
-import {CanvasKeyboardEventManager} from '../../event/keyboard/CanvasKeyboardEventManager';
-import {ECanvasKeyboardEventType} from '../../enum/ECanvasKeyboardEventType';
+import {WebGL2Scene} from '../../base/WebGL2Scene';
+import {Point3s} from '../../../common/geometry/solid/Point3s';
+import {Vector3} from '../../../common/math/vector/Vector3';
+import {Color4} from '../../../common/color/Color4';
+import {CanvasKeyboardEventManager} from '../../../event/keyboard/CanvasKeyboardEventManager';
+import {ECanvasKeyboardEventType} from '../../../enum/ECanvasKeyboardEventType';
 
 
 /**

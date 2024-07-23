@@ -3,19 +3,19 @@ import {RotatingCubeScene} from './webgl/RotationCubeScene';
 import {CoordinateSystemScene} from './webgl/CoordinateSystemScene';
 import {BasicWebGLScene} from './webgl/BasicWebGLScene';
 import {MeshBuilderScene} from './webgl/MeshBuilderScene';
-import {RotatingTriangleScene} from './webgl2/RotatingTriangleScene';
-import {SixPointStarScene} from './webgl2/SixPointedStarScene';
-import {TransformCubeScene} from './webgl2/TransformCubeScene';
-import {LineDrawModeScene} from './webgl2/LineDrawModeScene';
-import {TriangleDrawModeScene} from './webgl2/TriangleDrawModeScene';
-import {CameraViewScene} from './webgl2/CameraViewScene';
-import {CullFaceScene} from './webgl2/CullFaceScene';
+import {RotatingTriangleScene} from './webgl2/transform/RotatingTriangleScene';
+import {SixPointStarScene} from './webgl2/projection/SixPointedStarScene';
+import {TransformCubeScene} from './webgl2/transform/TransformCubeScene';
+import {LineDrawModeScene} from './webgl2/draw/LineDrawModeScene';
+import {TriangleDrawModeScene} from './webgl2/draw/TriangleDrawModeScene';
+import {CameraViewScene} from './webgl2/camera/CameraViewScene';
+import {FrontFaceCullScene} from './webgl2/FrontFaceCullScene';
 import {LightReflectionScene} from './webgl2/light/LightReflectionScene';
 import {LightSourceScene} from './webgl2/light/LightSourceScene';
 import {LightNormalScene} from './webgl2/light/LightNormalScene';
 import {LightComputeScene} from './webgl2/light/LightComputeScene';
-import {WallTextureScene} from './webgl2/WallTextureScene';
-import {TextureWrapScene} from './webgl2/TextureWrapScene';
+import {WallTextureScene} from './webgl2/texture/WallTextureScene';
+import {TextureWrapScene} from './webgl2/texture/TextureWrapScene';
 
 /**
  * 场景管理器。
@@ -44,7 +44,7 @@ export class SceneManager {
             ['LineDrawMode', LineDrawModeScene],
             ['TriangleDrawMode', TriangleDrawModeScene],
             ['CameraView', CameraViewScene],
-            ['CullFace', CullFaceScene],
+            ['CullFace', FrontFaceCullScene],
             ['LightReflection', LightReflectionScene],
             ['LightSource', LightSourceScene],
             ['LightNormal', LightNormalScene],
