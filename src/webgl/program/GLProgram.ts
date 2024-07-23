@@ -148,7 +148,8 @@ export class GLProgram {
      * @param {number} offset
      */
     public setVertexAttribute(name: string, buffer: WebGLBuffer, size: number, target: number = this.gl.ARRAY_BUFFER, type: number = this.gl.FLOAT, normalized: boolean = false, stride: number = 0, offset: number = 0): void {
-        let location = this.getAttributeLocation(name);
+        const location = this.getAttributeLocation(name);
+        if (location < 0) return;
         //启用顶点数据数组
         this.gl.enableVertexAttribArray(location);
         //绑定顶点数据缓冲
