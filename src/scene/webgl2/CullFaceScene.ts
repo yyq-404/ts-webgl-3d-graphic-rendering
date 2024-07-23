@@ -51,9 +51,7 @@ export class CullFaceScene extends WebGL2Scene {
         this.worldMatrixStack.rotate(this.mouseMoveEvent.currentYAngle, Vector3.up);
         //执行绕X轴旋转
         this.worldMatrixStack.rotate(this.mouseMoveEvent.currentXAngle, Vector3.right);
-        for (let i = 0; i < this._triangles.length; i++) {
-            this.drawTriangle(this._triangles[i]);
-        }
+        this._triangles.forEach(triangle => this.drawTriangle(triangle));
         this.worldMatrixStack.popMatrix();
     }
     
