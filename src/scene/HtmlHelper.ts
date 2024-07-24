@@ -127,4 +127,33 @@ export class HtmlHelper {
         b.style.transform = 'translateX(-50%)';
         return b;
     }
+    
+    /**
+     * 创建单选框组。
+     * @param {string} name
+     * @param {string} textContent
+     * @param {string[]} args
+     * @param {() => void} onClick
+     * @private
+     */
+    public static createRadioGroup(name: string, textContent: string, args: string[], onClick: (event: Event) => void): void {
+        const parent = document.getElementById('controls');
+        const label = document.createElement('label');
+        label.textContent = textContent;
+        label.style.position = 'relative';
+        label.style.margin = '10px';
+        args.forEach((value, index) => {
+            const radio: HTMLInputElement = document.createElement('input');
+            radio.type = 'radio';
+            radio.name = name;
+            radio.value = value;
+            radio.onclick = onClick;
+            radio.checked = index === 0;
+            label.appendChild(radio);
+            label.append(value + '  ');
+        });
+        parent.appendChild(label);
+        const br = document.createElement('br');
+        parent.appendChild(br);
+    }
 }

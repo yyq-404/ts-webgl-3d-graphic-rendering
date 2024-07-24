@@ -9,13 +9,14 @@ import {TransformCubeScene} from './webgl2/transform/TransformCubeScene';
 import {LineDrawModeScene} from './webgl2/draw/LineDrawModeScene';
 import {TriangleDrawModeScene} from './webgl2/draw/TriangleDrawModeScene';
 import {CameraViewScene} from './webgl2/camera/CameraViewScene';
-import {FrontFaceCullScene} from './webgl2/FrontFaceCullScene';
+import {FrontFaceCullScene} from './webgl2/camera/FrontFaceCullScene';
 import {LightReflectionScene} from './webgl2/light/LightReflectionScene';
 import {LightSourceScene} from './webgl2/light/LightSourceScene';
 import {LightNormalScene} from './webgl2/light/LightNormalScene';
 import {LightComputeScene} from './webgl2/light/LightComputeScene';
 import {WallTextureScene} from './webgl2/texture/WallTextureScene';
 import {TextureWrapScene} from './webgl2/texture/TextureWrapScene';
+import {TextureSampleScene} from './webgl2/texture/TextureSampleScene';
 
 /**
  * 场景管理器。
@@ -50,7 +51,8 @@ export class SceneManager {
             ['LightNormal', LightNormalScene],
             ['LightCompute', LightComputeScene],
             ['WallTexture', WallTextureScene],
-            ['TextureRepeat', TextureWrapScene],
+            ['TextureWrap', TextureWrapScene],
+            ['TextureSample', TextureSampleScene]
         ]);
         this.changeScene('RotatingCube');
     }

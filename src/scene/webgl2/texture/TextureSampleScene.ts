@@ -2,24 +2,27 @@ import {WebGL2Scene} from '../../base/WebGL2Scene';
 import {Rect} from '../../../common/geometry/solid/Rect';
 import {GLAttributeHelper} from '../../../webgl/GLAttributeHelper';
 import {SceneConstants} from '../../SceneConstants';
+import {HttpHelper} from '../../../net/HttpHelper';
 import {Vector3} from '../../../common/math/vector/Vector3';
 import {GLShaderConstants} from '../../../webgl/GLShaderConstants';
-import {HttpHelper} from '../../../net/HttpHelper';
 import {HtmlHelper} from '../../HtmlHelper';
 
-
 /**
- * 材质拉伸模式场景。
+ * 纹理采样器应用。
  */
-export class TextureWrapScene extends WebGL2Scene {
+export class TextureSampleScene extends WebGL2Scene {
     /** 矩形 */
-    private _rect: Rect = new Rect(2, 2);
-    /** 纹理贴图 */
-    private _texture: WebGLTexture;
-    
-    private _currentSize: string = '1*1';
-    
-    private _currentWrapMode: string = 'EDGE';
+    private _rects: Rect[] = [new Rect(2, 2), new Rect(2, 2)];
+    /** 纹理贴图，尺寸32*32 */
+    private _texture32: WebGLTexture;
+    /** 纹理贴图，尺寸256*256 */
+    private _texture256: WebGLTexture;
+    /** MIN采样方式 */
+    private _minSample: GLint;
+    /** MAG采样方式 */
+    private _magSample: GLint;
+    /** 采样组合 */
+    private _samples: Map<string, GLint>;
     
     /**
      * 构造
@@ -27,7 +30,14 @@ export class TextureWrapScene extends WebGL2Scene {
     public constructor() {
         super(true);
         this.attributeBits = GLAttributeHelper.POSITION.BIT | GLAttributeHelper.TEX_COORDINATE_0.BIT;
+        this._rects.forEach(rect => rect.uvs = rect.createUVs());
+        this.createBuffers(...this._rects);
         this.createControls();
+        this._samples = new Map<string, GLint>([
+            ['LINEAR', this.gl.LINEAR],
+            ['NEAREST', this.gl.NEAREST]
+        ]);
+        this._magSample = this._minSample = this.gl.NEAREST;
     }
     
     /**
@@ -47,17 +57,16 @@ export class TextureWrapScene extends WebGL2Scene {
      */
     public override async runAsync(): Promise<void> {
         await this.initAsync();
-        const sizes = this._currentSize.split('*');
-        this._rect.uvs = this._rect.createUVs(parseInt(sizes[0]), parseInt(sizes[1]));
-        this.createBuffers(this._rect);
-        this._texture = await this.loadTextureAsync();
+        this._texture32 = await this.loadTextureAsync('res/image/bw32.png');
+        this._texture256 = await this.loadTextureAsync('res/image/bw256.png');
     }
     
     /**
      * 渲染
      */
     public override render(): void {
-        this.drawRect();
+        this.drawRect(this._rects[0], this._texture256, new Vector3([1.0, 0, 0]), new Vector3([0.1, 0.1, 0.1]));
+        this.drawRect(this._rects[1], this._texture32, new Vector3([-1.0, 0, 0]), new Vector3([0.3, 0.3, 0.3]));
     }
     
     /**
@@ -72,24 +81,25 @@ export class TextureWrapScene extends WebGL2Scene {
      * 绘制矩形。
      * @private
      */
-    private drawRect(): void {
-        const buffers = this.vertexBuffers.get(this._rect);
+    private drawRect(rect: Rect, texture: WebGLTexture, translate: Vector3, scale: Vector3): void {
+        const buffers = this.vertexBuffers.get(rect);
         if (!buffers) return;
         this.program.bind();
         this.program.loadSampler();
         this.worldMatrixStack.pushMatrix();
-        this.worldMatrixStack.translate(Vector3.zero);
-        this.worldMatrixStack.scale(new Vector3([0.5, 0.5, 0.5]));
+        this.worldMatrixStack.translate(translate);
+        this.worldMatrixStack.scale(scale);
         this.worldMatrixStack.rotate(this.mouseMoveEvent.currentYAngle, Vector3.up);
         this.worldMatrixStack.rotate(this.mouseMoveEvent.currentXAngle, Vector3.right);
         this.program.setMatrix4(GLShaderConstants.MVPMatrix, this.mvpMatrix());
         for (const entity of buffers.entries()) {
             this.program.setVertexAttribute(entity[0].NAME, entity[1], entity[0].COMPONENT);
         }
+        this.gl.activeTexture(this.gl.TEXTURE0);
+        this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
         this.program.setInt('sTexture', 0);
-        this.gl.drawArrays(this.gl.TRIANGLES, 0, this._rect.vertex.count);
+        this.gl.drawArrays(this.gl.TRIANGLES, 0, rect.vertex.count);
         this.worldMatrixStack.popMatrix();
-        // this.unbind();
         this.program.unbind();
     }
     
@@ -98,8 +108,8 @@ export class TextureWrapScene extends WebGL2Scene {
      * @return {Promise<WebGLTexture>}
      * @private
      */
-    private async loadTextureAsync(): Promise<WebGLTexture> {
-        const image = await HttpHelper.loadImageAsync('res/image/robot.png');
+    private async loadTextureAsync(uri: string): Promise<WebGLTexture> {
+        const image = await HttpHelper.loadImageAsync(uri);
         const texture = this.gl.createTexture();
         // 上传数据。
         this.upload(image, texture);
@@ -107,8 +117,6 @@ export class TextureWrapScene extends WebGL2Scene {
         this.filter();
         // 拉伸方式
         this.wrap();
-        // 激活纹理。
-        this.active();
         return texture;
     }
     
@@ -126,26 +134,14 @@ export class TextureWrapScene extends WebGL2Scene {
     }
     
     /**
-     * 激活纹理
-     * @private
-     */
-    private active(): void {
-        if (this._texture) {
-            this.gl.activeTexture(this.gl.TEXTURE0);
-        }
-    }
-    
-    /**
      * 采样器。
-     * @param {GLint} minFilter
-     * @param {GLint} magFilter
      * @private
      */
-    private filter(minFilter: GLint = this.gl.LINEAR, magFilter: GLint = this.gl.LINEAR): void {
+    private filter(): void {
         //设置MIN采样方式
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, minFilter);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this._minSample);
         //设置MAG采样方式
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, magFilter);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this._magSample);
     }
     
     /**
@@ -154,9 +150,9 @@ export class TextureWrapScene extends WebGL2Scene {
      */
     private wrap(): void {
         //设置S轴拉伸方式
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this._currentWrapMode === 'EDGE' ? this.gl.CLAMP_TO_EDGE : this.gl.REPEAT);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
         //设置T轴拉伸方式
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this._currentWrapMode === 'EDGE' ? this.gl.CLAMP_TO_EDGE : this.gl.REPEAT);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
     }
     
     /**
@@ -164,7 +160,10 @@ export class TextureWrapScene extends WebGL2Scene {
      * @private
      */
     private unbind(): void {
-        if (this._texture) {
+        if (this._texture32) {
+            this.gl.bindTexture(this.gl.TEXTURE_2D, null);
+        }
+        if (this._texture256) {
             this.gl.bindTexture(this.gl.TEXTURE_2D, null);
         }
     }
@@ -174,30 +173,29 @@ export class TextureWrapScene extends WebGL2Scene {
      * @private
      */
     private createControls(): void {
-        const modes = ['EDGE', 'REPEAT'];
-        HtmlHelper.createRadioGroup('stretching', '拉伸方式: ', modes, this.onWarpModeChange);
-        const sizes = ['1*1', '4*2', '4*4'];
-        HtmlHelper.createRadioGroup('size', '纹理尺寸坐标: ', sizes, this.onTextureCoordinateSizeChange);
+        const sampleModes = ['NEAREST', 'LINEAR'];
+        HtmlHelper.createRadioGroup('min_sample', 'MIN: ', sampleModes, this.onMinSampleChange);
+        HtmlHelper.createRadioGroup('mag_sample', 'MAG: ', sampleModes, this.onMagSampleChange);
     }
     
     /**
-     * 拉伸模式更改
+     * MIN采样方式更改。
      */
-    private onWarpModeChange = (event: Event): void => {
+    private onMinSampleChange = (event: Event): void => {
         let element = event.target as HTMLInputElement;
         if (element.checked) {
-            this._currentWrapMode = element.value;
+            this._minSample = this._samples.get(element.value);
         }
         this.runAsync.apply(this);
     };
     
     /**
-     * 纹理坐标尺寸更改
+     * MAG采样方式更改
      */
-    private onTextureCoordinateSizeChange = (event: Event): void => {
+    private onMagSampleChange = (event: Event): void => {
         let element = event.target as HTMLInputElement;
         if (element.checked) {
-            this._currentSize = element.value;
+            this._magSample = this._samples.get(element.value);
         }
         this.runAsync.apply(this);
     };
