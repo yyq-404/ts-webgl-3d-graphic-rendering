@@ -8,6 +8,7 @@ attribute vec4 aColor;
 uniform mat4 uMVPMatrix;
 // 3．varying变量声明
 varying vec4 vColor;
+
 // 4．顶点处理入口main函数
 void main(void){
     //设置点的尺寸
