@@ -12,7 +12,7 @@ import {HtmlHelper} from '../../HtmlHelper';
  */
 export class TextureSampleScene extends WebGL2Scene {
     /** 矩形 */
-    private _rects: Rect[] = [new Rect(2, 2), new Rect(2, 2)];
+    private _rects: Rect[] = Array.from({length: 2}, () => new Rect(2, 2));
     /** 纹理贴图，尺寸32*32 */
     private _texture32: WebGLTexture;
     /** 纹理贴图，尺寸256*256 */
@@ -30,7 +30,6 @@ export class TextureSampleScene extends WebGL2Scene {
     public constructor() {
         super(true);
         this.attributeBits = GLAttributeHelper.POSITION.BIT | GLAttributeHelper.TEX_COORDINATE_0.BIT;
-        this._rects.forEach(rect => rect.uvs = rect.createUVs());
         this.createBuffers(...this._rects);
         this.createControls();
         this._samples = new Map<string, GLint>([
@@ -95,9 +94,9 @@ export class TextureSampleScene extends WebGL2Scene {
         for (const entity of buffers.entries()) {
             this.program.setVertexAttribute(entity[0].NAME, entity[1], entity[0].COMPONENT);
         }
+        this.program.setInt('sTexture', 0);
         this.gl.activeTexture(this.gl.TEXTURE0);
         this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
-        this.program.setInt('sTexture', 0);
         this.gl.drawArrays(this.gl.TRIANGLES, 0, rect.vertex.count);
         this.worldMatrixStack.popMatrix();
         this.program.unbind();

@@ -17,6 +17,7 @@ import {LightComputeScene} from './webgl2/light/LightComputeScene';
 import {WallTextureScene} from './webgl2/texture/WallTextureScene';
 import {TextureWrapScene} from './webgl2/texture/TextureWrapScene';
 import {TextureSampleScene} from './webgl2/texture/TextureSampleScene';
+import {TextureMipmapScene} from './webgl2/texture/TextureMipmapScene';
 
 /**
  * 场景管理器。
@@ -52,7 +53,8 @@ export class SceneManager {
             ['LightCompute', LightComputeScene],
             ['WallTexture', WallTextureScene],
             ['TextureWrap', TextureWrapScene],
-            ['TextureSample', TextureSampleScene]
+            ['TextureSample', TextureSampleScene],
+            ['TextureMipmap', TextureMipmapScene]
         ]);
         this.changeScene('RotatingCube');
     }

@@ -106,7 +106,6 @@ export class CanvasMouseEventManager {
      * @private
      */
     private onMouseEvent(owner: any, event: CanvasMouseEvent, callback: (...args: any[]) => void, ...args: any[]): void {
-        console.log(event.type);
         switch (event.type) {
             case ECanvasMouseEventType.MOUSE_DOWN:
                 this._isMouseDown = true;
