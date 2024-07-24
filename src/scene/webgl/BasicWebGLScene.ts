@@ -277,14 +277,6 @@ export class BasicWebGLScene extends WebGLScene {
     }
     
     /**
-     * 更新
-     * @param {number} elapsedMsec
-     * @param {number} intervalSec
-     */
-    public override update(elapsedMsec: number, intervalSec: number): void {
-    }
-    
-    /**
      * 渲染处理。
      */
     public override render(): void {
@@ -301,30 +293,6 @@ export class BasicWebGLScene extends WebGLScene {
     public override dispose(): void {
         this.clearBuffer();
         super.dispose();
-    }
-    
-    /**
-     * 获取渲染上下文环境属性
-     * @return {WebGLContextAttributes}
-     * @protected
-     */
-    protected getContextAttributes(): WebGLContextAttributes {
-        // WebGL上下文渲染对象需要创建深度和模版缓冲区
-        return {
-            // 创建深度缓冲区，default为true
-            depth: true,
-            // 创建模版缓冲区，default为false，我们这里设置为true
-            stencil: true,
-            // WebGL上下文自动会创建一个颜色缓冲区,
-            // 颜色缓冲区的格式为rgba，如果设置为false，则颜色缓冲区使用rgb格式，default为true
-            alpha: true,
-            // 不使用预乘alpha，default为true。预乘alpha超出本书范围，暂时就用默认值
-            premultipliedAlpha: true,
-            //设置抗锯齿为true，如果硬件支持，会使用抗锯齿功能，default为false
-            antialias: true,
-            // 帧缓冲区抗锯齿及是否保留上一帧的内容，default为true
-            preserveDrawingBuffer: false
-        } as WebGLContextAttributes;
     }
     
     /**
