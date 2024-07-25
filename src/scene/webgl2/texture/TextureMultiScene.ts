@@ -86,7 +86,7 @@ export class TextureMultiScene extends WebGL2Scene {
      */
     public override update(elapsedMsec: number, intervalSec: number): void {
         // s = vt，根据两帧间隔更新角速度和角位移
-        this._currentAngle += 10 * intervalSec;
+        this._currentAngle += 5 * intervalSec;
         if (this._currentAngle >= 360) {
             this._currentAngle %= 360;
         }
@@ -98,7 +98,7 @@ export class TextureMultiScene extends WebGL2Scene {
      */
     public override render(): void {
         GLRenderHelper.clearBuffer(this.gl);
-        this.worldMatrixStack.rotate(2, Vector3.up);
+        this.worldMatrixStack.rotate(1, Vector3.up);
         this.drawEarth();
         this.drawMoon();
     }
