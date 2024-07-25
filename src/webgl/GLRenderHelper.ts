@@ -29,8 +29,8 @@ export class GLRenderHelper {
      * @param gl
      */
     public static triggerContextLostEvent(gl: WebGLRenderingContextBase): void {
-        const glExt: WEBGL_lose_context = gl.getExtension('WEBGL_lose_context');
-        if (glExt) glExt.loseContext();
+        const lcExt: WEBGL_lose_context = GLRenderHelper.getExtension(gl, 'WEBGL_lose_context');
+        if (lcExt) lcExt.loseContext();
     }
     
     /**
@@ -284,7 +284,6 @@ export class GLRenderHelper {
      * 获取扩展
      * @param {WebGLRenderingContextBase} gl
      * @param {string} name
-     * @return {T}
      */
     public static getExtension<T>(gl: WebGLRenderingContextBase, name: string): T {
         const vendorPrefixes = ['', 'WEBKIT_', 'MOZ_'];
