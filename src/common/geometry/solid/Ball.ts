@@ -2,6 +2,7 @@ import {Geometry} from '../Geometry';
 import {VertexStructure} from '../VertexStructure';
 import {Vector3} from '../../math/vector/Vector3';
 import {MathHelper} from '../../math/MathHelper';
+import {Vector2} from '../../math/vector/Vector2';
 
 /**
  * 球体
@@ -11,6 +12,8 @@ export class Ball extends Geometry {
     private readonly _r: number = 1;
     /** 将球进行单位切分的角度 */
     private readonly _angleSpan: number = 10;
+    /** uv坐标集合 */
+    private _uvs: Vector2[];
     
     /**
      * 构造。
@@ -20,6 +23,7 @@ export class Ball extends Geometry {
         this._r = r;
         this._angleSpan = angleSpan;
         this.init();
+        this._uvs = this.createUVs();
     }
     
     /**
@@ -39,7 +43,7 @@ export class Ball extends Geometry {
             const vRadian = MathHelper.toRadian(vAngle);
             const vSpanRadian = MathHelper.toRadian(vAngle + this._angleSpan);
             // 水平方向angleSpan度一份
-            for (let hAngle = 0; hAngle <= 360; hAngle = hAngle + this._angleSpan) {
+            for (let hAngle = 0; hAngle < 360; hAngle = hAngle + this._angleSpan) {
                 const hRadian = MathHelper.toRadian(hAngle);
                 const hSpanRadian = MathHelper.toRadian(hAngle + this._angleSpan);
                 const p0 = new Vector3([this._r * Math.cos(vRadian) * Math.cos(hRadian), this._r * Math.cos(vRadian) * Math.sin(hRadian), this._r * Math.sin(vRadian)]);
@@ -52,6 +56,32 @@ export class Ball extends Geometry {
     }
     
     /**
+     * 创建uv坐标集合。
+     * @return {Vector2[]}
+     * @private
+     */
+    private createUVs(): Vector2[] {
+        const uvs: Vector2[] = [];
+        const bw = 360 / this._angleSpan;
+        const bh = 180 / this._angleSpan;
+        const width = 1 / bw;
+        const height = 1 / bh;
+        for (let i = 0; i < bh; i++) {
+            for (let j = 0; j < bw; j++) {
+                let s = j * width;
+                let t = i * height;
+                uvs.push(new Vector2([s, t]));
+                uvs.push(new Vector2([s, t + height]));
+                uvs.push(new Vector2([s + width, t]));
+                uvs.push(new Vector2([s + width, t]));
+                uvs.push(new Vector2([s, t + height]));
+                uvs.push(new Vector2([s + width, t + height]));
+            }
+        }
+        return uvs;
+    }
+    
+    /**
      * 获取顶点数据。
      * @return {VertexStructure}
      */
@@ -59,6 +89,7 @@ export class Ball extends Geometry {
         let vertex = new VertexStructure();
         vertex.positions = this._points;
         vertex.normals = this._points;
+        vertex.uvs = this._uvs;
         return vertex;
     }
 }

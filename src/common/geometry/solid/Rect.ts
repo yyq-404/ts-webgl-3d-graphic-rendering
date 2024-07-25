@@ -11,7 +11,7 @@ export class Rect extends Geometry {
     private readonly _halfWidth: number;
     /** 半高 */
     private readonly _halfHeight: number;
-    
+    /** uv坐标集合 */
     private _uvs: Vector2[];
     
     /**
