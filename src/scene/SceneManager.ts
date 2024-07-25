@@ -14,7 +14,7 @@ import {LightReflectionScene} from './webgl2/light/LightReflectionScene';
 import {LightSourceScene} from './webgl2/light/LightSourceScene';
 import {LightNormalScene} from './webgl2/light/LightNormalScene';
 import {LightComputeScene} from './webgl2/light/LightComputeScene';
-import {WallTextureScene} from './webgl2/texture/WallTextureScene';
+import {TextureCompressScene} from './webgl2/texture/TextureCompressScene';
 import {TextureWrapScene} from './webgl2/texture/TextureWrapScene';
 import {TextureSampleScene} from './webgl2/texture/TextureSampleScene';
 import {TextureMipmapScene} from './webgl2/texture/TextureMipmapScene';
@@ -52,7 +52,7 @@ export class SceneManager {
             ['LightSource', LightSourceScene],
             ['LightNormal', LightNormalScene],
             ['LightCompute', LightComputeScene],
-            ['WallTexture', WallTextureScene],
+            ['TextureCompress', TextureCompressScene],
             ['TextureWrap', TextureWrapScene],
             ['TextureSample', TextureSampleScene],
             ['TextureMipmap', TextureMipmapScene],

@@ -279,4 +279,21 @@ export class GLRenderHelper {
         gl.deleteShader(fsShader);
         gl.deleteProgram(program);
     }
+    
+    /**
+     * 获取扩展
+     * @param {WebGLRenderingContextBase} gl
+     * @param {string} name
+     * @return {T}
+     */
+    public static getExtension<T>(gl: WebGLRenderingContextBase, name: string): T {
+        const vendorPrefixes = ['', 'WEBKIT_', 'MOZ_'];
+        for (let i in vendorPrefixes) {
+            let ext = gl.getExtension(vendorPrefixes[i] + name);
+            if (ext) {
+                return ext;
+            }
+        }
+        return null;
+    }
 }
