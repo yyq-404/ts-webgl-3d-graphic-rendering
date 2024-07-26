@@ -325,7 +325,7 @@ export class Vector3 {
     }
     
     /**
-     * 在指定的阈值范围内比较两个矩阵是否相等。
+     * 在指定的阈值范围内比较两个向量否相等。
      * @param {Vector3} vector
      * @param {number} threshold
      * @return {boolean}
@@ -338,6 +338,16 @@ export class Vector3 {
             return false;
         }
         return Math.abs(this.z - vector.z) <= threshold;
+    }
+    
+    /**
+     * 在指定的阈值范围内比较两个向量大小。
+     * @param {Vector3} target
+     * @param {number} threshold
+     * @return {boolean}
+     */
+    public compare(target: Vector3, threshold: number = EPSILON): boolean {
+        return !((this.x - target.x < threshold) && (this.y - target.y < threshold) && (this.z - target.z < threshold));
     }
     
     /**

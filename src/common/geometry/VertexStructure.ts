@@ -62,9 +62,9 @@ export class VertexStructure {
      * 获取纹理贴图坐标。
      * @return {number[]}
      */
-    public get uvArray():number[]{
+    public get uvArray(): number[] {
         const uvArray: number[] = [];
-       this.uvs.forEach(uv=>uvArray.push(...uv.xy))
+        this.uvs.forEach(uv => uvArray.push(...uv.xy));
         return uvArray;
     }
 }
