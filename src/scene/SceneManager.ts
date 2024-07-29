@@ -19,7 +19,7 @@ import {TextureWrapScene} from './webgl2/texture/TextureWrapScene';
 import {TextureSampleScene} from './webgl2/texture/TextureSampleScene';
 import {TextureMipmapScene} from './webgl2/texture/TextureMipmapScene';
 import {TextureMultiScene} from './webgl2/texture/TextureMultiScene';
-import {ModelObjScene} from './webgl2/model/ModelObjScene';
+import {ModelOBJScene} from './webgl2/model/ModelOBJScene';
 
 /**
  * 场景管理器。
@@ -58,7 +58,7 @@ export class SceneManager {
             ['TextureSample', TextureSampleScene],
             ['TextureMipmap', TextureMipmapScene],
             ['TextureMulti', TextureMultiScene],
-            ['ModelOBJ', ModelObjScene]
+            ['ModelOBJ', ModelOBJScene]
         ]);
         this.changeScene('RotatingCube');
     }
