@@ -30,5 +30,4 @@ export class ModelOBJ extends Geometry {
         vertex.normals = this._normals;
         return vertex;
     }
-    
 }
