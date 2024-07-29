@@ -39,9 +39,9 @@ export class CameraComponent {
     /** 纵横比 */
     private _aspectRatio: number;
     /** 摄影机移动速速 */
-    private _speed: number = 0.1;
+    private _speed: number = 0.5;
     /** 摄影机旋转角度 */
-    private _degree: number = 0.1;
+    private _degree: number = 0.5;
     
     /**
      * 构造
