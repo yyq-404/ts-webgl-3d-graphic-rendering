@@ -13,11 +13,14 @@ export class LightController {
     private _lightTypeControls: Map<string, HtmlRangeProps[]>;
     /** 光照位置UI配置 */
     private _lightLocationControls: Map<string, HtmlRangeProps[]>;
-    /** 光照参数 */
-    private _args: Map<string, number> = new Map<string, number>([
+    /** 颜色 */
+    private _colors: Map<string, number> = new Map<string, number>([
         [GLShaderConstants.ambient, 0.8],
         [GLShaderConstants.diffuse, 0.8],
-        [GLShaderConstants.specular, 0.8],
+        [GLShaderConstants.specular, 0.8]
+    ]);
+    /** 位置 */
+    private _location: Map<string, number> = new Map<string, number>([
         ['location_x', 0],
         ['location_y', 0],
         ['location_z', 5]
@@ -34,28 +37,28 @@ export class LightController {
         ]);
         this._lightLocationControls = new Map<string, HtmlRangeProps[]>([
             ['光源位置', [
-                {id: 'location_x', name: 'X轴', value: '0', onChange: this.onLocationChange, min: '-50', max: '50'},
-                {id: 'location_y', name: 'Y轴', value: '0', onChange: this.onLocationChange, min: '-50', max: '50'},
-                {id: 'location_z', name: 'Z轴', value: '5', onChange: this.onLocationChange, min: '-50', max: '50'}
+                {id: 'location_x', name: 'X轴', value: this._location.get('location_x').toString(), onChange: this.onLocationChange, min: '-50', max: '50'},
+                {id: 'location_y', name: 'Y轴', value: this._location.get('location_y').toString(), onChange: this.onLocationChange, min: '-50', max: '50'},
+                {id: 'location_z', name: 'Z轴', value: this._location.get('location_z').toString(), onChange: this.onLocationChange, min: '-50', max: '50'}
             ]]
         ]);
     }
     
     /**
-     * 获取控制参数。
-     * @return {Map<string, number>}
+     * 设置位置
      */
-    public get args(): Map<string, number> {
-        return this._args;
+    public set location(value: Vector3) {
+        this._location.set('location_x', value.x);
+        this._location.set('location_y', value.y);
+        this._location.set('location_z', value.z);
     }
     
     /**
      * 光照位置
      * @return {Vector3}
-     * @private
      */
     public get location(): Vector3 {
-        return new Vector3([this._args.get('location_x'), this._args.get('location_y'), this.args.get('location_z')]);
+        return new Vector3([this._location.get('location_x'), this._location.get('location_y'), this._location.get('location_z')]);
     }
     
     /**
@@ -64,7 +67,7 @@ export class LightController {
      * @return {Vector4}
      */
     public getColor(type: string): Vector4 {
-        const color = this.args.get(type);
+        const color = this._colors.get(type);
         if (color) {
             return new Vector4([color, color, color, 1]);
         } else {
@@ -116,7 +119,7 @@ export class LightController {
      * @private
      */
     public setColor(program: GLProgram): void {
-        this.args.forEach((value, key) => {
+        this._colors.forEach((value, key) => {
             program.setVector4(key, new Vector4([value, value, value, 1.0]));
         });
     }
@@ -129,7 +132,7 @@ export class LightController {
         const element = event.target as HTMLInputElement;
         if (element) {
             const value: number = parseFloat(element.value) / 100;
-            this._args.set(element.id, isNaN(value) ? 1 : value);
+            this._colors.set(element.id, isNaN(value) ? 1 : value);
         }
     };
     
@@ -141,7 +144,7 @@ export class LightController {
         const element = event.target as HTMLInputElement;
         if (element) {
             const value: number = parseFloat(element.value);
-            this._args.set(element.id, isNaN(value) ? 0 : value);
+            this._location.set(element.id, isNaN(value) ? 0 : value);
         }
     };
 }
