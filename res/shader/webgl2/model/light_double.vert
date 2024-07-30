@@ -12,8 +12,10 @@ uniform vec3 uCamera;
 in vec3 aPosition;
 //顶点法向量
 in vec3 aNormal;
-//最终光
-out vec4 finalLight;
+//传递给片元着色器的正面光最终强度
+out vec4 finalLightZ;
+//传递给片元着色器的反面光最终强度
+out vec4 finalLightF;
 
 /**定位光光照计算的方法
  * @param normal 法向量
@@ -55,12 +57,15 @@ void pointLight(in vec3 normal, inout vec4 ambient, inout vec4 diffuse, inout ve
     specular = lightSpecular * powerFactor;
 }
 
+
 void main() {
     //根据总变换矩阵计算此次绘制此顶点位置
     gl_Position = uMVPMatrix * vec4(aPosition, 1);
-    vec4 tempColor = vec4(1.0, 1.0, 1.0, 1.0);
+    vec4 tempColor = vec4(0.9, 0.9, 0.9, 1.0);
     //存放环境光、散射光、镜面反射光的临时变量
     vec4 ambientTemp, diffuseTemp, specularTemp;
     pointLight(normalize(aNormal), ambientTemp, diffuseTemp, specularTemp, uLightLocation, vec4(0.1, 0.1, 0.1, 1.0), vec4(0.7, 0.7, 0.7, 1.0), vec4(0.3, 0.3, 0.3, 1.0));
-    finalLight = (ambientTemp + diffuseTemp + specularTemp);
+    finalLightZ = (ambientTemp + diffuseTemp + specularTemp);
+    pointLight(normalize(-aNormal), ambientTemp, diffuseTemp, specularTemp, uLightLocation, vec4(0.1, 0.1, 0.1, 1.0), vec4(0.7, 0.7, 0.7, 1.0), vec4(0.3, 0.3, 0.3, 1.0));
+    finalLightF = ambientTemp + diffuseTemp + specularTemp;
 }
