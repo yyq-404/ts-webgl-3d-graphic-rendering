@@ -1,22 +1,23 @@
-import {WebGL2Scene} from './base/WebGL2Scene';
-import {ModelOBJ} from '../common/geometry/model/ModelOBJ';
-import {ModelOBJHelper} from './ModelOBJHelper';
-import {GLProgram} from '../webgl/program/GLProgram';
-import {Rect} from '../common/geometry/solid/Rect';
-import {GLAttributeHelper} from '../webgl/GLAttributeHelper';
-import {GLTextureHelper} from '../webgl/texture/GLTextureHelper';
-import {SceneConstants} from './SceneConstants';
-import {Vector3} from '../common/math/vector/Vector3';
-import {GLShaderConstants} from '../webgl/GLShaderConstants';
-import {IGLAttribute} from '../webgl/attribute/IGLAttribute';
-import {CanvasKeyboardEventManager} from '../event/keyboard/CanvasKeyboardEventManager';
-import {ECanvasKeyboardEventType} from '../enum/ECanvasKeyboardEventType';
-import {Vector2} from '../common/math/vector/Vector2';
+import {WebGL2Scene} from '../../base/WebGL2Scene';
+import {ModelOBJ} from '../../../common/geometry/model/ModelOBJ';
+import {ModelOBJHelper} from '../../ModelOBJHelper';
+import {GLProgram} from '../../../webgl/program/GLProgram';
+import {Rect} from '../../../common/geometry/solid/Rect';
+import {GLAttributeHelper} from '../../../webgl/GLAttributeHelper';
+import {GLTextureHelper} from '../../../webgl/texture/GLTextureHelper';
+import {SceneConstants} from '../../SceneConstants';
+import {Vector3} from '../../../common/math/vector/Vector3';
+import {GLShaderConstants} from '../../../webgl/GLShaderConstants';
+import {IGLAttribute} from '../../../webgl/attribute/IGLAttribute';
+import {CanvasKeyboardEventManager} from '../../../event/keyboard/CanvasKeyboardEventManager';
+import {ECanvasKeyboardEventType} from '../../../enum/ECanvasKeyboardEventType';
+import {Vector2} from '../../../common/math/vector/Vector2';
+import {HtmlHelper} from '../../HtmlHelper';
 
 /**
  * 颜色混合场景。
  */
-export class ColorMixScene extends WebGL2Scene {
+export class ColorBlendScene extends WebGL2Scene {
     /** 模型名称集合 */
     private _modelNames = ['ch', 'pm', 'qt', 'cft', 'yh'];
     /** 模型集合 */
@@ -29,6 +30,8 @@ export class ColorMixScene extends WebGL2Scene {
     private _texture: WebGLTexture;
     /** 纹理文职 */
     private _pos: Vector2 = Vector2.zero.copy();
+    /** 类型 */
+    private _type = 'color';
     
     /**
      * 构造
@@ -37,6 +40,7 @@ export class ColorMixScene extends WebGL2Scene {
         super(true);
         this.attributeBits = GLAttributeHelper.POSITION.BIT | GLAttributeHelper.TEX_COORDINATE_0.BIT | GLAttributeHelper.NORMAL.BIT;
         this.gl.enable(this.gl.DEPTH_TEST);
+        this.gl.clearColor(0.3, 0.3, 0.3, 1.0);
         this.canvas.style.background = 'black';
         this.camera.z = 100;
         CanvasKeyboardEventManager.instance.registers(this, [
@@ -69,7 +73,9 @@ export class ColorMixScene extends WebGL2Scene {
             const model = await ModelOBJHelper.loadAsync(`res/model/${this._modelNames[i]}.obj`);
             this._models.push(model);
         }
-        this._texture = await GLTextureHelper.loadNormalTextureAsync(this.gl, `res/image/lgq.png`);
+        const imgName: string = this._type === 'color' ? 'lgq' : 'lgq_t';
+        this._texture = await GLTextureHelper.loadNormalTextureAsync(this.gl, `res/image/${imgName}.png`);
+        this.createControls();
         this.createBuffers(...this._models, this._rect);
     }
     
@@ -170,7 +176,11 @@ export class ColorMixScene extends WebGL2Scene {
         this._textureProgram.bind();
         this._textureProgram.loadSampler();
         this.gl.enable(this.gl.BLEND);
-        this.gl.blendFunc(this.gl.SRC_COLOR, this.gl.ONE_MINUS_SRC_COLOR);
+        if (this._type === 'alpha') {
+            this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
+        } else {
+            this.gl.blendFunc(this.gl.SRC_COLOR, this.gl.ONE_MINUS_SRC_COLOR);
+        }
         this.matrixStack.pushMatrix();
         this.matrixStack.scale(new Vector3([2.0, 2.0, 2.0]));
         this.matrixStack.translate(new Vector3([...this._pos.xy, 25]));
@@ -206,4 +216,25 @@ export class ColorMixScene extends WebGL2Scene {
     private onYAxisMove(speed: number): void {
         this._pos.y += speed;
     }
+    
+    /**
+     * 创建控制控件。
+     * @private
+     */
+    private createControls(): void {
+        const sizes = ['color', 'alpha'];
+        HtmlHelper.createRadioGroup('type', '类型: ', sizes, this.onTypeChange);
+    }
+    
+    /**
+     * 纹理坐标尺寸更改
+     */
+    private onTypeChange = (event: Event): void => {
+        let element = event.target as HTMLInputElement;
+        if (element.checked) {
+            this._type = element.value;
+        }
+        this.clearControls();
+        this.runAsync.apply(this);
+    };
 }
