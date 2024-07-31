@@ -27,15 +27,15 @@ export class GLShaderConstants {
     /** 深度取样器 */
     public static readonly DepthSampler: string = 'uDepthSampler';
     /** 光源位置 */
-    public static readonly lightLocation: string = 'uLightLocation';
+    public static readonly LightLocation: string = 'uLightLocation';
     /** 光源方向 */
-    public static readonly lightDirection: string = 'uLightDirection';
+    public static readonly LightDirection: string = 'uLightDirection';
     /** 相机位置 */
-    public static readonly cameraPosition: string = 'uCamera';
+    public static readonly Camera: string = 'uCamera';
     /** 环境光 */
-    public static readonly ambient: string = 'uAmbient';
+    public static readonly Ambient: string = 'uAmbient';
     /** 散射光 */
-    public static readonly diffuse: string = 'uDiffuse';
+    public static readonly Diffuse: string = 'uDiffuse';
     /** 镜面光 */
-    public static readonly specular: string = 'uSpecular';
+    public static readonly Specular: string = 'uSpecular';
 }
