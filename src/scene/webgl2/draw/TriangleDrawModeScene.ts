@@ -49,9 +49,9 @@ export class TriangleDrawModeScene extends WebGL2Scene {
     private drawSolids(): void {
         this._solids.forEach((solid) => {
             this.begin();
-            this.worldMatrixStack.translate(new Vector3([(solid instanceof Belt) ? -0.8 : 0.8, 0.0, 0.0]));
-            this.worldMatrixStack.rotate(this.mouseMoveEvent.currentXAngle, Vector3.right);
-            this.worldMatrixStack.rotate(this.mouseMoveEvent.currentYAngle, Vector3.up);
+            this.matrixStack.translate(new Vector3([(solid instanceof Belt) ? -0.8 : 0.8, 0.0, 0.0]));
+            this.matrixStack.rotate(this.mouseMoveEvent.currentXAngle, Vector3.right);
+            this.matrixStack.rotate(this.mouseMoveEvent.currentYAngle, Vector3.up);
             this.drawArrays(solid, (solid instanceof Belt) ? this.gl.TRIANGLE_STRIP : this.gl.TRIANGLE_FAN);
             this.end();
         });
@@ -64,8 +64,8 @@ export class TriangleDrawModeScene extends WebGL2Scene {
     private drawBelts(): void {
         this._belts.forEach((belt) => {
             this.begin();
-            this.worldMatrixStack.rotate(this.mouseMoveEvent.currentXAngle, Vector3.right);
-            this.worldMatrixStack.rotate(this.mouseMoveEvent.currentYAngle, Vector3.up);
+            this.matrixStack.rotate(this.mouseMoveEvent.currentXAngle, Vector3.right);
+            this.matrixStack.rotate(this.mouseMoveEvent.currentYAngle, Vector3.up);
             //将总变换矩阵送入渲染管线
             this.drawArrays(belt, this.gl.TRIANGLE_STRIP);
             this.end();

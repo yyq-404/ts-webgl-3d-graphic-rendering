@@ -104,9 +104,9 @@ export class ColorMixScene extends WebGL2Scene {
      */
     private drawModels(): void {
         this.matrixStack.pushMatrix();
+        //平面
         this.matrixStack.pushMatrix();
         this.matrixStack.rotate(25, Vector3.right);
-        //平面
         this.drawModel(this._models[0]);
         //缩放物体
         this.matrixStack.pushMatrix();
@@ -137,6 +137,11 @@ export class ColorMixScene extends WebGL2Scene {
         this.matrixStack.popMatrix();
     }
     
+    /**
+     * 绘制模型。
+     * @param {ModelOBJ} model
+     * @private
+     */
     private drawModel(model: ModelOBJ): void {
         const buffers = this.vertexBuffers.get(model);
         if (!buffers) return;

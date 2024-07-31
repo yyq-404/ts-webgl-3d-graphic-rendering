@@ -45,14 +45,14 @@ export class FrontFaceCullScene extends WebGL2Scene {
      * 绘制立方体集合。
      */
     public drawTriangles(): void {
-        this.worldMatrixStack.pushMatrix();
-        this.worldMatrixStack.translate(new Vector3([0.0, -0.5, 0.0]));
+        this.matrixStack.pushMatrix();
+        this.matrixStack.translate(new Vector3([0.0, -0.5, 0.0]));
         //执行绕Y轴旋转
-        this.worldMatrixStack.rotate(this.mouseMoveEvent.currentYAngle, Vector3.up);
+        this.matrixStack.rotate(this.mouseMoveEvent.currentYAngle, Vector3.up);
         //执行绕X轴旋转
-        this.worldMatrixStack.rotate(this.mouseMoveEvent.currentXAngle, Vector3.right);
+        this.matrixStack.rotate(this.mouseMoveEvent.currentXAngle, Vector3.right);
         this._triangles.forEach(triangle => this.drawTriangle(triangle));
-        this.worldMatrixStack.popMatrix();
+        this.matrixStack.popMatrix();
     }
     
     /**

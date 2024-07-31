@@ -85,20 +85,20 @@ export class TextureSampleScene extends WebGL2Scene {
         if (!buffers) return;
         this.program.bind();
         this.program.loadSampler();
-        this.worldMatrixStack.pushMatrix();
-        this.worldMatrixStack.translate(translate);
-        this.worldMatrixStack.scale(scale);
-        this.worldMatrixStack.rotate(this.mouseMoveEvent.currentYAngle, Vector3.up);
-        this.worldMatrixStack.rotate(this.mouseMoveEvent.currentXAngle, Vector3.right);
+        this.matrixStack.pushMatrix();
+        this.matrixStack.translate(translate);
+        this.matrixStack.scale(scale);
+        this.matrixStack.rotate(this.mouseMoveEvent.currentYAngle, Vector3.up);
+        this.matrixStack.rotate(this.mouseMoveEvent.currentXAngle, Vector3.right);
         this.program.setMatrix4(GLShaderConstants.MVPMatrix, this.mvpMatrix());
         for (const entity of buffers.entries()) {
             this.program.setVertexAttribute(entity[0].NAME, entity[1], entity[0].COMPONENT);
         }
-        this.program.setInt('sTexture', 0);
         this.gl.activeTexture(this.gl.TEXTURE0);
         this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
+        this.program.setInt('sTexture', 0);
         this.gl.drawArrays(this.gl.TRIANGLES, 0, rect.vertex.count);
-        this.worldMatrixStack.popMatrix();
+        this.matrixStack.popMatrix();
         this.program.unbind();
     }
     

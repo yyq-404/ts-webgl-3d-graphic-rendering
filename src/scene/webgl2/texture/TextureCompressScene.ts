@@ -7,6 +7,7 @@ import {GLRenderHelper} from '../../../webgl/GLRenderHelper';
 import {GLShaderConstants} from '../../../webgl/GLShaderConstants';
 import {HttpHelper} from '../../../net/HttpHelper';
 import {HtmlHelper} from '../../HtmlHelper';
+import {GLTextureHelper} from '../../../webgl/texture/GLTextureHelper';
 
 /**
  * 枪支贴图示例。
@@ -64,7 +65,7 @@ export class TextureCompressScene extends WebGL2Scene {
             }
             this._texture = await this.LoadS3tcDxt5TextureAsync(s3tcExt, 'res/dds/wl_dxt5.dds');
         } else {
-            this._texture = await this.loadNormalTextureAsync('res/image/wall.png');
+            this._texture = await GLTextureHelper.loadNormalTextureAsync(this.gl, 'res/image/wall.png');
         }
     }
     
@@ -85,11 +86,11 @@ export class TextureCompressScene extends WebGL2Scene {
         if (!buffers) return;
         this.program.bind();
         this.program.loadSampler();
-        this.worldMatrixStack.pushMatrix();
-        this.worldMatrixStack.translate(Vector3.zero);
-        this.worldMatrixStack.scale(new Vector3([0.5, 0.5, 0.5]));
-        this.worldMatrixStack.rotate(this.mouseMoveEvent.currentYAngle, Vector3.up);
-        this.worldMatrixStack.rotate(this.mouseMoveEvent.currentXAngle, Vector3.right);
+        this.matrixStack.pushMatrix();
+        this.matrixStack.translate(Vector3.zero);
+        this.matrixStack.scale(new Vector3([0.5, 0.5, 0.5]));
+        this.matrixStack.rotate(this.mouseMoveEvent.currentYAngle, Vector3.up);
+        this.matrixStack.rotate(this.mouseMoveEvent.currentXAngle, Vector3.right);
         this.program.setMatrix4(GLShaderConstants.MVPMatrix, this.mvpMatrix());
         buffers.forEach((buffer, attribute) => {
             this.program.setVertexAttribute(attribute.NAME, buffer, attribute.COMPONENT);
@@ -98,26 +99,8 @@ export class TextureCompressScene extends WebGL2Scene {
         this.gl.bindTexture(this.gl.TEXTURE_2D, this._texture);
         this.program.setInt('sTexture', 0);
         this.gl.drawArrays(this.gl.TRIANGLES, 0, this._triangle.vertex.count);
-        this.worldMatrixStack.popMatrix();
+        this.matrixStack.popMatrix();
         this.program.unbind();
-    }
-    
-    /**
-     * 加载纹理。
-     * @return {Promise<WebGLTexture>}
-     * @private
-     */
-    private async loadNormalTextureAsync(url: string): Promise<WebGLTexture> {
-        const img = await HttpHelper.loadImageAsync(url);
-        const texture = this.gl.createTexture();
-        //绑定纹理ID
-        this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
-        //加载纹理进缓存
-        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, img);
-        this.setTextureParameters();
-        //纹理加载成功后释放纹理图
-        this.gl.bindTexture(this.gl.TEXTURE_2D, null);
-        return texture;
     }
     
     /**
@@ -137,7 +120,7 @@ export class TextureCompressScene extends WebGL2Scene {
         let texData: ArrayBuffer = buffer.slice(ETC_PKM_HEADER_SIZE);
         this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
         this.gl.compressedTexImage2D(this.gl.TEXTURE_2D, 0, ext.COMPRESSED_RGB_ETC1_WEBGL, width, height, 0, new Uint8Array(texData));
-        this.setTextureParameters();
+        GLTextureHelper.setTextureDefaultParameters(this.gl);
         this.gl.bindTexture(this.gl.TEXTURE_2D, null);
         return texture;
     }
@@ -216,7 +199,7 @@ export class TextureCompressScene extends WebGL2Scene {
             //计算新一层纹理的数据字节偏移量
             offset += levelSize;
         }
-        this.setTextureParameters();
+        GLTextureHelper.setTextureDefaultParameters(this.gl);
         //解除绑定特定纹理
         this.gl.bindTexture(this.gl.TEXTURE_2D, null);
         return texture;
@@ -233,20 +216,20 @@ export class TextureCompressScene extends WebGL2Scene {
         return ((width + 3) >> 2) * ((height + 3) >> 2) * 16;
     }
     
-    /**
-     * 设置纹理参数。
-     * @private
-     */
-    private setTextureParameters(): void {
-        //设置MAG采样方式
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
-        //设置MIN采样方式
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
-        //设置S轴拉伸方式
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.REPEAT);
-        //设置T轴拉伸方式
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.REPEAT);
-    }
+    // /**
+    //  * 设置纹理参数。
+    //  * @private
+    //  */
+    // private setTextureParameters(): void {
+    //     //设置MAG采样方式
+    //     this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
+    //     //设置MIN采样方式
+    //     this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
+    //     //设置S轴拉伸方式
+    //     this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.REPEAT);
+    //     //设置T轴拉伸方式
+    //     this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.REPEAT);
+    // }
     
     /**
      * 创建控制控件。

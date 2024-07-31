@@ -23,7 +23,7 @@ export class WebGLScene extends BaseScene {
     protected canvas2d: HTMLCanvasElement;
     /** 2D渲染环境 */
     protected context2d: CanvasRenderingContext2D;
-
+    
     /**
      * 构造
      */
@@ -33,6 +33,7 @@ export class WebGLScene extends BaseScene {
         if (!this.gl) {
             throw new Error(' 无法创建WebGLRenderingContext上下文对象 ');
         }
+        this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
         this.worldMatrixStack = new GLMatrixStack();
         // 初始化渲染状态
         GLRenderHelper.setDefaultState(this.gl);
@@ -81,6 +82,7 @@ export class WebGLScene extends BaseScene {
         this.worldMatrixStack.clear();
         GLProgramCache.instance.clear();
         GLTextureCache.instance.clear();
+        this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
         if (this.canvas2d && this.canvas2d.parentElement) {
             this.canvas2d.parentElement.removeChild(this.canvas2d);
             this.canvas2d = null;

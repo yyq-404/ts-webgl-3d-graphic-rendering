@@ -20,7 +20,7 @@ export class WebGL2Scene extends BaseScene {
     /* 可以直接操作WebGL2相关内容 */
     protected gl: WebGL2RenderingContext;
     /** 模拟 `OpenGL1.1` 中的矩阵堆栈, 封装在 `GLWorldMatrixStack` 类中 */
-    protected worldMatrixStack: GLMatrixStack;
+    protected matrixStack: GLMatrixStack;
     /** 链接器 */
     protected program: GLProgram;
     /** 顶点缓冲集合 */
@@ -39,7 +39,8 @@ export class WebGL2Scene extends BaseScene {
         if (!this.gl) {
             throw new Error(' 无法创建WebGL2RenderingContext上下文对象 ');
         }
-        this.worldMatrixStack = new GLMatrixStack();
+        this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+        this.matrixStack = new GLMatrixStack();
         if (optionMouseMove) {
             this.mouseMoveEvent = new CanvasMouseMoveEvent(this.canvas);
         }
@@ -68,7 +69,8 @@ export class WebGL2Scene extends BaseScene {
      * 释放d
      */
     public override dispose(): void {
-        this.worldMatrixStack.clear();
+        this.matrixStack.clear();
+        this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
         GLProgramCache.instance.clear();
         GLRenderHelper.clearBuffer(this.gl);
         if (this.gl) {
@@ -110,7 +112,7 @@ export class WebGL2Scene extends BaseScene {
      * @protected
      */
     protected mvpMatrix(): Matrix4 {
-        return Matrix4.product(this.camera.viewProjectionMatrix, this.worldMatrixStack.modelViewMatrix);
+        return Matrix4.product(this.camera.viewProjectionMatrix, this.matrixStack.modelViewMatrix);
     }
     
     /**
@@ -125,16 +127,16 @@ export class WebGL2Scene extends BaseScene {
                 buffers = new Map<IGLAttribute, WebGLBuffer>();
                 this.vertexBuffers.set(solid, buffers);
             }
-            if (GLAttributeHelper.hasAttribute(this.attributeBits, GLAttributeHelper.POSITION.BIT)) {
+            if (GLAttributeHelper.hasAttribute(this.attributeBits, GLAttributeHelper.POSITION.BIT) && solid.vertex.positionArray.length > 0) {
                 buffers.set(GLAttributeHelper.POSITION, this.bindBuffer(solid.vertex.positionArray));
             }
-            if (GLAttributeHelper.hasAttribute(this.attributeBits, GLAttributeHelper.COLOR.BIT)) {
+            if (GLAttributeHelper.hasAttribute(this.attributeBits, GLAttributeHelper.COLOR.BIT) && solid.vertex.colorArray.length > 0) {
                 buffers.set(GLAttributeHelper.COLOR, this.bindBuffer(solid.vertex.colorArray));
             }
-            if (GLAttributeHelper.hasAttribute(this.attributeBits, GLAttributeHelper.NORMAL.BIT)) {
+            if (GLAttributeHelper.hasAttribute(this.attributeBits, GLAttributeHelper.NORMAL.BIT) && solid.vertex.normalArray.length > 0) {
                 buffers.set(GLAttributeHelper.NORMAL, this.bindBuffer(solid.vertex.normalArray));
             }
-            if (GLAttributeHelper.hasAttribute(this.attributeBits, GLAttributeHelper.TEX_COORDINATE_0.BIT)) {
+            if (GLAttributeHelper.hasAttribute(this.attributeBits, GLAttributeHelper.TEX_COORDINATE_0.BIT) && solid.vertex.uvArray.length > 0) {
                 buffers.set(GLAttributeHelper.TEX_COORDINATE_0, this.bindBuffer(solid.vertex.uvArray));
             }
         });
@@ -158,7 +160,7 @@ export class WebGL2Scene extends BaseScene {
      * @protected
      */
     protected begin(): void {
-        this.worldMatrixStack.pushMatrix();
+        this.matrixStack.pushMatrix();
         this.program.bind();
         this.program.loadSampler();
     }
@@ -174,7 +176,7 @@ export class WebGL2Scene extends BaseScene {
         const buffers = this.vertexBuffers.get(solid);
         if (!buffers) return;
         //将位置、旋转变换矩阵传入shader程序
-        this.program.setMatrix4(GLShaderConstants.MMatrix, this.worldMatrixStack.worldMatrix());
+        this.program.setMatrix4(GLShaderConstants.MMatrix, this.matrixStack.worldMatrix());
         //将总变换矩阵送入渲染管线
         this.program.setMatrix4(GLShaderConstants.MVPMatrix, this.mvpMatrix());
         buffers.forEach((value, attribute) => {
@@ -189,7 +191,7 @@ export class WebGL2Scene extends BaseScene {
      */
     protected end(): void {
         this.program.unbind();
-        this.worldMatrixStack.popMatrix();
+        this.matrixStack.popMatrix();
     }
     
     /**

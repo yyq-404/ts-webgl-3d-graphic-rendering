@@ -64,12 +64,12 @@ export class CameraViewScene extends WebGL2Scene {
         //总绘制思想：通过把一个颜色矩形旋转移位到立方体每个面的位置
         //绘制立方体的每个面
         //保护现场
-        this.worldMatrixStack.pushMatrix();
-        this.worldMatrixStack.translate(index % 2 ? new Vector3([-0.8, 0.5, 0]) : new Vector3([0.4, 0.5, 0]));
+        this.matrixStack.pushMatrix();
+        this.matrixStack.translate(index % 2 ? new Vector3([-0.8, 0.5, 0]) : new Vector3([0.4, 0.5, 0]));
         //执行绕Y轴旋转
-        this.worldMatrixStack.rotate(this.mouseMoveEvent.currentYAngle, Vector3.up);
+        this.matrixStack.rotate(this.mouseMoveEvent.currentYAngle, Vector3.up);
         //执行绕X轴旋转
-        this.worldMatrixStack.rotate(this.mouseMoveEvent.currentXAngle, Vector3.right);
+        this.matrixStack.rotate(this.mouseMoveEvent.currentXAngle, Vector3.right);
         [
             // 绘制前小面
             {position: new Vector3([0.0, 0.0, 0.25]), rotations: null},
@@ -85,7 +85,7 @@ export class CameraViewScene extends WebGL2Scene {
             {position: new Vector3([-0.25, 0.0, 0.0]), rotations: [{angle: 90, axis: Vector3.right}, {angle: -90, axis: Vector3.up}]}
         ].forEach((arg) => this.drawSurface(arg.position, arg.rotations));
         //恢复现场
-        this.worldMatrixStack.popMatrix();
+        this.matrixStack.popMatrix();
     }
     
     /**
@@ -95,13 +95,13 @@ export class CameraViewScene extends WebGL2Scene {
      * @private
      */
     private drawSurface(position: Vector3, rotations?: { angle: number, axis: Vector3 }[]): void {
-        this.worldMatrixStack.pushMatrix();
-        this.worldMatrixStack.translate(position);
+        this.matrixStack.pushMatrix();
+        this.matrixStack.translate(position);
         if (rotations instanceof Array) {
-            rotations.forEach(rotation => this.worldMatrixStack.rotate(rotation.angle, rotation.axis));
+            rotations.forEach(rotation => this.matrixStack.rotate(rotation.angle, rotation.axis));
         }
         this.drawRect();
-        this.worldMatrixStack.popMatrix();
+        this.matrixStack.popMatrix();
     }
     
     /**

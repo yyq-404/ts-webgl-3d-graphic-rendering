@@ -38,12 +38,12 @@ export class SixPointStarScene extends WebGL2Scene {
      * @private
      */
     private renderStars() {
-        this.worldMatrixStack.pushMatrix();
+        this.matrixStack.pushMatrix();
         //执行旋转,即按哪个轴旋转
-        this.worldMatrixStack.rotate(this.mouseMoveEvent.currentYAngle, Vector3.up);
-        this.worldMatrixStack.rotate(this.mouseMoveEvent.currentXAngle, Vector3.right);
+        this.matrixStack.rotate(this.mouseMoveEvent.currentYAngle, Vector3.up);
+        this.matrixStack.rotate(this.mouseMoveEvent.currentXAngle, Vector3.right);
         this.vertexBuffers.forEach((buffers, star) => this.renderStar(star, buffers));
-        this.worldMatrixStack.popMatrix();
+        this.matrixStack.popMatrix();
     }
 
     /**

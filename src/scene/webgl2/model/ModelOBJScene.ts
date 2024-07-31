@@ -9,7 +9,7 @@ import {ModelOBJ} from '../../../common/geometry/model/ModelOBJ';
 import {GLRenderHelper} from '../../../webgl/GLRenderHelper';
 import {LightController} from '../../LightController';
 import {HtmlHelper} from '../../HtmlHelper';
-import {HttpHelper} from '../../../net/HttpHelper';
+import {GLTextureHelper} from '../../../webgl/texture/GLTextureHelper';
 
 
 /**
@@ -75,7 +75,7 @@ export class ModelOBJScene extends WebGL2Scene {
             this._lightController.createLocationControls();
             this._lightController.location = new Vector3([0, 0, 50]);
             this._objModel = await ModelOBJHelper.loadAsync('res/model/teapot_t.obj');
-            this._texture = await this.loadNormalTextureAsync('res/image/ghxp.png');
+            this._texture = await GLTextureHelper.loadNormalTextureAsync(this.gl, 'res/image/ghxp.png');
         }
         this.createControls();
         this.createBuffers(this._objModel);
@@ -97,56 +97,24 @@ export class ModelOBJScene extends WebGL2Scene {
         if (!buffers) return;
         this.program.bind();
         this.program.loadSampler();
-        this.worldMatrixStack.pushMatrix();
-        this.worldMatrixStack.rotate(this.mouseMoveEvent.currentYAngle, Vector3.up);
-        this.worldMatrixStack.rotate(this.mouseMoveEvent.currentXAngle, Vector3.right);
+        this.matrixStack.pushMatrix();
+        this.matrixStack.rotate(this.mouseMoveEvent.currentYAngle, Vector3.up);
+        this.matrixStack.rotate(this.mouseMoveEvent.currentXAngle, Vector3.right);
         this.program.setMatrix4(GLShaderConstants.MVPMatrix, this.mvpMatrix());
-        this.program.setMatrix4(GLShaderConstants.MMatrix, this.worldMatrixStack.worldMatrix());
-        this.program.setVector3(GLShaderConstants.cameraPosition, this.camera.position);
-        this.program.setVector3(GLShaderConstants.lightLocation, this._lightController.location);
+        this.program.setMatrix4(GLShaderConstants.MMatrix, this.matrixStack.worldMatrix());
+        this.program.setVector3(GLShaderConstants.Camera, this.camera.position);
+        this.program.setVector3(GLShaderConstants.LightLocation, this._lightController.location);
         buffers.forEach((buffer: WebGLBuffer, attribute: IGLAttribute) => {
             this.program.setVertexAttribute(attribute.NAME, buffer, attribute.COMPONENT);
         });
         if (this._texture) {
             this.gl.activeTexture(this.gl.TEXTURE0);
             this.gl.bindTexture(this.gl.TEXTURE_2D, this._texture);
+            this.program.setInt('sTexture', 0);
         }
         this.gl.drawArrays(this.gl.TRIANGLES, 0, this._objModel.vertex.count);
-        this.worldMatrixStack.popMatrix();
+        this.matrixStack.popMatrix();
         this.program.unbind();
-    }
-    
-    /**
-     * 加载纹理。
-     * @return {Promise<WebGLTexture>}
-     * @private
-     */
-    private async loadNormalTextureAsync(url: string): Promise<WebGLTexture> {
-        const img = await HttpHelper.loadImageAsync(url);
-        const texture = this.gl.createTexture();
-        //绑定纹理ID
-        this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
-        //加载纹理进缓存
-        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, img);
-        this.setTextureParameters();
-        //纹理加载成功后释放纹理图
-        this.gl.bindTexture(this.gl.TEXTURE_2D, null);
-        return texture;
-    }
-    
-    /**
-     * 设置纹理参数。
-     * @private
-     */
-    private setTextureParameters(): void {
-        //设置MAG采样方式
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
-        //设置MIN采样方式
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
-        //设置S轴拉伸方式
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.REPEAT);
-        //设置T轴拉伸方式
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.REPEAT);
     }
     
     /**

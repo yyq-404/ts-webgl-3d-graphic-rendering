@@ -15,9 +15,9 @@ export class LightController {
     private _lightLocationControls: Map<string, HtmlRangeProps[]>;
     /** 颜色 */
     private _colors: Map<string, number> = new Map<string, number>([
-        [GLShaderConstants.ambient, 0.8],
-        [GLShaderConstants.diffuse, 0.8],
-        [GLShaderConstants.specular, 0.8]
+        [GLShaderConstants.Ambient, 0.8],
+        [GLShaderConstants.Diffuse, 0.8],
+        [GLShaderConstants.Specular, 0.8]
     ]);
     /** 位置 */
     private _location: Map<string, number> = new Map<string, number>([
@@ -31,9 +31,9 @@ export class LightController {
      */
     public constructor() {
         this._lightTypeControls = new Map<string, HtmlRangeProps[]>([
-            ['环境光', [{id: GLShaderConstants.ambient, name: '颜色', value: '80', onChange: this.onColorChange, min: '0', max: '100'}]],
-            ['散射光', [{id: GLShaderConstants.diffuse, name: '颜色', value: '80', onChange: this.onColorChange, min: '0', max: '100'}]],
-            ['镜面光', [{id: GLShaderConstants.specular, name: '颜色', value: '80', onChange: this.onColorChange, min: '0', max: '100'}]]
+            ['环境光', [{id: GLShaderConstants.Ambient, name: '颜色', value: '80', onChange: this.onColorChange, min: '0', max: '100'}]],
+            ['散射光', [{id: GLShaderConstants.Diffuse, name: '颜色', value: '80', onChange: this.onColorChange, min: '0', max: '100'}]],
+            ['镜面光', [{id: GLShaderConstants.Specular, name: '颜色', value: '80', onChange: this.onColorChange, min: '0', max: '100'}]]
         ]);
         this._lightLocationControls = new Map<string, HtmlRangeProps[]>([
             ['光源位置', [

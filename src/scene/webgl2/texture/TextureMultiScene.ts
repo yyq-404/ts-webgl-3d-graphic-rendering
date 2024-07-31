@@ -98,7 +98,7 @@ export class TextureMultiScene extends WebGL2Scene {
      */
     public override render(): void {
         GLRenderHelper.clearBuffer(this.gl);
-        this.worldMatrixStack.rotate(1, Vector3.up);
+        this.matrixStack.rotate(1, Vector3.up);
         this.drawEarth();
         this.drawMoon();
     }
@@ -112,13 +112,13 @@ export class TextureMultiScene extends WebGL2Scene {
         if (!buffers) return;
         this.program.bind();
         this.program.loadSampler();
-        this.worldMatrixStack.pushMatrix();
-        this.worldMatrixStack.rotate(this._currentAngle, Vector3.up);
-        this.worldMatrixStack.rotate(90, Vector3.right);
+        this.matrixStack.pushMatrix();
+        this.matrixStack.rotate(this._currentAngle, Vector3.up);
+        this.matrixStack.rotate(90, Vector3.right);
         this.program.setMatrix4(GLShaderConstants.MVPMatrix, this.mvpMatrix());
-        this.program.setMatrix4(GLShaderConstants.MMatrix, this.worldMatrixStack.worldMatrix());
+        this.program.setMatrix4(GLShaderConstants.MMatrix, this.matrixStack.worldMatrix());
         this.program.setVector3('uLightLocationSun', new Vector3([50, 5, 0]));
-        this.program.setVector3(GLShaderConstants.cameraPosition, this.camera.position);
+        this.program.setVector3(GLShaderConstants.Camera, this.camera.position);
         buffers.forEach((buffer, attribute) => {
                 this.program.setVertexAttribute(attribute.NAME, buffer, attribute.COMPONENT);
             }
@@ -134,7 +134,7 @@ export class TextureMultiScene extends WebGL2Scene {
         this.gl.bindTexture(this.gl.TEXTURE_2D, this._earthNightTexture);
         this.program.setInt('sTextureNight', 1);
         this.gl.drawArrays(this.gl.TRIANGLES, 0, this._earth.vertex.count);
-        this.worldMatrixStack.popMatrix();
+        this.matrixStack.popMatrix();
         this.program.unbind();
     }
     
@@ -147,14 +147,14 @@ export class TextureMultiScene extends WebGL2Scene {
         if (!buffers) return;
         this._moonProgram.bind();
         this._moonProgram.loadSampler();
-        this.worldMatrixStack.pushMatrix();
-        this.worldMatrixStack.translate(new Vector3([9, 0, 0]));
-        this.worldMatrixStack.rotate(this._currentAngle, Vector3.up);
-        this.worldMatrixStack.rotate(90, Vector3.right);
+        this.matrixStack.pushMatrix();
+        this.matrixStack.translate(new Vector3([9, 0, 0]));
+        this.matrixStack.rotate(this._currentAngle, Vector3.up);
+        this.matrixStack.rotate(90, Vector3.right);
         this._moonProgram.setMatrix4(GLShaderConstants.MVPMatrix, this.mvpMatrix());
-        this._moonProgram.setMatrix4(GLShaderConstants.MMatrix, this.worldMatrixStack.worldMatrix());
+        this._moonProgram.setMatrix4(GLShaderConstants.MMatrix, this.matrixStack.worldMatrix());
         this._moonProgram.setVector3('uLightLocationSun', new Vector3([50, 5, 0]));
-        this._moonProgram.setVector3(GLShaderConstants.cameraPosition, this.camera.position);
+        this._moonProgram.setVector3(GLShaderConstants.Camera, this.camera.position);
         buffers.forEach((buffer, attribute) => {
                 this._moonProgram.setVertexAttribute(attribute.NAME, buffer, attribute.COMPONENT);
             }
@@ -165,7 +165,7 @@ export class TextureMultiScene extends WebGL2Scene {
         this.gl.bindTexture(this.gl.TEXTURE_2D, this._moonTexture);
         this._moonProgram.setInt('sTexture', 0);
         this.gl.drawArrays(this.gl.TRIANGLES, 0, this._moon.vertex.count);
-        this.worldMatrixStack.popMatrix();
+        this.matrixStack.popMatrix();
         this._moonProgram.unbind();
     }
     

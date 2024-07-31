@@ -49,7 +49,7 @@ export class RotatingTriangleScene extends WebGL2Scene {
      */
     private renderRotationTriangle(): void {
         this.begin();
-        this.worldMatrixStack.rotate(this._currentAngle, Vector3.up);
+        this.matrixStack.rotate(this._currentAngle, Vector3.up);
         this.drawArrays(this._triangle, this.gl.TRIANGLES);
         this.end();
     }

@@ -69,24 +69,24 @@ export class LightNormalScene extends WebGL2Scene {
     private drawCube(cube: ColorCube, index: number): void {
         const buffers = this.vertexBuffers.get(cube);
         if (!buffers) return;
-        this.worldMatrixStack.pushMatrix();
-        this.worldMatrixStack.translate(new Vector3([index % 2 ? -1.0 : 1.0, 0.0, 0.0]));
-        this.worldMatrixStack.rotate(this.mouseMoveEvent.currentYAngle, Vector3.up);
-        this.worldMatrixStack.rotate(this.mouseMoveEvent.currentXAngle, Vector3.right);
+        this.matrixStack.pushMatrix();
+        this.matrixStack.translate(new Vector3([index % 2 ? -1.0 : 1.0, 0.0, 0.0]));
+        this.matrixStack.rotate(this.mouseMoveEvent.currentYAngle, Vector3.up);
+        this.matrixStack.rotate(this.mouseMoveEvent.currentXAngle, Vector3.right);
         this.program.bind();
         this.program.loadSampler();
         //将总变换矩阵送入渲染管线
         this.program.setMatrix4(GLShaderConstants.MVPMatrix, this.mvpMatrix());
-        this.program.setMatrix4(GLShaderConstants.MMatrix, this.worldMatrixStack.worldMatrix());
-        this.program.setVector3(GLShaderConstants.lightLocation, this._lightController.location);
-        this.program.setVector3(GLShaderConstants.cameraPosition, this.camera.position);
+        this.program.setMatrix4(GLShaderConstants.MMatrix, this.matrixStack.worldMatrix());
+        this.program.setVector3(GLShaderConstants.LightLocation, this._lightController.location);
+        this.program.setVector3(GLShaderConstants.Camera, this.camera.position);
         this.program.setFloat('uR', cube.halfSize);
         this._lightController.setColor(this.program);
         buffers.forEach((value, attribute) => {
             this.program.setVertexAttribute(attribute.NAME, value, attribute.COMPONENT);
         });
         this.gl.drawArrays(this.gl.TRIANGLES, 0, cube.vertex.count);
-        this.worldMatrixStack.popMatrix();
+        this.matrixStack.popMatrix();
         this.program.unbind();
     }
     

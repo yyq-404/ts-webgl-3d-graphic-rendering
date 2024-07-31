@@ -16,9 +16,9 @@ export class TextureWrapScene extends WebGL2Scene {
     private _rect: Rect = new Rect(2, 2);
     /** 纹理贴图 */
     private _texture: WebGLTexture;
-    
+    /** 当前选中尺寸 */
     private _currentSize: string = '1*1';
-    
+    /** 当前选中拉升方式 */
     private _currentWrapMode: string = 'EDGE';
     
     /**
@@ -77,18 +77,18 @@ export class TextureWrapScene extends WebGL2Scene {
         if (!buffers) return;
         this.program.bind();
         this.program.loadSampler();
-        this.worldMatrixStack.pushMatrix();
-        this.worldMatrixStack.translate(Vector3.zero);
-        this.worldMatrixStack.scale(new Vector3([0.5, 0.5, 0.5]));
-        this.worldMatrixStack.rotate(this.mouseMoveEvent.currentYAngle, Vector3.up);
-        this.worldMatrixStack.rotate(this.mouseMoveEvent.currentXAngle, Vector3.right);
+        this.matrixStack.pushMatrix();
+        this.matrixStack.translate(Vector3.zero);
+        this.matrixStack.scale(new Vector3([0.5, 0.5, 0.5]));
+        this.matrixStack.rotate(this.mouseMoveEvent.currentYAngle, Vector3.up);
+        this.matrixStack.rotate(this.mouseMoveEvent.currentXAngle, Vector3.right);
         this.program.setMatrix4(GLShaderConstants.MVPMatrix, this.mvpMatrix());
         for (const entity of buffers.entries()) {
             this.program.setVertexAttribute(entity[0].NAME, entity[1], entity[0].COMPONENT);
         }
         this.program.setInt('sTexture', 0);
         this.gl.drawArrays(this.gl.TRIANGLES, 0, this._rect.vertex.count);
-        this.worldMatrixStack.popMatrix();
+        this.matrixStack.popMatrix();
         // this.unbind();
         this.program.unbind();
     }

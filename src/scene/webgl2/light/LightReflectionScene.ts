@@ -76,10 +76,10 @@ export class LightReflectionScene extends WebGL2Scene {
         if (!buffers) return;
         this.program.bind();
         this.program.loadSampler();
-        this.worldMatrixStack.pushMatrix();
-        this.worldMatrixStack.translate(Vector3.zero);
-        this.worldMatrixStack.rotate(this.mouseMoveEvent.currentYAngle, Vector3.up);
-        this.worldMatrixStack.rotate(this.mouseMoveEvent.currentXAngle, Vector3.right);
+        this.matrixStack.pushMatrix();
+        this.matrixStack.translate(Vector3.zero);
+        this.matrixStack.rotate(this.mouseMoveEvent.currentYAngle, Vector3.up);
+        this.matrixStack.rotate(this.mouseMoveEvent.currentXAngle, Vector3.right);
         //将总变换矩阵送入渲染管线
         this.program.setMatrix4(GLShaderConstants.MVPMatrix, this.mvpMatrix());
         this.program.setFloat('uR', this._ball.r);
@@ -88,7 +88,7 @@ export class LightReflectionScene extends WebGL2Scene {
             this.program.setVertexAttribute(attribute.NAME, value, attribute.COMPONENT);
         });
         this.gl.drawArrays(this.gl.TRIANGLES, 0, this._ball.vertex.count);
-        this.worldMatrixStack.popMatrix();
+        this.matrixStack.popMatrix();
         this.program.unbind();
     }
     
@@ -99,18 +99,18 @@ export class LightReflectionScene extends WebGL2Scene {
     private setLightColor(): void {
         switch (this._reflectionType) {
             case 'ambient':
-                this.program.setVector4(GLShaderConstants.ambient, this._lightController.getColor(GLShaderConstants.ambient));
+                this.program.setVector4(GLShaderConstants.Ambient, this._lightController.getColor(GLShaderConstants.Ambient));
                 break;
             case 'diffuse':
-                this.program.setMatrix4(GLShaderConstants.MMatrix, this.worldMatrixStack.worldMatrix());
-                this.program.setVector4(GLShaderConstants.diffuse, this._lightController.getColor(GLShaderConstants.diffuse));
-                this.program.setVector3(GLShaderConstants.lightLocation, this._lightController.location);
+                this.program.setMatrix4(GLShaderConstants.MMatrix, this.matrixStack.worldMatrix());
+                this.program.setVector4(GLShaderConstants.Diffuse, this._lightController.getColor(GLShaderConstants.Diffuse));
+                this.program.setVector3(GLShaderConstants.LightLocation, this._lightController.location);
                 break;
             case 'specular':
-                this.program.setMatrix4(GLShaderConstants.MMatrix, this.worldMatrixStack.worldMatrix());
-                this.program.setVector4(GLShaderConstants.specular, this._lightController.getColor(GLShaderConstants.specular));
-                this.program.setVector3(GLShaderConstants.lightLocation, this._lightController.location);
-                this.program.setVector3(GLShaderConstants.cameraPosition, this.camera.position);
+                this.program.setMatrix4(GLShaderConstants.MMatrix, this.matrixStack.worldMatrix());
+                this.program.setVector4(GLShaderConstants.Specular, this._lightController.getColor(GLShaderConstants.Specular));
+                this.program.setVector3(GLShaderConstants.LightLocation, this._lightController.location);
+                this.program.setVector3(GLShaderConstants.Camera, this.camera.position);
                 break;
             default:
                 break;

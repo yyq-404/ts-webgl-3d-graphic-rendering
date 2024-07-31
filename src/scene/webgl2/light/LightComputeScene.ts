@@ -70,20 +70,20 @@ export class LightComputeScene extends WebGL2Scene {
     private drawRect(): void {
         const buffers = this.vertexBuffers.get(this._rect);
         if (!buffers) return;
-        this.worldMatrixStack.pushMatrix();
-        this.worldMatrixStack.scale(new Vector3([0.7, 0.7, 0.7]));
+        this.matrixStack.pushMatrix();
+        this.matrixStack.scale(new Vector3([0.7, 0.7, 0.7]));
         this.program.bind();
         this.program.loadSampler();
         //将总变换矩阵送入渲染管线
         this.program.setMatrix4(GLShaderConstants.MVPMatrix, this.mvpMatrix());
-        this.program.setMatrix4(GLShaderConstants.MMatrix, this.worldMatrixStack.worldMatrix());
-        this.program.setVector3(GLShaderConstants.lightLocation, new Vector3([...this._lightController.location.xy, 1]));
-        this.program.setVector3(GLShaderConstants.cameraPosition, this.camera.position);
+        this.program.setMatrix4(GLShaderConstants.MMatrix, this.matrixStack.worldMatrix());
+        this.program.setVector3(GLShaderConstants.LightLocation, new Vector3([...this._lightController.location.xy, 1]));
+        this.program.setVector3(GLShaderConstants.Camera, this.camera.position);
         buffers.forEach((value, attribute) => {
             this.program.setVertexAttribute(attribute.NAME, value, attribute.COMPONENT);
         });
         this.gl.drawArrays(this.gl.TRIANGLES, 0, this._rect.vertex.count);
-        this.worldMatrixStack.popMatrix();
+        this.matrixStack.popMatrix();
         this.program.unbind();
     }
     

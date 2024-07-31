@@ -82,10 +82,10 @@ export class TextureMipmapScene extends WebGL2Scene {
         if (!buffers) return;
         this.program.bind();
         this.program.loadSampler();
-        this.worldMatrixStack.pushMatrix();
-        this.worldMatrixStack.translate(new Vector3([-this._span + j * this._span, this._span - i * this._span, 0]));
-        this.worldMatrixStack.rotate(this.mouseMoveEvent.currentYAngle, Vector3.up);
-        this.worldMatrixStack.rotate(this.mouseMoveEvent.currentXAngle, Vector3.right);
+        this.matrixStack.pushMatrix();
+        this.matrixStack.translate(new Vector3([-this._span + j * this._span, this._span - i * this._span, 0]));
+        this.matrixStack.rotate(this.mouseMoveEvent.currentYAngle, Vector3.up);
+        this.matrixStack.rotate(this.mouseMoveEvent.currentXAngle, Vector3.right);
         this.program.setMatrix4(GLShaderConstants.MVPMatrix, this.mvpMatrix());
         buffers.forEach((buffer, attribute) => {
             this.program.setVertexAttribute(attribute.NAME, buffer, attribute.COMPONENT);
@@ -95,7 +95,7 @@ export class TextureMipmapScene extends WebGL2Scene {
         this.gl.activeTexture(this.gl.TEXTURE0);
         this.gl.bindTexture(this.gl.TEXTURE_2D, this._texture);
         this.gl.drawArrays(this.gl.TRIANGLES, 0, rect.vertex.count);
-        this.worldMatrixStack.popMatrix();
+        this.matrixStack.popMatrix();
         this.program.unbind();
         this.gl.bindTexture(this.gl.TEXTURE_2D, null);
     }

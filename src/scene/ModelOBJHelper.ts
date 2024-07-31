@@ -101,10 +101,14 @@ export class ModelOBJHelper {
             fVertices.push(vertex);
             // 纹理坐标
             const tIndex = parseInt(vtn[1]) - 1;
-            fTextureCoords.push(textureCoords[tIndex]);
+            if (!isNaN(tIndex) && tIndex > -1 && textureCoords[tIndex] !== undefined) {
+                fTextureCoords.push(textureCoords[tIndex]);
+            }
             // 法线
             const nIndex = parseInt(vtn[2]) - 1;
-            fNormals.push(vNormals[nIndex]);
+            if (!isNaN(nIndex) && nIndex > -1 && vNormals[nIndex] !== undefined) {
+                fNormals.push(vNormals[nIndex]);
+            }
             if (optionComputeNormal) {
                 // 计算法线所需数据
                 face.push(vertex.copy());

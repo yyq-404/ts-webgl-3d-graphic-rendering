@@ -56,9 +56,9 @@ export class TransformCubeScene extends WebGL2Scene {
     private renderTranslationCube(index: number): void {
         this.begin();
         let pos = index % 2 == 0 ? new Vector3([-0.5 * (index % 2 + 1), 0.0, 0.0]) : new Vector3([0.5 * (index % 2 + 1), 0.0, 0.0]);
-        this.worldMatrixStack.translate(pos);
-        this.worldMatrixStack.rotate(this.mouseMoveEvent.currentXAngle, Vector3.right);
-        this.worldMatrixStack.rotate(this.mouseMoveEvent.currentYAngle, Vector3.up);
+        this.matrixStack.translate(pos);
+        this.matrixStack.rotate(this.mouseMoveEvent.currentXAngle, Vector3.right);
+        this.matrixStack.rotate(this.mouseMoveEvent.currentYAngle, Vector3.up);
         if (index % 2) {
             this.onTransform();
         }
@@ -73,11 +73,11 @@ export class TransformCubeScene extends WebGL2Scene {
     private onTransform(): void {
         switch (this._transformType) {
             case 'translation':
-                this.worldMatrixStack.rotate(45, Vector3.forward);
+                this.matrixStack.rotate(45, Vector3.forward);
                 break;
             case 'scale':
-                this.worldMatrixStack.rotate(30, Vector3.forward);
-                this.worldMatrixStack.scale(new Vector3([0.4, 2, 0.6]));
+                this.matrixStack.rotate(30, Vector3.forward);
+                this.matrixStack.scale(new Vector3([0.4, 2, 0.6]));
                 break;
             default:
                 break;
