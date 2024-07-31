@@ -4,9 +4,9 @@ import {GLProgram} from '../../../webgl/program/GLProgram';
 import {Ball} from '../../../common/geometry/solid/Ball';
 import {GLRenderHelper} from '../../../webgl/GLRenderHelper';
 import {Vector3} from '../../../common/math/vector/Vector3';
-import {HttpHelper} from '../../../net/HttpHelper';
 import {GLShaderConstants} from '../../../webgl/GLShaderConstants';
 import {GLAttributeHelper} from '../../../webgl/GLAttributeHelper';
+import {GLTextureHelper} from '../../../webgl/texture/GLTextureHelper';
 
 /**
  * 多重和过渡材质场景。
@@ -26,6 +26,13 @@ export class TextureMultiScene extends WebGL2Scene {
     private _moonTexture: WebGLTexture;
     /** 月球链接程序 */
     private _moonProgram: GLProgram;
+    /** 余层 */
+    private _cloud: Ball = new Ball(3.05, 1);
+    /** 云层纹理 */
+    private _cloudTexture: WebGLTexture;
+    /** 云层链接程序 */
+    private _cloudProgram: GLProgram;
+    
     
     /**
      * 构造
@@ -33,10 +40,12 @@ export class TextureMultiScene extends WebGL2Scene {
     public constructor() {
         super();
         this.attributeBits = GLAttributeHelper.POSITION.BIT | GLAttributeHelper.NORMAL.BIT | GLAttributeHelper.TEX_COORDINATE_0.BIT;
-        this.createBuffers(this._earth, this._moon);
+        this.createBuffers(this._earth, this._moon, this._cloud);
         this.camera.z = 20;
-        this.canvas.style.background = 'black';
+        // this.canvas.style.background = 'black';
         GLRenderHelper.setDefaultState(this.gl);
+        //设置屏幕背景色RGBA
+        this.gl.clearColor(0.0,0.0,0.0,1.0);
     }
     
     /**
@@ -68,15 +77,34 @@ export class TextureMultiScene extends WebGL2Scene {
     }
     
     /**
+     * 创建云层链接程序。
+     * @return {Promise<void>}
+     * @private
+     */
+    protected async createCloudProgramAsync(): Promise<void> {
+        const shaderUrls: Map<string, string> = new Map<string, string>([
+            ['bns.vert', `${SceneConstants.webgl2ShaderRoot}/texture/cloud.vert`],
+            ['bns.frag', `${SceneConstants.webgl2ShaderRoot}/texture/cloud.frag`]
+        ]);
+        // 加载颜色顶点着色器代码
+        let vertexShaderSource = await this.loadShaderSourceAsync(shaderUrls, 'bns.vert');
+        // 加载颜色片元着色器代码
+        let fragShaderSource = await this.loadShaderSourceAsync(shaderUrls, 'bns.frag');
+        this._cloudProgram = GLProgram.createDefaultProgram(this.gl, vertexShaderSource, fragShaderSource);
+    }
+    
+    /**
      * 运行。
      * @return {Promise<void>}
      */
     public override async runAsync(): Promise<void> {
         await this.initAsync();
         await this.createMoonProgramAsync();
-        this._earthDayTexture = await this.loadTextureAsync('res/image/earthDay.png');
-        this._earthNightTexture = await this.loadTextureAsync('res/image/earthNight.png');
-        this._moonTexture = await this.loadTextureAsync('res/image/moon.png');
+        await this.createCloudProgramAsync();
+        this._earthDayTexture = await GLTextureHelper.loadNormalTextureAsync(this.gl, 'res/image/earthDay.png');
+        this._earthNightTexture = await GLTextureHelper.loadNormalTextureAsync(this.gl, 'res/image/earthNight.png');
+        this._moonTexture = await GLTextureHelper.loadNormalTextureAsync(this.gl, 'res/image/moon.png');
+        this._cloudTexture = await GLTextureHelper.loadNormalTextureAsync(this.gl, 'res/image/cloud.jpg');
     }
     
     /**
@@ -100,6 +128,7 @@ export class TextureMultiScene extends WebGL2Scene {
         GLRenderHelper.clearBuffer(this.gl);
         this.matrixStack.rotate(1, Vector3.up);
         this.drawEarth();
+        this.drawCloud();
         this.drawMoon();
     }
     
@@ -170,21 +199,33 @@ export class TextureMultiScene extends WebGL2Scene {
     }
     
     /**
-     * 加载资源。
-     * @param {string} url
-     * @return {Promise<WebGLTexture>}
+     * 绘制云层
      * @private
      */
-    private async loadTextureAsync(url: string): Promise<WebGLTexture> {
-        const image = await HttpHelper.loadImageAsync(url);
-        const texture = this.gl.createTexture();
-        this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
-        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, image);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.NEAREST);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.REPEAT);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.REPEAT);
-        this.gl.bindTexture(this.gl.TEXTURE_2D, null);
-        return texture;
+    private drawCloud(): void {
+        const buffers = this.vertexBuffers.get(this._cloud);
+        if (!buffers) return;
+        this._cloudProgram.bind();
+        this._cloudProgram.loadSampler();
+        //开启混合
+        this.gl.enable(this.gl.BLEND);
+        this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);//设置混合因子
+        this._cloudProgram.setMatrix4(GLShaderConstants.MVPMatrix, this.mvpMatrix());
+        this._cloudProgram.setMatrix4(GLShaderConstants.MMatrix, this.matrixStack.worldMatrix());
+        this._moonProgram.setVector3('uLightLocationSun', new Vector3([50, 5, 0]));
+        this._cloudProgram.setVector3(GLShaderConstants.Camera, this.camera.position);
+        buffers.forEach((buffer, attribute) => {
+                this._cloudProgram.setVertexAttribute(attribute.NAME, buffer, attribute.COMPONENT);
+            }
+        );
+        //设置使用的纹理编号-0
+        this.gl.activeTexture(this.gl.TEXTURE0);
+        //绑定纹理
+        this.gl.bindTexture(this.gl.TEXTURE_2D, this._cloudTexture);
+        this._cloudProgram.setInt('sTexture', 0);
+        this.gl.drawArrays(this.gl.TRIANGLES, 0, this._cloud.vertex.count);
+        // this.matrixStack.popMatrix();
+        this.gl.disable(this.gl.BLEND);
+        this._cloudProgram.unbind();
     }
 }
