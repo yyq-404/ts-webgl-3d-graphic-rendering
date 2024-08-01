@@ -143,7 +143,7 @@ export class HtmlHelper {
         label.textContent = textContent;
         label.style.position = 'relative';
         label.style.margin = '10px';
-        args.forEach((value, index) => {
+        args.forEach((value) => {
             const radio: HTMLInputElement = document.createElement('input');
             radio.type = 'radio';
             radio.name = name;
