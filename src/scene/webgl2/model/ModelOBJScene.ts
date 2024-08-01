@@ -122,8 +122,8 @@ export class ModelOBJScene extends WebGL2Scene {
      * @private
      */
     private createControls(): void {
-        const sizes = ['color', 'light', 'light_double', 'texture'];
-        HtmlHelper.createRadioGroup('type', '类型: ', sizes, this.onTypeChange);
+        const types = ['color', 'light', 'light_double', 'texture'];
+        HtmlHelper.createRadioGroup('type', '类型: ', types, this._type, this.onTypeChange);
     }
     
     /**

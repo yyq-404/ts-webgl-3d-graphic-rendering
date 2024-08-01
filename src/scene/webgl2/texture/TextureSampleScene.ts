@@ -173,8 +173,8 @@ export class TextureSampleScene extends WebGL2Scene {
      */
     private createControls(): void {
         const sampleModes = ['NEAREST', 'LINEAR'];
-        HtmlHelper.createRadioGroup('min_sample', 'MIN: ', sampleModes, this.onMinSampleChange);
-        HtmlHelper.createRadioGroup('mag_sample', 'MAG: ', sampleModes, this.onMagSampleChange);
+        HtmlHelper.createRadioGroup('min_sample', 'MIN: ', sampleModes, this._minSample.toString(), this.onMinSampleChange);
+        HtmlHelper.createRadioGroup('mag_sample', 'MAG: ', sampleModes, this._magSample.toString(), this.onMagSampleChange);
     }
     
     /**

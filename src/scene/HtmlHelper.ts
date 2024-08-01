@@ -133,10 +133,11 @@ export class HtmlHelper {
      * @param {string} name
      * @param {string} textContent
      * @param {string[]} args
+     * @param {string[]} currentValue
      * @param {() => void} onClick
      * @private
      */
-    public static createRadioGroup(name: string, textContent: string, args: string[], onClick: (event: Event) => void): void {
+    public static createRadioGroup(name: string, textContent: string, args: string[], currentValue: string, onClick: (event: Event) => void): void {
         const parent = document.getElementById('controls');
         const label = document.createElement('label');
         label.textContent = textContent;
@@ -148,7 +149,7 @@ export class HtmlHelper {
             radio.name = name;
             radio.value = value;
             radio.onclick = onClick;
-            radio.checked = index === 0;
+            radio.checked = currentValue === value;
             label.appendChild(radio);
             label.append(value + '  ');
         });

@@ -175,9 +175,9 @@ export class TextureWrapScene extends WebGL2Scene {
      */
     private createControls(): void {
         const modes = ['EDGE', 'REPEAT'];
-        HtmlHelper.createRadioGroup('stretching', '拉伸方式: ', modes, this.onWarpModeChange);
+        HtmlHelper.createRadioGroup('stretching', '拉伸方式: ', modes, this._currentWrapMode, this.onWarpModeChange);
         const sizes = ['1*1', '4*2', '4*4'];
-        HtmlHelper.createRadioGroup('size', '纹理尺寸坐标: ', sizes, this.onTextureCoordinateSizeChange);
+        HtmlHelper.createRadioGroup('size', '纹理尺寸坐标: ', sizes, this._currentSize, this.onTextureCoordinateSizeChange);
     }
     
     /**

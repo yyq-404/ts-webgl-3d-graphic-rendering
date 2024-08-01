@@ -216,28 +216,13 @@ export class TextureCompressScene extends WebGL2Scene {
         return ((width + 3) >> 2) * ((height + 3) >> 2) * 16;
     }
     
-    // /**
-    //  * 设置纹理参数。
-    //  * @private
-    //  */
-    // private setTextureParameters(): void {
-    //     //设置MAG采样方式
-    //     this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
-    //     //设置MIN采样方式
-    //     this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
-    //     //设置S轴拉伸方式
-    //     this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.REPEAT);
-    //     //设置T轴拉伸方式
-    //     this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.REPEAT);
-    // }
-    
     /**
      * 创建控制控件。
      * @private
      */
     private createControls(): void {
-        const modes = ['NORMAL', 'ETC1', 'DXT5'];
-        HtmlHelper.createRadioGroup('type', '材质类型: ', modes, this.onWarpModeChange);
+        const types = ['NORMAL', 'ETC1', 'DXT5'];
+        HtmlHelper.createRadioGroup('type', '材质类型: ', types, this._textureType, this.onWarpModeChange);
     }
     
     /**

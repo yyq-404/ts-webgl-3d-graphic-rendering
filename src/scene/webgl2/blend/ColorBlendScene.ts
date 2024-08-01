@@ -32,6 +32,8 @@ export class ColorBlendScene extends WebGL2Scene {
     private _pos: Vector2 = Vector2.zero.copy();
     /** 类型 */
     private _type = 'color';
+    /** 雾效类型 */
+    private _fogType: string = 'linear';
     
     /**
      * 构造
@@ -56,9 +58,15 @@ export class ColorBlendScene extends WebGL2Scene {
      * @return {Map<string, string>}
      */
     public override get shaderUrls(): Map<string, string> {
+        if (this._type === 'fog') {
+            return new Map<string, string>([
+                ['bns.vert', `${SceneConstants.webgl2ShaderRoot}/model/fog.vert`],
+                ['bns.frag', `${SceneConstants.webgl2ShaderRoot}/model/fog.frag`]
+            ]);
+        }
         return new Map<string, string>([
-            ['bns.vert', `${SceneConstants.webgl2ShaderRoot}/model/model_mix.vert`],
-            ['bns.frag', `${SceneConstants.webgl2ShaderRoot}/model/model_mix.frag`]
+            ['bns.vert', `${SceneConstants.webgl2ShaderRoot}/model/model_blend.vert`],
+            ['bns.frag', `${SceneConstants.webgl2ShaderRoot}/model/model_blend.frag`]
         ]);
     }
     
@@ -73,10 +81,15 @@ export class ColorBlendScene extends WebGL2Scene {
             const model = await ModelOBJHelper.loadAsync(`res/model/${this._modelNames[i]}.obj`);
             this._models.push(model);
         }
-        const imgName: string = this._type === 'color' ? 'lgq' : 'lgq_t';
-        this._texture = await GLTextureHelper.loadNormalTextureAsync(this.gl, `res/image/${imgName}.png`);
+        this.createBuffers(...this._models);
         this.createControls();
-        this.createBuffers(...this._models, this._rect);
+        if (this._type === 'fog') {
+            this.createFogControls();
+        } else {
+            const imgName: string = this._type === 'color' ? 'lgq' : 'lgq_t';
+            this._texture = await GLTextureHelper.loadNormalTextureAsync(this.gl, `res/image/${imgName}.png`);
+            this.createBuffers(this._rect);
+        }
     }
     
     /**
@@ -84,7 +97,9 @@ export class ColorBlendScene extends WebGL2Scene {
      */
     public override render(): void {
         this.drawModels();
-        this.drawTexture();
+        if (this._type !== 'fog') {
+            this.drawTexture();
+        }
     }
     
     /**
@@ -94,8 +109,8 @@ export class ColorBlendScene extends WebGL2Scene {
      */
     protected async createTextureProgramAsync(): Promise<void> {
         const shaderUrls: Map<string, string> = new Map<string, string>([
-            ['bns.vert', `${SceneConstants.webgl2ShaderRoot}/model/texture_mix.vert`],
-            ['bns.frag', `${SceneConstants.webgl2ShaderRoot}/model/texture_mix.frag`]
+            ['bns.vert', `${SceneConstants.webgl2ShaderRoot}/model/texture_blend.vert`],
+            ['bns.frag', `${SceneConstants.webgl2ShaderRoot}/model/texture_blend.frag`]
         ]);
         // 加载颜色顶点着色器代码
         let vertexShaderSource = await this.loadShaderSourceAsync(shaderUrls, 'bns.vert');
@@ -162,6 +177,10 @@ export class ColorBlendScene extends WebGL2Scene {
         buffers.forEach((buffer: WebGLBuffer, attribute: IGLAttribute) => {
             this.program.setVertexAttribute(attribute.NAME, buffer, attribute.COMPONENT);
         });
+        if (this._type === 'fog') {
+            const uLinearFog: number = this._fogType === 'linear' ? 1 : 0;
+            this.program.setInt('uLinearFog', uLinearFog);
+        }
         this.gl.drawArrays(this.gl.TRIANGLES, 0, model.vertex.count);
         this.program.unbind();
     }
@@ -222,17 +241,38 @@ export class ColorBlendScene extends WebGL2Scene {
      * @private
      */
     private createControls(): void {
-        const sizes = ['color', 'alpha'];
-        HtmlHelper.createRadioGroup('type', '类型: ', sizes, this.onTypeChange);
+        const types = ['color', 'alpha', 'fog'];
+        HtmlHelper.createRadioGroup('type', '混合类型: ', types, this._type, this.onTypeChange);
     }
     
     /**
-     * 纹理坐标尺寸更改
+     * 混合类型更改
      */
     private onTypeChange = (event: Event): void => {
         let element = event.target as HTMLInputElement;
         if (element.checked) {
             this._type = element.value;
+        }
+        this.clearControls();
+        this.runAsync.apply(this);
+    };
+    
+    /**
+     * 创建雾效控制控件。
+     * @private
+     */
+    private createFogControls(): void {
+        const types = ['linear', 'nonlinear'];
+        HtmlHelper.createRadioGroup('type', '雾效类型: ', types, this._fogType, this.onFogTypeChange);
+    }
+    
+    /**
+     * 雾效类型更改
+     */
+    private onFogTypeChange = (event: Event): void => {
+        let element = event.target as HTMLInputElement;
+        if (element.checked) {
+            this._fogType = element.value;
         }
         this.clearControls();
         this.runAsync.apply(this);
