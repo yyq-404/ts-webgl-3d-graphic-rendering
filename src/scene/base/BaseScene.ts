@@ -20,7 +20,6 @@ export class BaseScene implements EventListenerObject {
     public constructor() {
         this.canvas = this.createWebGLCanvas();
         this.camera = new CameraComponent(this.canvas.width, this.canvas.height, 45, 1);
-        // this.frameCallback = null;
         document.oncontextmenu = () => false;
         CanvasKeyboardEventManager.instance.types.forEach(type => window.addEventListener(type, this, false));
         CanvasMouseEventManager.instance.types.forEach(type => this.canvas.addEventListener(type, this, false));

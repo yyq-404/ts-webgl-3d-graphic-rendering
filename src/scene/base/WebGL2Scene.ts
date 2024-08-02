@@ -101,6 +101,7 @@ export class WebGL2Scene extends BaseScene {
      * @protected
      */
     protected override onMouseEvent(event: MouseEvent): void {
+        super.onMouseEvent(event);
         if (this.mouseMoveEvent) {
             CanvasMouseEventManager.instance.dispatch(this.mouseMoveEvent, event);
         }

@@ -499,7 +499,8 @@ export class CameraComponent {
      * @param target 要观察的目标，世界坐标系中的任意一个点来构建视图矩阵
      * @param up
      */
-    private lookAt(position: Vector3, target: Vector3, up: Vector3 = Vector3.up): void {
+    public lookAt(position: Vector3, target: Vector3, up: Vector3 = Vector3.up): void {
+        this.position = position;
         this._viewMatrix = Matrix4.lookAt(position, target, up);
         this.xAxis.xyz = [this._viewMatrix.at(0), this._viewMatrix.at(4), this._viewMatrix.at(8)];
         this.yAxis.xyz = [this._viewMatrix.at(1), this._viewMatrix.at(5), this._viewMatrix.at(9)];

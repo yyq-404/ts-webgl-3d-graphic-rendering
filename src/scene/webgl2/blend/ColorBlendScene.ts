@@ -38,7 +38,7 @@ export class ColorBlendScene extends WebGL2Scene {
     /**
      * 构造
      */
-    constructor() {
+    public constructor() {
         super(true);
         this.attributeBits = GLAttributeHelper.POSITION.BIT | GLAttributeHelper.TEX_COORDINATE_0.BIT | GLAttributeHelper.NORMAL.BIT;
         this.gl.enable(this.gl.DEPTH_TEST);
