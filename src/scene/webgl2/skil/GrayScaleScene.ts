@@ -15,13 +15,15 @@ export class GrayScaleScene extends WebGL2Scene {
     /** 地形最高高度 */
     private readonly _landHighest: number = 20;
     /** 地形适配高度 */
-    private readonly _landHighAdjust: number = 2;
+    private readonly _landHighAdjust: number = -2;
     /** 行数 */
     private readonly _rowCount: number = 64;
     /** 列数 */
     private readonly _columnCount: number = 64;
     /** 草地纹理 */
     private _grassTexture: WebGLTexture;
+    /** 岩石纹理 */
+    private _rockTexture: WebGLTexture;
     /** 灰度数据 */
     private _grayScales: Array<Array<number>> = new Array<Array<number>>();
     /** 顶点数量 */
@@ -36,6 +38,7 @@ export class GrayScaleScene extends WebGL2Scene {
         super(true);
         this.create2dCanvas();
         this.camera.position = new Vector3([0.5, 11.5, 19]);
+        this.gl.enable(this.gl.DEPTH_TEST);
     }
     
     /**
@@ -44,14 +47,15 @@ export class GrayScaleScene extends WebGL2Scene {
      */
     public override get shaderUrls(): Map<string, string> {
         return new Map<string, string>([
-            ['bns.vert', `${SceneConstants.webgl2ShaderRoot}/texture/texture.vert`],
-            ['bns.frag', `${SceneConstants.webgl2ShaderRoot}/texture/texture.frag`]
+            ['bns.vert', `${SceneConstants.webgl2ShaderRoot}/texture/texture_gray.vert`],
+            ['bns.frag', `${SceneConstants.webgl2ShaderRoot}/texture/texture_gray.frag`]
         ]);
     }
     
     public override async runAsync(): Promise<void> {
         await this.initAsync();
-        this._grassTexture = await GLTextureHelper.loadNormalTextureAsync(this.gl, 'res/image/grass.png');
+        this._grassTexture = await GLTextureHelper.loadNormalTextureAsync(this.gl, 'res/image/grass.png', true);
+        this._rockTexture = await GLTextureHelper.loadNormalTextureAsync(this.gl, 'res/image/rock.png', true);
         const image = await HttpHelper.loadImageAsync('res/image/land.png');
         this._grayScales = await this.computeLandGrayScalesAsync(image);
         const vertexData = new Array<number>();
@@ -80,7 +84,12 @@ export class GrayScaleScene extends WebGL2Scene {
         });
         this.gl.activeTexture(this.gl.TEXTURE0);
         this.gl.bindTexture(this.gl.TEXTURE_2D, this._grassTexture);
-        this.program.setInt('sTexture', 0);
+        this.gl.activeTexture(this.gl.TEXTURE1);
+        this.gl.bindTexture(this.gl.TEXTURE_2D, this._rockTexture);
+        this.program.setFloat('landStartY', 0);
+        this.program.setFloat('landYSpan', 20);
+        this.program.setInt('sTextureGrass', 0);
+        this.program.setInt('sTextureRock', 1);
         this.gl.drawArrays(this.gl.TRIANGLES, 0, this._vertexCount);
         this.matrixStack.popMatrix();
         this.program.unbind();
