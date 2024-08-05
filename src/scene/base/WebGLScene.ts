@@ -19,10 +19,6 @@ export class WebGLScene extends BaseScene {
     protected worldMatrixStack: GLMatrixStack;
     /** 模拟OpenGL1.1中的立即绘制模式, 封装在GLMeshBuilder类中 */
     protected meshBuilder: GLMeshBuilder;
-    /** 为了在3D环境中同时支持Canvas2D绘制，特别是为了实现文字绘制 */
-    protected canvas2d: HTMLCanvasElement;
-    /** 2D渲染环境 */
-    protected context2d: CanvasRenderingContext2D;
     
     /**
      * 构造
@@ -122,23 +118,5 @@ export class WebGLScene extends BaseScene {
         this.meshBuilder.program = defaultColorProgram;
     }
     
-    /**
-     * 创建2D画布。
-     * @private
-     */
-    protected create2dCanvas(): void {
-        const canvas2d: HTMLCanvasElement = document.createElement('canvas') as HTMLCanvasElement;
-        canvas2d.width = this.canvas.width;
-        canvas2d.height = this.canvas.height;
-        canvas2d.style.backgroundColor = 'transparent';
-        canvas2d.style.position = 'absolute';
-        canvas2d.style.left = '0px';
-        canvas2d.style.top = '0px';
-        canvas2d.style.pointerEvents = 'none';
-        const parent: HTMLElement = this.canvas.parentElement;
-        if (!parent) throw new Error('canvas元素必须要有父亲!!');
-        this.context2d = canvas2d.getContext('2d');
-        parent.appendChild(canvas2d);
-        this.canvas2d = canvas2d;
-    }
+   
 }

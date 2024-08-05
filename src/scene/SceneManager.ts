@@ -22,6 +22,7 @@ import {TextureMultiScene} from './webgl2/texture/TextureMultiScene';
 import {ModelOBJScene} from './webgl2/model/ModelOBJScene';
 import {ColorBlendScene} from './webgl2/blend/ColorBlendScene';
 import {BillboardScene} from './webgl2/skil/BillboardScene';
+import {GrayScaleScene} from './webgl2/skil/GrayScaleScene';
 
 /**
  * 场景管理器。
@@ -62,7 +63,8 @@ export class SceneManager {
             ['TextureMulti', TextureMultiScene],
             ['ModelOBJ', ModelOBJScene],
             ['ColorBlend', ColorBlendScene],
-            ['Billboard', BillboardScene]
+            ['Billboard', BillboardScene],
+            ['GrayScale', GrayScaleScene]
         ]);
         this.changeScene('RotatingCube');
     }

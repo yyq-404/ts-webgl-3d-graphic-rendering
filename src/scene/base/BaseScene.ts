@@ -13,6 +13,10 @@ export class BaseScene implements EventListenerObject {
     protected camera: CameraComponent;
     /** 我们的Application主要是canvas2D和webGL应用， 而canvas2D和webGL context都是从HTMLCanvasElement元素获取的 */
     protected canvas: HTMLCanvasElement;
+    /** 为了在3D环境中同时支持Canvas2D绘制，特别是为了实现文字绘制 */
+    protected canvas2d: HTMLCanvasElement;
+    /** 2D渲染环境 */
+    protected context2d: CanvasRenderingContext2D;
     
     /**
      * 构造
@@ -132,6 +136,26 @@ export class BaseScene implements EventListenerObject {
             // 帧缓冲区抗锯齿及是否保留上一帧的内容，default为true
             preserveDrawingBuffer: false
         } as WebGLContextAttributes;
+    }
+    
+    /**
+     * 创建2D画布。
+     * @private
+     */
+    protected create2dCanvas(): void {
+        const canvas2d: HTMLCanvasElement = document.createElement('canvas') as HTMLCanvasElement;
+        canvas2d.width = this.canvas.width;
+        canvas2d.height = this.canvas.height;
+        canvas2d.style.backgroundColor = 'transparent';
+        canvas2d.style.position = 'absolute';
+        canvas2d.style.left = '0px';
+        canvas2d.style.top = '0px';
+        canvas2d.style.pointerEvents = 'none';
+        const parent: HTMLElement = this.canvas.parentElement;
+        if (!parent) throw new Error('canvas元素必须要有父亲!!');
+        this.context2d = canvas2d.getContext('2d');
+        parent.appendChild(canvas2d);
+        this.canvas2d = canvas2d;
     }
     
     /**
